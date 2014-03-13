@@ -21,11 +21,11 @@ This is an unmanaged extension.
 
 6. The real service for write RDF (serialised as Turtle or N3) into the database is located at
 
-	http://localhost:7474/dmp/rdf
+        http://localhost:7474/dmp/rdf
 
    You can POST to this service a multipart/mixed object with the bytes of the RDF (Turtle or N3) and the second part should be a resource graph URI (as string)
 
 7. You can check this resource via
 
-	http://localhost:7474/dmp/rdf/ping 
+        http://localhost:7474/dmp/rdf/ping 
 

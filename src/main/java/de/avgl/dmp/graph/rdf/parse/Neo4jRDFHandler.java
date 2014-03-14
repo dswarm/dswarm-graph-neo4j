@@ -40,8 +40,9 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
-	private final Index<Node>			nodeIndex;
-	private final Index<Relationship> relationshipIndex;
+	private final Index<Node>			resources;
+	private final Index<Node>			bnodes;
+	private final Index<Relationship> statements;
 
 	private Transaction					tx;
 
@@ -51,8 +52,9 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		this.database = database;
 		tx = database.beginTx();
-		nodeIndex = database.index().forNodes("nodeIndex");
-		relationshipIndex = database.index().forRelationships("relationshipIndex");
+		resources = database.index().forNodes("resources");
+		bnodes = database.index().forNodes("bnodes");
+		statements = database.index().forRelationships("statements");
 
 		resourceGraphURI = resourceGraphURIArg;
 	}
@@ -79,10 +81,10 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 			if (subject.isAnon()) {
 
-				hits = nodeIndex.get(GraphStatics.BNODE, subject.toString());
+				hits = bnodes.get(GraphStatics.BNODE, subject.toString());
 			} else {
 
-				hits = nodeIndex.get(GraphStatics.URI, subject.toString());
+				hits = resources.get(GraphStatics.URI, subject.toString());
 			}
 
 			if (hits != null && hits.hasNext()) { // node exists
@@ -96,12 +98,12 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 					// TODO: how unique is a generated bnode as identifier
 					subjectNode.setProperty(GraphStatics.BNODE_PROPERTY, subject.toString());
-					nodeIndex.add(subjectNode, GraphStatics.BNODE, subject.toString());
+					bnodes.add(subjectNode, GraphStatics.BNODE, subject.toString());
 				} else {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
 					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-					nodeIndex.add(subjectNode, GraphStatics.URI, subject.toString());
+					resources.add(subjectNode, GraphStatics.URI, subject.toString());
 				}
 
 				addedNodes++;
@@ -129,7 +131,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 				rel.setProperty(GraphStatics.URI_PROPERTY, predicate.toString());
 				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-				relationshipIndex.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+				statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
 
 				addedRelationships++;
 
@@ -163,10 +165,10 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 				if (object.isAnon()) {
 
-					objectHits = nodeIndex.get(GraphStatics.BNODE, object.toString());
+					objectHits = bnodes.get(GraphStatics.BNODE, object.toString());
 				} else {
 
-					objectHits = nodeIndex.get(GraphStatics.URI, object.toString());
+					objectHits = resources.get(GraphStatics.URI, object.toString());
 				}
 
 				if (objectHits != null && objectHits.hasNext()) { // node exists
@@ -180,11 +182,11 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 						// TODO: how unique is a generated bnode as identifier
 						objectNode.setProperty(GraphStatics.BNODE_PROPERTY, object.toString());
-						nodeIndex.add(objectNode, GraphStatics.BNODE, object.toString());
+						bnodes.add(objectNode, GraphStatics.BNODE, object.toString());
 					} else {
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, object.toString());
-						nodeIndex.add(objectNode, GraphStatics.URI, object.toString());
+						resources.add(objectNode, GraphStatics.URI, object.toString());
 					}
 
 					addedNodes++;
@@ -194,7 +196,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 				rel.setProperty(GraphStatics.URI_PROPERTY, predicate.toString());
 				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-				relationshipIndex.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+				statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
 
 				addedRelationships++;
 				// }

@@ -8,7 +8,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
-import de.avgl.dmp.graph.MyService;
+import de.avgl.dmp.graph.resources.MyService;
 
 import javax.ws.rs.core.Response;
 

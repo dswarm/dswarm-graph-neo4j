@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph;
+package de.avgl.dmp.graph.resources;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.cypher.javacompat.ExecutionEngine;

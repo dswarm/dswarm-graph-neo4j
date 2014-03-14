@@ -1,4 +1,4 @@
-package org.neo4j.example.unmanagedextension;
+package de.avgl.dmp.graph.test;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;

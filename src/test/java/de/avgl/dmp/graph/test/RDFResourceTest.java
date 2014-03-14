@@ -1,9 +1,11 @@
-package org.neo4j.example.unmanagedextension;
+package de.avgl.dmp.graph.test;
 
 import java.io.IOException;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.neo4j.server.NeoServer;
@@ -19,6 +21,30 @@ import com.sun.jersey.multipart.MultiPart;
 public class RDFResourceTest {
 
 	public static final String	MOUNT_POINT	= "/ext";
+	
+	@Test
+	public void testPingToTestDB() throws IOException {
+
+		final NeoServer server = CommunityServerBuilder.server().onPort(7499)
+				.withThirdPartyJaxRsPackage("de.avgl.dmp.graph", RDFResourceTest.MOUNT_POINT).build();
+		server.start();
+
+		final Client c = Client.create();
+		final WebResource service = c.resource(server.baseUri().resolve(RDFResourceTest.MOUNT_POINT));
+
+		// POST the request
+		final ClientResponse response = service.path("/rdf/ping").get(ClientResponse.class);
+		System.out.println("Response Status : " + response.getStatus());
+		
+		String body = response.getEntity(String.class);
+		
+		System.out.println("Response Status : " + body);
+		
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+		Assert.assertEquals("expected pong", "pong", body);
+		
+		server.stop();
+	}
 
 	@Test
 	public void writeRDFToTestDB() throws IOException {

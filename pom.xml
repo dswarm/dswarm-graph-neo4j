@@ -31,6 +31,12 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -100,6 +106,16 @@
 			<artifactId>apache-jena-libs</artifactId>
 			<type>pom</type>
 			<version>2.11.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

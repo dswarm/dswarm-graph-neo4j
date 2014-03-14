@@ -1,4 +1,4 @@
-package org.neo4j.example.unmanagedextension;
+package de.avgl.dmp.graph.test;
 
 import static org.junit.Assert.assertEquals;
 

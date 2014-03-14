@@ -87,8 +87,7 @@
 		<appender-ref ref="FAF" />
 	</logger>
 
-	<root>
-		<priority value="DEBUG" />
+	<root level="DEBUG" >
 		<appender-ref ref="DEFAULT" />
 	</root>
 </configuration>

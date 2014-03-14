@@ -92,6 +92,8 @@ public class RDFResourceTest {
 		System.out.println("Response Status : " + response.getStatus());
 
 		multiPart.close();
+		
+		// TODO: do clean-up in DB
 	}
 	
 	@Test

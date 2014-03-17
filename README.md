@@ -47,5 +47,9 @@ You can check your deployed unmanaged extension via the following unit tests:
  - RDFResourceTest#writeRDFToRunningDB()
  - RDFResourceTest#readRDFFromRunningDB()
 
-Note: the database wouldn't get cleaned after the unit tests were executed, so you need to take care of cleaning up the database to ensure test correctness. 
+Note: the database wouldn't get cleaned after the unit tests were executed, so you need to take care of cleaning up the database to ensure test correctness.
+
+To enable logging, you need to copy the logback config from src/main/resources/dmp-graph-logback.xml to $NEO4J_HOME/conf/logback.xml. Furthermore, you need to remove the logback.xml from the related neo4j-server package (to avoid duplicated logback configs in the classpath), see http://stackoverflow.com/a/22452107/1022591 for further instructions on this issue. You can review these log files at $NEO4J_HOME/logs.
+
+Note: the port of your neo4j stand-alone installation may vary from the standard port 7474. If you run your neo4j stand-alone installation on another port, you need to modify the unit tests re. this configuration.
 

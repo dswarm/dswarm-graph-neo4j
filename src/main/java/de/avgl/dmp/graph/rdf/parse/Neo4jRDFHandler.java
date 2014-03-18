@@ -78,20 +78,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final RDFNode object = st.getObject();
 
 			// Check index for subject
-			Node subjectNode = null;
-
-			if (subject.isAnon()) {
-
-				subjectNode = bnodes.get(subject.toString());
-			} else {
-
-				IndexHits<Node> hits = resources.get(GraphStatics.URI, subject.toString());
-
-				if (hits != null && hits.hasNext()) { // node exists
-
-					subjectNode = hits.next();
-				}
-			}
+			Node subjectNode = determineNode(subject);
 
 			if (subjectNode == null) {
 
@@ -130,15 +117,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 				addedNodes++;
 
-				final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
-
-				final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-				rel.setProperty(GraphStatics.URI_PROPERTY, predicate.toString());
-				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-				statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
-
-				addedRelationships++;
-
+				addReleationship(subjectNode, predicateName, objectNode);
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -147,46 +126,13 @@ public class Neo4jRDFHandler implements RDFHandler {
 				// add Label if this is a type entry
 				if (predicate.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
 
-					final Label label = DynamicLabel.label(object.asResource().toString());
-					boolean hit = false;
-					final Iterable<Label> labels = subjectNode.getLabels();
-					final List<Label> labelList = new LinkedList<Label>();
-
-					for (final Label lbl : labels) {
-						if (label.equals(lbl)) {
-
-							hit = true;
-							break;
-						}
-
-						labelList.add(lbl);
-					}
-
-					if (!hit) {
-
-						labelList.add(label);
-						subjectNode.addLabel(label);
-						addedLabels++;
-					}
+					addLabel(subjectNode, object.asResource().toString());
 
 					isType = true;
 				}
 
 				// Check index for object
-				Node objectNode = null;
-
-				if (object.isAnon()) {
-
-					objectNode = bnodes.get(object.toString());
-				} else {
-
-					IndexHits<Node> hits = resources.get(GraphStatics.URI, object.toString());
-
-					if (hits != null && hits.hasNext()) { // node exists
-
-						objectNode = hits.next();
-					}
-				}
+				Node objectNode = determineNode(object);
 
 				if (objectNode == null) {
 
@@ -202,6 +148,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.TYPE_BNODE);
+							addLabel(objectNode, "http://www.w3.org/2000/01/rdf-schema#Class");
 						}
 					} else {
 
@@ -213,6 +160,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.TYPE_RESOURCE);
+							addLabel(objectNode, "http://www.w3.org/2000/01/rdf-schema#Class");
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
@@ -221,13 +169,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 					addedNodes++;
 				}
 
-				final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
-				final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-				rel.setProperty(GraphStatics.URI_PROPERTY, predicate.toString());
-				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-				statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
-
-				addedRelationships++;
+				addReleationship(subjectNode, predicateName, objectNode);
 			}
 
 			totalTriples++;
@@ -278,5 +220,67 @@ public class Neo4jRDFHandler implements RDFHandler {
 	public int getCountedLiterals() {
 
 		return literals;
+	}
+
+	private void addLabel(final Node node, final String labelString) {
+
+		final Label label = DynamicLabel.label(labelString);
+		boolean hit = false;
+		final Iterable<Label> labels = node.getLabels();
+		final List<Label> labelList = new LinkedList<Label>();
+
+		for (final Label lbl : labels) {
+			
+			if (label.equals(lbl)) {
+
+				hit = true;
+				break;
+			}
+
+			labelList.add(lbl);
+		}
+
+		if (!hit) {
+
+			labelList.add(label);
+			node.addLabel(label);
+			addedLabels++;
+		}
+	}
+
+	private void addReleationship(final Node subjectNode, final String predicateName, final Node objectNode) {
+
+		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
+		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
+		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
+		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+		statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+
+		addedRelationships++;
+	}
+
+	private Node determineNode(final RDFNode resource) {
+
+		final Node node;
+
+		if (resource.isAnon()) {
+
+			node = bnodes.get(resource.toString());
+
+			return node;
+		}
+
+		IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
+
+		if (hits != null && hits.hasNext()) {
+
+			// node exists
+
+			node = hits.next();
+
+			return node;
+		}
+
+		return null;
 	}
 }

@@ -154,6 +154,8 @@ public class PropertyGraphReader implements RDFReader {
 		public void handleRelationship(final Relationship rel) {
 
 			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+				
+				// TODO: utilise __NODETYPE__ property for switch
 
 				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
@@ -178,6 +180,8 @@ public class PropertyGraphReader implements RDFReader {
 				final String objectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
 				final Resource objectResource;
+				
+				// TODO: utilise __NODETYPE__ property for switch
 
 				if (objectURI != null) {
 

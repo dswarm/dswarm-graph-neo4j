@@ -142,6 +142,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 			} else { // must be Resource
 						// Make sure object exists
 
+				boolean isType = false;
+
 				// add Label if this is a type entry
 				if (predicate.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
 
@@ -166,6 +168,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 						subjectNode.addLabel(label);
 						addedLabels++;
 					}
+
+					isType = true;
 				}
 
 				// Check index for object
@@ -191,11 +195,26 @@ public class Neo4jRDFHandler implements RDFHandler {
 					if (object.isAnon()) {
 
 						bnodes.put(object.toString(), objectNode);
-						objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.BNODE);
+
+						if (!isType) {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.BNODE);
+						} else {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.TYPE_BNODE);
+						}
 					} else {
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, object.toString());
-						objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.RESOURCE);
+
+						if (!isType) {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.RESOURCE);
+						} else {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.TYPE_RESOURCE);
+						}
+
 						resources.add(objectNode, GraphStatics.URI, object.toString());
 					}
 

@@ -1,7 +1,9 @@
 package de.avgl.dmp.graph.rdf.parse;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -41,8 +43,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
 	private final Index<Node>			resources;
-	private final Index<Node>			bnodes;
-	private final Index<Relationship> statements;
+	private final Map<String, Node>		bnodes;
+	private final Index<Relationship>	statements;
 
 	private Transaction					tx;
 
@@ -53,7 +55,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		this.database = database;
 		tx = database.beginTx();
 		resources = database.index().forNodes("resources");
-		bnodes = database.index().forNodes("bnodes");
+		bnodes = new HashMap<String, Node>();
 		statements = database.index().forRelationships("statements");
 
 		resourceGraphURI = resourceGraphURIArg;
@@ -67,7 +69,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		System.out.println("handle statement " + i + ": " + st.toString());
 
 		try {
-			
+
 			final Resource subject = st.getSubject();
 
 			final Property predicate = st.getPredicate();
@@ -76,33 +78,34 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final RDFNode object = st.getObject();
 
 			// Check index for subject
-			Node subjectNode;
-			IndexHits<Node> hits = null;
+			Node subjectNode = null;
 
 			if (subject.isAnon()) {
 
-				hits = bnodes.get(GraphStatics.BNODE, subject.toString());
+				subjectNode = bnodes.get(subject.toString());
 			} else {
 
-				hits = resources.get(GraphStatics.URI, subject.toString());
+				IndexHits<Node> hits = resources.get(GraphStatics.URI, subject.toString());
+
+				if (hits != null && hits.hasNext()) { // node exists
+
+					subjectNode = hits.next();
+				}
 			}
 
-			if (hits != null && hits.hasNext()) { // node exists
-				
-				subjectNode = hits.next();
-			} else {
+			if (subjectNode == null) {
 
 				subjectNode = database.createNode();
 
 				if (subject.isAnon()) {
 
-					// TODO: how unique is a generated bnode as identifier
-					subjectNode.setProperty(GraphStatics.BNODE_PROPERTY, subject.toString());
-					bnodes.add(subjectNode, GraphStatics.BNODE, subject.toString());
+					bnodes.put(subject.toString(), subjectNode);
+					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.BNODE);
 				} else {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
 					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.RESOURCE);
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
 				}
 
@@ -118,6 +121,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				Object value = literal.getValue();
 				final Node objectNode = database.createNode();
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
+				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.LITERAL);
 
 				if (type != null) {
 
@@ -140,52 +144,58 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 				// add Label if this is a type entry
 				if (predicate.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-					
+
 					final Label label = DynamicLabel.label(object.asResource().toString());
 					boolean hit = false;
 					final Iterable<Label> labels = subjectNode.getLabels();
 					final List<Label> labelList = new LinkedList<Label>();
+
 					for (final Label lbl : labels) {
 						if (label.equals(lbl)) {
+
 							hit = true;
 							break;
 						}
+
 						labelList.add(lbl);
 					}
+
 					if (!hit) {
+
 						labelList.add(label);
 						subjectNode.addLabel(label);
 						addedLabels++;
 					}
 				}
 
-				Node objectNode;
-
-				IndexHits<Node> objectHits = null;
+				// Check index for object
+				Node objectNode = null;
 
 				if (object.isAnon()) {
 
-					objectHits = bnodes.get(GraphStatics.BNODE, object.toString());
+					objectNode = bnodes.get(object.toString());
 				} else {
 
-					objectHits = resources.get(GraphStatics.URI, object.toString());
+					IndexHits<Node> hits = resources.get(GraphStatics.URI, object.toString());
+
+					if (hits != null && hits.hasNext()) { // node exists
+
+						objectNode = hits.next();
+					}
 				}
 
-				if (objectHits != null && objectHits.hasNext()) { // node exists
-					
-					objectNode = objectHits.next();
-				} else {
+				if (objectNode == null) {
 
 					objectNode = database.createNode();
 
 					if (object.isAnon()) {
 
-						// TODO: how unique is a generated bnode as identifier
-						objectNode.setProperty(GraphStatics.BNODE_PROPERTY, object.toString());
-						bnodes.add(objectNode, GraphStatics.BNODE, object.toString());
+						bnodes.put(object.toString(), objectNode);
+						objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.BNODE);
 					} else {
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, object.toString());
+						objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, GraphStatics.RESOURCE);
 						resources.add(objectNode, GraphStatics.URI, object.toString());
 					}
 
@@ -199,7 +209,6 @@ public class Neo4jRDFHandler implements RDFHandler {
 				statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
 
 				addedRelationships++;
-				// }
 			}
 
 			totalTriples++;
@@ -208,7 +217,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
 			if (nodeDelta >= 150000 || timeDelta >= 30) { // Commit every 150k operations or every 30 seconds
-				
+
 				tx.success();
 				tx.close();
 				tx = database.beginTx();
@@ -218,16 +227,16 @@ public class Neo4jRDFHandler implements RDFHandler {
 				tick = System.currentTimeMillis();
 			}
 		} catch (final Exception e) {
-			
+
 			e.printStackTrace();
 			tx.close();
 			tx = database.beginTx();
 		}
 	}
-	
+
 	@Override
 	public void closeTransaction() {
-		
+
 		tx.success();
 		tx.close();
 	}

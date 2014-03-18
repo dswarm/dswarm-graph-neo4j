@@ -147,7 +147,7 @@ public class PropertyGraphReader implements RDFReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<String, Resource>	bnodes		= new HashMap<String, Resource>();
+		final Map<Long, Resource>	bnodes		= new HashMap<Long, Resource>();
 		final Map<String, Resource>	resources	= new HashMap<String, Resource>();
 
 		@Override
@@ -163,8 +163,8 @@ public class PropertyGraphReader implements RDFReader {
 
 					// subject is a bnode
 
-					final String subjectBNode = (String) rel.getStartNode().getProperty(GraphStatics.BNODE_PROPERTY, null);
-					subjectResource = createResourceFromBNode(subjectBNode);
+					final long subjectId = rel.getStartNode().getId();
+					subjectResource = createResourceFromBNode(subjectId);
 				} else {
 
 					subjectResource = createResourceFromURI(subject);
@@ -189,13 +189,13 @@ public class PropertyGraphReader implements RDFReader {
 
 					// check, whether object is a bnode
 
-					final String objectBNode = (String) rel.getEndNode().getProperty(GraphStatics.BNODE_PROPERTY, null);
-
-					if (objectBNode != null) {
+					if (!rel.getEndNode().hasProperty(GraphStatics.VALUE_PROPERTY)) {
 
 						// object is a bnode
 
-						objectResource = createResourceFromBNode(objectBNode);
+						final long objectId = rel.getEndNode().getId();
+
+						objectResource = createResourceFromBNode(objectId);
 
 					} else {
 
@@ -216,14 +216,14 @@ public class PropertyGraphReader implements RDFReader {
 			}
 		}
 
-		private Resource createResourceFromBNode(final String bnodeId) {
+		private Resource createResourceFromBNode(final long bnodeId) {
 
-			if (!bnodes.containsKey(bnodeId)) {
+			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
 
-				bnodes.put(bnodeId, model.createResource());
+				bnodes.put(Long.valueOf(bnodeId), model.createResource());
 			}
 
-			return bnodes.get(bnodeId);
+			return bnodes.get(Long.valueOf(bnodeId));
 		}
 
 		private Resource createResourceFromURI(final String uri) {

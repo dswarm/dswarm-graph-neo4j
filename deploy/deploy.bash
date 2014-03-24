@@ -6,7 +6,7 @@ SHOULD_RESTART=$1
 
 
 function ensureRoot {
-  if [[ $EUID -ne 0 ]]; then
+  if [[ "x${BUILD_NUMBER}" == "x" && $EUID -ne 0 ]]; then
      echo "This script must be run as root" 1>&2
      exit 1
   fi

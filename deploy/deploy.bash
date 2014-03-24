@@ -14,7 +14,7 @@ function ensureRoot {
 
 
 function cdProjectRoot {
-  pushd ${PROJECT_ROOT}
+  pushd "${PROJECT_ROOT}"
 }
 
 function shutdownNeo4j {
@@ -29,7 +29,7 @@ function makeProject {
 
 function copyProject {
   cdProjectRoot
-  cp target/graph-1.0-jar.with-dependencies.jar ${NEO_HOME}/plugins/
+  cp "target/graph-1.0-jar-with-dependencies.jar" "${NEO_HOME}/plugins/"
 }
 
 function startupNeo4j {

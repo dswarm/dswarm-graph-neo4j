@@ -95,6 +95,8 @@ public class RDFResource {
 	@Produces("application/n-triples")
 	public Response readRDF(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
 
+		LOG.debug("try to read RDF statements from graph db");
+
 		final ObjectNode json;
 
 		try {
@@ -112,14 +114,20 @@ public class RDFResource {
 		final String recordClassUri = json.get("record_class_uri").asText();
 		final String resourceGraphUri = json.get("resource_graph_uri").asText();
 
+		LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' from graph db");
+
 		final RDFReader rdfReader = new PropertyGraphReader(recordClassUri, resourceGraphUri, database);
 		final Model model = rdfReader.read();
-		
+
 		model.write(System.out, "N-TRIPLE");
 
 		final StringWriter writer = new StringWriter();
 		model.write(writer, "N-TRIPLE");
 		final String result = writer.toString();
+
+		LOG.debug("finished reading " + model.size() + " RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
+				+ recordClassUri + "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

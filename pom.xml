@@ -9,7 +9,6 @@
 
 	<properties>
 		<neo4j.version>2.0.1</neo4j.version>
-		<jackson.version>2.3.1</jackson.version>
 		<google.guava.version>14.0.1</google.guava.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.7</java.source.version>
@@ -22,6 +21,9 @@
 		<maven-clean-plugin.version>2.5</maven-clean-plugin.version>
 		<maven-release-plugin.version>2.4.2</maven-release-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
+		<jena.version>2.11.0</jena.version>
+		<jersey.version>1.9</jersey.version>
+		<junit.version>4.9</junit.version>
 	</properties>
 
 	<build>
@@ -139,19 +141,32 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<repository>
+			<id>deployment</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.slub-dresden.de:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>deployment</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.slub-dresden.de:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
 		<!-- <dependency> <groupId>javax.ws.rs</groupId> <artifactId>javax.ws.rs-api</artifactId> 
 			<version>2.0</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-multipart</artifactId>
-			<version>1.9</version>
+			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
 			<artifactId>apache-jena-libs</artifactId>
 			<type>pom</type>
-			<version>2.11.0</version>
+			<version>${jena.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
@@ -204,13 +219,13 @@
 				<dependency>
 					<groupId>com.sun.jersey</groupId>
 					<artifactId>jersey-client</artifactId>
-					<version>1.9</version>
+					<version>${jersey.version}</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
-					<version>4.9</version>
+					<version>${junit.version}</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
@@ -267,13 +282,13 @@
 				<dependency>
 					<groupId>com.sun.jersey</groupId>
 					<artifactId>jersey-client</artifactId>
-					<version>1.9</version>
+					<version>${jersey.version}</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
-					<version>4.9</version>
+					<version>${junit.version}</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>

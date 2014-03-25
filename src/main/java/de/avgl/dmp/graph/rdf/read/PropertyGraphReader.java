@@ -12,6 +12,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -31,6 +32,8 @@ public class PropertyGraphReader implements RDFReader {
 
 	private final String				recordClassUri;
 	private final String				resourceGraphUri;
+	
+	private boolean 					ignoreProvenance = false;
 
 	private final GraphDatabaseService	database;
 
@@ -46,17 +49,64 @@ public class PropertyGraphReader implements RDFReader {
 		relationshipHandler = new CBDRelationshipHandler();
 	}
 
+	public PropertyGraphReader(final GraphDatabaseService databaseArg) {
+
+		recordClassUri = null;
+		resourceGraphUri = null;
+		ignoreProvenance = true;
+		database = databaseArg;
+		nodeHandler = new CBDNodeHandler();
+		startNodeHandler = new CBDStartNodeHandler();
+		relationshipHandler = new CBDRelationshipHandler();
+	}
+
 	@Override
 	public Model read() {
 
 		final Transaction tx = database.beginTx();
 
 		try {
-
+			
+			final ResourceIterable<Node> recordNodes;
+	
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
+			recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
 					resourceGraphUri);
+			
+			if (recordNodes == null) {
+
+				return null;
+			}
+
+			model = ModelFactory.createDefaultModel();
+
+			for (final Node recordNode : recordNodes) {
+
+				startNodeHandler.handleNode(recordNode);
+			}
+		} catch (final Exception e) {
+
+			// TODO:
+		} finally {
+
+			tx.success();
+			tx.close();
+		}
+
+		return model;
+	}
+	
+	public Model readAll() {
+
+		final Transaction tx = database.beginTx();
+
+		try {
+			
+			final Iterable<Node> recordNodes;
+
+				GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database);
+				recordNodes = globalGraphOperations.getAllNodes();
 
 			if (recordNodes == null) {
 
@@ -153,7 +203,7 @@ public class PropertyGraphReader implements RDFReader {
 		@Override
 		public void handleRelationship(final Relationship rel) {
 
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (ignoreProvenance || rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
 				
 				// TODO: utilise __NODETYPE__ property for switch
 

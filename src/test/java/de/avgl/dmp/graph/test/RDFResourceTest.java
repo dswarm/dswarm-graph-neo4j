@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
@@ -111,7 +112,8 @@ public class RDFResourceTest {
 		final Client c = Client.create();
 		final WebResource service = c.resource("http://localhost:7474/graph");
 
-		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		//final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		final URL fileURL = Resources.getResource("turtle_untyped.ttl");
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts
@@ -131,7 +133,7 @@ public class RDFResourceTest {
 	@Test
 	public void readRDFFromRunningDB() throws IOException {
 
-		writeRDFToRunningDB();
+		//writeRDFToRunningDB();
 
 		final Client c = Client.create();
 		final WebResource service = c.resource("http://localhost:7474/graph");

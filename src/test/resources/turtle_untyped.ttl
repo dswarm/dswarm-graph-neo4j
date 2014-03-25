@@ -1,0 +1,19 @@
+<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/ontology/publicationDate>	"1971-03-06" .
+<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Don_Houghton> .
+<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Dave_Martin_(screenwriter)> .
+<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/ontology/publicationDate>	"1971-01-23" .
+<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/property/serialName>	"The D\u00E6mons" .
+<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/serialName>	"Terror of the Autons" .
+<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/ontology/publicationDate>	"1971-04-03" .
+<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/serialName>	"The Claws of Axos" .
+<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/ontology/publicationDate>	"1971-05-15" .
+<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
+<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/property/serialName>	"Colony in Space" .
+<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/serialName>	"The Mind of Evil" .
+<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/ontology/publicationDate>	"1971-06-19" .
+<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Bob_Baker_(scriptwriter)> .
+<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Barry_Letts> .
+<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
+<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Malcolm_Hulke> .
+<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
+<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Robert_Holmes_(scriptwriter)> .

@@ -58,6 +58,7 @@ public class RDFResource {
 
 		return "pong";
 	}
+	
 
 	@POST
 	@Path("/put")
@@ -128,6 +129,52 @@ public class RDFResource {
 
 		LOG.debug("finished reading " + model.size() + " RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
 				+ recordClassUri + "' from graph db");
+
+		return Response.ok().entity(result).build();
+	}
+	
+	@POST
+	@Path("/getall")
+	//@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/n-triples")
+	public Response readAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		LOG.debug("try to read RDF statements from graph db");
+
+		final ObjectNode json;
+
+		/*
+		try {
+
+			json = objectMapper.readValue(jsonObjectString, ObjectNode.class);
+		} catch (IOException e) {
+
+			final String message = "could not deserialise request JSON for read from graph DB request";
+
+			LOG.debug(message);
+
+			throw new DMPGraphException(message, e);
+		}
+		
+		
+
+		final String recordClassUri = json.get("record_class_uri").asText();
+		final String resourceGraphUri = json.get("resource_graph_uri").asText();
+		
+		*/
+
+		LOG.debug("try to read all RDF statements (for all resource graphs and all record class uris) from graph db");
+
+		final RDFReader rdfReader = new PropertyGraphReader(database);
+		final Model model = rdfReader.readAll();
+
+		model.write(System.out, "N-TRIPLE");
+
+		final StringWriter writer = new StringWriter();
+		model.write(writer, "N-TRIPLE");
+		final String result = writer.toString();
+
+		LOG.debug("finished reading " + model.size() + " RDF statements from graph db");
 
 		return Response.ok().entity(result).build();
 	}

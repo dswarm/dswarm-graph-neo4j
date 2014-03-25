@@ -308,7 +308,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			return null;
 		}
 
-		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
+		// objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
 
 		return resourceUri;
 	}
@@ -325,7 +325,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			finalResourceUri = determineResourceUri(subjectNode, subject);
 		}
 
-		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+		// rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
 
 		return finalResourceUri;
 	}

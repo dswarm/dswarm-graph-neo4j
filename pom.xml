@@ -139,6 +139,17 @@
 			<id>neo4jRepo</id>
 			<url>http://m2.neo4j.org</url>
 		</repository>
+		<repository>
+			<id>slubnexus</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.slub-dresden.de:8081/nexus/content/repositories/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
@@ -180,6 +191,11 @@
 		</dependency>
 		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId> 
 			<version>${jackson.version}</version> </dependency> -->
+		<dependency>
+			<groupId>de.avgl.dmp.graph</groupId>
+			<artifactId>json</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

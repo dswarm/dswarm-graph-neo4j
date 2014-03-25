@@ -25,8 +25,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import de.avgl.dmp.graph.rdf.GraphStatics;
-import de.avgl.dmp.graph.rdf.NodeType;
+import de.avgl.dmp.graph.GraphStatics;
+import de.avgl.dmp.graph.NodeType;
 
 /**
  * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)

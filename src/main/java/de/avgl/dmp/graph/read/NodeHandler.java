@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.rdf.read;
+package de.avgl.dmp.graph.read;
 
 import org.neo4j.graphdb.Node;
 

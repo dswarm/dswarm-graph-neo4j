@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.rdf;
+package de.avgl.dmp.graph;
 
 /**
  * The node type enum. A node type indicates the type of a node.<br>

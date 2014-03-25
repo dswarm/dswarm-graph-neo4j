@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.avgl.dmp.graph.rdf.GraphStatics;
@@ -132,7 +133,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				boolean isType = false;
 
 				// add Label if this is a type entry
-				if (predicate.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+				if (predicate.toString().equals(RDF.type.getURI())) {
 
 					addLabel(subjectNode, object.asResource().toString());
 
@@ -172,7 +173,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 							addLabel(objectNode, RDFS.Class.getURI());
 						}
-						
+
 						resources.add(objectNode, GraphStatics.URI, object.toString());
 					}
 

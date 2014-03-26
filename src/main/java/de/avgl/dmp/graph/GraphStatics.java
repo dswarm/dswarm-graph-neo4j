@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.rdf;
+package de.avgl.dmp.graph;
 
 /**
  * @author tgaengler

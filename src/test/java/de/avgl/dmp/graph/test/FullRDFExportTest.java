@@ -53,8 +53,8 @@ public class FullRDFExportTest {
 
 		System.out.println("number of statements = '" + model.size() + "'");
 
-		// Assert.assertEquals("the number of statements should be 2601", 2601,
-		// model.size());
+		Assert.assertEquals("the number of statements should be 2601", 2601,
+		model.size());
 	}
 
 	@Test

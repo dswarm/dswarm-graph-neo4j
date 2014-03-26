@@ -29,7 +29,7 @@ import de.avgl.dmp.graph.rdf.parse.JenaModelParser;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
-import de.avgl.dmp.graph.rdf.read.PropertyGraphReader;
+import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
 import de.avgl.dmp.graph.rdf.read.RDFReader;
 
 /**
@@ -118,7 +118,7 @@ public class RDFResource {
 		LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
-		final RDFReader rdfReader = new PropertyGraphReader(recordClassUri, resourceGraphUri, database);
+		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
 		final Model model = rdfReader.read();
 
 		model.write(System.out, "N-TRIPLE");
@@ -165,7 +165,7 @@ public class RDFResource {
 
 		LOG.debug("try to read all RDF statements (for all resource graphs and all record class uris) from graph db");
 
-		final RDFReader rdfReader = new PropertyGraphReader(database);
+		final RDFReader rdfReader = new PropertyGraphRDFReader(database);
 		final Model model = rdfReader.readAll();
 
 		model.write(System.out, "N-TRIPLE");

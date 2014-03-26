@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.rdf.read;
+package de.avgl.dmp.graph.gdm;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,19 +12,20 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-
-import de.avgl.dmp.graph.rdf.GraphStatics;
+import de.avgl.dmp.graph.GraphStatics;
+import de.avgl.dmp.graph.json.LiteralNode;
+import de.avgl.dmp.graph.json.Model;
+import de.avgl.dmp.graph.json.Predicate;
+import de.avgl.dmp.graph.json.Resource;
+import de.avgl.dmp.graph.json.ResourceNode;
+import de.avgl.dmp.graph.read.NodeHandler;
+import de.avgl.dmp.graph.read.RelationshipHandler;
 
 /**
  * @author tgaengler
  */
-public class PropertyGraphReader implements RDFReader {
+public class PropertyGraphGDMReader implements GDMReader {
 
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
@@ -32,28 +33,16 @@ public class PropertyGraphReader implements RDFReader {
 
 	private final String				recordClassUri;
 	private final String				resourceGraphUri;
-	
-	private boolean 					ignoreProvenance = false;
 
 	private final GraphDatabaseService	database;
 
 	private Model						model;
+	private Resource currentResource;
 
-	public PropertyGraphReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphGDMReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
 		resourceGraphUri = resourceGraphUriArg;
-		database = databaseArg;
-		nodeHandler = new CBDNodeHandler();
-		startNodeHandler = new CBDStartNodeHandler();
-		relationshipHandler = new CBDRelationshipHandler();
-	}
-
-	public PropertyGraphReader(final GraphDatabaseService databaseArg) {
-
-		recordClassUri = null;
-		resourceGraphUri = null;
-		ignoreProvenance = true;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -66,58 +55,33 @@ public class PropertyGraphReader implements RDFReader {
 		final Transaction tx = database.beginTx();
 
 		try {
-			
-			final ResourceIterable<Node> recordNodes;
-	
+
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
+			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
 					resourceGraphUri);
-			
-			if (recordNodes == null) {
-
-				return null;
-			}
-
-			model = ModelFactory.createDefaultModel();
-
-			for (final Node recordNode : recordNodes) {
-
-				startNodeHandler.handleNode(recordNode);
-			}
-		} catch (final Exception e) {
-
-			// TODO:
-		} finally {
-
-			tx.success();
-			tx.close();
-		}
-
-		return model;
-	}
-	
-	public Model readAll() {
-
-		final Transaction tx = database.beginTx();
-
-		try {
-			
-			final Iterable<Node> recordNodes;
-
-				GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database);
-				recordNodes = globalGraphOperations.getAllNodes();
 
 			if (recordNodes == null) {
 
 				return null;
 			}
 
-			model = ModelFactory.createDefaultModel();
+			model = new Model();
 
 			for (final Node recordNode : recordNodes) {
 
+				final String resourceUri = (String )recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+				
+				if(resourceUri == null) {
+					
+					// TODO: logging
+					
+					continue;
+				}
+				
+				currentResource = new Resource(resourceUri);
 				startNodeHandler.handleNode(recordNode);
+				model.addResource(currentResource);
 			}
 		} catch (final Exception e) {
 
@@ -197,48 +161,52 @@ public class PropertyGraphReader implements RDFReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, Resource>	bnodes		= new HashMap<Long, Resource>();
-		final Map<String, Resource>	resources	= new HashMap<String, Resource>();
+		final Map<Long, de.avgl.dmp.graph.json.Node>	bnodes		= new HashMap<Long, de.avgl.dmp.graph.json.Node>();
+		final Map<String, ResourceNode>	resourceNodes	= new HashMap<String, ResourceNode>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) {
 
-			if (ignoreProvenance || rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+				
+				final long statementId = rel.getId();
 				
 				// TODO: utilise __NODETYPE__ property for switch
 
 				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
-
-				final Resource subjectResource;
-
+				final long subjectId = rel.getStartNode().getId();
+				
+				final de.avgl.dmp.graph.json.Node subjectNode;
+				
 				if (subject == null) {
 
 					// subject is a bnode
 
-					final long subjectId = rel.getStartNode().getId();
-					subjectResource = createResourceFromBNode(subjectId);
+					subjectNode = createResourceFromBNode(subjectId);
 				} else {
 
-					subjectResource = createResourceFromURI(subject);
+					subjectNode = createResourceFromURI(subjectId, subject);
 				}
 
 				final String predicate = (String) rel.getProperty(GraphStatics.URI_PROPERTY, null);
-				final Property predicateProperty = model.createProperty(predicate);
+				final Predicate predicateProperty = new Predicate(predicate);
 
 				final String object;
 
 				final String objectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
-				final Resource objectResource;
+				final de.avgl.dmp.graph.json.Node objectNode;
 				
 				// TODO: utilise __NODETYPE__ property for switch
 
+				final long objectId = rel.getEndNode().getId();
+				
 				if (objectURI != null) {
 
 					// object is a resource
 
 					object = objectURI;
-					objectResource = createResourceFromURI(object);
+					objectNode = createResourceFromURI(objectId, object);
 				} else {
 
 					// check, whether object is a bnode
@@ -247,47 +215,47 @@ public class PropertyGraphReader implements RDFReader {
 
 						// object is a bnode
 
-						final long objectId = rel.getEndNode().getId();
-
-						objectResource = createResourceFromBNode(objectId);
+						objectNode = createResourceFromBNode(objectId);
 
 					} else {
 
 						// object is a literal node
 
 						object = (String) rel.getEndNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-						model.add(subjectResource, predicateProperty, object);
-
+						
+						objectNode = new LiteralNode(objectId, object);
+						
+						currentResource.addStatement(statementId, subjectNode, predicateProperty, objectNode);
+						
 						return;
 					}
 				}
 
-				model.add(subjectResource, predicateProperty, objectResource);
+				currentResource.addStatement(statementId, subjectNode, predicateProperty, objectNode);
 
 				// continue traversal with object node
 				nodeHandler.handleNode(rel.getEndNode());
 			}
 		}
 
-		private Resource createResourceFromBNode(final long bnodeId) {
+		private de.avgl.dmp.graph.json.Node createResourceFromBNode(final long bnodeId) {
 
 			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
 
-				bnodes.put(Long.valueOf(bnodeId), model.createResource());
+				bnodes.put(Long.valueOf(bnodeId), new de.avgl.dmp.graph.json.Node(bnodeId));
 			}
 
 			return bnodes.get(Long.valueOf(bnodeId));
 		}
 
-		private Resource createResourceFromURI(final String uri) {
+		private ResourceNode createResourceFromURI(final long id, final String uri) {
 
-			if (!resources.containsKey(uri)) {
+			if (!resourceNodes.containsKey(uri)) {
 
-				resources.put(uri, model.createResource(uri));
+				resourceNodes.put(uri, new ResourceNode(id, uri));
 			}
 
-			return resources.get(uri);
+			return resourceNodes.get(uri);
 		}
 	}
 }

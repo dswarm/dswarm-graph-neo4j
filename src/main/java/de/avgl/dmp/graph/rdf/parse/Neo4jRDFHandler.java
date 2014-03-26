@@ -22,6 +22,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.avgl.dmp.graph.rdf.GraphStatics;
 import de.avgl.dmp.graph.rdf.NodeType;
@@ -131,7 +133,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				boolean isType = false;
 
 				// add Label if this is a type entry
-				if (predicate.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+				if (predicate.toString().equals(RDF.type.getURI())) {
 
 					addLabel(subjectNode, object.asResource().toString());
 
@@ -157,7 +159,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
-							addLabel(objectNode, "http://www.w3.org/2000/01/rdf-schema#Class");
+							addLabel(objectNode, RDFS.Class.getURI());
 						}
 					} else {
 
@@ -169,9 +171,9 @@ public class Neo4jRDFHandler implements RDFHandler {
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-							addLabel(objectNode, "http://www.w3.org/2000/01/rdf-schema#Class");
+							addLabel(objectNode, RDFS.Class.getURI());
 						}
-						
+
 						resources.add(objectNode, GraphStatics.URI, object.toString());
 					}
 
@@ -307,7 +309,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			return null;
 		}
 
-		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
+		// objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
 
 		return resourceUri;
 	}
@@ -324,7 +326,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			finalResourceUri = determineResourceUri(subjectNode, subject);
 		}
 
-		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+		// rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
 
 		return finalResourceUri;
 	}

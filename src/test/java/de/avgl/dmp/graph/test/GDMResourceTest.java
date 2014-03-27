@@ -125,7 +125,8 @@ public class GDMResourceTest {
 		// TODO: do clean-up in DB
 	}
 
-	@Test
+	// enable as needed
+	//@Test
 	public void readGDMFromRunningDB() throws IOException {
 
 		writeRDFToRunningDB();
@@ -159,7 +160,8 @@ public class GDMResourceTest {
 		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
 	}
 
-	@Test
+	// enable as needed
+	//@Test
 	public void testPing() throws IOException {
 
 		final Client c = Client.create();

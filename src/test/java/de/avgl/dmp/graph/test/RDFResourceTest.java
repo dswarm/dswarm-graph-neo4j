@@ -105,7 +105,8 @@ public class RDFResourceTest {
 		server.stop();
 	}
 
-	@Test
+	// enable as needed
+	//@Test
 	public void writeRDFToRunningDB() throws IOException {
 
 		final Client c = Client.create();
@@ -128,7 +129,8 @@ public class RDFResourceTest {
 		// TODO: do clean-up in DB
 	}
 
-	@Test
+	// enable as needed
+	//@Test
 	public void readRDFFromRunningDB() throws IOException {
 
 		writeRDFToRunningDB();
@@ -163,7 +165,8 @@ public class RDFResourceTest {
 		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
 	}
 
-	@Test
+	// enable as needed
+	//@Test
 	public void testPing() throws IOException {
 
 		final Client c = Client.create();

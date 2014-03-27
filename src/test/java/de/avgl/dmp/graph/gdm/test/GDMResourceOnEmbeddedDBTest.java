@@ -80,27 +80,6 @@ public class GDMResourceOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
 	}
 
-	public void writeRDFToRunningDB() throws IOException {
-
-		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
-		final byte[] file = Resources.toByteArray(fileURL);
-
-		// Construct a MultiPart with two body parts
-		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/2", MediaType.TEXT_PLAIN_TYPE));
-
-		// POST the request
-		final ClientResponse response = service().path("/rdf/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
-		// System.out.println("Response Status : " + response.getStatus());
-
-		Assert.assertEquals("expected 200", 200, response.getStatus());
-
-		multiPart.close();
-
-		// TODO: do clean-up in DB
-	}
-
 	private void writeRDFToTestDBInternal(final NeoServer server) throws IOException {
 
 		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");

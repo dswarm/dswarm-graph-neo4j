@@ -73,7 +73,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		i++;
 
-		System.out.println("handle statement " + i + ": " + st.toString());
+		// System.out.println("handle statement " + i + ": " + st.toString());
 
 		try {
 
@@ -195,7 +195,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				tx = database.beginTx();
 
 				sinceLastCommit = totalTriples;
-				System.out.println(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+				// System.out.println(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
 				tick = System.currentTimeMillis();
 			}
 		} catch (final Exception e) {

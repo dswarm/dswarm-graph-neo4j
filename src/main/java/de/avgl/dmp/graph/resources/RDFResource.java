@@ -120,7 +120,7 @@ public class RDFResource {
 		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
 		final Model model = rdfReader.read();
 
-		model.write(System.out, "N-TRIPLE");
+		// model.write(System.out, "N-TRIPLE");
 
 		final StringWriter writer = new StringWriter();
 		model.write(writer, "N-TRIPLE");

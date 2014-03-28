@@ -15,6 +15,8 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -34,6 +36,8 @@ import de.avgl.dmp.graph.NodeType;
  * @author tgaengler
  */
 public class Neo4jRDFHandler implements RDFHandler {
+
+	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jRDFHandler.class);
 
 	private int							totalTriples		= 0;
 	private int							addedNodes			= 0;
@@ -59,6 +63,9 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		this.database = database;
 		tx = database.beginTx();
+
+		LOG.debug("start write TX");
+
 		resources = database.index().forNodes("resources");
 		resourceTypes = database.index().forNodes("resource_types");
 		bnodes = new HashMap<String, Node>();
@@ -195,19 +202,33 @@ public class Neo4jRDFHandler implements RDFHandler {
 				tx = database.beginTx();
 
 				sinceLastCommit = totalTriples;
-				// System.out.println(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+
+				LOG.debug(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+
 				tick = System.currentTimeMillis();
 			}
 		} catch (final Exception e) {
 
-			e.printStackTrace();
+			LOG.error("couldn't finished write TX successfully", e);
+
+			tx.failure();
 			tx.close();
+			LOG.debug("close a write TX");
+
 			tx = database.beginTx();
+
+			LOG.debug("start another write TX");
+
+		} finally {
+
+			// ???
 		}
 	}
 
 	@Override
 	public void closeTransaction() {
+
+		LOG.debug("close write TX finally");
 
 		tx.success();
 		tx.close();

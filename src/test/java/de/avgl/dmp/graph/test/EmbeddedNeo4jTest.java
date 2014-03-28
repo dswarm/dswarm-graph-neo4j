@@ -70,6 +70,8 @@ public abstract class EmbeddedNeo4jTest {
 		if (server != null) {
 
 			// TODO: we may need to remove this and replace this with a more precise delete method
+			
+			LOG.debug("clean-up DB after test has finished");
 
 			final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
 

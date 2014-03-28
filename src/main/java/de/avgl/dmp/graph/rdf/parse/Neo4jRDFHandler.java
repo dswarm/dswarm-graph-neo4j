@@ -195,7 +195,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 150000 || timeDelta >= 30) { // Commit every 150k operations or every 30 seconds
+			if (nodeDelta >= 40000 || timeDelta >= 30) { // Commit every 40k operations or every 30 seconds
 
 				tx.success();
 				tx.close();

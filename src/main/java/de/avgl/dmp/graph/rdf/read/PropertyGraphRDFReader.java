@@ -1,10 +1,9 @@
 package de.avgl.dmp.graph.rdf.read;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -102,8 +101,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -112,17 +109,9 @@ public class PropertyGraphRDFReader implements RDFReader {
 			// => maybe we should find an appropriated cypher query as replacement for this processing
 			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				// TODO: how to traverse only in one direction? - currently, we need to check for already processed relationships
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}
@@ -132,8 +121,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDStartNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -141,16 +128,9 @@ public class PropertyGraphRDFReader implements RDFReader {
 			// node that holds the uri of the resource (record)
 			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}

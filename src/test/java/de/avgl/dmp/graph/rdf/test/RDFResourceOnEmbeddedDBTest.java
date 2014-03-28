@@ -86,9 +86,9 @@ public class RDFResourceOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(stream, null, "N-TRIPLE");
 
-		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
-
 		LOG.debug("read '" + model.size() + "' statements");
+		
+		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
 
 		LOG.debug("finished read test for RDF resource at embedded DB");
 	}

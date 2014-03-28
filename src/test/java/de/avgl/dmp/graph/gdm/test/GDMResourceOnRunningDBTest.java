@@ -55,9 +55,9 @@ public class GDMResourceOnRunningDBTest extends RunningNeo4jTest {
 
 		final de.avgl.dmp.graph.json.Model model = objectMapper.readValue(body, de.avgl.dmp.graph.json.Model.class);
 
-		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
-
 		LOG.debug("read '" + model.size() + "' statements");
+		
+		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
 
 		LOG.debug("finished read test for GDM resource at running DB");
 	}

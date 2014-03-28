@@ -31,7 +31,7 @@ import de.avgl.dmp.graph.json.util.Util;
 @Path("/gdm")
 public class GDMResource {
 
-	private static final Logger									LOG	= LoggerFactory.getLogger(GDMResource.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
@@ -122,8 +122,9 @@ public class GDMResource {
 			throw new DMPGraphException("some problems occur, while processing the JSON from the GDM model", e);
 		}
 
-		GDMResource.LOG.debug("finished reading " + model.size() + " GDM statements for resource graph uri = '" + resourceGraphUri
-				+ "' and record class uri = '" + recordClassUri + "' from graph db");
+		GDMResource.LOG.debug("finished reading '" + model.size() + "' GDM statements ('" + gdmReader.countStatements()
+				+ "' via GDM reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

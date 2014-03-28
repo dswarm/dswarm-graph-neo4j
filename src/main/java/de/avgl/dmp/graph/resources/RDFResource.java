@@ -126,8 +126,9 @@ public class RDFResource {
 		model.write(writer, "N-TRIPLE");
 		final String result = writer.toString();
 
-		LOG.debug("finished reading " + model.size() + " RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
-				+ recordClassUri + "' from graph db");
+		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
+				+ "' via RDF reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

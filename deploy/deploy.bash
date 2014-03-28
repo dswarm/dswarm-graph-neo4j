@@ -23,7 +23,7 @@ function shutdownNeo4j {
 
 function makeProject {
   cdProjectRoot
-  mvn -PRELEASE -DskipTests clean package
+  mvn -U -PRELEASE -DskipTests clean package
 }
 
 

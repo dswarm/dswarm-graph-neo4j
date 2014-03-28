@@ -13,6 +13,10 @@ import javax.ws.rs.core.Response;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,72 +60,119 @@ public class MaintainResource {
 
 		// TODO: should we do this in a transaction?
 
-		ExecutionResult result = engine.execute(deleteQuery);
+		final Transaction tx = database.beginTx();
 
-		MaintainResource.LOG.debug("try to delete up to 10000 nodes and their relationships for the first time");
+		try {
 
-		int i = 2;
+			ExecutionResult result = engine.execute(deleteQuery);
 
-		while (result != null && result.iterator().hasNext()) {
+			MaintainResource.LOG.debug("try to delete up to 10000 nodes and their relationships for the first time");
 
-			final Map<String, Object> row = result.iterator().next();
+			int i = 2;
 
-			if (row == null) {
+			while (result != null && result.iterator().hasNext()) {
 
-				break;
+				final Map<String, Object> row = result.iterator().next();
+
+				if (row == null) {
+
+					break;
+				}
+
+				if (row.isEmpty()) {
+
+					break;
+				}
+
+				final Set<Entry<String, Object>> column = row.entrySet();
+
+				if (column == null) {
+
+					break;
+				}
+
+				if (column.isEmpty()) {
+
+					break;
+				}
+
+				final Entry<String, Object> entry = column.iterator().next();
+
+				if (entry == null) {
+
+					break;
+				}
+
+				final Object value = entry.getValue();
+
+				if (value == null) {
+
+					break;
+				}
+
+				if (!entry.getKey().equals("entity_count")) {
+
+					break;
+				}
+
+				final Long count = (Long) value;
+
+				MaintainResource.LOG.debug("deleted " + count + " entities");
+
+				if (count.longValue() < 10000) {
+
+					break;
+				}
+
+				MaintainResource.LOG.debug("try to delete up to 10000 nodes and their relationships for the " + i + " time");
+
+				result = engine.execute(deleteQuery);
+
+				i++;
 			}
+		} catch (final Exception e) {
 
-			if (row.isEmpty()) {
+			// TODO:
+		} finally {
 
-				break;
-			}
-
-			final Set<Entry<String, Object>> column = row.entrySet();
-
-			if (column == null) {
-
-				break;
-			}
-
-			if (column.isEmpty()) {
-
-				break;
-			}
-
-			final Entry<String, Object> entry = column.iterator().next();
-
-			if (entry == null) {
-
-				break;
-			}
-
-			final Object value = entry.getValue();
-
-			if (value == null) {
-
-				break;
-			}
-
-			if (!entry.getKey().equals("entity_count")) {
-
-				break;
-			}
-
-			final Long count = (Long) value;
-			
-			MaintainResource.LOG.debug("deleted " + count + " entities");
-
-			if (count.longValue() < 10000) {
-
-				break;
-			}
-
-			MaintainResource.LOG.debug("try to delete up to 10000 nodes and their relationships for the " + i + " time");
-
-			result = engine.execute(deleteQuery);
-
-			i++;
+			tx.success();
+			tx.close();
 		}
+
+		MaintainResource.LOG.debug("start indices clean-up");
+
+		final Transaction itx = database.beginTx();
+
+		try {
+
+			final Index<Node> resources = database.index().forNodes("resources");
+			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
+			final Index<Relationship> statements = database.index().forRelationships("statements");
+			
+			if (resources != null) {
+
+				resources.delete();
+			}
+
+			if (resourceTypes != null) {
+
+				resourceTypes.delete();
+			}
+
+			if (statements != null) {
+
+				statements.delete();
+			}
+		} catch (final Exception e) {
+
+			// TODO:
+		} finally {
+
+			itx.success();
+			itx.close();
+		}
+
+		MaintainResource.LOG.debug("finished indices clean-up");
 
 		MaintainResource.LOG.debug("finished cleaning up the db");
 

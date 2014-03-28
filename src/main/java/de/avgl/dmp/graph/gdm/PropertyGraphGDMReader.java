@@ -12,6 +12,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.json.LiteralNode;
@@ -26,6 +28,8 @@ import de.avgl.dmp.graph.read.RelationshipHandler;
  * @author tgaengler
  */
 public class PropertyGraphGDMReader implements GDMReader {
+	
+	private static final Logger			LOG					= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
 
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
@@ -53,6 +57,8 @@ public class PropertyGraphGDMReader implements GDMReader {
 	public Model read() {
 
 		final Transaction tx = database.beginTx();
+		
+		LOG.debug("start read GDM TX");
 
 		try {
 
@@ -85,8 +91,13 @@ public class PropertyGraphGDMReader implements GDMReader {
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished read GDM TX successfully", e);
+			
+			tx.failure();
+			tx.close();
 		} finally {
+			
+			LOG.debug("finished read GDM TX finally");
 
 			tx.success();
 			tx.close();

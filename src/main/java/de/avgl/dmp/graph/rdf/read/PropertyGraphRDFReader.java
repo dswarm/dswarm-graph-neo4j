@@ -12,6 +12,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -26,6 +28,8 @@ import de.avgl.dmp.graph.read.RelationshipHandler;
  * @author tgaengler
  */
 public class PropertyGraphRDFReader implements RDFReader {
+
+	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFReader.class);
 
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
@@ -53,6 +57,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		final Transaction tx = database.beginTx();
 
+		LOG.debug("start read RDF TX");
+
 		try {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
@@ -73,8 +79,13 @@ public class PropertyGraphRDFReader implements RDFReader {
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished read RDF TX successfully", e);
+
+			tx.failure();
+			tx.close();
 		} finally {
+
+			LOG.debug("finished read RDF TX finally");
 
 			tx.success();
 			tx.close();
@@ -156,7 +167,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		public void handleRelationship(final Relationship rel) {
 
 			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
-				
+
 				// TODO: utilise __NODETYPE__ property for switch
 
 				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
@@ -182,7 +193,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 				final String objectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
 				final Resource objectResource;
-				
+
 				// TODO: utilise __NODETYPE__ property for switch
 
 				if (objectURI != null) {

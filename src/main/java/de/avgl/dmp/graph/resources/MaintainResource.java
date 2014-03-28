@@ -62,6 +62,8 @@ public class MaintainResource {
 
 		final Transaction tx = database.beginTx();
 
+		LOG.debug("start delete-all-entities TX");
+
 		try {
 
 			ExecutionResult result = engine.execute(deleteQuery);
@@ -132,8 +134,13 @@ public class MaintainResource {
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished delete-all-entities TX successfully", e);
+
+			tx.failure();
+			tx.close();
 		} finally {
+
+			LOG.debug("finished delete-all-entities TX finally");
 
 			tx.success();
 			tx.close();
@@ -143,12 +150,14 @@ public class MaintainResource {
 
 		final Transaction itx = database.beginTx();
 
+		LOG.debug("start delete indices TX");
+
 		try {
 
 			final Index<Node> resources = database.index().forNodes("resources");
 			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
 			final Index<Relationship> statements = database.index().forRelationships("statements");
-			
+
 			if (resources != null) {
 
 				resources.delete();
@@ -165,8 +174,13 @@ public class MaintainResource {
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished delete indices TX successfully", e);
+
+			itx.failure();
+			itx.close();
 		} finally {
+
+			LOG.debug("finished delete indices TX finally");
 
 			itx.success();
 			itx.close();

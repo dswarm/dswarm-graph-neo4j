@@ -134,7 +134,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 			}
 		} catch (final Exception e) {
 	
-			LOG.error("couldn't finished read RDF TX successfully", e);
+			LOG.error("couldn't finish read RDF TX successfully", e);
 
 			tx.failure();
 			tx.close();

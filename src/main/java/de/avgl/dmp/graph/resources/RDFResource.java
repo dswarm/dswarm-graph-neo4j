@@ -29,6 +29,7 @@ import de.avgl.dmp.graph.rdf.parse.JenaModelParser;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
+import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFExporter;
 import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
 import de.avgl.dmp.graph.rdf.read.RDFReader;
 
@@ -138,12 +139,13 @@ public class RDFResource {
 	@Path("/getall")
 	//@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("application/n-triples")
+	//@Produces(MediaType.APPLICATION_OCTET_STREAM) // for triggering "download as ..."
 	public Response readAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to read all RDF statements (for all resource graphs and all record class uris) from graph db");
 
-		final RDFReader rdfReader = new PropertyGraphRDFReader(database);
-		final Model model = rdfReader.readAll();
+		final RDFReader rdfReader = new PropertyGraphRDFExporter(database);
+		final Model model = rdfReader.read();
 
 		//model.write(System.out, "N-TRIPLE");
 
@@ -153,6 +155,9 @@ public class RDFResource {
 
 		LOG.debug("finished reading " + model.size() + " RDF statements from graph db");
 
-		return Response.ok().entity(result).build();
+		return Response.ok()
+				//.header("Content-Disposition", "attachment; filename=\"rdf_export.ttl\"") // for triggering "download as ..."
+				//.header("Content-Disposition", "attachment") // for triggering "download as ..."
+				.entity(result).build();
 	}
 }

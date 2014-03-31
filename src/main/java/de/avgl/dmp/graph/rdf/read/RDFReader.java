@@ -6,7 +6,5 @@ public interface RDFReader {
 	
 	public Model read();
 	
-	public Model readAll();
-	
 	public long countStatements();
 }

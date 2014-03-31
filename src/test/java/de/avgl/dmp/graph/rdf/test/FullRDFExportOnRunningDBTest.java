@@ -45,7 +45,8 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 		
 		LOG.debug("start export all RDF test for RDF resource at running DB");
 		
-		writeRDFToRunningDBInternal();
+		writeRDFToRunningDBInternal("http://data.slub-dresden.de/resources/2");
+		writeRDFToRunningDBInternal("http://data.slub-dresden.de/resources/3");
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/getall")
@@ -90,9 +91,9 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 	}
 
 	
-private void writeRDFToRunningDBInternal() throws IOException {
+	private void writeRDFToRunningDBInternal(String resource_graph_uri) throws IOException {
 		
-		LOG.debug("start writing RDF statements for RDF resource at running DB");
+		LOG.debug("start writing RDF statements for RDF resource at running DB (to graph " +  resource_graph_uri + ")");
 		
 		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -100,7 +101,7 @@ private void writeRDFToRunningDBInternal() throws IOException {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/2", MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(resource_graph_uri, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -109,6 +110,6 @@ private void writeRDFToRunningDBInternal() throws IOException {
 
 		multiPart.close();
 		
-		LOG.debug("finished writing RDF statements for RDF resource at running DB");
+		LOG.debug("finished writing RDF statements for RDF resource at running DB (to graph " +  resource_graph_uri + ")");
 	}
 }

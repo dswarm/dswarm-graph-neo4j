@@ -1,6 +1,7 @@
 package de.avgl.dmp.graph.rdf.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -64,7 +65,13 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(stream, null, "N-TRIPLE");
 		
-		LOG.debug("read '" + model.size() + "' statements");
+		FileWriter fileWriter = new FileWriter("testExport.ttl");
+		//FileWriter fileWriter = new FileWriter("testExport.ntriples");
+		
+		model.getWriter("TURTLE").write(model,fileWriter, null);
+		//model.getWriter("N-TRIPLE").write(model,fileWriter, null);
+		
+		LOG.info("read '" + model.size() + "' statements");
 
 		Assert.assertEquals("the number of statements should be 2601", 2601,
 				model.size());

@@ -27,72 +27,69 @@ import de.avgl.dmp.graph.read.NodeHandler;
 import de.avgl.dmp.graph.read.RelationshipHandler;
 
 /**
- * @author tgaengler
+ * @author polowins
  */
-public class PropertyGraphRDFReader implements RDFReader {
+public class PropertyGraphRDFExporter implements RDFReader {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFReader.class);
+	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFExporter.class);
 
 	private final NodeHandler			nodeHandler;
-	private final NodeHandler			startNodeHandler;
 	private final RelationshipHandler	relationshipHandler;
 
-	private final String				recordClassUri;
-	private final String				resourceGraphUri;
-	
 	private final GraphDatabaseService	database;
 
 	private Model						model;
 
-	public PropertyGraphRDFReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
-		recordClassUri = recordClassUriArg;
-		resourceGraphUri = resourceGraphUriArg;
+	public PropertyGraphRDFExporter(final GraphDatabaseService databaseArg) {
+
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
-		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
 	}
 
 	@Override
 	public Model read() {
-
+	
 		final Transaction tx = database.beginTx();
-
-		LOG.debug("start read RDF TX");
-
+	
 		try {
-
-			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
-
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
-					resourceGraphUri);
-
-			if (recordNodes == null) {
-
+			
+			/*// all nodes would also return endnodes without further outgoing relations
+			final Iterable<Node> recordNodes;
+			GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database);
+			recordNodes = globalGraphOperations.getAllNodes();
+			 */
+			
+			GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database);
+	
+			final Iterable<Relationship> relations = globalGraphOperations.getAllRelationships();
+			
+			if (relations == null) {
+	
 				return null;
 			}
-
+	
 			model = ModelFactory.createDefaultModel();
-
-			for (final Node recordNode : recordNodes) {
-
-				startNodeHandler.handleNode(recordNode);
+	
+			for (final Relationship recordNode : relations) {
+	
+				relationshipHandler.handleRelationship(recordNode);
 			}
 		} catch (final Exception e) {
-
-			LOG.error("couldn't finished read RDF TX successfully", e);
+	
+			LOG.error("couldn't finish read RDF TX successfully", e);
 
 			tx.failure();
 			tx.close();
 		} finally {
-
+	
 			LOG.debug("finished read RDF TX finally");
 
 			tx.success();
 			tx.close();
 		}
-
+	
 		return model;
 	}
 
@@ -122,25 +119,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 		}
 	}
 
-	private class CBDStartNodeHandler implements NodeHandler {
-
-		@Override
-		public void handleNode(final Node node) {
-
-			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
-			// node that holds the uri of the resource (record)
-			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
-
-				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
-
-				for (final Relationship relationship : relationships) {
-
-					relationshipHandler.handleRelationship(relationship);
-				}
-			}
-		}
-	}
-
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
 		final Map<Long, Resource>	bnodes		= new HashMap<Long, Resource>();
@@ -149,7 +127,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 		@Override
 		public void handleRelationship(final Relationship rel) {
 
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
 
 				// TODO: utilise __NODETYPE__ property for switch
 
@@ -210,10 +187,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 				}
 
 				model.add(subjectResource, predicateProperty, objectResource);
-
-				// continue traversal with object node
-				nodeHandler.handleNode(rel.getEndNode());
-			}
 		}
 
 		private Resource createResourceFromBNode(final long bnodeId) {

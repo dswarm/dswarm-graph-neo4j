@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -13,6 +14,8 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -27,6 +30,8 @@ import de.avgl.dmp.graph.read.RelationshipHandler;
  * @author tgaengler
  */
 public class PropertyGraphRDFReader implements RDFReader {
+
+	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFReader.class);
 
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
@@ -67,6 +72,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		final Transaction tx = database.beginTx();
 
+		LOG.debug("start read RDF TX");
+
 		try {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
@@ -87,8 +94,13 @@ public class PropertyGraphRDFReader implements RDFReader {
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished read RDF TX successfully", e);
+
+			tx.failure();
+			tx.close();
 		} finally {
+
+			LOG.debug("finished read RDF TX finally");
 
 			tx.success();
 			tx.close();
@@ -122,9 +134,14 @@ public class PropertyGraphRDFReader implements RDFReader {
 			}
 		} catch (final Exception e) {
 	
-			// TODO:
+			LOG.error("couldn't finished read RDF TX successfully", e);
+
+			tx.failure();
+			tx.close();
 		} finally {
 	
+			LOG.debug("finished read RDF TX finally");
+
 			tx.success();
 			tx.close();
 		}
@@ -140,8 +157,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -150,17 +165,9 @@ public class PropertyGraphRDFReader implements RDFReader {
 			// => maybe we should find an appropriated cypher query as replacement for this processing
 			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				// TODO: how to traverse only in one direction? - currently, we need to check for already processed relationships
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}
@@ -170,8 +177,6 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDStartNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -179,16 +184,9 @@ public class PropertyGraphRDFReader implements RDFReader {
 			// node that holds the uri of the resource (record)
 			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}
@@ -205,7 +203,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		public void handleRelationship(final Relationship rel) {
 
 			if (ignoreProvenance || rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
-				
+
 				// TODO: utilise __NODETYPE__ property for switch
 
 				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);

@@ -1,10 +1,9 @@
 package de.avgl.dmp.graph.gdm;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -12,6 +11,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.json.LiteralNode;
@@ -27,6 +28,8 @@ import de.avgl.dmp.graph.read.RelationshipHandler;
  */
 public class PropertyGraphGDMReader implements GDMReader {
 
+	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
+
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
 	private final RelationshipHandler	relationshipHandler;
@@ -37,7 +40,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 	private final GraphDatabaseService	database;
 
 	private Model						model;
-	private Resource currentResource;
+	private Resource					currentResource;
 
 	public PropertyGraphGDMReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
@@ -53,6 +56,8 @@ public class PropertyGraphGDMReader implements GDMReader {
 	public Model read() {
 
 		final Transaction tx = database.beginTx();
+
+		LOG.debug("start read GDM TX");
 
 		try {
 
@@ -70,23 +75,28 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 			for (final Node recordNode : recordNodes) {
 
-				final String resourceUri = (String )recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
-				
-				if(resourceUri == null) {
-					
+				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+
+				if (resourceUri == null) {
+
 					// TODO: logging
-					
+
 					continue;
 				}
-				
+
 				currentResource = new Resource(resourceUri);
 				startNodeHandler.handleNode(recordNode);
 				model.addResource(currentResource);
 			}
 		} catch (final Exception e) {
 
-			// TODO:
+			LOG.error("couldn't finished read GDM TX successfully", e);
+
+			tx.failure();
+			tx.close();
 		} finally {
+
+			LOG.debug("finished read GDM TX finally");
 
 			tx.success();
 			tx.close();
@@ -103,8 +113,6 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -113,17 +121,9 @@ public class PropertyGraphGDMReader implements GDMReader {
 			// => maybe we should find an appropriated cypher query as replacement for this processing
 			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				// TODO: how to traverse only in one direction? - currently, we need to check for already processed relationships
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}
@@ -133,8 +133,6 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDStartNodeHandler implements NodeHandler {
 
-		private final Set<Long>	handledRelationships	= new HashSet<Long>();
-
 		@Override
 		public void handleNode(final Node node) {
 
@@ -142,16 +140,9 @@ public class PropertyGraphGDMReader implements GDMReader {
 			// node that holds the uri of the resource (record)
 			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				final Iterable<Relationship> relationships = database.traversalDescription().traverse(node).relationships();
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
 				for (final Relationship relationship : relationships) {
-
-					if (handledRelationships.contains(Long.valueOf(relationship.getId()))) {
-
-						continue;
-					}
-
-					handledRelationships.add(relationship.getId());
 
 					relationshipHandler.handleRelationship(relationship);
 				}
@@ -161,23 +152,23 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, de.avgl.dmp.graph.json.Node>	bnodes		= new HashMap<Long, de.avgl.dmp.graph.json.Node>();
-		final Map<String, ResourceNode>	resourceNodes	= new HashMap<String, ResourceNode>();
+		final Map<Long, de.avgl.dmp.graph.json.Node>	bnodes			= new HashMap<Long, de.avgl.dmp.graph.json.Node>();
+		final Map<String, ResourceNode>					resourceNodes	= new HashMap<String, ResourceNode>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) {
 
 			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
-				
+
 				final long statementId = rel.getId();
-				
+
 				// TODO: utilise __NODETYPE__ property for switch
 
 				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
 				final long subjectId = rel.getStartNode().getId();
-				
+
 				final de.avgl.dmp.graph.json.Node subjectNode;
-				
+
 				if (subject == null) {
 
 					// subject is a bnode
@@ -196,11 +187,11 @@ public class PropertyGraphGDMReader implements GDMReader {
 				final String objectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
 				final de.avgl.dmp.graph.json.Node objectNode;
-				
+
 				// TODO: utilise __NODETYPE__ property for switch
 
 				final long objectId = rel.getEndNode().getId();
-				
+
 				if (objectURI != null) {
 
 					// object is a resource
@@ -222,11 +213,11 @@ public class PropertyGraphGDMReader implements GDMReader {
 						// object is a literal node
 
 						object = (String) rel.getEndNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
-						
+
 						objectNode = new LiteralNode(objectId, object);
-						
+
 						currentResource.addStatement(statementId, subjectNode, predicateProperty, objectNode);
-						
+
 						return;
 					}
 				}

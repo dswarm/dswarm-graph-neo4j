@@ -121,14 +121,15 @@ public class RDFResource {
 		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
 		final Model model = rdfReader.read();
 
-		model.write(System.out, "N-TRIPLE");
+		// model.write(System.out, "N-TRIPLE");
 
 		final StringWriter writer = new StringWriter();
 		model.write(writer, "N-TRIPLE");
 		final String result = writer.toString();
 
-		LOG.debug("finished reading " + model.size() + " RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
-				+ recordClassUri + "' from graph db");
+		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
+				+ "' via RDF reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

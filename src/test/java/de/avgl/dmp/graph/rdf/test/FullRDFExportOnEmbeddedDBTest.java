@@ -46,7 +46,8 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		
 		LOG.debug("start read test for RDF resource at embedded DB");
 
-		writeRDFToTestDBInternal(server);
+		writeRDFToTestDBInternal(server,"http://data.slub-dresden.de/resources/2");
+		writeRDFToTestDBInternal(server,"http://data.slub-dresden.de/resources/3");
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/getall")
@@ -95,17 +96,16 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 	}
 
 	
-	private void writeRDFToTestDBInternal(final NeoServer server) throws IOException {
+	private void writeRDFToTestDBInternal(final NeoServer server, String resource_graph_uri) throws IOException {
 
-		LOG.debug("start writing RDF statements for RDF resource at embedded DB");
-
+		LOG.debug("start writing RDF statements for RDF resource at embedded DB (to graph " +  resource_graph_uri + ")");
 		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(resource_graph_uri, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -114,7 +114,7 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing RDF statements for RDF resource at embedded DB");
+		LOG.debug("finished writing RDF statements for RDF resource at embedded DB (to graph " +  resource_graph_uri + ")");
 	}
 
 }

@@ -135,13 +135,31 @@ public class RDFResource {
 		return Response.ok().entity(result).build();
 	}
 	
-	@POST
+	@GET
 	@Path("/getall")
-	//@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("application/n-triples")
-	//@Produces(MediaType.APPLICATION_OCTET_STREAM) // for triggering "download as ..."
-	public Response readAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
 
+		final String result = readAllRDFInternal(database);
+
+		return Response.ok().entity(result).build();
+	}
+	
+	@GET
+	@Path("/getall")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM) // for triggering "download as ..."
+	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		final String result = readAllRDFInternal(database);
+
+		return Response.ok()
+				//.header("Content-Disposition", "attachment; filename=rdf_export.ntriples") // for triggering "download as ..."
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl") // for triggering "download as ..."
+				//.header("Content-Disposition", "attachment") // for triggering "download as ..."
+				.entity(result).build();
+	}
+
+	private String readAllRDFInternal(final GraphDatabaseService database) {
 		LOG.debug("try to read all RDF statements (for all resource graphs and all record class uris) from graph db");
 
 		final RDFReader rdfReader = new PropertyGraphRDFExporter(database);
@@ -154,10 +172,6 @@ public class RDFResource {
 		final String result = writer.toString();
 
 		LOG.debug("finished reading " + model.size() + " RDF statements from graph db");
-
-		return Response.ok()
-				//.header("Content-Disposition", "attachment; filename=\"rdf_export.ttl\"") // for triggering "download as ..."
-				//.header("Content-Disposition", "attachment") // for triggering "download as ..."
-				.entity(result).build();
+		return result;
 	}
 }

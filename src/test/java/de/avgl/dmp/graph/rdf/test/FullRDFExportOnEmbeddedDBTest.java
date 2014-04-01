@@ -51,11 +51,10 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		writeRDFToTestDBInternal(server,"http://data.slub-dresden.de/resources/2");
 		writeRDFToTestDBInternal(server,"http://data.slub-dresden.de/resources/3");
 
-		// POST the request
+		// GET the request
 		final ClientResponse response = service().path("/rdf/getall")
-				.type(MediaType.APPLICATION_JSON_TYPE)
 				.accept("application/n-triples")
-				.post(ClientResponse.class);
+				.get(ClientResponse.class);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
@@ -69,11 +68,9 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		model.read(stream, null, "N-TRIPLE");
 
 		/* write export to file for debugging */
-		
-		FileWriter fileWriter = new FileWriter("testExport.ttl");
-		//FileWriter fileWriter = new FileWriter("testExport.ntriples");
-		model.getWriter("TURTLE").write(model,fileWriter, null);
 		//model.setNsPrefixes(map); // TODO get prefix map from prefix registry
+		//FileWriter fileWriter = new FileWriter("testExport.ntriples");
+		//model.getWriter("TURTLE").write(model,fileWriter, null);
 		//model.getWriter("N-TRIPLE").write(model,fileWriter, null);
 		
 		LOG.info("read '" + model.size() + "' statements");

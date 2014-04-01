@@ -25,13 +25,12 @@ dbpr:The_Mind_of_Evil	dbpo:publicationDate	"2000-01-01" . # fictional added valu
 [] dbpp:writer	dbpr:Dave_Martin .
 #dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Dave_Martin .
 dbpr:Terror_of_the_Autons dbpp:writer [ 
-										rdfs:label "Terrance_Dicks"^^xsd:string  	
+										rdfs:label "Terrance_Dicks" 	
 									  ] .
 #dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Terrance_Dicks .
 
 # typed literals
-dbpr:The_Daemons	dbpp:serialName	"The Daemons (should be typed as string)"^^xsd:string . # seems to work
-#dbpr:The_Mind_of_Evil	dbpo:publicationDateAsXsdDate	"1971-03-06"^^xsd:date . # not yet supported
+dbpr:The_Daemons	dbpp:serialName	"The Daemons (should be typed as string)". # seems to work
 
 
 #dbpr:Terror_of_the_Autons	dbpo:publicationDate	"1971-01-23" .

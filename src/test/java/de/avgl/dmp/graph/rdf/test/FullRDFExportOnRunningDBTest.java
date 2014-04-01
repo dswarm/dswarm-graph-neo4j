@@ -33,9 +33,9 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 	
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(FullRDFExportOnRunningDBTest.class);
-	//private static final String TEST_RDF_FILE = "dmpf_bsp1.n3";
-	//private static final String TEST_RDF_FILE = "turtle_untyped.ttl";
-	private static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl"; 
+	protected static final String TEST_RDF_FILE = "dmpf_bsp1.n3";
+	//protected static final String TEST_RDF_FILE = "turtle_untyped.ttl";
+	//protected static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl"; 
 
 
 	public FullRDFExportOnRunningDBTest() {
@@ -51,10 +51,9 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 		writeRDFToRunningDBInternal("http://data.slub-dresden.de/resources/2");
 		writeRDFToRunningDBInternal("http://data.slub-dresden.de/resources/3");
 
-		// POST the request
+		// GET the request
 		final ClientResponse response = service().path("/rdf/getall")
-				.type(MediaType.APPLICATION_JSON_TYPE)
-				.accept("application/n-triples").post(ClientResponse.class);
+				.accept("application/n-triples").get(ClientResponse.class);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
@@ -123,7 +122,7 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 	}
 
 	
-	private void writeRDFToRunningDBInternal(String resource_graph_uri) throws IOException {
+	protected void writeRDFToRunningDBInternal(String resource_graph_uri) throws IOException {
 		
 		LOG.debug("start writing RDF statements for RDF resource at running DB (to graph " +  resource_graph_uri + ")");
 		

@@ -33,6 +33,9 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 	
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(FullRDFExportOnRunningDBTest.class);
+	//private static final String TEST_RDF_FILE = "dmpf_bsp1.n3"; // 2601 stmts
+	private static final String TEST_RDF_FILE = "turtle_untyped.ttl"; // 20 stmts
+	private static final int TEST_RDF_FILE_STMT_COUNT = 20;
 
 
 	public FullRDFExportOnRunningDBTest() {
@@ -66,8 +69,18 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 
 		LOG.debug("read '" + model.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 2601", 2601,
+		Assert.assertEquals("the number of statements should be " + TEST_RDF_FILE_STMT_COUNT, TEST_RDF_FILE_STMT_COUNT,
 		model.size());
+		
+		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
+		final Model modelFromOriginalRDFile  = ModelFactory.createDefaultModel();
+		modelFromOriginalRDFile.read(Resources.getResource(TEST_RDF_FILE).getFile());
+		System.out.println("size after first read " + model.size());
+		modelFromOriginalRDFile.read(Resources.getResource(TEST_RDF_FILE).getFile());
+		System.out.println("size after second read " + model.size());
+		
+		Assert.assertTrue("the RDF from the property grah is not isomorphic to the RDF in the original file ",
+				model.isIsomorphicWith(modelFromOriginalRDFile));
 		
 		LOG.debug("finished export all RDF test for RDF resource at running DB");
 	}
@@ -95,7 +108,7 @@ public class FullRDFExportOnRunningDBTest extends RunningNeo4jTest {
 		
 		LOG.debug("start writing RDF statements for RDF resource at running DB (to graph " +  resource_graph_uri + ")");
 		
-		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts

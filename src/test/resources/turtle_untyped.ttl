@@ -1,19 +1,33 @@
-<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/ontology/publicationDate>	"1971-03-06" .
-<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Don_Houghton> .
-<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Dave_Martin_(screenwriter)> .
-<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/ontology/publicationDate>	"1971-01-23" .
-<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/property/serialName>	"The D\u00E6mons" .
-<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/serialName>	"Terror of the Autons" .
-<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/ontology/publicationDate>	"1971-04-03" .
-<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/serialName>	"The Claws of Axos" .
-<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/ontology/publicationDate>	"1971-05-15" .
-<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
-<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/property/serialName>	"Colony in Space" .
-<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/serialName>	"The Mind of Evil" .
-<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/ontology/publicationDate>	"1971-06-19" .
-<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Bob_Baker_(scriptwriter)> .
-<http://dbpedia.org/resource/The_Daemons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Barry_Letts> .
-<http://dbpedia.org/resource/The_Mind_of_Evil>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
-<http://dbpedia.org/resource/Colony_in_Space>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Malcolm_Hulke> .
-<http://dbpedia.org/resource/The_Claws_of_Axos>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Terrance_Dicks> .
-<http://dbpedia.org/resource/Terror_of_the_Autons>	<http://dbpedia.org/property/writer>	<http://dbpedia.org/resource/Robert_Holmes_(scriptwriter)> .
+@prefix dbpr: <http://d.o/r/> .
+@prefix dbpp: <http://d.o/p/> .
+@prefix dbpo: <http://d.o/o/> .
+
+# 20 statements
+
+# same subject (URI)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"1971-03-06" .
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Don_Houghton .
+
+# same object (URI)
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Terrance_Dicks .
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Terrance_Dicks .
+
+# multiple literals (same subject, predicate as above)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"2000-01-01" . # fictional added value ... 
+
+
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Dave_Martin .
+dbpr:Terror_of_the_Autons	dbpo:publicationDate	"1971-01-23" .
+dbpr:The_Daemons	dbpp:serialName	"The Daemons" .
+dbpr:Terror_of_the_Autons	dbpp:serialName	"Terror of the Autons" .
+dbpr:The_Claws_of_Axos	dbpo:publicationDate	"1971-04-03" .
+dbpr:The_Claws_of_Axos	dbpp:serialName	"The Claws of Axos" .
+dbpr:Colony_in_Space	dbpo:publicationDate	"1971-05-15" .
+dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Terrance_Dicks .
+dbpr:Colony_in_Space	dbpp:serialName	"Colony in Space" .
+dbpr:The_Mind_of_Evil	dbpp:serialName	"The Mind of Evil" .
+dbpr:The_Daemons	dbpo:publicationDate	"1971-06-19" .
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Bob_Baker .
+dbpr:The_Daemons	dbpp:writer	dbpr:Barry_Letts .
+dbpr:Colony_in_Space	dbpp:writer	dbpr:Malcolm_Hulke .
+dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Robert_Holmes .

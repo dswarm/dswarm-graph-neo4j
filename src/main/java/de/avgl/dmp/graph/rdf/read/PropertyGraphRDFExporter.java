@@ -17,10 +17,14 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.read.NodeHandler;
@@ -174,15 +178,30 @@ public class PropertyGraphRDFExporter implements RDFReader {
 
 						objectResource = createResourceFromBNode(objectId);
 
-					} else {
+					} else { // object is a literal node
+						
+						Node endNode = rel.getEndNode();
+						object = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+						
+						if (endNode.hasProperty(GraphStatics.DATATYPE_PROPERTY)) {
+							
+							String literalType = (String) endNode.getProperty(GraphStatics.DATATYPE_PROPERTY, null);
+							
+							// object is a typed literal node
+							
+							Literal typedObject = model.createTypedLiteral(object,literalType);
+							
+							model.add(subjectResource, predicateProperty, typedObject); 
+							return;
+							
+						} else { 
+							
+							// object is an untyped literal node
+							
+							model.add(subjectResource, predicateProperty, object);
+							return;
+						}
 
-						// object is a literal node
-
-						object = (String) rel.getEndNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-						model.add(subjectResource, predicateProperty, object);
-
-						return;
 					}
 				}
 

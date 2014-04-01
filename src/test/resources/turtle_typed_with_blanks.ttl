@@ -1,0 +1,51 @@
+@prefix dbpr: <http://d.o/r/> .
+@prefix dbpp: <http://d.o/p/> .
+@prefix dbpo: <http://d.o/o/> .
+
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# 6 statements
+
+# same subject (URI)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"1971-03-06"^^xsd:string .
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Don_Houghton .
+
+# same object (URI)
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Terrance_Dicks .
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Terrance_Dicks .
+
+# multiple literals (same subject, predicate as above)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"2000-01-01"^^xsd:string . # fictional added value ... 
+
+# blank nodes
+
+[] dbpp:writer	dbpr:Dave_Martin .
+#dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Dave_Martin .
+dbpr:Terror_of_the_Autons dbpp:writer [ 
+										rdfs:label "Terrance_Dicks"^^xsd:string  	
+									  ] .
+#dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Terrance_Dicks .
+
+# typed literals
+dbpr:The_Daemons	dbpp:serialName	"The Daemons (should be typed as string)"^^xsd:string . # seems to work, probably xsd:string default
+dbpr:The_Mind_of_Evil	dbpo:publicationDateAsXsdDate	"1971-03-06"^^xsd:date . # not yet supported
+
+
+#dbpr:Terror_of_the_Autons	dbpo:publicationDate	"1971-01-23" .
+#dbpr:The_Daemons	dbpp:serialName	"The Daemons" .
+#dbpr:Terror_of_the_Autons	dbpp:serialName	"Terror of the Autons" .
+#dbpr:The_Claws_of_Axos	dbpo:publicationDate	"1971-04-03" .
+#dbpr:The_Claws_of_Axos	dbpp:serialName	"The Claws of Axos" .
+#dbpr:Colony_in_Space	dbpo:publicationDate	"1971-05-15" .
+#dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Terrance_Dicks .
+#dbpr:Colony_in_Space	dbpp:serialName	"Colony in Space" .
+#dbpr:The_Mind_of_Evil	dbpp:serialName	"The Mind of Evil" .
+#dbpr:The_Daemons	dbpo:publicationDate	"1971-06-19" .
+#dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Bob_Baker .
+#dbpr:The_Daemons	dbpp:writer	dbpr:Barry_Letts .
+#dbpr:Colony_in_Space	dbpp:writer	dbpr:Malcolm_Hulke .
+#dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Robert_Holmes .
+

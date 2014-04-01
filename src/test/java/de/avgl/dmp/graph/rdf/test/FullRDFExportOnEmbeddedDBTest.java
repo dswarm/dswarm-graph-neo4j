@@ -34,7 +34,9 @@ import de.avgl.dmp.graph.test.RunningNeo4jTest;
 public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 	
 	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResourceOnEmbeddedDBTest.class);
-
+	//private static final String TEST_RDF_FILE = "dmpf_bsp1.n3"; // 2601 stmts
+	//private static final String TEST_RDF_FILE = "turtle_untyped.ttl"; // 20 stmts
+	private static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl"; // 6 stmts
 
 	public FullRDFExportOnEmbeddedDBTest() {
 		super("/ext");
@@ -65,17 +67,47 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 				body.getBytes("UTF-8"));
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(stream, null, "N-TRIPLE");
+
+		/* write export to file for debugging */
 		
 		FileWriter fileWriter = new FileWriter("testExport.ttl");
 		//FileWriter fileWriter = new FileWriter("testExport.ntriples");
-		
 		model.getWriter("TURTLE").write(model,fileWriter, null);
+		//model.setNsPrefixes(map); // TODO get prefix map from prefix registry
 		//model.getWriter("N-TRIPLE").write(model,fileWriter, null);
 		
 		LOG.info("read '" + model.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 2601", 2601,
-				model.size());
+		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
+		final Model modelFromOriginalRDFile  = ModelFactory.createDefaultModel();
+		modelFromOriginalRDFile.read(Resources.getResource(TEST_RDF_FILE).getFile());
+		//System.out.println("size after first read " + modelFromOriginalRDFile.size());
+		
+		long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();
+		
+		modelFromOriginalRDFile.read(Resources.getResource(TEST_RDF_FILE).getFile());
+		//System.out.println("size after second read " + modelFromOriginalRDFile.size());
+		
+		long statementsInOriginalRDFFileAfter2ndRead = modelFromOriginalRDFile.size();
+		
+		Assert.assertTrue("the RDF from the property grah is not isomorphic to the RDF in the original file ",
+				model.isIsomorphicWith(modelFromOriginalRDFile));
+	
+		long statementsInExportedRDFModel = model.size();
+		
+		// this will not be equal when a file with blank nodes is imported multiple times
+		/*Assert.assertEquals("the number of statements should be " + TEST_RDF_FILE_STMT_COUNT, TEST_RDF_FILE_STMT_COUNT,
+		model.size());*/
+		
+		Assert.assertTrue("the number of statements should be as large or larger (because of isomorphic bnode-statements)"
+				+ " as the number of statements in the original RDF file (" + statementsInOriginalRDFFile + "), but was " + statementsInExportedRDFModel ,
+				statementsInExportedRDFModel >= statementsInOriginalRDFFile);
+		
+		Assert.assertEquals("the number of statements should be as large as the number of statements in the model"
+				+ " that read 2 times the original RDF file (" + statementsInOriginalRDFFileAfter2ndRead + ")" ,
+				statementsInExportedRDFModel, statementsInOriginalRDFFileAfter2ndRead);
+		
+		LOG.debug("size of exported RDF model " + model.size());
 
 		LOG.debug("finished read test for RDF resource at embedded DB");
 	}
@@ -99,7 +131,8 @@ public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 	private void writeRDFToTestDBInternal(final NeoServer server, String resource_graph_uri) throws IOException {
 
 		LOG.debug("start writing RDF statements for RDF resource at embedded DB (to graph " +  resource_graph_uri + ")");
-		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		
+		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts

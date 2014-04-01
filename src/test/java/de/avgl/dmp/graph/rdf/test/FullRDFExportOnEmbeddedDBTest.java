@@ -34,9 +34,9 @@ import de.avgl.dmp.graph.test.RunningNeo4jTest;
 public class FullRDFExportOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 	
 	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResourceOnEmbeddedDBTest.class);
-	//private static final String TEST_RDF_FILE = "dmpf_bsp1.n3"; // 2601 stmts
-	//private static final String TEST_RDF_FILE = "turtle_untyped.ttl"; // 20 stmts
-	private static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl"; // 6 stmts
+	private static final String TEST_RDF_FILE = "dmpf_bsp1.n3";
+	//private static final String TEST_RDF_FILE = "turtle_untyped.ttl";
+	//private static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl";
 
 	public FullRDFExportOnEmbeddedDBTest() {
 		super("/ext");

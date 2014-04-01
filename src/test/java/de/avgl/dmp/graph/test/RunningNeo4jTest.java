@@ -41,7 +41,6 @@ public class RunningNeo4jTest {
 		MOUNT_POINT = mountEndpoint;
 	}
 
-	
 	@After
 	public void tearDown() {
 

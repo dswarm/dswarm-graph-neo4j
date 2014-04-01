@@ -121,7 +121,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				final RDFDatatype type = literal.getDatatype();
 				Object value = literal.getValue();
 				final Node objectNode = database.createNode();
-				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
+				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value.toString());
 				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
 
 				if (type != null) {

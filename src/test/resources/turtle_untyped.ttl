@@ -2,8 +2,6 @@
 @prefix dbpp: <http://d.o/p/> .
 @prefix dbpo: <http://d.o/o/> .
 
-# 20 statements
-
 # same subject (URI)
 dbpr:The_Mind_of_Evil	dbpo:publicationDate	"1971-03-06" .
 dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Don_Houghton .

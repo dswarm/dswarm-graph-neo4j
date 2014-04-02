@@ -1,33 +1,23 @@
 package de.avgl.dmp.graph.rdf.read;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.avgl.dmp.graph.GraphStatics;
-import de.avgl.dmp.graph.read.NodeHandler;
 import de.avgl.dmp.graph.read.RelationshipHandler;
 
 /**
@@ -37,7 +27,6 @@ public class PropertyGraphRDFExporter implements RDFReader {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFExporter.class);
 
-	private final NodeHandler			nodeHandler;
 	private final RelationshipHandler	relationshipHandler;
 
 	private final GraphDatabaseService	database;
@@ -48,7 +37,6 @@ public class PropertyGraphRDFExporter implements RDFReader {
 	public PropertyGraphRDFExporter(final GraphDatabaseService databaseArg) {
 
 		database = databaseArg;
-		nodeHandler = new CBDNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
 	}
 
@@ -101,26 +89,6 @@ public class PropertyGraphRDFExporter implements RDFReader {
 	public long countStatements() {
 
 		return model.size();
-	}
-
-	private class CBDNodeHandler implements NodeHandler {
-
-		@Override
-		public void handleNode(final Node node) {
-
-			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
-			// node that holds the uri of the resource (record)
-			// => maybe we should find an appropriated cypher query as replacement for this processing
-			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
-
-				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
-
-				for (final Relationship relationship : relationships) {
-
-					relationshipHandler.handleRelationship(relationship);
-				}
-			}
-		}
 	}
 
 	private class CBDRelationshipHandler implements RelationshipHandler {

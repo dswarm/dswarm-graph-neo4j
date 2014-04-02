@@ -7,8 +7,6 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
-# 6 statements
-
 # same subject (URI)
 dbpr:The_Mind_of_Evil	dbpo:publicationDate	"1971-03-06"^^xsd:string .
 dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Don_Houghton .

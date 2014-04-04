@@ -50,6 +50,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
 	private final Index<Node>			resources;
+	private final Index<Node>			resourcesWProvenance;
 	private final Index<Node>			resourceTypes;
 	private final Map<String, Node>		bnodes;
 	private final Index<Relationship>	statements;
@@ -67,6 +68,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		LOG.debug("start write TX");
 
 		resources = database.index().forNodes("resources");
+		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		resourceTypes = database.index().forNodes("resource_types");
 		bnodes = new HashMap<String, Node>();
 		statements = database.index().forRelationships("statements");
@@ -108,6 +110,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
+					resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() + resourceGraphURI);
 				}
 
 				addedNodes++;
@@ -182,6 +185,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
+						resourcesWProvenance.add(objectNode, GraphStatics.URI_W_PROVENANCE, object.toString() + resourceGraphURI);
 					}
 
 					addedNodes++;
@@ -195,7 +199,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 40000 || timeDelta >= 30) { // Commit every 40k operations or every 30 seconds
+			if (nodeDelta >= 50000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
 
 				tx.success();
 				tx.close();
@@ -307,7 +311,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 			return node;
 		}
 
-		IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
+		IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
 
 		if (hits != null && hits.hasNext()) {
 

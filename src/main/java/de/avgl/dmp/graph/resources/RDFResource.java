@@ -13,23 +13,27 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 
 import de.avgl.dmp.graph.DMPGraphException;
+import de.avgl.dmp.graph.rdf.export.PropertyGraphRDFExporter;
+import de.avgl.dmp.graph.rdf.export.RDFExporter;
 import de.avgl.dmp.graph.rdf.parse.JenaModelParser;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
-import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFExporter;
 import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
 import de.avgl.dmp.graph.rdf.read.RDFReader;
 
@@ -59,7 +63,6 @@ public class RDFResource {
 
 		return "pong";
 	}
-	
 
 	@POST
 	@Path("/put")
@@ -134,44 +137,43 @@ public class RDFResource {
 
 		return Response.ok().entity(result).build();
 	}
-	
+
 	@GET
 	@Path("/getall")
-	@Produces("application/n-triples")
+	@Produces("application/n-quads")
 	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
 
-		final String result = readAllRDFInternal(database);
+		final String result = exportAllRDFInternal(database);
 
 		return Response.ok().entity(result).build();
 	}
-	
+
 	@GET
 	@Path("/getall")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM) // for triggering "download as ..."
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	// for triggering "download as ..."
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database) throws DMPGraphException {
 
-		final String result = readAllRDFInternal(database);
+		final String result = exportAllRDFInternal(database);
 
-		return Response.ok()
-				//.header("Content-Disposition", "attachment; filename=rdf_export.ntriples") // for triggering "download as ..."
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl") // for triggering "download as ..."
-				//.header("Content-Disposition", "attachment") // for triggering "download as ..."
-				.entity(result).build();
+		return Response.ok().header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl").entity(result).build();
 	}
 
-	private String readAllRDFInternal(final GraphDatabaseService database) {
-		LOG.debug("try to read all RDF statements (for all resource graphs and all record class uris) from graph db");
+	private String exportAllRDFInternal(final GraphDatabaseService database) {
 
-		final RDFReader rdfReader = new PropertyGraphRDFExporter(database);
-		final Model model = rdfReader.read();
+		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
-		//model.write(System.out, "N-TRIPLE");
+		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
+		final Dataset dataset = rdfExporter.export();
 
 		final StringWriter writer = new StringWriter();
-		model.write(writer, "N-TRIPLE");
+		RDFDataMgr.write(writer, dataset, Lang.NQUADS);
 		final String result = writer.toString();
 
-		LOG.debug("finished reading " + model.size() + " RDF statements from graph db");
+		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
+				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
+				+ "'))");
+
 		return result;
 	}
 }

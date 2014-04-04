@@ -19,6 +19,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+import de.avgl.dmp.graph.DMPGraphException;
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.read.NodeHandler;
 import de.avgl.dmp.graph.read.RelationshipHandler;
@@ -102,7 +103,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 	private class CBDNodeHandler implements NodeHandler {
 
 		@Override
-		public void handleNode(final Node node) {
+		public void handleNode(final Node node) throws DMPGraphException {
 
 			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
 			// node that holds the uri of the resource (record)
@@ -122,7 +123,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 	private class CBDStartNodeHandler implements NodeHandler {
 
 		@Override
-		public void handleNode(final Node node) {
+		public void handleNode(final Node node) throws DMPGraphException {
 
 			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
 			// node that holds the uri of the resource (record)
@@ -144,7 +145,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		final Map<String, Resource>	resources	= new HashMap<String, Resource>();
 
 		@Override
-		public void handleRelationship(final Relationship rel) {
+		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
 			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
 

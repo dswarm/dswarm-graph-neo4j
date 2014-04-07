@@ -89,12 +89,12 @@ public class RDFResource {
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements into graph db for resource graph URI '"
-				+ resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}
-	
+
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -114,7 +114,34 @@ public class RDFResource {
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements into graph db");
+		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/putstraight")
+	@Consumes("multipart/mixed")
+	public Response writeRDFStraight(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
+		final InputStream rdfInputStream = bpe.getInputStream();
+
+		final Model model = ModelFactory.createDefaultModel();
+		model.read(rdfInputStream, null, "N3");
+
+		LOG.debug("deserialized RDF statements that were serialised as Turtle or N3");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final RDFHandler handler = new Neo4jRDFHandler(database);
+		final RDFParser parser = new JenaModelParser(model);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
 
 		return Response.ok().build();
 	}

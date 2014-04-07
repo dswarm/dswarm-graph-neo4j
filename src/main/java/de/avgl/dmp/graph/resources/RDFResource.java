@@ -18,6 +18,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
+import de.avgl.dmp.graph.rdf.parse.nx.NxModelParser;
 import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
 import de.avgl.dmp.graph.rdf.read.RDFReader;
 
@@ -115,6 +117,29 @@ public class RDFResource {
 		parser.parse();
 
 		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+
+		return Response.ok().build();
+	}
+	
+	@POST
+	@Path("/putnx")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final NxParser nxParser = new NxParser(inputStream);
+
+		LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFHandler handler = new de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler(database);
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
 
 		return Response.ok().build();
 	}

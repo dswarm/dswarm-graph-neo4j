@@ -32,6 +32,7 @@ import de.avgl.dmp.graph.rdf.export.PropertyGraphRDFExporter;
 import de.avgl.dmp.graph.rdf.export.RDFExporter;
 import de.avgl.dmp.graph.rdf.parse.JenaModelParser;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
+import de.avgl.dmp.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
 import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
@@ -83,13 +84,37 @@ public class RDFResource {
 
 		LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFHandler(database, resourceGraphURI);
+		final RDFHandler handler = new Neo4jRDFWProvenanceHandler(database, resourceGraphURI);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db for resource graph URI '"
+		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements into graph db for resource graph URI '"
 				+ resourceGraphURI + "'");
+
+		return Response.ok().build();
+	}
+	
+	@POST
+	@Path("/put")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final Model model = ModelFactory.createDefaultModel();
+		model.read(inputStream, null, "N3");
+
+		LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final RDFHandler handler = new Neo4jRDFHandler(database);
+		final RDFParser parser = new JenaModelParser(model);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements into graph db");
 
 		return Response.ok().build();
 	}

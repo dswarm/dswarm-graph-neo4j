@@ -5,10 +5,12 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,6 +47,8 @@ import de.avgl.dmp.graph.rdf.read.RDFReader;
 public class RDFResource {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResource.class);
+
+	private static final MediaType N_QUADS_TYPE = new MediaType("application", "n-quads");
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
@@ -190,6 +194,33 @@ public class RDFResource {
 		return Response.ok().entity(result).build();
 	}
 
+	/**
+	 * for triggering a download
+	 * @param database the graph database
+	 * @throws DMPGraphException
+	 */
+	@GET
+	@Path("/getall")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database, @QueryParam("format") @DefaultValue("application/n-quads") String format) throws DMPGraphException {
+
+		final String[] formatStrings = format.split("/", 2);
+		final MediaType formatType;
+		if (formatStrings.length == 2) {
+			formatType = new MediaType(formatStrings[0], formatStrings[1]);
+		} else {
+			formatType = N_QUADS_TYPE;
+		}
+
+		LOG.debug("Exporting rdf data into " + formatType);
+
+		final String result = exportAllRDFInternal(database);
+
+		return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl")
+				.build();
+	}
+
 	@GET
 	@Path("/getall")
 	@Produces("application/n-quads")
@@ -198,17 +229,6 @@ public class RDFResource {
 		final String result = exportAllRDFInternal(database);
 
 		return Response.ok().entity(result).build();
-	}
-
-	@GET
-	@Path("/getall")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	// for triggering "download as ..."
-	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database) throws DMPGraphException {
-
-		final String result = exportAllRDFInternal(database);
-
-		return Response.ok().header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl").entity(result).build();
 	}
 
 	private String exportAllRDFInternal(final GraphDatabaseService database) {

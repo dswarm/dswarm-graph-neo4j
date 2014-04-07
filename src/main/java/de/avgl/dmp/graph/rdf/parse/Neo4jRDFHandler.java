@@ -52,6 +52,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private final Index<Node>			resources;
 	private final Index<Node>			resourcesWProvenance;
 	private final Index<Node>			resourceTypes;
+	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
 	private final Index<Relationship>	statements;
 	private final Map<Long, String>		nodeResourceMap;
@@ -70,6 +71,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		resources = database.index().forNodes("resources");
 		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		resourceTypes = database.index().forNodes("resource_types");
+		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
 		statements = database.index().forRelationships("statements");
 		nodeResourceMap = new HashMap<Long, String>();
@@ -126,6 +128,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				final Node objectNode = database.createNode();
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value.toString());
 				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
+				values.add(objectNode, GraphStatics.VALUE, value.toString());
 
 				if (type != null) {
 

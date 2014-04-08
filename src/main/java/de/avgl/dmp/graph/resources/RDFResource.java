@@ -48,14 +48,14 @@ import de.avgl.dmp.graph.rdf.read.RDFReader;
 @Path("/rdf")
 public class RDFResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResource.class);
+	private static final Logger		LOG				= LoggerFactory.getLogger(RDFResource.class);
 
-	private static final MediaType N_QUADS_TYPE = new MediaType("application", "n-quads");
+	private static final MediaType	N_QUADS_TYPE	= new MediaType("application", "n-quads");
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper		objectMapper;
 
 	public RDFResource() {
 
@@ -124,7 +124,7 @@ public class RDFResource {
 
 		return Response.ok().build();
 	}
-	
+
 	@POST
 	@Path("/putnx")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -134,7 +134,7 @@ public class RDFResource {
 
 		final NxParser nxParser = new NxParser(inputStream);
 
-		LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
+		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 
 		LOG.debug("try to write RDF statements into graph db");
 
@@ -143,34 +143,38 @@ public class RDFResource {
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db");
 
 		return Response.ok().build();
 	}
 
 	@POST
-	@Path("/putstraight")
+	@Path("/putnx")
 	@Consumes("multipart/mixed")
-	public Response writeRDFStraight(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) {
 
 		LOG.debug("try to process RDF statements and write them into graph db");
 
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
 
-		final Model model = ModelFactory.createDefaultModel();
-		model.read(rdfInputStream, null, "N3");
+		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
-		LOG.debug("deserialized RDF statements that were serialised as Turtle or N3");
+		final NxParser nxParser = new NxParser(rdfInputStream);
+
+		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 
 		LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFHandler(database);
-		final RDFParser parser = new JenaModelParser(model);
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFHandler handler = new de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler(database,
+				resourceGraphURI);
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}
@@ -221,13 +225,15 @@ public class RDFResource {
 
 	/**
 	 * for triggering a download
+	 * 
 	 * @param database the graph database
 	 * @throws DMPGraphException
 	 */
 	@GET
 	@Path("/getall")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database, @QueryParam("format") @DefaultValue("application/n-quads") String format) throws DMPGraphException {
+	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
+			@QueryParam("format") @DefaultValue("application/n-quads") String format) throws DMPGraphException {
 
 		final String[] formatStrings = format.split("/", 2);
 		final MediaType formatType;
@@ -242,8 +248,7 @@ public class RDFResource {
 		final String result = exportAllRDFInternal(database);
 
 		return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM_TYPE)
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl")
-				.build();
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl").build();
 	}
 
 	@GET

@@ -66,22 +66,22 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		this.database = database;
 
-		createIndex(DynamicLabel.label(NodeType.Resource.toString()), GraphStatics.URI_PROPERTY);
-		createIndex(DynamicLabel.label(NodeType.TypeResource.toString()), GraphStatics.URI_PROPERTY);
-		createIndex(DynamicLabel.label(NodeType.Literal.toString()), GraphStatics.VALUE_PROPERTY);
+		getOrCreateIndex(DynamicLabel.label(NodeType.Resource.toString()), GraphStatics.URI_PROPERTY);
+		getOrCreateIndex(DynamicLabel.label(NodeType.TypeResource.toString()), GraphStatics.URI_PROPERTY);
+		getOrCreateIndex(DynamicLabel.label(NodeType.Literal.toString()), GraphStatics.VALUE_PROPERTY);
 
 		// resources = database.index().forNodes("resources");
 		// resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		// resourceTypes = database.index().forNodes("resource_types");
 		// values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		
+
 		try (Transaction tx = database.beginTx()) {
 
 			statements = database.index().forRelationships("statements");
 			tx.success();
 		}
-		
+
 		// nodeResourceMap = new HashMap<Long, String>();
 
 		tx = database.beginTx();
@@ -148,11 +148,11 @@ public class Neo4jRDFHandler implements RDFHandler {
 					objectNode.setProperty(GraphStatics.DATATYPE_PROPERTY, type.toString());
 				}
 
-				//final String resourceUri = addResourceProperty(subjectNode, subject, objectNode);
+				// final String resourceUri = addResourceProperty(subjectNode, subject, objectNode);
 
 				addedNodes++;
 
-				addReleationship(subjectNode, predicateName, objectNode, /*resourceUri*/ null, subject);
+				addReleationship(subjectNode, predicateName, objectNode, /* resourceUri */null, subject);
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -331,8 +331,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 			return node;
 		}
 
-		//IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
-		
+		// IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
+
 		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_PROPERTY, resource.toString());
 
 		if (hits != null && hits.iterator().hasNext()) {
@@ -347,65 +347,81 @@ public class Neo4jRDFHandler implements RDFHandler {
 		return null;
 	}
 
-//	private String addResourceProperty(final Node subjectNode, final org.semanticweb.yars.nx.Node subject, final Node objectNode) {
-//
-//		final String resourceUri = determineResourceUri(subjectNode, subject);
-//
-//		if (resourceUri == null) {
-//
-//			return null;
-//		}
-//
-//		// objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
-//
-//		return resourceUri;
-//	}
+	// private String addResourceProperty(final Node subjectNode, final org.semanticweb.yars.nx.Node subject, final Node
+	// objectNode) {
+	//
+	// final String resourceUri = determineResourceUri(subjectNode, subject);
+	//
+	// if (resourceUri == null) {
+	//
+	// return null;
+	// }
+	//
+	// // objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
+	//
+	// return resourceUri;
+	// }
 
-//	private String addResourceProperty(final Node subjectNode, final org.semanticweb.yars.nx.Node subject, final Relationship rel,
-//			final String resourceUri) {
-//
-//		final String finalResourceUri;
-//
-//		if (resourceUri != null) {
-//
-//			finalResourceUri = resourceUri;
-//		} else {
-//
-//			finalResourceUri = determineResourceUri(subjectNode, subject);
-//		}
-//
-//		// rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
-//
-//		return finalResourceUri;
-//	}
+	// private String addResourceProperty(final Node subjectNode, final org.semanticweb.yars.nx.Node subject, final Relationship
+	// rel,
+	// final String resourceUri) {
+	//
+	// final String finalResourceUri;
+	//
+	// if (resourceUri != null) {
+	//
+	// finalResourceUri = resourceUri;
+	// } else {
+	//
+	// finalResourceUri = determineResourceUri(subjectNode, subject);
+	// }
+	//
+	// // rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+	//
+	// return finalResourceUri;
+	// }
 
-//	private String determineResourceUri(final Node subjectNode, final org.semanticweb.yars.nx.Node subject) {
-//
-//		final Long nodeId = Long.valueOf(subjectNode.getId());
-//
-//		final String resourceUri;
-//
-//		if (nodeResourceMap.containsKey(nodeId)) {
-//
-//			resourceUri = nodeResourceMap.get(nodeId);
-//		} else {
-//
-//			resourceUri = subject.toString();
-//			nodeResourceMap.put(nodeId, resourceUri);
-//		}
-//
-//		return resourceUri;
-//	}
+	// private String determineResourceUri(final Node subjectNode, final org.semanticweb.yars.nx.Node subject) {
+	//
+	// final Long nodeId = Long.valueOf(subjectNode.getId());
+	//
+	// final String resourceUri;
+	//
+	// if (nodeResourceMap.containsKey(nodeId)) {
+	//
+	// resourceUri = nodeResourceMap.get(nodeId);
+	// } else {
+	//
+	// resourceUri = subject.toString();
+	// nodeResourceMap.put(nodeId, resourceUri);
+	// }
+	//
+	// return resourceUri;
+	// }
 
-	private IndexDefinition getOrCreateIndex(final String labelName, final String property) {
+	private IndexDefinition getOrCreateIndex(final Label label, final String property) {
 
-		final Label label = DynamicLabel.label(labelName);
+		IndexDefinition indexDefinition = null;
 
-		Iterable<IndexDefinition> indices = database.schema().getIndexes(label);
+		LOG.debug("try to find index for label = '" + label.name() + "' and property = '" + property + "'");
 
-		if (indices != null && indices.iterator().hasNext()) {
+		try (Transaction tx = database.beginTx()) {
 
-			return indices.iterator().next();
+			Iterable<IndexDefinition> indices = database.schema().getIndexes(label);
+
+			if (indices != null && indices.iterator().hasNext()) {
+
+				indexDefinition = indices.iterator().next();
+			}
+
+			tx.success();
+		}
+
+		if (indexDefinition != null) {
+
+			LOG.debug("found existing index for label = '" + label.name() + "' and property = '" + property + "'");
+
+			return indexDefinition;
 		}
 
 		return createIndex(label, property);
@@ -415,6 +431,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		IndexDefinition indexDefinition = null;
 
+		LOG.debug("try to create index for label = '" + label.name() + "' and property = '" + property + "'");
+
 		try (Transaction tx = database.beginTx()) {
 
 			final IndexCreator indexCreator = database.schema().indexFor(label).on(property);
@@ -422,11 +440,17 @@ public class Neo4jRDFHandler implements RDFHandler {
 			tx.success();
 		}
 
+		LOG.debug("created index for label = '" + label.name() + "' and property = '" + property + "'");
+
+		LOG.debug("try to bring index online for label = '" + label.name() + "' and property = '" + property + "'");
+
 		try (Transaction tx = database.beginTx()) {
 
 			database.schema().awaitIndexOnline(indexDefinition, 5, TimeUnit.SECONDS);
 			tx.success();
 		}
+
+		LOG.debug("brought index online for label = '" + label.name() + "' and property = '" + property + "'");
 
 		return indexDefinition;
 	}

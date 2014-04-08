@@ -1,15 +1,20 @@
 package de.avgl.dmp.graph.resources;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -30,6 +35,10 @@ public class MaintainResource {
 
 	private static final long	chunkSize	= 50000;
 
+	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
+
+	private static final JsonFactory jsonFactory = new JsonFactory();
+
 	public MaintainResource() {
 
 	}
@@ -45,17 +54,17 @@ public class MaintainResource {
 
 	/**
 	 * note utilise this endpoint with care, because it cleans your complete db!
-	 * 
-	 * @param database
-	 * @return
+	 *
+	 * @param database the graph database
 	 */
 	@DELETE
 	@Path("/delete")
-	public Response cleanGraph(@Context final GraphDatabaseService database) {
+	@Produces("application/json")
+	public Response cleanGraph(@Context final GraphDatabaseService database) throws IOException {
 
 		MaintainResource.LOG.debug("start cleaning up the db");
 
-		deleteSomeStatements(database);
+		final long deleted = deleteSomeStatements(database);
 
 		MaintainResource.LOG.debug("finished delete-all-entities TXs");
 
@@ -64,9 +73,111 @@ public class MaintainResource {
 		// TODO: maybe separate index clean-up + observe index clean-up
 		// => maybe we also need to do a label + relationship types clean-up ...
 
-		final Transaction itx = database.beginTx();
+		deleteSomeIndices(database);
 
+		MaintainResource.LOG.debug("finished indices clean-up");
+
+		MaintainResource.LOG.debug("finished cleaning up the db");
+
+		final StringWriter out = new StringWriter();
+		JsonGenerator generator = jsonFactory.createGenerator(out);
+
+		generator.writeStartObject();
+		generator.writeNumberField("deleted", deleted);
+		generator.writeEndObject();
+		generator.flush();
+		generator.close();
+
+		return Response.ok(out.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+	}
+
+	private long deleteSomeStatements(final GraphDatabaseService database) {
+
+		final ExecutionEngine engine = new ExecutionEngine(database);
+
+		final String deleteQuery = String.format(DELETE_CYPHER, MaintainResource.chunkSize);
+
+		long deleted = 0;
+
+		int i = 0;
+
+		while (true) {
+
+			i++;
+
+			final Transaction tx = database.beginTx();
+
+			MaintainResource.LOG.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i
+					+ ". time");
+
+			try {
+
+				final ExecutionResult result = engine.execute(deleteQuery);
+
+				if (!result.iterator().hasNext()) {
+
+					break;
+				}
+
+				final Map<String, Object> row = result.iterator().next();
+
+				if (row == null || row.isEmpty()) {
+
+					break;
+				}
+
+				final Entry<String, Object> entry = row.entrySet().iterator().next();
+
+				if (entry == null) {
+
+					break;
+				}
+
+				final Object value = entry.getValue();
+
+				if (value == null) {
+
+					break;
+				}
+
+				if (!entry.getKey().equals("entity_count")) {
+
+					break;
+				}
+
+				final Long count = (Long) value;
+
+				deleted += count;
+
+				MaintainResource.LOG.debug("deleted " + count + " entities");
+
+				if (count == 0) {
+
+					break;
+				}
+
+				tx.success();
+
+			} catch (final Exception e) {
+
+				MaintainResource.LOG.error("couldn't finished delete-all-entities TX successfully", e);
+
+				tx.failure();
+			} finally {
+
+				MaintainResource.LOG.debug("finished delete-all-entities TX finally");
+
+				tx.close();
+			}
+		}
+
+		return deleted;
+	}
+
+	private void deleteSomeIndices(final GraphDatabaseService database) {
 		MaintainResource.LOG.debug("start delete indices TX");
+
+		final Transaction itx = database.beginTx();
 
 		try {
 
@@ -102,147 +213,20 @@ public class MaintainResource {
 
 				statements.delete();
 			}
+
+			itx.success();
+
 		} catch (final Exception e) {
 
 			MaintainResource.LOG.error("couldn't finished delete indices TX successfully", e);
 
 			itx.failure();
-			itx.close();
 		} finally {
 
 			MaintainResource.LOG.debug("finished delete indices TX finally");
 
-			itx.success();
+
 			itx.close();
-		}
-
-		MaintainResource.LOG.debug("finished indices clean-up");
-
-		MaintainResource.LOG.debug("finished cleaning up the db");
-
-		return Response.ok().build();
-	}
-
-	private void deleteSomeStatements(final GraphDatabaseService database) {
-
-		final ExecutionEngine engine = new ExecutionEngine(database);
-
-		final String deleteQuery = "MATCH (a)\n" + "WITH a\n" + "LIMIT " + MaintainResource.chunkSize + "\n" + "OPTIONAL MATCH (a)-[r]-()\n"
-				+ "DELETE a,r\n" + "RETURN COUNT(*) AS entity_count\n";
-
-		boolean finished = false;
-
-		while (!finished) {
-
-			final Transaction tx = database.beginTx();
-
-			try {
-
-				final ExecutionResult result = engine.execute(deleteQuery);
-
-				MaintainResource.LOG.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the first time");
-
-				int i = 1;
-
-				if (result == null) {
-
-					finished = true;
-
-					break;
-				}
-
-				if (!result.iterator().hasNext()) {
-
-					finished = true;
-
-					break;
-				}
-
-				final Map<String, Object> row = result.iterator().next();
-
-				if (row == null) {
-
-					finished = true;
-
-					break;
-				}
-
-				if (row.isEmpty()) {
-
-					finished = true;
-
-					break;
-				}
-
-				final Set<Entry<String, Object>> column = row.entrySet();
-
-				if (column == null) {
-
-					finished = true;
-
-					break;
-				}
-
-				if (column.isEmpty()) {
-
-					finished = true;
-
-					break;
-				}
-
-				final Entry<String, Object> entry = column.iterator().next();
-
-				if (entry == null) {
-
-					finished = true;
-
-					break;
-				}
-
-				final Object value = entry.getValue();
-
-				if (value == null) {
-
-					finished = true;
-
-					break;
-				}
-
-				if (!entry.getKey().equals("entity_count")) {
-
-					finished = true;
-
-					break;
-				}
-
-				final Long count = (Long) value;
-
-				MaintainResource.LOG.debug("deleted " + count + " entities");
-
-				if (count.longValue() < MaintainResource.chunkSize) {
-
-					finished = true;
-
-					break;
-				}
-
-				MaintainResource.LOG.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i
-						+ " time");
-
-				i++;
-			} catch (final Exception e) {
-
-				MaintainResource.LOG.error("couldn't finished delete-all-entities TX successfully", e);
-
-				tx.failure();
-				tx.close();
-			} finally {
-
-				MaintainResource.LOG.debug("finished delete-all-entities TX finally");
-
-				tx.success();
-				tx.close();
-			}
 		}
 	}
 }

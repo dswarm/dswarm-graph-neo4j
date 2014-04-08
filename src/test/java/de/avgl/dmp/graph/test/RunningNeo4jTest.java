@@ -45,12 +45,12 @@ public class RunningNeo4jTest {
 	public void tearDown() {
 
 		// TODO: we may need to remove this and replace this with a more precise delete method
-		
+
 		LOG.debug("clean-up DB after test has finished");
 
-		// final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
+		final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
 
-		// Assert.assertEquals("expected 200", 200, response.getStatus());
+		Assert.assertEquals("expected 200", 200, response.getStatus());
 	}
 
 	protected WebResource service() {

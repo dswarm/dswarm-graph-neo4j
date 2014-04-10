@@ -2,6 +2,8 @@ package de.avgl.dmp.graph.read;
 
 import org.neo4j.graphdb.Node;
 
+import de.avgl.dmp.graph.DMPGraphException;
+
 
 /**
  * 
@@ -10,5 +12,5 @@ import org.neo4j.graphdb.Node;
  */
 public interface NodeHandler {
 
-	public void handleNode(Node node);
+	public void handleNode(Node node) throws DMPGraphException;
 }

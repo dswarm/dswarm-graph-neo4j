@@ -201,8 +201,6 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
 							addLabel(objectNode, RDFS.CLASS.toString());
 						}
-
-						objectNode.setProperty(GraphStatics.URI_W_PROVENANCE_PROPERTY, object.toString() + " " + resourceGraphURI);
 					} else {
 
 						if (!isType) {

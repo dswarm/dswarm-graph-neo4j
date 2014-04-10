@@ -76,6 +76,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 		// values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
 
+		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing
+		
 		try (Transaction tx = database.beginTx()) {
 
 			statements = database.index().forRelationships("statements");

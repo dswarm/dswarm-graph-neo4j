@@ -3,6 +3,7 @@ package de.avgl.dmp.graph.rdf.export.test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
@@ -68,8 +70,11 @@ public class FullRDFExportSingleGraphOnEmbeddedDBTest extends FullRDFExportOnEmb
 
 		FullRDFExportSingleGraphOnEmbeddedDBTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
+		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
+		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
+
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile(), "TURTLE");
+		modelFromOriginalRDFile.read(inputSupplier.getInput(), null, "TURTLE");
 
 		final long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();
 

@@ -14,6 +14,7 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.avgl.dmp.graph.DMPGraphException;
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.json.LiteralNode;
 import de.avgl.dmp.graph.json.Model;
@@ -114,7 +115,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 	private class CBDNodeHandler implements NodeHandler {
 
 		@Override
-		public void handleNode(final Node node) {
+		public void handleNode(final Node node) throws DMPGraphException {
 
 			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
 			// node that holds the uri of the resource (record)
@@ -134,7 +135,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 	private class CBDStartNodeHandler implements NodeHandler {
 
 		@Override
-		public void handleNode(final Node node) {
+		public void handleNode(final Node node) throws DMPGraphException {
 
 			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
 			// node that holds the uri of the resource (record)
@@ -156,7 +157,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 		final Map<String, ResourceNode>					resourceNodes	= new HashMap<String, ResourceNode>();
 
 		@Override
-		public void handleRelationship(final Relationship rel) {
+		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
 			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
 

@@ -5,30 +5,40 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 
 import de.avgl.dmp.graph.DMPGraphException;
+import de.avgl.dmp.graph.rdf.export.PropertyGraphRDFExporter;
+import de.avgl.dmp.graph.rdf.export.RDFExporter;
 import de.avgl.dmp.graph.rdf.parse.JenaModelParser;
 import de.avgl.dmp.graph.rdf.parse.Neo4jRDFHandler;
+import de.avgl.dmp.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFHandler;
 import de.avgl.dmp.graph.rdf.parse.RDFParser;
+import de.avgl.dmp.graph.rdf.parse.nx.NxModelParser;
 import de.avgl.dmp.graph.rdf.read.PropertyGraphRDFReader;
 import de.avgl.dmp.graph.rdf.read.RDFReader;
 
@@ -38,12 +48,14 @@ import de.avgl.dmp.graph.rdf.read.RDFReader;
 @Path("/rdf")
 public class RDFResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResource.class);
+	private static final Logger		LOG				= LoggerFactory.getLogger(RDFResource.class);
+
+	private static final MediaType	N_QUADS_TYPE	= new MediaType("application", "n-quads");
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper		objectMapper;
 
 	public RDFResource() {
 
@@ -78,13 +90,91 @@ public class RDFResource {
 
 		LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFHandler(database, resourceGraphURI);
+		final RDFHandler handler = new Neo4jRDFWProvenanceHandler(database, resourceGraphURI);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db for resource graph URI '"
-				+ resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/put")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final Model model = ModelFactory.createDefaultModel();
+		model.read(inputStream, null, "N3");
+
+		LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final RDFHandler handler = new Neo4jRDFHandler(database);
+		final RDFParser parser = new JenaModelParser(model);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/putnx")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final NxParser nxParser = new NxParser(inputStream);
+
+		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFHandler handler = new de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler(database);
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db");
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/putnx")
+	@Consumes("multipart/mixed")
+	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+
+		LOG.debug("try to process RDF statements and write them into graph db");
+
+		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
+		final InputStream rdfInputStream = bpe.getInputStream();
+
+		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+
+		final NxParser nxParser = new NxParser(rdfInputStream);
+
+		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+
+		LOG.debug("try to write RDF statements into graph db");
+
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFHandler handler = new de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler(database,
+				resourceGraphURI);
+		final de.avgl.dmp.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		LOG.debug("finished writing " + ((de.avgl.dmp.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}
@@ -131,5 +221,61 @@ public class RDFResource {
 				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
+	}
+
+	/**
+	 * for triggering a download
+	 * 
+	 * @param database the graph database
+	 * @throws DMPGraphException
+	 */
+	@GET
+	@Path("/getall")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
+			@QueryParam("format") @DefaultValue("application/n-quads") String format) throws DMPGraphException {
+
+		final String[] formatStrings = format.split("/", 2);
+		final MediaType formatType;
+		if (formatStrings.length == 2) {
+			formatType = new MediaType(formatStrings[0], formatStrings[1]);
+		} else {
+			formatType = N_QUADS_TYPE;
+		}
+
+		LOG.debug("Exporting rdf data into " + formatType);
+
+		final String result = exportAllRDFInternal(database);
+
+		return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl").build();
+	}
+
+	@GET
+	@Path("/getall")
+	@Produces("application/n-quads")
+	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		final String result = exportAllRDFInternal(database);
+
+		return Response.ok().entity(result).build();
+	}
+
+	private String exportAllRDFInternal(final GraphDatabaseService database) {
+
+		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
+
+		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
+		final Dataset dataset = rdfExporter.export();
+
+		final StringWriter writer = new StringWriter();
+		RDFDataMgr.write(writer, dataset, Lang.NQUADS);
+		final String result = writer.toString();
+
+		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
+				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
+				+ "'))");
+
+		return result;
 	}
 }

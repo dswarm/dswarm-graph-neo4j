@@ -1,0 +1,31 @@
+@prefix dbpr: <http://d.o/r/> .
+@prefix dbpp: <http://d.o/p/> .
+@prefix dbpo: <http://d.o/o/> .
+
+# same subject (URI)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"1971-03-06" .
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Don_Houghton .
+
+# same object (URI)
+dbpr:The_Mind_of_Evil	dbpp:writer	dbpr:Terrance_Dicks .
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Terrance_Dicks .
+
+# multiple literals (same subject, predicate as above)
+dbpr:The_Mind_of_Evil	dbpo:publicationDate	"2000-01-01" . # fictional added value ... 
+
+
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Dave_Martin .
+dbpr:Terror_of_the_Autons	dbpo:publicationDate	"1971-01-23" .
+dbpr:The_Daemons	dbpp:serialName	"The Daemons" .
+dbpr:Terror_of_the_Autons	dbpp:serialName	"Terror of the Autons" .
+dbpr:The_Claws_of_Axos	dbpo:publicationDate	"1971-04-03" .
+dbpr:The_Claws_of_Axos	dbpp:serialName	"The Claws of Axos" .
+dbpr:Colony_in_Space	dbpo:publicationDate	"1971-05-15" .
+dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Terrance_Dicks .
+dbpr:Colony_in_Space	dbpp:serialName	"Colony in Space" .
+dbpr:The_Mind_of_Evil	dbpp:serialName	"The Mind of Evil" .
+dbpr:The_Daemons	dbpo:publicationDate	"1971-06-19" .
+dbpr:The_Claws_of_Axos	dbpp:writer	dbpr:Bob_Baker .
+dbpr:The_Daemons	dbpp:writer	dbpr:Barry_Letts .
+dbpr:Colony_in_Space	dbpp:writer	dbpr:Malcolm_Hulke .
+dbpr:Terror_of_the_Autons	dbpp:writer	dbpr:Robert_Holmes .

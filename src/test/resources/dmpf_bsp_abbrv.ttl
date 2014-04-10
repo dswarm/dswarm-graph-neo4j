@@ -1,0 +1,3276 @@
+# baseURI: file:/K:/LokalRepositories/git/dmp-graph/src/test/resources/dmpf_bsp1.n3
+
+@prefix maxbxml:  <http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#> .
+@prefix oai2:    <http://www.openarchives.org/OAI/2.0/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<http://data.slub-dresden.de/datamodels/22/records/18d68601-0623-42b4-ad89-f8954cc25912>
+      rdf:type oai2:recordType ;
+      oai2:header
+              [ rdf:type oai2:headerType ;
+                oai2:identifier
+                        [ rdf:type oai2:identifierType ;
+                          rdf:value "libero-publish:13703983"
+                        ]
+              ] ;
+      oai2:metadata
+              [ rdf:type oai2:metadataType ;
+                maxbxml:record
+                        [ rdf:type maxbxml:recordType ;
+                          maxbxml:controlfield
+                                  [ rdf:type maxbxml:controlfieldType ;
+                                    rdf:value "00946nM2.01200024||||||h" ;
+                                    maxbxml:tag "LDR"
+                                  ] ;
+                          maxbxml:controlfield
+                                  [ rdf:type maxbxml:controlfieldType ;
+                                    rdf:value "13703983" ;
+                                    maxbxml:tag "SYS"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "M�nchen, Techn. Univ., Diss., 2004" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "519"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 5400-YC 9599" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b|||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "065" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "aa1u|rn|||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Zetkin unter Fiberbronchoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "808" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|Lungenkrankheit" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "850" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWD" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20051207214754" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "s" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "  210204028           Lungenfunktionsst�rung" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "RVK" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "803" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Unternehmen / Qualit�tssicherung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "830" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "WW-YV" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Management-Enz., HW Prod., gegen Gabler, B 1996" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "808" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Fiberendoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "27.9b" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00721nM2.01200024      q" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00286nM2.01200024      s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "g" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "207162921           YB 6511" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20050117" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 6500-YB 6599" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "- analog Schilddr�senfunktionsst�rung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "808" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "b" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|610" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWB" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "909"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "az1uc|l||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20110601133411" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20120101000000" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "003"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "4211508-5" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "028" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Theoretische und Klinische Medizin" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "31.1a" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Fiberendoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "b" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "hs" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "076"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a|zu|||z|0017" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "030"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "211922501" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Brustorgane allgemein" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWD" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "04,H12,1351" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "574"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "s" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "  211922501           Fiberendoskopie" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "616.07545" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "RVK" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 6500-YB 7099" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20050117" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "002"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "450881660" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "ULUB" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "080"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "4388781-8" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "028" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 6511" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "4126457-5" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "028" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "c" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "druck" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "076"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Zetkin unter Fiberbronchoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "808" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Beschaffenheitssicherung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "830" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "188721398" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "972425012" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "025"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00214nM2.01200024      s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "z" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "e" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "4126457-5" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "028" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "g|" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "041" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "PND" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2004" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "425"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "11542413X" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "012" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "z" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Inhaltsverzeichnis" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "088"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "za1u|rz||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "novd" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "998"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "aa1u|rn|||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Innere Medizin" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Schl�ssel zur Theoretischen und Klinischen Medizin" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a|||||||||||||" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "050"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "30846757" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "6209" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "fied1" ;
+                                              maxbxml:code "d"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "K13" ;
+                                              maxbxml:code "f"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "XC 1604 G312 L9" ;
+                                              maxbxml:code "g"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "fied1" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "3204 40458 001" ;
+                                              maxbxml:code "g"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "G" ;
+                                              maxbxml:code "h"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "K" ;
+                                              maxbxml:code "e"
+                                            ] ;
+                                    maxbxml:tag "AVA"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "620.0045" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Atmungsorgane, Pulmonologie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "b" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "188721398" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "DDSU" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB-YC" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 5700-YB 7099" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Allgemeine Literatur zu einem Hauptgebiet" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "s" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "  209585226           Qualit�tssicherung" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "210204028" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Medizin" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20120425230000" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "19900405" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "30 cm" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "435"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20100607161609" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "o" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "76525830" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "025"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "http://digitool.hbz-nrw.de:1801/webclient/DeliveryManager?pid=3597032" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "088"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "aa1u|z|||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|Endoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "850" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "27.5" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "4388781-8" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "028" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "aa1u|rn|||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 6501-YB 6528" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Lunge (s.a. WW 9460 = Vorklinik)" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "x181" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "997"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "A. Formalschl�ssel" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "||1u|||||||||" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "030" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Qualit�tssicherung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "BSZ" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "070"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "19951017" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|Funktionsst�rung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "850" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Geigant, Claudia" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00134nM2.01200024      p" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Spezielle Innere Medizin" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "m" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "658.4013" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWD" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "mu|||||" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "051"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "b" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "ger" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "037"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "13703983" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "000"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "616.24" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "211922501" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "11542413X" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "z" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "dt." ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "037"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Methodik, Arbeitsmethoden, Nachweise, (einschlie�lich Apparate, Instrumente, Einrichtung)" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "840" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "616.07545" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|Endoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "850" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20050709" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2004" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "425"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Lungenfunktionsver�nderungen obstruktiver und nicht-obstruktiver Patienten und Evaluierung von Qualit�tskriterien in der Fiberbronchoskopie" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "331"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20100828183215" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20050201" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 5400-YB 9999" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "14" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "071" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5090 ddsu,sred" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "537"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800sQualit�tssicherung++4126457-5++swd" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "z" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "f" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "2205618" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "102"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "207162921" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00214nM2.01200024      s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Als technische G�tesicherung von Produkten und Prozessen Teilbereich des Qualit�tsmanagement. Als integrative Qualit�tssicherung Vorform des Qualit�tsmanagement." ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "b" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "808" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "a" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWB" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "904"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Lungenfunktionsst�rung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "800" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20050201000000" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "rvkn" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922|450881660" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "19951017" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "b" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|610" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "c" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "88 Bl. : graph. Darst." ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "433"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "w" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "e" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "068" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "XA-YV" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "10.11c" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "s" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "  211922501           Fiberendoskopie" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "209585226" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "001" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Claudia Geigant" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "359"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00290cM2.01200024      l" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "|Qualit�tsmanagement" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "850" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Geigant, Claudia &lt;P&gt;: Lungenfunktionsver�nderungen obstruktiver und nicht-obstruktiver Patienten und Evaluierung von Qualit�tskriterien in der Fiberbronchoskopie" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "081" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "5998922" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "3001"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Geigant, Claudia" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "100"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "SWD" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "080" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "Lunge / Funktionsst�rung" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "s" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "830" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "626837" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 " " ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "DNB972425012" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "026"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "e" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value " mV:DE-605;X:Imageware qapplication/pdf uhttp://digitool.hbz-nrw.de:1801/webclient/DeliveryManager?pid=3597032 3Inhaltsverzeichnis" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "655"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "20110601133411" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "003" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "902"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "19900329" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "a" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "002" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "YB 6511-YB 6528" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "n" ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "076" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "271306" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "700"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "m" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "HS" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "029"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "00578nM2.01200024      s" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "###" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "550634" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "c" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "M�nchen" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:tag "673"
+                                  ] ;
+                          maxbxml:datafield
+                                  [ rdf:type maxbxml:datafieldType ;
+                                    maxbxml:ind1 "x" ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "27.5" ;
+                                              maxbxml:code "c"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              maxbxml:code "b"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "040" ;
+                                              maxbxml:code "a"
+                                            ] ;
+                                    maxbxml:subfield
+                                            [ rdf:type maxbxml:subfieldType ;
+                                              rdf:value "814422" ;
+                                              maxbxml:code "_"
+                                            ] ;
+                                    maxbxml:tag "907"
+                                  ] ;
+                          maxbxml:leader
+                                  [ rdf:type maxbxml:leaderType ;
+                                    rdf:value "00946nM2.01200024||||||h"
+                                  ]
+                        ]
+              ] .

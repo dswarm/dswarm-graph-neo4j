@@ -68,7 +68,7 @@ public class FullRDFExportSingleGraphOnRunningDBTest extends FullRDFExportOnRunn
 		FullRDFExportSingleGraphOnRunningDBTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile());
+		modelFromOriginalRDFile.read(Resources.getResource(FullRDFExportOnRunningDBTest.TEST_RDF_FILE).getFile(), "TURTLE");
 
 		final long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();
 

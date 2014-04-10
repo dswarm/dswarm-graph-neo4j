@@ -69,10 +69,10 @@ public class FullRDFExportMultipleGraphsOnEmbeddedDBTest extends FullRDFExportOn
 		FullRDFExportMultipleGraphsOnEmbeddedDBTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile());
+		modelFromOriginalRDFile.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile(), "TURTLE");
 
 		final Model modelFromOriginalRDFile2 = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile2.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile());
+		modelFromOriginalRDFile2.read(Resources.getResource(FullRDFExportOnEmbeddedDBTest.TEST_RDF_FILE).getFile(), "TURTLE");
 
 		final long statementsInOriginalRDFFileAfter2ndRead = modelFromOriginalRDFile.size() + modelFromOriginalRDFile2.size();
 

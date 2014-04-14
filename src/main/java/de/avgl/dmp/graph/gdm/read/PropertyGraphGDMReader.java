@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.gdm;
+package de.avgl.dmp.graph.gdm.read;
 
 import java.util.HashMap;
 import java.util.Map;

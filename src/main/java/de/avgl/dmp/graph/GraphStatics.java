@@ -13,6 +13,8 @@ public final class GraphStatics {
 	public static final String	URI_PROPERTY				= "__URI__";
 	public static final String	URI_W_PROVENANCE_PROPERTY	= "__URI_W_PROVENANCE__";
 	public static final String	VALUE_PROPERTY				= "__VALUE__";
+	public static final String	ORDER_PROPERTY				= "__ORDER__";
+	public static final String	INDEX_PROPERTY				= "__INDEX__";
 	public static final String	PROVENANCE_PROPERTY			= "__PROVENANCE__";
 	public static final String	RESOURCE_PROPERTY			= "__RESOURCE__";
 	public static final String	DATATYPE_PROPERTY			= "__DATATYPE__";

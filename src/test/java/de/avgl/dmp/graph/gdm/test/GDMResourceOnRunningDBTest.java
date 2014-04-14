@@ -29,6 +29,12 @@ public class GDMResourceOnRunningDBTest extends RunningNeo4jTest {
 
 		super("/ext");
 	}
+	
+	@Test
+	public void writeGDMToRunningDB() throws IOException {
+
+		writeGDMToTestDBInternal();
+	}
 
 	@Test
 	public void readGDMFromRunningDB() throws IOException {
@@ -98,5 +104,27 @@ public class GDMResourceOnRunningDBTest extends RunningNeo4jTest {
 		multiPart.close();
 
 		LOG.debug("finished writing RDF statements for GDM resource at embedded DB");
+	}
+	
+	private void writeGDMToTestDBInternal() throws IOException {
+
+		LOG.debug("start writing GDM statements for GDM resource at embedded DB");
+
+		final URL fileURL = Resources.getResource("test-mabxml.gson");
+		final byte[] file = Resources.toByteArray(fileURL);
+
+		// Construct a MultiPart with two body parts
+		final MultiPart multiPart = new MultiPart();
+		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+				new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE));
+
+		// POST the request
+		final ClientResponse response = service().path("/gdm/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		multiPart.close();
+
+		LOG.debug("finished writing GDM statements for GDM resource at embedded DB");
 	}
 }

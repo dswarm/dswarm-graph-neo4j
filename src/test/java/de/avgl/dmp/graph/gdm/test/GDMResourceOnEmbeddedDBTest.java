@@ -53,7 +53,7 @@ public class GDMResourceOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 	}
 
 	@Test
-	public void readGDMFromTestDB() throws IOException {
+	public void readGDMFromTestDBThatWasWrittenAsRDF() throws IOException {
 
 		LOG.debug("start read test for GDM resource at embedded DB");
 
@@ -81,6 +81,39 @@ public class GDMResourceOnEmbeddedDBTest extends EmbeddedNeo4jTest {
 		LOG.debug("read '" + model.size() + "' statements");
 
 		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
+
+		LOG.debug("finished read test for GDM resource at embedded DB");
+	}
+	
+	@Test
+	public void readGDMFromTestDBThatWasWrittenAsGDM() throws IOException {
+
+		LOG.debug("start read test for GDM resource at embedded DB");
+
+		writeGDMToTestDBInternal();
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		requestJson.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
+		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+
+		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
+
+		// POST the request
+		final ClientResponse response = service().path("/gdm/get").type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, requestJsonString);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		final String body = response.getEntity(String.class);
+
+		final de.avgl.dmp.graph.json.Model model = objectMapper.readValue(body, de.avgl.dmp.graph.json.Model.class);
+
+		LOG.debug("read '" + model.size() + "' statements");
+
+		Assert.assertEquals("the number of statements should be 190", 190, model.size());
 
 		LOG.debug("finished read test for GDM resource at embedded DB");
 	}

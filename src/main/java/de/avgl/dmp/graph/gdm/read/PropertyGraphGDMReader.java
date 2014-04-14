@@ -2,6 +2,7 @@ package de.avgl.dmp.graph.gdm.read;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
@@ -14,6 +15,9 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import de.avgl.dmp.graph.DMPGraphException;
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.json.LiteralNode;
@@ -21,6 +25,7 @@ import de.avgl.dmp.graph.json.Model;
 import de.avgl.dmp.graph.json.Predicate;
 import de.avgl.dmp.graph.json.Resource;
 import de.avgl.dmp.graph.json.ResourceNode;
+import de.avgl.dmp.graph.json.Statement;
 import de.avgl.dmp.graph.read.NodeHandler;
 import de.avgl.dmp.graph.read.RelationshipHandler;
 
@@ -29,7 +34,7 @@ import de.avgl.dmp.graph.read.RelationshipHandler;
  */
 public class PropertyGraphGDMReader implements GDMReader {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
+	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
 
 	private final NodeHandler			nodeHandler;
 	private final NodeHandler			startNodeHandler;
@@ -42,6 +47,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 	private Model						model;
 	private Resource					currentResource;
+	private Map<Long, Statement>		currentResourceStatements	= Maps.newHashMap();
 
 	public PropertyGraphGDMReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
@@ -87,6 +93,28 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 				currentResource = new Resource(resourceUri);
 				startNodeHandler.handleNode(recordNode);
+
+				if (currentResourceStatements != null && !currentResourceStatements.isEmpty()) {
+
+					// note, this is just an integer number (i.e. NOT long)
+					final int mapSize = currentResourceStatements.size();
+
+					long i = 0;
+
+					final Set<Statement> statements = Sets.newLinkedHashSet();
+
+					while (i < mapSize) {
+
+						i++;
+
+						final Statement statement = currentResourceStatements.get(Long.valueOf(i));
+
+						statements.add(statement);
+					}
+
+					currentResource.setStatements(statements);
+				}
+				
 				model.addResource(currentResource);
 			}
 		} catch (final Exception e) {
@@ -223,7 +251,30 @@ public class PropertyGraphGDMReader implements GDMReader {
 					}
 				}
 
-				currentResource.addStatement(statementId, subjectNode, predicateProperty, objectNode);
+				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+
+				final Statement statement;
+
+				if (order != null) {
+
+					statement = new Statement(statementId, subjectNode, predicateProperty, objectNode, order);
+				} else {
+
+					statement = new Statement(statementId, subjectNode, predicateProperty, objectNode);
+				}
+
+				// index should never be null (when resource was written as GDM JSON)
+				final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
+
+				if (index != null) {
+
+					currentResourceStatements.put(index, statement);
+				} else {
+
+					// note maybe improve this here
+
+					currentResource.addStatement(statement);
+				}
 
 				// continue traversal with object node
 				nodeHandler.handleNode(rel.getEndNode());

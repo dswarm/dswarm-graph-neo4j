@@ -1,24 +1,18 @@
 package de.avgl.dmp.graph.rdf.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
 import junit.framework.Assert;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Test;
 import org.neo4j.server.NeoServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.avgl.dmp.graph.test.EmbeddedNeo4jTest;

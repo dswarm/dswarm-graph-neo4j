@@ -24,6 +24,7 @@ import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
 import de.avgl.dmp.graph.rdf.utils.RDFUtils;
 import de.avgl.dmp.graph.read.RelationshipHandler;
+import de.avgl.dmp.graph.utils.GraphUtils;
 
 /**
  * @author polowins
@@ -153,7 +154,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 			// subject
 
 			final Node subjectNode = rel.getStartNode();
-			final NodeType subjectNodeType = determineNodeType(subjectNode);
+			final NodeType subjectNodeType = GraphUtils.determineNodeType(subjectNode);
 
 			final Resource subjectResource;
 
@@ -194,13 +195,14 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			// predicate
 
-			final String predicate = (String) rel.getProperty(GraphStatics.URI_PROPERTY, null);
+			final String predicate = rel.getType().name();
+					//.getProperty(GraphStatics.URI_PROPERTY, null);
 			final Property predicateProperty = model.createProperty(predicate);
 
 			// object
 
 			final Node objectNode = rel.getEndNode();
-			final NodeType objectNodeType = determineNodeType(objectNode);
+			final NodeType objectNodeType = GraphUtils.determineNodeType(objectNode);
 
 			final RDFNode objectRDFNode;
 
@@ -307,33 +309,6 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			return resources.get(uri);
 		}
-	}
-
-	private NodeType determineNodeType(final Node node) throws DMPGraphException {
-
-		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
-
-		if (nodeTypeString == null) {
-
-			final String message = "node type string can't never be null (node id = '" + node.getId() + "')";
-
-			PropertyGraphRDFExporter.LOG.error(message);
-
-			throw new DMPGraphException(message);
-		}
-
-		final NodeType nodeType = NodeType.getByName(nodeTypeString);
-
-		if (nodeType == null) {
-
-			final String message = "node type can't never be null (node id = '" + node.getId() + "')";
-
-			PropertyGraphRDFExporter.LOG.error(message);
-
-			throw new DMPGraphException(message);
-		}
-
-		return nodeType;
 	}
 
 	@Override

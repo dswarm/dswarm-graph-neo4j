@@ -166,7 +166,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 					subjectResource = createResourceFromURI(subject);
 				}
 
-				final String predicate = (String) rel.getProperty(GraphStatics.URI_PROPERTY, null);
+				final String predicate = rel.getType().name();
+						//.getProperty(GraphStatics.URI_PROPERTY, null);
 				final Property predicateProperty = model.createProperty(predicate);
 
 				final String object;

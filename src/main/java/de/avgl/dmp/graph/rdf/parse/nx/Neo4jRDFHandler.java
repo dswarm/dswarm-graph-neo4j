@@ -53,7 +53,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 	// private final Index<Node> resourceTypes;
 	// private final Index<Node> values;
 	private final Map<String, Node>		bnodes;
-	private final Index<Relationship>	statements;
+	// private final Index<Relationship>	statements;
 	// private final Map<Long, String> nodeResourceMap;
 
 	private Transaction					tx;
@@ -76,13 +76,13 @@ public class Neo4jRDFHandler implements RDFHandler {
 		// values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
 
-		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing
+		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing => via uuid property ;)
 		
-		try (Transaction tx = database.beginTx()) {
-
-			statements = database.index().forRelationships("statements");
-			tx.success();
-		}
+//		try (Transaction tx = database.beginTx()) {
+//
+//			statements = database.index().forRelationships("statements");
+//			tx.success();
+//		}
 
 		// nodeResourceMap = new HashMap<Long, String>();
 
@@ -313,7 +313,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
 		// rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-		statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+		// statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
 
 		addedRelationships++;
 

@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.rdf.parse;
+package de.avgl.dmp.graph.gdm.parse;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,26 +18,24 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
+import de.avgl.dmp.graph.json.LiteralNode;
+import de.avgl.dmp.graph.json.Resource;
+import de.avgl.dmp.graph.json.ResourceNode;
+import de.avgl.dmp.graph.json.Statement;
 
 /**
  * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
  * 
  * @author tgaengler
  */
-public class Neo4jRDFHandler implements RDFHandler {
+public class Neo4jGDMHandler implements GDMHandler {
 
-	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jRDFHandler.class);
+	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jGDMHandler.class);
 
 	private int							totalTriples		= 0;
 	private int							addedNodes			= 0;
@@ -54,12 +52,12 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	//private final Index<Relationship>	statements;
+	// private final Index<Relationship> statements;
 	private final Map<Long, String>		nodeResourceMap;
 
 	private Transaction					tx;
 
-	public Neo4jRDFHandler(final GraphDatabaseService database) {
+	public Neo4jGDMHandler(final GraphDatabaseService database) {
 
 		this.database = database;
 		tx = database.beginTx();
@@ -71,12 +69,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		//statements = database.index().forRelationships("statements");
+		// statements = database.index().forRelationships("statements");
 		nodeResourceMap = new HashMap<Long, String>();
 	}
 
 	@Override
-	public void handleStatement(final Statement st) {
+	public void handleStatement(final Statement st, final Resource r, final long index) {
+
+		// utilise r for the resource property
 
 		i++;
 
@@ -84,12 +84,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		try {
 
-			final Resource subject = st.getSubject();
+			final de.avgl.dmp.graph.json.Node subject = st.getSubject();
 
-			final Property predicate = st.getPredicate();
-			final String predicateName = predicate.toString();
+			final de.avgl.dmp.graph.json.Predicate predicate = st.getPredicate();
+			final String predicateName = predicate.getUri();
 
-			final RDFNode object = st.getObject();
+			final de.avgl.dmp.graph.json.Node object = st.getObject();
+
+			final Long order = st.getOrder();
 
 			// Check index for subject
 			Node subjectNode = determineNode(subject);
@@ -98,54 +100,53 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 				subjectNode = database.createNode();
 
-				if (subject.isAnon()) {
+				if (subject instanceof ResourceNode) {
 
-					bnodes.put(subject.toString(), subjectNode);
-					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-				} else {
+					final String subjectURI = ((ResourceNode) subject).getUri();
 
-					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
+					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					// subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
-					resources.add(subjectNode, GraphStatics.URI, subject.toString());
+					resources.add(subjectNode, GraphStatics.URI, subjectURI);
 					// resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() +
 					// resourceGraphURI);
+				} else {
+
+					// subject is a blank node
+
+					// note: can I expect an id here?
+					bnodes.put(subject.toString(), subjectNode);
+					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
 				addedNodes++;
 			}
 
-			if (object.isLiteral()) {
+			if (object instanceof LiteralNode) {
 
 				literals++;
 
-				final Literal literal = (Literal) object;
-				final RDFDatatype type = literal.getDatatype();
-				Object value = literal.getValue();
+				final LiteralNode literal = (LiteralNode) object;
+				final String value = literal.getValue();
 				final Node objectNode = database.createNode();
-				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value.toString());
+				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
 				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
-				values.add(objectNode, GraphStatics.VALUE, value.toString());
+				values.add(objectNode, GraphStatics.VALUE, value);
 
-				if (type != null) {
-
-					objectNode.setProperty(GraphStatics.DATATYPE_PROPERTY, type.getURI());
-				}
-
-				final String resourceUri = addResourceProperty(subjectNode, subject, objectNode);
+				final String resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
 
 				addedNodes++;
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject);
+				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index);
 			} else { // must be Resource
 						// Make sure object exists
 
 				boolean isType = false;
 
 				// add Label if this is a type entry
-				if (predicate.toString().equals(RDF.type.getURI())) {
+				if (predicateName.equals(RDF.type.getURI())) {
 
-					addLabel(subjectNode, object.asResource().toString());
+					addLabel(subjectNode, ((ResourceNode) object).getUri());
 
 					isType = true;
 				}
@@ -158,22 +159,13 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 					objectNode = database.createNode();
 
-					if (object.isAnon()) {
+					if (object instanceof ResourceNode) {
 
-						bnodes.put(object.toString(), objectNode);
+						// object is a resource node
+						
+						final String objectURI = ((ResourceNode) object).getUri();
 
-						if (!isType) {
-
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-							resourceUri = addResourceProperty(subjectNode, subject, objectNode);
-						} else {
-
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
-							addLabel(objectNode, RDFS.Class.getURI());
-						}
-					} else {
-
-						objectNode.setProperty(GraphStatics.URI_PROPERTY, object.toString());
+						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
 
 						if (!isType) {
 
@@ -184,15 +176,30 @@ public class Neo4jRDFHandler implements RDFHandler {
 							addLabel(objectNode, RDFS.Class.getURI());
 						}
 
-						resources.add(objectNode, GraphStatics.URI, object.toString());
+						resources.add(objectNode, GraphStatics.URI, objectURI);
 						// resourcesWProvenance.add(objectNode, GraphStatics.URI_W_PROVENANCE, object.toString() +
 						// resourceGraphURI);
+					} else {
+
+						// object is a blank node
+
+						bnodes.put(object.toString(), objectNode);
+
+						if (!isType) {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
+							resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
+						} else {
+
+							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
+							addLabel(objectNode, RDFS.Class.getURI());
+						}
 					}
 
 					addedNodes++;
 				}
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject);
+				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index);
 			}
 
 			totalTriples++;
@@ -286,61 +293,83 @@ public class Neo4jRDFHandler implements RDFHandler {
 	}
 
 	private Relationship addReleationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final Resource subject) {
+			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index) {
 
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
+
+		if (order != null) {
+
+			rel.setProperty(GraphStatics.ORDER_PROPERTY, order.longValue());
+		}
+
+		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
+
+		// note: this property is not really necessary, since the uri is also the relationship type
+		// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
 		// rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-		//statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+		// statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
 
 		addedRelationships++;
 
-		addResourceProperty(subjectNode, subject, rel, resourceUri);
+		addResourceProperty(subjectNode, subject, rel, resourceUri, resource);
 
 		return rel;
 	}
 
-	private Node determineNode(final RDFNode resource) {
+	private Node determineNode(final de.avgl.dmp.graph.json.Node resource) {
 
 		final Node node;
 
-		if (resource.isAnon()) {
+		if (resource instanceof ResourceNode) {
 
-			node = bnodes.get(resource.toString());
+			// resource node
 
-			return node;
+			IndexHits<Node> hits = resources.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+
+			if (hits != null && hits.hasNext()) {
+
+				// node exists
+
+				node = hits.next();
+
+				return node;
+			}
+
+			return null;
 		}
 
-		IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
+		if (resource instanceof LiteralNode) {
 
-		if (hits != null && hits.hasNext()) {
+			// literal node - should never be the case
 
-			// node exists
-
-			node = hits.next();
-
-			return node;
+			return null;
 		}
 
-		return null;
+		// resource must be a blank node
+
+		node = bnodes.get(resource.toString());
+
+		return node;
 	}
 
-	private String addResourceProperty(final Node subjectNode, final Resource subject, final Node objectNode) {
+	private String addResourceProperty(final Node subjectNode, final de.avgl.dmp.graph.json.Node subject, final Node objectNode,
+			final Resource resource) {
 
-		final String resourceUri = determineResourceUri(subjectNode, subject);
+		final String resourceUri = determineResourceUri(subjectNode, subject, resource);
 
 		if (resourceUri == null) {
 
 			return null;
 		}
 
-		// objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
+		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
 
 		return resourceUri;
 	}
 
-	private String addResourceProperty(final Node subjectNode, final Resource subject, final Relationship rel, final String resourceUri) {
+	private String addResourceProperty(final Node subjectNode, final de.avgl.dmp.graph.json.Node subject, final Relationship rel,
+			final String resourceUri, final Resource resource) {
 
 		final String finalResourceUri;
 
@@ -349,15 +378,15 @@ public class Neo4jRDFHandler implements RDFHandler {
 			finalResourceUri = resourceUri;
 		} else {
 
-			finalResourceUri = determineResourceUri(subjectNode, subject);
+			finalResourceUri = determineResourceUri(subjectNode, subject, resource);
 		}
 
-		// rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
 
 		return finalResourceUri;
 	}
 
-	private String determineResourceUri(final Node subjectNode, final Resource subject) {
+	private String determineResourceUri(final Node subjectNode, final de.avgl.dmp.graph.json.Node subject, final Resource resource) {
 
 		final Long nodeId = Long.valueOf(subjectNode.getId());
 
@@ -368,7 +397,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 			resourceUri = nodeResourceMap.get(nodeId);
 		} else {
 
-			resourceUri = subject.toString();
+			if (subject instanceof ResourceNode) {
+
+				resourceUri = ((ResourceNode) subject).getUri();
+			} else {
+
+				resourceUri = resource.getUri();
+			}
+
 			nodeResourceMap.put(nodeId, resourceUri);
 		}
 

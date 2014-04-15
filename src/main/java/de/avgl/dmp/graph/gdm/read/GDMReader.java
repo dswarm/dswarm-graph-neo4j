@@ -1,4 +1,4 @@
-package de.avgl.dmp.graph.gdm;
+package de.avgl.dmp.graph.gdm.read;
 
 import de.avgl.dmp.graph.json.Model;
 

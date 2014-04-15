@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.slf4j.Logger;
@@ -15,22 +11,21 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 /**
  * @author tgaengler
  */
-public abstract class EmbeddedNeo4jTest {
+public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(EmbeddedNeo4jTest.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jEmbeddedDBWrapper.class);
 
-	protected final String		MOUNT_POINT;
-	protected NeoServer			server;
+	private final String		MOUNT_POINT;
+	private NeoServer			server;
 
-	protected final int			serverPort;
+	private final int			serverPort;
 
-	public EmbeddedNeo4jTest(final String mountEndpoint) {
+	public Neo4jEmbeddedDBWrapper(final String mountEndpoint) {
 
 		final URL resource = Resources.getResource("dmpgraph.properties");
 		final Properties properties = new Properties();
@@ -48,15 +43,14 @@ public abstract class EmbeddedNeo4jTest {
 		MOUNT_POINT = mountEndpoint;
 	}
 
-	@Before
-	public void prepare() throws IOException {
+	public void startServer() throws IOException {
 
 		server = CommunityServerBuilder.server().onPort(serverPort).withThirdPartyJaxRsPackage("de.avgl.dmp.graph.resources", MOUNT_POINT).build();
 
 		server.start();
 	}
 
-	protected WebResource service() {
+	public WebResource service() {
 
 		final Client c = Client.create();
 		final WebResource service = c.resource(server.baseUri().resolve(MOUNT_POINT));
@@ -64,20 +58,15 @@ public abstract class EmbeddedNeo4jTest {
 		return service;
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	public boolean checkServer() {
 
-		if (server != null) {
+		return server != null;
+	}
 
-			// TODO: we may need to remove this and replace this with a more precise delete method
-			
-			LOG.debug("clean-up DB after test has finished");
+	@Override
+	public void stopServer() {
 
-			final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
-
-			Assert.assertEquals("expected 200", 200, response.getStatus());
-
-			server.stop();
-		}
+		server.stop();
 	}
 }

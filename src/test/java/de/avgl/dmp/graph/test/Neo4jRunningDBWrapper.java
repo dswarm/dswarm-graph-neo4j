@@ -15,15 +15,18 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-public class RunningNeo4jTest {
+/**
+ * 
+ * @author tgaengler
+ *
+ */
+public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RunningNeo4jTest.class);
-
-	protected final String		MOUNT_POINT;
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jRunningDBWrapper.class);
 
 	protected final String		graphEndpoint;
 
-	public RunningNeo4jTest(final String mountEndpoint) {
+	public Neo4jRunningDBWrapper() {
 
 		final URL resource = Resources.getResource("dmpgraph.properties");
 		final Properties properties = new Properties();
@@ -37,8 +40,6 @@ public class RunningNeo4jTest {
 		}
 
 		graphEndpoint = properties.getProperty("dmp_graph_endpoint", "http://localhost:7474/graph");
-
-		MOUNT_POINT = mountEndpoint;
 	}
 
 	@After
@@ -53,11 +54,33 @@ public class RunningNeo4jTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 	}
 
-	protected WebResource service() {
+	@Override
+	public WebResource service() {
 
 		final Client c = Client.create();
 		final WebResource service = c.resource(graphEndpoint);
 
 		return service;
+	}
+
+	@Override
+	public void startServer() throws IOException {
+
+		// nothing to do here, the server should already run ;)
+
+	}
+
+	@Override
+	public boolean checkServer() {
+
+		// TODO add check for running server
+
+		return true;
+	}
+
+	@Override
+	public void stopServer() {
+
+		// nothing to do here, the server should also run afterwards ;)
 	}
 }

@@ -5,9 +5,9 @@ import de.avgl.dmp.graph.test.Neo4jRunningDBWrapper;
 /**
  * @author tgaengler
  */
-public class MaintainResourceOnRunningDBTest extends MaintainResourceTest {
+public class MaintainResourceDeleteOnRunningDBTest extends MaintainResourceDeleteTest {
 
-	public MaintainResourceOnRunningDBTest() {
+	public MaintainResourceDeleteOnRunningDBTest() {
 
 		super(new Neo4jRunningDBWrapper(), "running");
 	}

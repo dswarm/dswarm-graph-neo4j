@@ -52,7 +52,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	// private final Index<Relationship> statements;
+	private final Index<Relationship> statements;
 	private final Map<Long, String>		nodeResourceMap;
 
 	private Transaction					tx;
@@ -71,7 +71,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		// statements = database.index().forRelationships("statements");
+		statements = database.index().forRelationships("statements");
 		nodeResourceMap = new HashMap<Long, String>();
 
 		resourceGraphURI = resourceGraphURIArg;
@@ -297,14 +297,14 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 	}
 
 	private Relationship addReleationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index) {
+			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index, final de.avgl.dmp.graph.json.NodeType subjectNodeType, final de.avgl.dmp.graph.json.NodeType objectNodeType) {
 
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 
 		if (order != null) {
 
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, order.longValue());
+			rel.setProperty(GraphStatics.ORDER_PROPERTY, order);
 		}
 
 		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
@@ -312,7 +312,12 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 		// note: this property is not really necessary, since the uri is also the relationship type
 		// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
 		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-		// statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+
+		final StringBuffer sb = new StringBuffer();
+
+		final String subjectIdentifier = getIdentifier(subjectNode)
+
+		statements.add(rel, GraphStatics.ID, );
 
 		addedRelationships++;
 
@@ -392,7 +397,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 	private String determineResourceUri(final Node subjectNode, final de.avgl.dmp.graph.json.Node subject, final Resource resource) {
 
-		final Long nodeId = Long.valueOf(subjectNode.getId());
+		final Long nodeId = subjectNode.getId();
 
 		final String resourceUri;
 
@@ -413,5 +418,36 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 		}
 
 		return resourceUri;
+	}
+
+	private String getIdentifier(final Node node, final de.avgl.dmp.graph.json.NodeType nodeType) {
+
+		final String identifier;
+
+		switch(nodeType) {
+
+			case Resource:
+
+				identifier = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+
+				break;
+			case BNode:
+
+				identifier = "" + node.getId();
+
+				break;
+			case Literal:
+
+				identifier = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
+
+				break;
+			default:
+
+				identifier = null;
+
+				break;
+		}
+
+		return identifier;
 	}
 }

@@ -1,10 +1,13 @@
 package de.avgl.dmp.graph.rdf.parse;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.avgl.dmp.graph.DMPGraphException;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -97,6 +100,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			// Check index for subject
 			Node subjectNode = determineNode(subject);
+			final NodeType subjectNodeType;
 
 			if (subjectNode == null) {
 
@@ -106,6 +110,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 					bnodes.put(subject.toString(), subjectNode);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
+
+					subjectNodeType = NodeType.BNode;
 				} else {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
@@ -113,9 +119,15 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
 					resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() + resourceGraphURI);
+
+					subjectNodeType = NodeType.Resource;
 				}
 
 				addedNodes++;
+			} else {
+
+				final String subjectNodeTypeString = (String) subjectNode.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
+				subjectNodeType = NodeType.getByName(subjectNodeTypeString);
 			}
 
 			if (object.isLiteral()) {
@@ -139,7 +151,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 				addedNodes++;
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject);
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, subjectNodeType, NodeType.Literal);
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -156,6 +168,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 				// Check index for object
 				Node objectNode = determineNode(object);
 				String resourceUri = null;
+				final NodeType objectNodeType;
 
 				if (objectNode == null) {
 
@@ -169,10 +182,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 							resourceUri = addResourceProperty(subjectNode, subject, objectNode);
+
+							objectNodeType = NodeType.BNode;
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
 							addLabel(objectNode, RDFS.Class.getURI());
+
+							objectNodeType = NodeType.TypeBNode;
 						}
 					} else {
 
@@ -181,10 +198,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 						if (!isType) {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+
+							objectNodeType = NodeType.Resource;
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 							addLabel(objectNode, RDFS.Class.getURI());
+
+							objectNodeType = NodeType.TypeResource;
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
@@ -192,9 +213,13 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 					}
 
 					addedNodes++;
+				} else {
+
+					final String objectNodeTypeString = (String) objectNode.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
+					objectNodeType = NodeType.getByName(objectNodeTypeString);
 				}
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject);
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, subjectNodeType, objectNodeType);
 			}
 
 			totalTriples++;
@@ -287,18 +312,54 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		}
 	}
 
-	private Relationship addReleationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final Resource subject) {
+	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
+			final Resource subject, final NodeType subjectNodeType, final NodeType objectNodeType) throws DMPGraphException {
 
-		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
-		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
-		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-		statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+		final StringBuffer sb = new StringBuffer();
 
-		addedRelationships++;
+		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
+		final String objectIdentifier = getIdentifier(objectNode, objectNodeType);
 
-		addResourceProperty(subjectNode, subject, rel, resourceUri);
+		final NodeType finalSubjectNodeType = remapNodeType(subjectNodeType);
+		final NodeType finalObjectNodeType = remapNodeType(objectNodeType);
+
+		sb.append(finalSubjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ")
+				.append(finalObjectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(resourceGraphURI);
+		MessageDigest messageDigest = null;
+
+		try {
+			messageDigest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+
+			throw new DMPGraphException("couldn't instantiate hash algo");
+		}
+		messageDigest.update(sb.toString().getBytes());
+		final String hash = new String(messageDigest.digest());
+
+		// System.out.println("hash = '" + hash + "' = '" + sb.toString());
+
+		final Relationship rel;
+
+		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
+
+		if (hits == null || !hits.hasNext()) {
+
+			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
+			rel = subjectNode.createRelationshipTo(objectNode, relType);
+
+			// note: this property is not really necessary, since the uri is also the relationship type
+			// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
+			rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+
+			statements.add(rel, GraphStatics.HASH, hash);
+
+			addedRelationships++;
+
+			addResourceProperty(subjectNode, subject, rel, resourceUri);
+		} else {
+
+			rel = hits.next();
+		}
 
 		return rel;
 	}
@@ -361,7 +422,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 	private String determineResourceUri(final Node subjectNode, final Resource subject) {
 
-		final Long nodeId = Long.valueOf(subjectNode.getId());
+		final Long nodeId = subjectNode.getId();
 
 		final String resourceUri;
 
@@ -375,5 +436,64 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		}
 
 		return resourceUri;
+	}
+
+	private String getIdentifier(final Node node, final NodeType nodeType) {
+
+		final String identifier;
+
+		switch (nodeType) {
+
+			case Resource:
+			case TypeResource:
+
+				identifier = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+
+				break;
+			case BNode:
+			case TypeBNode:
+
+				identifier = "" + node.getId();
+
+				break;
+			case Literal:
+
+				identifier = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
+
+				break;
+			default:
+
+				identifier = null;
+
+				break;
+		}
+
+		return identifier;
+	}
+
+	private NodeType remapNodeType(final NodeType nodeType) {
+
+		final NodeType finalNodeType;
+
+		switch(nodeType) {
+
+			case TypeResource:
+
+				finalNodeType = NodeType.Resource;
+
+				break;
+			case TypeBNode:
+
+				finalNodeType = NodeType.BNode;
+
+				break;
+			default:
+
+				finalNodeType = nodeType;
+
+				break;
+		}
+
+		return finalNodeType;
 	}
 }

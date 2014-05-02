@@ -6,6 +6,7 @@ package de.avgl.dmp.graph;
 public final class GraphStatics {
 
 	public static final String	ID							= "__ID__";
+	public static final String	HASH							= "__HASH__";
 	public static final String	URI							= "__URI__";
 	public static final String	URI_W_PROVENANCE			= "__URI_W_PROVENANCE__";
 	public static final String	VALUE						= "__VALUE__";

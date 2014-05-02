@@ -1,10 +1,13 @@
 package de.avgl.dmp.graph.gdm.parse;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.avgl.dmp.graph.DMPGraphException;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -142,7 +145,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 				addedNodes++;
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index);
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index, subject.getType(), object.getType());
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -203,7 +206,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				addReleationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index);
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index, subject.getType(), object.getType());
 			}
 
 			totalTriples++;
@@ -295,33 +298,58 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 			addedLabels++;
 		}
 	}
-
-	private Relationship addReleationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index, final de.avgl.dmp.graph.json.NodeType subjectNodeType, final de.avgl.dmp.graph.json.NodeType objectNodeType) {
-
-		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
-		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-
-		if (order != null) {
-
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, order);
-		}
-
-		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
-
-		// note: this property is not really necessary, since the uri is also the relationship type
-		// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
-		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
+			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index,
+			final de.avgl.dmp.graph.json.NodeType subjectNodeType, final de.avgl.dmp.graph.json.NodeType objectNodeType) throws
+			DMPGraphException {
 
 		final StringBuffer sb = new StringBuffer();
 
-		final String subjectIdentifier = getIdentifier(subjectNode)
+		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
+		final String objectIdentifier = getIdentifier(objectNode, objectNodeType);
 
-		statements.add(rel, GraphStatics.ID, );
+		sb.append(subjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ").append(objectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(resourceGraphURI);
 
-		addedRelationships++;
+		MessageDigest messageDigest = null;
 
-		addResourceProperty(subjectNode, subject, rel, resourceUri, resource);
+		try {
+			messageDigest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+
+			throw new DMPGraphException("couldn't instantiate hash algo");
+		}
+		messageDigest.update(sb.toString().getBytes());
+		final String hash = new String(messageDigest.digest());
+
+		final Relationship rel;
+
+		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
+
+		if(hits == null || !hits.hasNext()) {
+
+			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
+			rel = subjectNode.createRelationshipTo(objectNode, relType);
+
+			if (order != null) {
+
+				rel.setProperty(GraphStatics.ORDER_PROPERTY, order);
+			}
+
+			rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
+
+			// note: this property is not really necessary, since the uri is also the relationship type
+			// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
+			rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+
+			statements.add(rel, GraphStatics.HASH, hash);
+
+			addedRelationships++;
+
+			addResourceProperty(subjectNode, subject, rel, resourceUri, resource);
+		} else {
+
+			rel = hits.next();
+		}
 
 		return rel;
 	}

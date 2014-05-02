@@ -202,6 +202,7 @@ public class MaintainResource {
 		try {
 
 			final Index<Node> resources = database.index().forNodes("resources");
+			final Index<Node> values = database.index().forNodes("values");
 			final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
 			final Index<Relationship> statements = database.index().forRelationships("statements");
@@ -232,6 +233,13 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("delete statements legacy index");
 
 				statements.delete();
+			}
+
+			if(values != null) {
+
+				MaintainResource.LOG.debug("delete values legacy index");
+
+				values.delete();
 			}
 
 			itx.success();

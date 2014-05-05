@@ -95,8 +95,9 @@ public class RDFResource {
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
-				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements ('"
+				+ ((Neo4jRDFWProvenanceHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for resource graph URI '"
+				+ resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -26,7 +27,6 @@ import org.semanticweb.yars.nx.namespace.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
 
 /**

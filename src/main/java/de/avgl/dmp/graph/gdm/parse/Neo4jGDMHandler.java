@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.avgl.dmp.graph.DMPGraphException;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -24,12 +23,13 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import de.avgl.dmp.graph.GraphStatics;
+import de.avgl.dmp.graph.DMPGraphException;
 import de.avgl.dmp.graph.NodeType;
 import de.avgl.dmp.graph.json.LiteralNode;
 import de.avgl.dmp.graph.json.Resource;
 import de.avgl.dmp.graph.json.ResourceNode;
 import de.avgl.dmp.graph.json.Statement;
+import de.avgl.dmp.graph.model.GraphStatics;
 
 /**
  * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)

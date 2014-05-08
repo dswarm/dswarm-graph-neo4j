@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.avgl.dmp.graph.DMPGraphException;
-import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
 import de.avgl.dmp.graph.json.LiteralNode;
 import de.avgl.dmp.graph.json.Model;

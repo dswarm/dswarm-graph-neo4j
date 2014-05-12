@@ -3,6 +3,7 @@ package de.avgl.dmp.graph.rdf.read;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -20,7 +21,6 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 import de.avgl.dmp.graph.DMPGraphException;
-import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.read.NodeHandler;
 import de.avgl.dmp.graph.read.RelationshipHandler;
 

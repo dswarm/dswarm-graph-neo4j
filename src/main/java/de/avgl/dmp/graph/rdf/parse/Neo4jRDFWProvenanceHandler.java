@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.avgl.dmp.graph.DMPGraphException;
+import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -30,7 +31,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
 
 /**

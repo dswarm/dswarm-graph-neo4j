@@ -1,11 +1,11 @@
 package de.avgl.dmp.graph.utils;
 
+import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.avgl.dmp.graph.DMPGraphException;
-import de.avgl.dmp.graph.GraphStatics;
 import de.avgl.dmp.graph.NodeType;
 
 /**

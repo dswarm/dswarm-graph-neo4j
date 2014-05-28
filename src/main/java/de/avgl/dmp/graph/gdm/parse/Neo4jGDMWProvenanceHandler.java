@@ -362,7 +362,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 			// resource node
 
-			IndexHits<Node> hits = resources.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+			IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
 
 			if (hits != null && hits.hasNext()) {
 

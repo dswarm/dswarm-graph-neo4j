@@ -7,8 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.avgl.dmp.graph.DMPGraphException;
-import de.avgl.dmp.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,15 +23,15 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import de.avgl.dmp.graph.DMPGraphException;
 import de.avgl.dmp.graph.NodeType;
 import de.avgl.dmp.graph.json.LiteralNode;
 import de.avgl.dmp.graph.json.Resource;
 import de.avgl.dmp.graph.json.ResourceNode;
 import de.avgl.dmp.graph.json.Statement;
+import de.avgl.dmp.graph.model.GraphStatics;
 
 /**
- * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
- * 
  * @author tgaengler
  */
 public class Neo4jGDMWProvenanceHandler implements GDMHandler {
@@ -55,7 +53,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	private final Index<Relationship> statements;
+	private final Index<Relationship>	statements;
 	private final Map<Long, String>		nodeResourceMap;
 
 	private Transaction					tx;
@@ -101,7 +99,8 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 			final Long order = st.getOrder();
 
 			// Check index for subject
-			Node subjectNode = determineNode(subject);
+			// TODO: what should we do, if the subject is a resource type?
+			Node subjectNode = determineNode(subject, false);
 
 			if (subjectNode == null) {
 
@@ -117,13 +116,13 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subjectURI);
-					resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() + resourceGraphURI);
+					resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subjectURI + resourceGraphURI);
 				} else {
 
 					// subject is a blank node
 
 					// note: can I expect an id here?
-					bnodes.put(subject.toString(), subjectNode);
+					bnodes.put("" + subject.getId(), subjectNode);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
@@ -160,7 +159,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 				}
 
 				// Check index for object
-				Node objectNode = determineNode(object);
+				Node objectNode = determineNode(object, isType);
 				String resourceUri = null;
 
 				if (objectNode == null) {
@@ -170,7 +169,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 					if (object instanceof ResourceNode) {
 
 						// object is a resource node
-						
+
 						final String objectURI = ((ResourceNode) object).getUri();
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
@@ -182,6 +181,8 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 							addLabel(objectNode, RDFS.Class.getURI());
+
+							resourceTypes.add(objectNode, GraphStatics.URI, objectURI);
 						}
 
 						resources.add(objectNode, GraphStatics.URI, objectURI);
@@ -190,7 +191,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 						// object is a blank node
 
-						bnodes.put(object.toString(), objectNode);
+						bnodes.put("" + object.getId(), objectNode);
 
 						if (!isType) {
 
@@ -298,17 +299,18 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 			addedLabels++;
 		}
 	}
+
 	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
 			final de.avgl.dmp.graph.json.Node subject, final Resource resource, final Long order, final long index,
-			final de.avgl.dmp.graph.json.NodeType subjectNodeType, final de.avgl.dmp.graph.json.NodeType objectNodeType) throws
-			DMPGraphException {
+			final de.avgl.dmp.graph.json.NodeType subjectNodeType, final de.avgl.dmp.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
 		final StringBuffer sb = new StringBuffer();
 
 		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
 		final String objectIdentifier = getIdentifier(objectNode, objectNodeType);
 
-		sb.append(subjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ").append(objectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(resourceGraphURI);
+		sb.append(subjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ")
+				.append(objectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(resourceGraphURI);
 
 		MessageDigest messageDigest = null;
 
@@ -325,7 +327,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
 
-		if(hits == null || !hits.hasNext()) {
+		if (hits == null || !hits.hasNext()) {
 
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
@@ -354,7 +356,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 		return rel;
 	}
 
-	private Node determineNode(final de.avgl.dmp.graph.json.Node resource) {
+	private Node determineNode(final de.avgl.dmp.graph.json.Node resource, final boolean isType) {
 
 		final Node node;
 
@@ -362,7 +364,15 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 			// resource node
 
-			IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
+			final IndexHits<Node> hits;
+
+			if (!isType) {
+
+				hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, ((ResourceNode) resource).getUri() + resourceGraphURI);
+			} else {
+
+				hits = resourceTypes.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+			}
 
 			if (hits != null && hits.hasNext()) {
 
@@ -385,7 +395,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 		// resource must be a blank node
 
-		node = bnodes.get(resource.toString());
+		node = bnodes.get(resource.getId());
 
 		return node;
 	}
@@ -452,7 +462,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 		final String identifier;
 
-		switch(nodeType) {
+		switch (nodeType) {
 
 			case Resource:
 

@@ -34,7 +34,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import de.avgl.dmp.graph.NodeType;
 
 /**
- * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
  * 
  * @author tgaengler
  */
@@ -99,7 +98,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			final RDFNode object = st.getObject();
 
 			// Check index for subject
-			Node subjectNode = determineNode(subject);
+			// TODO: what should we do, if the subject is a resource type?
+			Node subjectNode = determineNode(subject, false);
 			final NodeType subjectNodeType;
 
 			if (subjectNode == null) {
@@ -166,7 +166,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 				}
 
 				// Check index for object
-				Node objectNode = determineNode(object);
+				Node objectNode = determineNode(object, isType);
 				String resourceUri = null;
 				final NodeType objectNodeType;
 
@@ -206,6 +206,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 							addLabel(objectNode, RDFS.Class.getURI());
 
 							objectNodeType = NodeType.TypeResource;
+
+							resourceTypes.add(objectNode, GraphStatics.URI, object.toString());
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
@@ -364,7 +366,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		return rel;
 	}
 
-	private Node determineNode(final RDFNode resource) {
+	private Node determineNode(final RDFNode resource, final boolean isType) {
 
 		final Node node;
 
@@ -375,7 +377,15 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			return node;
 		}
 
-		IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
+		final IndexHits<Node> hits;
+
+		if (!isType) {
+
+			hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
+		} else {
+
+			hits = resourceTypes.get(GraphStatics.URI, resource.toString());
+		}
 
 		if (hits != null && hits.hasNext()) {
 
@@ -475,7 +485,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		final NodeType finalNodeType;
 
-		switch(nodeType) {
+		switch (nodeType) {
 
 			case TypeResource:
 

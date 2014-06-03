@@ -40,7 +40,32 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 	@Test
 	public void writeGDMToDB() throws IOException {
 
-		writeGDMToDBInternal();
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
+	}
+
+	@Test
+	public void testResourceTypeNodeUniqueness() throws IOException {
+
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/2");
+
+		final String typeQuery = "MATCH (n) WHERE n.__NODETYPE__ = \"__TYPE_RESOURCE__\" RETURN id(n) AS node_id, n.__URI__ AS node_uri;";
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		requestJson.put("query", typeQuery);
+
+		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
+
+		final ClientResponse response = cypher().type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, requestJsonString);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		final String body = response.getEntity(String.class);
+
+		System.out.println(body);
 	}
 
 	@Test
@@ -48,7 +73,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeRDFToDBInternal();
+		writeRDFToDBInternal("http://data.slub-dresden.de/resources/1");
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -81,7 +106,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal();
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -109,7 +134,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeRDFToDBInternal() throws IOException {
+	private void writeRDFToDBInternal(final String resourceGraphURI) throws IOException {
 
 		LOG.debug("start writing RDF statements for GDM resource at " + dbType + " DB");
 
@@ -119,7 +144,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -131,7 +156,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished writing RDF statements for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal() throws IOException {
+	private void writeGDMToDBInternal(final String resourceGraphURI) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
@@ -141,7 +166,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

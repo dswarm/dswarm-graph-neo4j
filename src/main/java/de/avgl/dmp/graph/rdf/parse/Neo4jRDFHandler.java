@@ -53,7 +53,6 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
 	private final Index<Node>			resources;
-	// private final Index<Node> resourcesWProvenance;
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
@@ -70,7 +69,6 @@ public class Neo4jRDFHandler implements RDFHandler {
 		LOG.debug("start write TX");
 
 		resources = database.index().forNodes("resources");
-		// resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
@@ -95,7 +93,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final RDFNode object = st.getObject();
 
 			// Check index for subject
-			Node subjectNode = determineNode(subject);
+			// TODO: what should we do, if the subject is a resource type?
+			Node subjectNode = determineNode(subject, false);
 			final NodeType subjectNodeType;
 
 			if (subjectNode == null) {
@@ -111,11 +110,8 @@ public class Neo4jRDFHandler implements RDFHandler {
 				} else {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
-					// subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
-					// resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() +
-					// resourceGraphURI);
 
 					subjectNodeType = NodeType.Resource;
 				}
@@ -163,7 +159,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 				}
 
 				// Check index for object
-				Node objectNode = determineNode(object);
+				Node objectNode = determineNode(object, isType);
 				String resourceUri = null;
 				final NodeType objectNodeType;
 
@@ -203,11 +199,11 @@ public class Neo4jRDFHandler implements RDFHandler {
 							addLabel(objectNode, RDFS.Class.getURI());
 
 							objectNodeType = NodeType.TypeResource;
+
+							resourceTypes.add(objectNode, GraphStatics.URI, object.toString());
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
-						// resourcesWProvenance.add(objectNode, GraphStatics.URI_W_PROVENANCE, object.toString() +
-						// resourceGraphURI);
 					}
 
 					addedNodes++;
@@ -358,7 +354,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		return rel;
 	}
 
-	private Node determineNode(final RDFNode resource) {
+	private Node determineNode(final RDFNode resource, final boolean isType) {
 
 		final Node node;
 
@@ -369,7 +365,15 @@ public class Neo4jRDFHandler implements RDFHandler {
 			return node;
 		}
 
-		IndexHits<Node> hits = resources.get(GraphStatics.URI, resource.toString());
+		final IndexHits<Node> hits;
+
+		if (!isType) {
+
+			hits = resources.get(GraphStatics.URI, resource.toString());
+		} else {
+
+			hits = resourceTypes.get(GraphStatics.URI, resource.toString());
+		}
 
 		if (hits != null && hits.hasNext()) {
 
@@ -469,7 +473,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		final NodeType finalNodeType;
 
-		switch(nodeType) {
+		switch (nodeType) {
 
 			case TypeResource:
 

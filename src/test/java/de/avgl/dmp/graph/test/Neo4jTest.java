@@ -43,9 +43,19 @@ public abstract class Neo4jTest {
 		return neo4jDBWrapper.service();
 	}
 
+	protected WebResource base() {
+
+		return neo4jDBWrapper.base();
+	}
+
 	protected WebResource target() {
 
 		return service().path(resource);
+	}
+
+	protected WebResource cypher() {
+
+		return base().path("/db/data/cypher");
 	}
 
 	@After

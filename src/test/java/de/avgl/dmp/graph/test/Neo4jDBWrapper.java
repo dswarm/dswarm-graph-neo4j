@@ -12,6 +12,8 @@ import com.sun.jersey.api.client.WebResource;
 public interface Neo4jDBWrapper {
 
 	WebResource service();
+
+	WebResource base();
 	
 	void startServer() throws IOException;
 	

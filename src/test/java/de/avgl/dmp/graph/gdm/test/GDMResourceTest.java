@@ -2,9 +2,12 @@ package de.avgl.dmp.graph.gdm.test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -24,9 +27,7 @@ import de.avgl.dmp.graph.test.BasicResourceTest;
 import de.avgl.dmp.graph.test.Neo4jDBWrapper;
 
 /**
- * 
  * @author tgaengler
- *
  */
 public abstract class GDMResourceTest extends BasicResourceTest {
 
@@ -59,13 +60,39 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
-		final ClientResponse response = cypher().type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, requestJsonString);
+		final ClientResponse response = cypher().type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, requestJsonString);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		final String body = response.getEntity(String.class);
 
-		System.out.println(body);
+		final ObjectNode bodyJson = objectMapper.readValue(body, ObjectNode.class);
+
+		Assert.assertNotNull(bodyJson);
+
+		final JsonNode dataNode = bodyJson.get("data");
+
+		Assert.assertNotNull(dataNode);
+		Assert.assertTrue(dataNode.size() > 0);
+
+		final Map<String, Long> resourceTypeMap = Maps.newHashMap();
+
+		for (final JsonNode entry : dataNode) {
+
+			final String resourceType = entry.get(1).textValue();
+			final long nodeId = entry.get(0).longValue();
+
+			if (resourceTypeMap.containsKey(resourceType)) {
+
+				final Long existingNodeId = resourceTypeMap.get(resourceType);
+
+				Assert.assertTrue("resource node map already contains a node for resource type '" + resourceType + "' with the id '" + existingNodeId
+						+ "', but found another node with id '" + nodeId + "' for this resource type", false);
+			}
+
+			resourceTypeMap.put(resourceType, nodeId);
+		}
 	}
 
 	@Test

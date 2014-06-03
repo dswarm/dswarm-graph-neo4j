@@ -395,7 +395,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 
 		// resource must be a blank node
 
-		node = bnodes.get(resource.getId());
+		node = bnodes.get("" + resource.getId());
 
 		return node;
 	}

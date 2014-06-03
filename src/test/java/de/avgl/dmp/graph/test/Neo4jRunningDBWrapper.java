@@ -63,6 +63,16 @@ public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 		return service;
 	}
 
+	@Override public WebResource base() {
+
+		final String baseURI = graphEndpoint.substring(0,graphEndpoint.lastIndexOf("/"));
+
+		final Client c = Client.create();
+		final WebResource service = c.resource(baseURI);
+
+		return service;
+	}
+
 	@Override
 	public void startServer() throws IOException {
 

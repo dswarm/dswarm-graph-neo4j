@@ -58,6 +58,14 @@ public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 		return service;
 	}
 
+	@Override public WebResource base() {
+
+		final Client c = Client.create();
+		final WebResource service = c.resource(server.baseUri());
+
+		return service;
+	}
+
 	@Override
 	public boolean checkServer() {
 

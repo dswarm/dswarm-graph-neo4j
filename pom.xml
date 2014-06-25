@@ -3,7 +3,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.avgl.dmp</groupId>
+	<groupId>org.dswarm</groupId>
 	<artifactId>graph</artifactId>
 	<version>1.0</version>
 
@@ -173,7 +173,7 @@
 	</distributionManagement>
 
 	<dependencies>
-		<!-- <dependency> <groupId>javax.ws.rs</groupId> <artifactId>javax.ws.rs-api</artifactId> 
+		<!-- <dependency> <groupId>javax.ws.rs</groupId> <artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
@@ -196,16 +196,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId> 
+		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId>
 			<version>${jackson.version}</version> </dependency> -->
 		<dependency>
-			<groupId>de.avgl.dmp.graph</groupId>
-			<artifactId>json</artifactId>
+			<groupId>org.dswarm</groupId>
+			<artifactId>graph-json</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>de.avgl.dmp.graph</groupId>
-			<artifactId>model</artifactId>
+			<groupId>org.dswarm</groupId>
+			<artifactId>graph-model</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -340,6 +340,6 @@
 		</profile>
 	</profiles>
 
-	<url>http://dmp.slub-dresden.de/</url>
-	<name>Data Management Platform - Graph API</name>
+	<url>http://dswarm.org/</url>
+	<name>d:swarm - Graph API</name>
 </project>

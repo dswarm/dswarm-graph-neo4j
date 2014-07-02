@@ -13,7 +13,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dswarm.graph.gdm.parse.GDMModelParser;
+import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
+import org.dswarm.graph.json.Resource;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseBuilder;
+import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,6 +128,8 @@ public class GDMResource {
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 
 		LOG.debug("try to write GDM statements into graph db");
+
+		calculateDelta(model, resourceGraphURI, database);
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
 		final GDMParser parser = new GDMModelParser(model);
@@ -246,5 +253,56 @@ public class GDMResource {
 				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
+	}
+
+	private Model calculateDelta(final Model model, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
+
+		final Model deltaModel = new Model();
+
+		// calculate delta resource-wise
+		for(Resource resource : model.getResources()) {
+
+			final String resourceURI = resource.getUri();
+
+			// try to retrieve existing resource for the resource identifier in the provenance graph
+			final GDMReader gdmReader = new PropertyGraphResourceGDMReader(resourceURI, resourceGraphURI, permanentDatabase);
+			final Model existingResourceModel = gdmReader.read();
+
+			if(existingResourceModel == null) {
+
+				// take new resource model, since there was no match in the provenance graph for this resource identifier
+
+				deltaModel.addResource(resource);
+
+				// we don't need to calculate the delta, since everything is new
+
+				continue;
+			}
+
+			final Model newResourceModel = new Model();
+			newResourceModel.addResource(resource);
+
+			calculateDelta(existingResourceModel, newResourceModel);
+		}
+
+//		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
+//		final GDMParser parser = new GDMModelParser(model);
+//		parser.setGDMHandler(handler);
+//		parser.parse();
+
+		// TODO change this
+
+		return null;
+	}
+
+	private Model calculateDelta(final Model existingResourceModel, final Model newResourceModel) {
+
+		final GraphDatabaseService existingModelDB = loadModel(existingResourceModel);
+		final GraphDatabaseService newModelDB = loadModel(newResourceModel);
+	}
+
+	private GraphDatabaseService loadModel(final Model model) {
+
+		final GraphDatabaseService impermanentDB = TestGraphDatabaseFactory
 	}
 }

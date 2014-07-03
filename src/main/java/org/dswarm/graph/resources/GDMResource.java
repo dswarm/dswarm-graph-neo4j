@@ -16,8 +16,7 @@ import org.dswarm.graph.gdm.parse.GDMModelParser;
 import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
 import org.dswarm.graph.json.Resource;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.test.TestGraphDatabaseBuilder;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,16 +45,19 @@ import org.dswarm.graph.json.util.Util;
 @Path("/gdm")
 public class GDMResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource.class);
+	private static final Logger				LOG								= LoggerFactory.getLogger(GDMResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper				objectMapper;
+	private final TestGraphDatabaseFactory	impermanentGraphDatabaseFactory;
+	private static final String				IMPERMANENT_GRAPH_DATABASE_PATH	= "target/test-data/impermanent-db";
 
 	public GDMResource() {
 
 		objectMapper = Util.getJSONObjectMapper();
+		impermanentGraphDatabaseFactory = new TestGraphDatabaseFactory();
 	}
 
 	@GET
@@ -129,15 +131,15 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		calculateDelta(model, resourceGraphURI, database);
+		calculateDeltaForDataModel(model, resourceGraphURI, database);
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jGDMWProvenanceHandler) handler).getCountedStatements() + " GDM statements into graph db for resource graph URI '"
-				+ resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jGDMWProvenanceHandler) handler).getCountedStatements()
+				+ " GDM statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}
@@ -255,12 +257,12 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Model calculateDelta(final Model model, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
+	private Model calculateDeltaForDataModel(final Model model, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
 
 		final Model deltaModel = new Model();
 
 		// calculate delta resource-wise
-		for(Resource resource : model.getResources()) {
+		for (Resource resource : model.getResources()) {
 
 			final String resourceURI = resource.getUri();
 
@@ -268,41 +270,51 @@ public class GDMResource {
 			final GDMReader gdmReader = new PropertyGraphResourceGDMReader(resourceURI, resourceGraphURI, permanentDatabase);
 			final Model existingResourceModel = gdmReader.read();
 
-			if(existingResourceModel == null) {
-
-				// take new resource model, since there was no match in the provenance graph for this resource identifier
-
-				deltaModel.addResource(resource);
-
-				// we don't need to calculate the delta, since everything is new
-
-				continue;
-			}
+//			if (existingResourceModel == null) {
+//
+//				// take new resource model, since there was no match in the provenance graph for this resource identifier
+//
+//				deltaModel.addResource(resource);
+//
+//				// we don't need to calculate the delta, since everything is new
+//
+//				continue;
+//			}
 
 			final Model newResourceModel = new Model();
 			newResourceModel.addResource(resource);
 
-			calculateDelta(existingResourceModel, newResourceModel);
+			calculateDeltaForResource(existingResourceModel, newResourceModel);
 		}
 
-//		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
-//		final GDMParser parser = new GDMModelParser(model);
-//		parser.setGDMHandler(handler);
-//		parser.parse();
-
-		// TODO change this
+		// TODO change this, i.e., return overall changeset of the datamodel
 
 		return null;
 	}
 
-	private Model calculateDelta(final Model existingResourceModel, final Model newResourceModel) {
+	private Model calculateDeltaForResource(final Model existingResourceModel, final Model newResourceModel) {
 
-		final GraphDatabaseService existingModelDB = loadModel(existingResourceModel);
-		final GraphDatabaseService newModelDB = loadModel(newResourceModel);
+		//final GraphDatabaseService existingModelDB = loadModel(existingResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
+		final GraphDatabaseService newModelDB = loadModel(newResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
+
+		// TODO: do delta calculation on enriched GDM models in graph
+
+		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
+		return null;
 	}
 
-	private GraphDatabaseService loadModel(final Model model) {
+	private GraphDatabaseService loadModel(final Model model, final String impermanentGraphDatabaseDir) {
 
-		final GraphDatabaseService impermanentDB = TestGraphDatabaseFactory
+		// TODO: find proper graph database settings to hold everything in-memory only
+		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)
+				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
+
+		// TODO: implement handler that enriches the GDM model with useful information for changeset detection
+		final GDMHandler handler = new Neo4jGDMHandler(impermanentDB);
+		final GDMParser parser = new GDMModelParser(model);
+		parser.setGDMHandler(handler);
+		parser.parse();
+
+		return impermanentDB;
 	}
 }

@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dswarm.graph.gdm.parse.GDMModelParser;
+import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
 import org.dswarm.graph.json.Resource;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -310,7 +311,7 @@ public class GDMResource {
 				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
 
 		// TODO: implement handler that enriches the GDM model with useful information for changeset detection
-		final GDMHandler handler = new Neo4jGDMHandler(impermanentDB);
+		final GDMHandler handler = new Neo4jDeltaGDMHandler(impermanentDB);
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();

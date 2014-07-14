@@ -11,7 +11,7 @@ This is an unmanaged extension.
 
 3. Configure Neo4j by adding a line to conf/neo4j-server.properties:
 
-        org.neo4j.server.thirdparty_jaxrs_classes=de.avgl.dmp.graph.resources=/dmp
+	org.neo4j.server.thirdparty_jaxrs_classes=org.dswarm.graph.resources=/graph
 
 4. Start Neo4j server.
 

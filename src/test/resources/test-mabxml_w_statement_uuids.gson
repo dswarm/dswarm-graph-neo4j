@@ -1,0 +1,2285 @@
+[ {
+  "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497" : [ {
+    "id" : 27882,
+    "uuid" : "7a3d40b8-cdc2-49ab-9532-472a50b0ce4b",
+    "order" : 1,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26166,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType"
+    }
+  }, {
+    "id" : 27883,
+    "uuid" : "d1a5470e-1638-43ff-8f35-bc1a929016de",
+    "order" : 1,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#typ",
+    "o" : {
+      "id" : 26167,
+      "v" : "h"
+    }
+  }, {
+    "id" : 27884,
+    "uuid" : "b7f28ee6-57a2-4196-9497-59d27b9f7d1e",
+    "order" : 1,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#status",
+    "o" : {
+      "id" : 26168,
+      "v" : "n"
+    }
+  }, {
+    "id" : 27885,
+    "uuid" : "1470f418-2149-4559-9894-48e8b56fc0dd",
+    "order" : 1,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#mabVersion",
+    "o" : {
+      "id" : 26169,
+      "v" : "M2.0"
+    }
+  }, {
+    "id" : 27886,
+    "uuid" : "7164e0f5-7b23-4ba7-b6d7-939e0117f47b",
+    "order" : 1,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26170
+    }
+  }, {
+    "id" : 27887,
+    "uuid" : "22c75cd8-e5fb-4a0f-be89-cd2afb10a1b6",
+    "order" : 1,
+    "s" : {
+      "id" : 26170
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27888,
+    "uuid" : "0e29434f-fc3a-461c-a389-1c42ecd63b70",
+    "order" : 1,
+    "s" : {
+      "id" : 26170
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26172,
+      "v" : "001"
+    }
+  }, {
+    "id" : 27889,
+    "uuid" : "7224a691-b2bc-4b07-b6fd-46d8a4c94957",
+    "order" : 1,
+    "s" : {
+      "id" : 26170
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26173,
+      "v" : " "
+    }
+  }, {
+    "id" : 27890,
+    "uuid" : "79954aeb-1f72-4ccf-8188-d5ef5c825791",
+    "order" : 1,
+    "s" : {
+      "id" : 26170
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26174,
+      "v" : "06978834"
+    }
+  }, {
+    "id" : 27891,
+    "uuid" : "69e6e520-a1fe-4366-aee5-7ce3428acdf9",
+    "order" : 2,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26175
+    }
+  }, {
+    "id" : 27892,
+    "uuid" : "d81457e7-9aa8-4457-99f4-ea945fb8eb7e",
+    "order" : 1,
+    "s" : {
+      "id" : 26175
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27893,
+    "uuid" : "326f2692-c381-46e7-9ee0-288936397efb",
+    "order" : 1,
+    "s" : {
+      "id" : 26175
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26176,
+      "v" : "002"
+    }
+  }, {
+    "id" : 27894,
+    "uuid" : "ad43050d-ba7d-4049-b136-1056a964d970",
+    "order" : 1,
+    "s" : {
+      "id" : 26175
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26177,
+      "v" : "a"
+    }
+  }, {
+    "id" : 27895,
+    "uuid" : "86c03b64-0f66-4534-a80c-89fe588d7af3",
+    "order" : 1,
+    "s" : {
+      "id" : 26175
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26178,
+      "v" : "19981028"
+    }
+  }, {
+    "id" : 27896,
+    "uuid" : "f06ac4e6-f4d0-4524-9c88-3956c01e6b1d",
+    "order" : 3,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26179
+    }
+  }, {
+    "id" : 27897,
+    "uuid" : "b6c18a9c-0309-48d1-95a6-64a20b0e9494",
+    "order" : 1,
+    "s" : {
+      "id" : 26179
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27898,
+    "uuid" : "48458263-38e6-4f0d-a528-6085ece41682",
+    "order" : 1,
+    "s" : {
+      "id" : 26179
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26180,
+      "v" : "003"
+    }
+  }, {
+    "id" : 27899,
+    "uuid" : "c5eaffab-8a1e-40f0-a3ad-769f60ad1602",
+    "order" : 1,
+    "s" : {
+      "id" : 26179
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26181,
+      "v" : " "
+    }
+  }, {
+    "id" : 27900,
+    "uuid" : "4bb3bb49-b416-4fd3-bb83-9e7653341049",
+    "order" : 1,
+    "s" : {
+      "id" : 26179
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26182,
+      "v" : "20010620"
+    }
+  }, {
+    "id" : 27901,
+    "uuid" : "fa9d342d-f338-4ba0-89ae-c0443118effe",
+    "order" : 4,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26183
+    }
+  }, {
+    "id" : 27902,
+    "uuid" : "e09d6857-501d-4a54-a004-7f7b7f7cb38b",
+    "order" : 1,
+    "s" : {
+      "id" : 26183
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27903,
+    "uuid" : "11f8edac-1b4d-44e2-a436-7373f8dc3c0c",
+    "order" : 1,
+    "s" : {
+      "id" : 26183
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26184,
+      "v" : "005"
+    }
+  }, {
+    "id" : 27904,
+    "uuid" : "50736020-a02c-41b9-845c-b1fecf7d2992",
+    "order" : 1,
+    "s" : {
+      "id" : 26183
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26185,
+      "v" : "n"
+    }
+  }, {
+    "id" : 27905,
+    "uuid" : "cabea48c-d4a6-4482-8ae7-6eb22ab1bba4",
+    "order" : 1,
+    "s" : {
+      "id" : 26183
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26186,
+      "v" : "20011121"
+    }
+  }, {
+    "id" : 27906,
+    "uuid" : "6f4fb460-e8bc-4082-89e8-0e5182e1e3cd",
+    "order" : 5,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26187
+    }
+  }, {
+    "id" : 27907,
+    "uuid" : "8f9756f6-22b3-428a-8470-7dfb203966cf",
+    "order" : 1,
+    "s" : {
+      "id" : 26187
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27908,
+    "uuid" : "10ca0c6b-b114-421c-bb24-e1c41a06be30",
+    "order" : 1,
+    "s" : {
+      "id" : 26187
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26188,
+      "v" : "029"
+    }
+  }, {
+    "id" : 27909,
+    "uuid" : "2355047e-4200-4d39-a5f0-4bd665f77951",
+    "order" : 1,
+    "s" : {
+      "id" : 26187
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26189,
+      "v" : "m"
+    }
+  }, {
+    "id" : 27910,
+    "uuid" : "ad818b32-8b5a-4637-a506-26452c042382",
+    "order" : 1,
+    "s" : {
+      "id" : 26187
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26190,
+      "v" : "MB"
+    }
+  }, {
+    "id" : 27911,
+    "uuid" : "58fd857f-239e-4858-8c44-7057968e3865",
+    "order" : 6,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26191
+    }
+  }, {
+    "id" : 27912,
+    "uuid" : "9cf3def4-9066-415b-a73f-a67e4780d6e3",
+    "order" : 1,
+    "s" : {
+      "id" : 26191
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27913,
+    "uuid" : "93d58896-b038-4325-b67d-39e7eed2b89d",
+    "order" : 1,
+    "s" : {
+      "id" : 26191
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26192,
+      "v" : "030"
+    }
+  }, {
+    "id" : 27914,
+    "uuid" : "baa5caa0-6deb-474d-840e-606b4b17caa3",
+    "order" : 1,
+    "s" : {
+      "id" : 26191
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26193,
+      "v" : " "
+    }
+  }, {
+    "id" : 27915,
+    "uuid" : "2873f1c8-66b8-4706-b208-fff888f86f60",
+    "order" : 1,
+    "s" : {
+      "id" : 26191
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26194,
+      "v" : "az1dcr|||||37"
+    }
+  }, {
+    "id" : 27916,
+    "uuid" : "a81ea98d-07af-405c-9255-8bec52938fca",
+    "order" : 7,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26195
+    }
+  }, {
+    "id" : 27917,
+    "uuid" : "a4739c18-8b77-4396-aaaa-f22c465373a1",
+    "order" : 1,
+    "s" : {
+      "id" : 26195
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27918,
+    "uuid" : "52d85edc-205a-4273-904c-08cc262f6c58",
+    "order" : 1,
+    "s" : {
+      "id" : 26195
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26196,
+      "v" : "037"
+    }
+  }, {
+    "id" : 27919,
+    "uuid" : "7a09a817-1ed7-42b4-a47b-6334951888cf",
+    "order" : 1,
+    "s" : {
+      "id" : 26195
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26197,
+      "v" : "z"
+    }
+  }, {
+    "id" : 27920,
+    "uuid" : "0f364d51-fb35-4008-8f5a-a36634437b88",
+    "order" : 1,
+    "s" : {
+      "id" : 26195
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26198,
+      "v" : "dt."
+    }
+  }, {
+    "id" : 27921,
+    "uuid" : "46f1ef6b-3309-4a50-a200-6466f5a78773",
+    "order" : 8,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26199
+    }
+  }, {
+    "id" : 27922,
+    "uuid" : "0cb507a5-c76c-41b5-8081-1c1a2b4a9d22",
+    "order" : 1,
+    "s" : {
+      "id" : 26199
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27923,
+    "uuid" : "8de8b541-770f-4e34-aa0d-c4d51ab33751",
+    "order" : 1,
+    "s" : {
+      "id" : 26199
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26200,
+      "v" : "050"
+    }
+  }, {
+    "id" : 27924,
+    "uuid" : "e914c07c-35a5-4092-a416-7143cd490446",
+    "order" : 1,
+    "s" : {
+      "id" : 26199
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26201,
+      "v" : " "
+    }
+  }, {
+    "id" : 27925,
+    "uuid" : "80667487-554c-427a-928b-fd3fc87894cd",
+    "order" : 1,
+    "s" : {
+      "id" : 26199
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26202,
+      "v" : "|||||c||||||||"
+    }
+  }, {
+    "id" : 27926,
+    "uuid" : "5022a015-1080-45b2-b680-858fb8d2f179",
+    "order" : 9,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26203
+    }
+  }, {
+    "id" : 27927,
+    "uuid" : "aca7508f-883f-40fb-9e1a-ed125b301bad",
+    "order" : 1,
+    "s" : {
+      "id" : 26203
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27928,
+    "uuid" : "f9943d48-5d34-47bd-94db-bc0069aa2529",
+    "order" : 1,
+    "s" : {
+      "id" : 26203
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26204,
+      "v" : "051"
+    }
+  }, {
+    "id" : 27929,
+    "uuid" : "08b619da-1db3-4f0c-916b-687f7c2cd3eb",
+    "order" : 1,
+    "s" : {
+      "id" : 26203
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26205,
+      "v" : " "
+    }
+  }, {
+    "id" : 27930,
+    "uuid" : "46017ccc-c030-4a6c-8436-badacb89daf9",
+    "order" : 1,
+    "s" : {
+      "id" : 26203
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26206,
+      "v" : "n||||||"
+    }
+  }, {
+    "id" : 27931,
+    "uuid" : "3ad0bbac-1e38-4a7d-b152-74b51c160caa",
+    "order" : 10,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26207
+    }
+  }, {
+    "id" : 27932,
+    "uuid" : "9ae98d62-ac51-477c-ac7f-f85dd6031fd0",
+    "order" : 1,
+    "s" : {
+      "id" : 26207
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27933,
+    "uuid" : "3611af18-1aae-45c1-af82-859b57979596",
+    "order" : 1,
+    "s" : {
+      "id" : 26207
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26208,
+      "v" : "070"
+    }
+  }, {
+    "id" : 27934,
+    "uuid" : "5a3c2f96-e752-4169-8430-2404615d3f70",
+    "order" : 1,
+    "s" : {
+      "id" : 26207
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26209,
+      "v" : " "
+    }
+  }, {
+    "id" : 27935,
+    "uuid" : "573e98b9-a6a0-4461-8c47-2a4547524bca",
+    "order" : 1,
+    "s" : {
+      "id" : 26207
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26210,
+      "v" : "KNUB"
+    }
+  }, {
+    "id" : 27936,
+    "uuid" : "c0a4aa7e-152b-4bd6-a933-ce761d79841b",
+    "order" : 11,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26211
+    }
+  }, {
+    "id" : 27937,
+    "uuid" : "a9a000a5-d144-4d88-9fe8-91c4978d4364",
+    "order" : 1,
+    "s" : {
+      "id" : 26211
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27938,
+    "uuid" : "ffec6f67-e1e5-47f0-a764-afd7b74636f0",
+    "order" : 1,
+    "s" : {
+      "id" : 26211
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26212,
+      "v" : "070"
+    }
+  }, {
+    "id" : 27939,
+    "uuid" : "964390a4-e76b-4bc0-a274-ba14b6ba04b5",
+    "order" : 1,
+    "s" : {
+      "id" : 26211
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26213,
+      "v" : "b"
+    }
+  }, {
+    "id" : 27940,
+    "uuid" : "7f2ecc9a-d948-4f81-b7a0-d74c0c3aeb8e",
+    "order" : 1,
+    "s" : {
+      "id" : 26211
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26214,
+      "v" : "FRhk"
+    }
+  }, {
+    "id" : 27941,
+    "uuid" : "c9a8960d-e9bb-4ad2-bfee-fd0174800c28",
+    "order" : 12,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26215
+    }
+  }, {
+    "id" : 27942,
+    "uuid" : "c00da5a8-c58b-4985-a87b-3161b3a6fdc1",
+    "order" : 1,
+    "s" : {
+      "id" : 26215
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27943,
+    "uuid" : "97e48929-2ac9-4b67-8120-2f0343a0de22",
+    "order" : 1,
+    "s" : {
+      "id" : 26215
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26216,
+      "v" : "076"
+    }
+  }, {
+    "id" : 27944,
+    "uuid" : "4de043e6-6dc8-456a-ad7c-0fcb8ca5172c",
+    "order" : 1,
+    "s" : {
+      "id" : 26215
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26217,
+      "v" : "n"
+    }
+  }, {
+    "id" : 27945,
+    "uuid" : "aac95c20-f965-432e-bea4-505a3564821e",
+    "order" : 1,
+    "s" : {
+      "id" : 26215
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26218,
+      "v" : "098301"
+    }
+  }, {
+    "id" : 27946,
+    "uuid" : "e249cee0-b3d0-4f6a-be67-42b9001de5cb",
+    "order" : 13,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26219
+    }
+  }, {
+    "id" : 27947,
+    "uuid" : "2986f6db-ed7b-4e4e-bf9e-7c3d80d918d8",
+    "order" : 1,
+    "s" : {
+      "id" : 26219
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27948,
+    "uuid" : "86bc4c69-32b4-43bf-a9c7-df1a35d0f5d0",
+    "order" : 1,
+    "s" : {
+      "id" : 26219
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26220,
+      "v" : "076"
+    }
+  }, {
+    "id" : 27949,
+    "uuid" : "21fb2afc-cf58-45a1-a3a1-bfc349558937",
+    "order" : 1,
+    "s" : {
+      "id" : 26219
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26221,
+      "v" : "k"
+    }
+  }, {
+    "id" : 27950,
+    "uuid" : "6fdd89cd-d717-4d26-abd5-915e228df1fe",
+    "order" : 1,
+    "s" : {
+      "id" : 26219
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26222,
+      "v" : "101171"
+    }
+  }, {
+    "id" : 27951,
+    "uuid" : "b8b299be-f393-4d17-b1ae-97de0782a795",
+    "order" : 14,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26223
+    }
+  }, {
+    "id" : 27952,
+    "uuid" : "9da3bdca-a131-47f6-8ac2-5ab7262b358e",
+    "order" : 1,
+    "s" : {
+      "id" : 26223
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27953,
+    "uuid" : "155562d3-4d0f-4446-8c33-49f53da7c294",
+    "order" : 1,
+    "s" : {
+      "id" : 26223
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26224,
+      "v" : "076"
+    }
+  }, {
+    "id" : 27954,
+    "uuid" : "9b033b23-936e-4acd-a1f1-3e59d1f7f64f",
+    "order" : 1,
+    "s" : {
+      "id" : 26223
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26225,
+      "v" : "v"
+    }
+  }, {
+    "id" : 27955,
+    "uuid" : "5e301fe7-572e-41ea-9d39-2bdc526e4426",
+    "order" : 1,
+    "s" : {
+      "id" : 26223
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26226,
+      "v" : "5"
+    }
+  }, {
+    "id" : 27956,
+    "uuid" : "2d8cd118-6e8e-4bfb-9757-ccdcfc012bac",
+    "order" : 15,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26227
+    }
+  }, {
+    "id" : 27957,
+    "uuid" : "be2a3410-75ba-45d5-9955-1137aa85786f",
+    "order" : 1,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27958,
+    "uuid" : "96dc3319-4286-4a5b-9867-65ad0db46c79",
+    "order" : 1,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26228,
+      "v" : "077"
+    }
+  }, {
+    "id" : 27959,
+    "uuid" : "1fd49419-a1fe-41fa-9ba2-3e88a48bea89",
+    "order" : 1,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26229,
+      "v" : "p"
+    }
+  }, {
+    "id" : 27960,
+    "uuid" : "edd7f711-223f-4282-8f50-3ce48c6a1ecf",
+    "order" : 1,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26230,
+      "v" : "00872805"
+    }
+  }, {
+    "id" : 27961,
+    "uuid" : "d446ad01-dc7e-4f36-9197-2204c4d5796f",
+    "order" : 1,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tf",
+    "o" : {
+      "id" : 26231
+    }
+  }, {
+    "id" : 27962,
+    "uuid" : "3425b916-0362-4fad-958c-e9c8d796b12a",
+    "order" : 1,
+    "s" : {
+      "id" : 26231
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26232,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tfType"
+    }
+  }, {
+    "id" : 27963,
+    "uuid" : "183e6ef6-65e6-4ff4-8b43-03d87636885c",
+    "order" : 2,
+    "s" : {
+      "id" : 26227
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26233,
+      "v" : "Roll, Gernot"
+    }
+  }, {
+    "id" : 27964,
+    "uuid" : "3339d81c-5163-41b5-ad6e-4f79d264b545",
+    "order" : 16,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26234
+    }
+  }, {
+    "id" : 27965,
+    "uuid" : "2cdf1288-11a9-4a41-b755-b89089e07252",
+    "order" : 1,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27966,
+    "uuid" : "13ab436b-520a-4910-a790-3111e36a52e5",
+    "order" : 1,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26235,
+      "v" : "077"
+    }
+  }, {
+    "id" : 27967,
+    "uuid" : "9e3024ed-80fb-4d13-948a-2925e7e977eb",
+    "order" : 1,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26236,
+      "v" : "p"
+    }
+  }, {
+    "id" : 27968,
+    "uuid" : "522ba5f2-16a6-4d42-869b-5b6f3a8ba9a0",
+    "order" : 1,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26237,
+      "v" : "00872284"
+    }
+  }, {
+    "id" : 27969,
+    "uuid" : "232a2338-0884-44b6-be98-252e6b304b61",
+    "order" : 1,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tf",
+    "o" : {
+      "id" : 26238
+    }
+  }, {
+    "id" : 27970,
+    "uuid" : "23968825-704a-4ef5-b8b9-ac38c165af94",
+    "order" : 1,
+    "s" : {
+      "id" : 26238
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26232,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tfType"
+    }
+  }, {
+    "id" : 27971,
+    "uuid" : "7ee41653-435b-41c9-a9e5-278b23c8da1b",
+    "order" : 2,
+    "s" : {
+      "id" : 26234
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26239,
+      "v" : "Thomas, Eugen"
+    }
+  }, {
+    "id" : 27972,
+    "uuid" : "a5b1ee0f-0b61-4c77-98f0-57f678d2431a",
+    "order" : 17,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26240
+    }
+  }, {
+    "id" : 27973,
+    "uuid" : "ca657fa7-ae4f-45ac-8d05-847feced177a",
+    "order" : 1,
+    "s" : {
+      "id" : 26240
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27974,
+    "uuid" : "92415fff-c8e7-4dc7-86a9-6d1813dac446",
+    "order" : 1,
+    "s" : {
+      "id" : 26240
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26241,
+      "v" : "100"
+    }
+  }, {
+    "id" : 27975,
+    "uuid" : "738f1cff-4cec-4202-95e9-becbe01498a1",
+    "order" : 1,
+    "s" : {
+      "id" : 26240
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26242,
+      "v" : "b"
+    }
+  }, {
+    "id" : 27976,
+    "uuid" : "6b663804-ae3e-4bb4-9bbd-26977530c81d",
+    "order" : 1,
+    "s" : {
+      "id" : 26240
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26243,
+      "v" : "Wirth, Franz Peter"
+    }
+  }, {
+    "id" : 27977,
+    "uuid" : "5e8f2521-34bb-4aec-b72a-a8d2ec26b122",
+    "order" : 18,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26244
+    }
+  }, {
+    "id" : 27978,
+    "uuid" : "a7d4f032-39e8-4968-af14-42036b11b48e",
+    "order" : 1,
+    "s" : {
+      "id" : 26244
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27979,
+    "uuid" : "54e4d6a5-7457-49cf-810b-b5d645f0a05d",
+    "order" : 1,
+    "s" : {
+      "id" : 26244
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26245,
+      "v" : "102"
+    }
+  }, {
+    "id" : 27980,
+    "uuid" : "45d68b4c-5976-45f9-8798-f524b8d329d6",
+    "order" : 1,
+    "s" : {
+      "id" : 26244
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26246,
+      "v" : " "
+    }
+  }, {
+    "id" : 27981,
+    "uuid" : "5e151e1c-f947-4c96-a074-ae6b2461e132",
+    "order" : 1,
+    "s" : {
+      "id" : 26244
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26247,
+      "v" : "00412254"
+    }
+  }, {
+    "id" : 27982,
+    "uuid" : "815b3be5-3cde-49f2-a501-c3a28dd43604",
+    "order" : 19,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26248
+    }
+  }, {
+    "id" : 27983,
+    "uuid" : "980f41d6-e0a4-4266-8b4b-43e0e11d4a6d",
+    "order" : 1,
+    "s" : {
+      "id" : 26248
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27984,
+    "uuid" : "532d4fca-bfac-4a6a-b8ef-7be76f3f37a3",
+    "order" : 1,
+    "s" : {
+      "id" : 26248
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26249,
+      "v" : "104"
+    }
+  }, {
+    "id" : 27985,
+    "uuid" : "be4c5d87-76b5-456d-a790-8c52b09cdcf1",
+    "order" : 1,
+    "s" : {
+      "id" : 26248
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26250,
+      "v" : "b"
+    }
+  }, {
+    "id" : 27986,
+    "uuid" : "8608f409-5c3b-4283-9856-dc21b0cc82f0",
+    "order" : 1,
+    "s" : {
+      "id" : 26248
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26251,
+      "v" : "Mann, Golo"
+    }
+  }, {
+    "id" : 27987,
+    "uuid" : "387c7bf3-8824-4446-9759-067370ee0926",
+    "order" : 20,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26252
+    }
+  }, {
+    "id" : 27988,
+    "uuid" : "4da20cff-1468-4456-9a33-ea1bd080bbd8",
+    "order" : 1,
+    "s" : {
+      "id" : 26252
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27989,
+    "uuid" : "1c99850f-3913-46a7-b630-8ce914cc91a7",
+    "order" : 1,
+    "s" : {
+      "id" : 26252
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26253,
+      "v" : "106"
+    }
+  }, {
+    "id" : 27990,
+    "uuid" : "d4c7a02d-4cb5-4ef6-b2d4-08b5ceab3a20",
+    "order" : 1,
+    "s" : {
+      "id" : 26252
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26254,
+      "v" : " "
+    }
+  }, {
+    "id" : 27991,
+    "uuid" : "f618e4e4-9095-4657-81f1-bd9dc865f1a8",
+    "order" : 1,
+    "s" : {
+      "id" : 26252
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26255,
+      "v" : "00243077"
+    }
+  }, {
+    "id" : 27992,
+    "uuid" : "8190f03a-5df1-4b93-9bfe-d9d7373afcee",
+    "order" : 21,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26256
+    }
+  }, {
+    "id" : 27993,
+    "uuid" : "8f03829c-a205-416c-9214-e59c093a0dd4",
+    "order" : 1,
+    "s" : {
+      "id" : 26256
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27994,
+    "uuid" : "fef3ba78-1a50-4cc4-8850-63a6f0801ce1",
+    "order" : 1,
+    "s" : {
+      "id" : 26256
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26257,
+      "v" : "108"
+    }
+  }, {
+    "id" : 27995,
+    "uuid" : "15ffe0d4-0f02-4377-bb8b-a6b8141b75bc",
+    "order" : 1,
+    "s" : {
+      "id" : 26256
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26258,
+      "v" : "b"
+    }
+  }, {
+    "id" : 27996,
+    "uuid" : "633de7b5-7abb-45f7-9437-05c26cdac17f",
+    "order" : 1,
+    "s" : {
+      "id" : 26256
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26259,
+      "v" : "Ahlsen, Leopold"
+    }
+  }, {
+    "id" : 27997,
+    "uuid" : "f71fe444-a411-4858-9745-af6706d671bb",
+    "order" : 22,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26260
+    }
+  }, {
+    "id" : 27998,
+    "uuid" : "0fec15b9-eb35-4f21-8df6-dae151037506",
+    "order" : 1,
+    "s" : {
+      "id" : 26260
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 27999,
+    "uuid" : "07341d6a-665b-4763-a215-ad48e42f5c34",
+    "order" : 1,
+    "s" : {
+      "id" : 26260
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26261,
+      "v" : "110"
+    }
+  }, {
+    "id" : 28000,
+    "uuid" : "9bd94531-852c-48f0-a609-8552a0cbc651",
+    "order" : 1,
+    "s" : {
+      "id" : 26260
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26262,
+      "v" : " "
+    }
+  }, {
+    "id" : 28001,
+    "uuid" : "b808cbce-e51b-4e52-aab5-75fe25cfe68d",
+    "order" : 1,
+    "s" : {
+      "id" : 26260
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26263,
+      "v" : "00004514"
+    }
+  }, {
+    "id" : 28002,
+    "uuid" : "dc9936ea-86b0-4b64-96b5-1cebc0ec229b",
+    "order" : 23,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26264
+    }
+  }, {
+    "id" : 28003,
+    "uuid" : "b6cf1a68-2437-4a63-ba88-a2a2b91560f4",
+    "order" : 1,
+    "s" : {
+      "id" : 26264
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28004,
+    "uuid" : "a0d1106c-90e4-47a1-8d9c-bc55d70e3314",
+    "order" : 1,
+    "s" : {
+      "id" : 26264
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26265,
+      "v" : "112"
+    }
+  }, {
+    "id" : 28005,
+    "uuid" : "502ca3e6-01b8-4141-b481-239904c2944d",
+    "order" : 1,
+    "s" : {
+      "id" : 26264
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26266,
+      "v" : "b"
+    }
+  }, {
+    "id" : 28006,
+    "uuid" : "de9c6cb0-8144-4b42-917e-86528d7e24ae",
+    "order" : 1,
+    "s" : {
+      "id" : 26264
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26267,
+      "v" : "Boysen, Rolf"
+    }
+  }, {
+    "id" : 28007,
+    "uuid" : "74401e81-46b8-4317-91f4-20aabaffd25b",
+    "order" : 24,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26268
+    }
+  }, {
+    "id" : 28008,
+    "uuid" : "befaf3a2-cb7b-48df-a169-a2db02436a41",
+    "order" : 1,
+    "s" : {
+      "id" : 26268
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28009,
+    "uuid" : "cfa8e006-4be8-46ac-9f1f-e19d70f80bc2",
+    "order" : 1,
+    "s" : {
+      "id" : 26268
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26269,
+      "v" : "114"
+    }
+  }, {
+    "id" : 28010,
+    "uuid" : "861a3547-bd5d-41fd-a549-75c2761464dd",
+    "order" : 1,
+    "s" : {
+      "id" : 26268
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26270,
+      "v" : " "
+    }
+  }, {
+    "id" : 28011,
+    "uuid" : "28183a88-646b-4cf0-bcd1-8c360e4a452e",
+    "order" : 1,
+    "s" : {
+      "id" : 26268
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26271,
+      "v" : "00045374"
+    }
+  }, {
+    "id" : 28012,
+    "uuid" : "b9e55703-d211-41a3-84bd-24c3fe5463d1",
+    "order" : 25,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26272
+    }
+  }, {
+    "id" : 28013,
+    "uuid" : "d7449769-f6c3-447a-9751-e491c8c42b81",
+    "order" : 1,
+    "s" : {
+      "id" : 26272
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28014,
+    "uuid" : "4b17bd18-48ec-4a9a-86d7-0c9c047bcff3",
+    "order" : 1,
+    "s" : {
+      "id" : 26272
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26273,
+      "v" : "116"
+    }
+  }, {
+    "id" : 28015,
+    "uuid" : "ca449860-58af-4dcb-92cb-f894f67ab38c",
+    "order" : 1,
+    "s" : {
+      "id" : 26272
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26274,
+      "v" : "b"
+    }
+  }, {
+    "id" : 28016,
+    "uuid" : "e0075111-c126-43b8-898d-bfac2f362f21",
+    "order" : 1,
+    "s" : {
+      "id" : 26272
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26275,
+      "v" : "Pekny, Romuald"
+    }
+  }, {
+    "id" : 28017,
+    "uuid" : "bdb6bdca-b0db-4ed4-8731-7983330e7087",
+    "order" : 26,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26276
+    }
+  }, {
+    "id" : 28018,
+    "uuid" : "75aeaaa0-5976-4c25-bc3f-52caf55b8422",
+    "order" : 1,
+    "s" : {
+      "id" : 26276
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28019,
+    "uuid" : "d9a635d6-9c93-4634-b223-7ace926bfe3a",
+    "order" : 1,
+    "s" : {
+      "id" : 26276
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26277,
+      "v" : "118"
+    }
+  }, {
+    "id" : 28020,
+    "uuid" : "6dfe14a8-ccdb-4afe-84cf-bea7f183342f",
+    "order" : 1,
+    "s" : {
+      "id" : 26276
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26278,
+      "v" : " "
+    }
+  }, {
+    "id" : 28021,
+    "uuid" : "d1dc5566-2d90-42f2-9e03-30c70f3435b1",
+    "order" : 1,
+    "s" : {
+      "id" : 26276
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26279,
+      "v" : "00465696"
+    }
+  }, {
+    "id" : 28022,
+    "uuid" : "db484358-7d8d-49b1-a3c8-aba0a13c57ef",
+    "order" : 27,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26280
+    }
+  }, {
+    "id" : 28023,
+    "uuid" : "331655f2-af11-4b9b-90f8-4475aac6fa59",
+    "order" : 1,
+    "s" : {
+      "id" : 26280
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28024,
+    "uuid" : "11fbdf14-33e3-46f3-ba28-779095c40144",
+    "order" : 1,
+    "s" : {
+      "id" : 26280
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26281,
+      "v" : "120"
+    }
+  }, {
+    "id" : 28025,
+    "uuid" : "41ba81a5-8e24-4fd4-bdf2-20f4597d6d85",
+    "order" : 1,
+    "s" : {
+      "id" : 26280
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26282,
+      "v" : "b"
+    }
+  }, {
+    "id" : 28026,
+    "uuid" : "01b56c4c-5185-4554-8f65-e03904368ce0",
+    "order" : 1,
+    "s" : {
+      "id" : 26280
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26283,
+      "v" : "Kreindl, Werner"
+    }
+  }, {
+    "id" : 28027,
+    "uuid" : "23d85378-028d-4d13-bee8-688fde1eef70",
+    "order" : 28,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26284
+    }
+  }, {
+    "id" : 28028,
+    "uuid" : "c2969c39-6625-477b-9c1f-9bb3dcafbe22",
+    "order" : 1,
+    "s" : {
+      "id" : 26284
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28029,
+    "uuid" : "a9ab9f18-9d05-42cd-91dc-aa4f2e5aa93b",
+    "order" : 1,
+    "s" : {
+      "id" : 26284
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26285,
+      "v" : "122"
+    }
+  }, {
+    "id" : 28030,
+    "uuid" : "65291be9-52b8-4a57-8786-1951a57ac8e7",
+    "order" : 1,
+    "s" : {
+      "id" : 26284
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26286,
+      "v" : " "
+    }
+  }, {
+    "id" : 28031,
+    "uuid" : "e635b219-89d5-4341-b52c-7a9ba1091b78",
+    "order" : 1,
+    "s" : {
+      "id" : 26284
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26287,
+      "v" : "00209123"
+    }
+  }, {
+    "id" : 28032,
+    "uuid" : "002ed88d-ded1-4396-84b7-3ebd347971f4",
+    "order" : 29,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26288
+    }
+  }, {
+    "id" : 28033,
+    "uuid" : "085deb0a-fd03-4b07-a0bb-b3c3a39e1178",
+    "order" : 1,
+    "s" : {
+      "id" : 26288
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28034,
+    "uuid" : "3bd3fabe-a68c-4320-ab52-0e18b4d6b28d",
+    "order" : 1,
+    "s" : {
+      "id" : 26288
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26289,
+      "v" : "331"
+    }
+  }, {
+    "id" : 28035,
+    "uuid" : "f554ec77-975e-4f49-8ae6-4c6f5d7bbfc9",
+    "order" : 1,
+    "s" : {
+      "id" : 26288
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26290,
+      "v" : " "
+    }
+  }, {
+    "id" : 28036,
+    "uuid" : "317accda-c009-4036-bcac-08a5e689712e",
+    "order" : 1,
+    "s" : {
+      "id" : 26288
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26291,
+      "v" : "Wallenstein"
+    }
+  }, {
+    "id" : 28037,
+    "uuid" : "9966fefe-e064-4d0d-8ca2-2a720cac96d3",
+    "order" : 30,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26292
+    }
+  }, {
+    "id" : 28038,
+    "uuid" : "c2ea94b0-66e5-4f01-a883-e94e44460aaf",
+    "order" : 1,
+    "s" : {
+      "id" : 26292
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28039,
+    "uuid" : "8f4b6080-c00d-4a19-9f57-209a8397d268",
+    "order" : 1,
+    "s" : {
+      "id" : 26292
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26293,
+      "v" : "334"
+    }
+  }, {
+    "id" : 28040,
+    "uuid" : "49b81ba0-fcc1-4f2e-983b-ddb72a2c847d",
+    "order" : 1,
+    "s" : {
+      "id" : 26292
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26294,
+      "v" : " "
+    }
+  }, {
+    "id" : 28041,
+    "uuid" : "b1378f6b-68d9-40f2-993c-3f26b77b0264",
+    "order" : 1,
+    "s" : {
+      "id" : 26292
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26295,
+      "v" : "Bildtonträger"
+    }
+  }, {
+    "id" : 28042,
+    "uuid" : "68106345-a9aa-4a44-a7ff-db9d8d73b71f",
+    "order" : 31,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26296
+    }
+  }, {
+    "id" : 28043,
+    "uuid" : "baf572e4-87d7-406d-b203-9f4ddc3e90eb",
+    "order" : 1,
+    "s" : {
+      "id" : 26296
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28044,
+    "uuid" : "3ec8770b-a7ba-467e-ac10-7bb9869dab01",
+    "order" : 1,
+    "s" : {
+      "id" : 26296
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26297,
+      "v" : "335"
+    }
+  }, {
+    "id" : 28045,
+    "uuid" : "0dae9d65-690a-4a2d-b4c3-7cfb4c9a8524",
+    "order" : 1,
+    "s" : {
+      "id" : 26296
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26298,
+      "v" : " "
+    }
+  }, {
+    "id" : 28046,
+    "uuid" : "15c1d838-1913-4479-b644-4399591637ab",
+    "order" : 1,
+    "s" : {
+      "id" : 26296
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26299,
+      "v" : "nach der Biographie von Golo Mann für das Fernsehen erzählt von Leopold Ahlsen"
+    }
+  }, {
+    "id" : 28047,
+    "uuid" : "047945ec-a084-4e1b-8b89-a162f048b50f",
+    "order" : 32,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26300
+    }
+  }, {
+    "id" : 28048,
+    "uuid" : "3db5cc15-8acb-4839-bf59-740325a96284",
+    "order" : 1,
+    "s" : {
+      "id" : 26300
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28049,
+    "uuid" : "1e9edfd0-28b7-4053-90ae-24e315018fb4",
+    "order" : 1,
+    "s" : {
+      "id" : 26300
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26301,
+      "v" : "359"
+    }
+  }, {
+    "id" : 28050,
+    "uuid" : "8a9f66af-6c83-4762-a5c3-62fd9a0ef237",
+    "order" : 1,
+    "s" : {
+      "id" : 26300
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26302,
+      "v" : " "
+    }
+  }, {
+    "id" : 28051,
+    "uuid" : "1a250313-9723-41d1-8408-634da1524cef",
+    "order" : 1,
+    "s" : {
+      "id" : 26300
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26303,
+      "v" : "[Darsteller:] Rolf Boysen, Romuald Pekny, Werner Kreindl ... Kamera: Gernot Roll ... Musik: Eugen Thomas. Regie: Franz Peter Wirth"
+    }
+  }, {
+    "id" : 28052,
+    "uuid" : "d96729e6-54ba-445c-ba59-2ab610e49a3f",
+    "order" : 33,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26304
+    }
+  }, {
+    "id" : 28053,
+    "uuid" : "6cfab4b9-01f2-4d98-a97d-2c9f04152520",
+    "order" : 1,
+    "s" : {
+      "id" : 26304
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28054,
+    "uuid" : "825e643c-d851-44c7-a451-cfeb3e268c23",
+    "order" : 1,
+    "s" : {
+      "id" : 26304
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26305,
+      "v" : "410"
+    }
+  }, {
+    "id" : 28055,
+    "uuid" : "1ca78315-3ff5-4522-aeea-cc1abedfc0fc",
+    "order" : 1,
+    "s" : {
+      "id" : 26304
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26306,
+      "v" : " "
+    }
+  }, {
+    "id" : 28056,
+    "uuid" : "d17cc43b-11b3-43d6-8a2b-563c6fc951fb",
+    "order" : 1,
+    "s" : {
+      "id" : 26304
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26307,
+      "v" : "[Mainz]"
+    }
+  }, {
+    "id" : 28057,
+    "uuid" : "00617d4c-42f9-42b3-ba08-93221ae24444",
+    "order" : 34,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26308
+    }
+  }, {
+    "id" : 28058,
+    "uuid" : "6931d6b3-9f14-42c6-96b0-f871480a5d8f",
+    "order" : 1,
+    "s" : {
+      "id" : 26308
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28059,
+    "uuid" : "2e3602c3-263c-4626-96c2-06873a7b7291",
+    "order" : 1,
+    "s" : {
+      "id" : 26308
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26309,
+      "v" : "412"
+    }
+  }, {
+    "id" : 28060,
+    "uuid" : "8e2ca4cc-9f3d-428f-9073-5612c6a4b6d4",
+    "order" : 1,
+    "s" : {
+      "id" : 26308
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26310,
+      "v" : " "
+    }
+  }, {
+    "id" : 28061,
+    "uuid" : "4506edf5-7757-4d4b-8565-a42ecb58c347",
+    "order" : 1,
+    "s" : {
+      "id" : 26308
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26311,
+      "v" : "ZDF [u.a.]"
+    }
+  }, {
+    "id" : 28062,
+    "uuid" : "b5ee1521-ad34-4e29-b038-961db7876fc6",
+    "order" : 35,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26312
+    }
+  }, {
+    "id" : 28063,
+    "uuid" : "6104a699-f4b8-4c71-91b9-5bd8a4186aff",
+    "order" : 1,
+    "s" : {
+      "id" : 26312
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28064,
+    "uuid" : "add0425e-613e-433d-aa55-5518f2d50093",
+    "order" : 1,
+    "s" : {
+      "id" : 26312
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26313,
+      "v" : "433"
+    }
+  }, {
+    "id" : 28065,
+    "uuid" : "430bfede-1438-4d06-bbfc-c9f07c3f15c4",
+    "order" : 1,
+    "s" : {
+      "id" : 26312
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26314,
+      "v" : " "
+    }
+  }, {
+    "id" : 28066,
+    "uuid" : "8115c99d-a26c-4a4f-b88a-c460d0aa2441",
+    "order" : 1,
+    "s" : {
+      "id" : 26312
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26315,
+      "v" : "Videokassetten"
+    }
+  }, {
+    "id" : 28067,
+    "uuid" : "513d1b59-0d2c-4c1d-b00e-0a51e1507a21",
+    "order" : 36,
+    "s" : {
+      "id" : 26165,
+      "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26316
+    }
+  }, {
+    "id" : 28068,
+    "uuid" : "157c35cd-4f1e-44ee-b307-594ac90a65bb",
+    "order" : 1,
+    "s" : {
+      "id" : 26316
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "id" : 26171,
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "id" : 28069,
+    "uuid" : "b5d03227-f63c-4a60-bfca-b75b26d47e52",
+    "order" : 1,
+    "s" : {
+      "id" : 26316
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "id" : 26317,
+      "v" : "501"
+    }
+  }, {
+    "id" : 28070,
+    "uuid" : "f66731ec-8843-46cb-bd79-ca7d222d9204",
+    "order" : 1,
+    "s" : {
+      "id" : 26316
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "id" : 26318,
+      "v" : " "
+    }
+  }, {
+    "id" : 28071,
+    "uuid" : "0df994f4-f37c-4a83-8b91-e2a733b38dfe",
+    "order" : 1,
+    "s" : {
+      "id" : 26316
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "id" : 26319,
+      "v" : "Fernsehfilm, BRD 1978"
+    }
+  } ]
+} ]

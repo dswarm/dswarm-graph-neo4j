@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
@@ -53,7 +54,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	private final Index<Node>          resourceTypes;
 	private final Index<Node>          values;
 	private final Map<String, Node>    bnodes;
-	private final Index<Relationship>  statements;
+	private final Index<Relationship> statementHashes;
+	private final Index<Relationship> statementUUIDs;
 	private final Map<Long, String>    nodeResourceMap;
 
 	private final Label leafLabel = DynamicLabel.label("__LEAF__");
@@ -71,7 +73,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		statements = database.index().forRelationships("statements");
+		statementHashes = database.index().forRelationships("statement_hashes");
+		statementUUIDs = database.index().forRelationships("statement_uuids");
 		nodeResourceMap = new HashMap<Long, String>();
 	}
 
@@ -93,6 +96,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			final org.dswarm.graph.json.Node object = st.getObject();
 
+			final String statementUUID = st.getUUID();
 			final Long order = st.getOrder();
 
 			// Check index for subject
@@ -138,7 +142,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				addedNodes++;
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index, subject.getType(), object.getType());
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(), object.getType());
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -203,7 +207,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, order, index, subject.getType(), object.getType());
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(), object.getType());
 			}
 
 			totalTriples++;
@@ -297,7 +301,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final org.dswarm.graph.json.Node subject, final Resource resource, final Long order, final long index,
+			final org.dswarm.graph.json.Node subject, final Resource resource, final String statementUUID, final Long order, final long index,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
 		final StringBuffer sb = new StringBuffer();
@@ -321,12 +325,24 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 		final Relationship rel;
 
-		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
+		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
 
 		if (hits == null || !hits.hasNext()) {
 
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
+
+			final String finalStatementUUID;
+
+			if(statementUUID == null) {
+
+				finalStatementUUID = UUID.randomUUID().toString();
+			} else {
+
+				finalStatementUUID = statementUUID;
+			}
+
+			rel.setProperty(GraphStatics.UUID_PROPERTY, finalStatementUUID);
 
 			if (order != null) {
 
@@ -335,7 +351,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
 
-			statements.add(rel, GraphStatics.HASH, hash);
+			statementHashes.add(rel, GraphStatics.HASH, hash);
+			statementUUIDs.add(rel, GraphStatics.UUID, finalStatementUUID);
 
 			addedRelationships++;
 

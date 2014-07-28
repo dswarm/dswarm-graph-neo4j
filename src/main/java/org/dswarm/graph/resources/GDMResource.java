@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.sun.jersey.multipart.BodyPart;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
@@ -132,7 +133,32 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		calculateDeltaForDataModel(model, resourceGraphURI, database);
+		final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
+		final ObjectNode contentSchema;
+
+		if(contentSchemaBP != null) {
+
+			final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
+
+			try {
+
+				contentSchema = objectMapper.readValue(contentSchemaJSONString, ObjectNode.class);
+			} catch (final IOException e) {
+
+				final String message = "could not deserialise content schema JSON for write from graph DB request";
+
+				GDMResource.LOG.debug(message);
+
+				throw new DMPGraphException(message);
+			}
+		} else {
+
+			// no content schema available for data model
+
+			contentSchema = null;
+		}
+
+		calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
 		final GDMParser parser = new GDMModelParser(model);
@@ -258,16 +284,18 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Model calculateDeltaForDataModel(final Model model, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
+	private Model calculateDeltaForDataModel(final Model model, final ObjectNode contentSchema, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
 
 		final Model deltaModel = new Model();
 
 		// calculate delta resource-wise
 		for (Resource resource : model.getResources()) {
 
+			// TODO: determine legacy resource identifier via content schema
+
 			final String resourceURI = resource.getUri();
 
-			// try to retrieve existing resource for the resource identifier in the provenance graph
+			// TODO: try to retrieve existing resource via legacy resource identifier in the provenance graph, i.e., build a cypher query with the help of the record identifier attribute path
 			final GDMReader gdmReader = new PropertyGraphResourceGDMReader(resourceURI, resourceGraphURI, permanentDatabase);
 			final Model existingResourceModel = gdmReader.read();
 

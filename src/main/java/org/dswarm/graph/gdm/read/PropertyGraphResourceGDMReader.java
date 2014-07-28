@@ -311,13 +311,20 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 				// qualified properties at relationship (statement)
 
+				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
 				final Statement statement;
 
-				if (order != null) {
+				if (order != null && uuid != null) {
+
+					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
+				} else if(order != null && uuid == null) {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
+				} else if(order == null && uuid != null) {
+
+					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
 				} else {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode);

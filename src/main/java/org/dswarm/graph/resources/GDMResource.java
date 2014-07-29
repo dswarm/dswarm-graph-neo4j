@@ -47,7 +47,7 @@ import org.dswarm.graph.json.util.Util;
 @Path("/gdm")
 public class GDMResource {
 
-	private static final Logger				LOG								= LoggerFactory.getLogger(GDMResource.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.ResourceNode;
@@ -35,14 +36,12 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 	private final NodeHandler						startNodeHandler;
 	private final HierarchyLevelRelationshipHandler	relationshipHandler;
 
-	private final String							resourceClassUri;
 	private final String							resourceUri;
 
 	private final GraphDatabaseService				database;
 
-	public PropertyEnrichGDMWorker(final String resourceClassUriArg, final String resourceUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyEnrichGDMWorker(final String resourceUriArg, final GraphDatabaseService databaseArg) {
 
-		resourceClassUri = resourceClassUriArg;
 		resourceUri = resourceUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
@@ -59,22 +58,17 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 		try {
 
-			final Label recordClassLabel = DynamicLabel.label(resourceClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.URI_PROPERTY, resourceUri);
+			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceUri);
 
-			if (recordNodes == null) {
+			if (recordNode == null) {
 
-				PropertyEnrichGDMWorker.LOG.debug("couldn't find records for resource '" + resourceUri + "' and resource class '" + resourceClassUri
-						+ "'");
+				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '" + resourceUri + "'");
 
 				return;
 			}
 
-			for (final Node recordNode : recordNodes) {
-
-				startNodeHandler.handleNode(recordNode);
-			}
+			startNodeHandler.handleNode(recordNode);
 		} catch (final Exception e) {
 
 			PropertyEnrichGDMWorker.LOG.error("couldn't finished enrich GDM TX successfully", e);

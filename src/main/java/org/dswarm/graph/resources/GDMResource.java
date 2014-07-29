@@ -13,13 +13,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.sun.jersey.multipart.BodyPart;
+import org.dswarm.graph.delta.ContentSchema;
+import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
+import org.dswarm.graph.gdm.work.GDMWorker;
+import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +144,7 @@ public class GDMResource {
 		LOG.debug("try to write GDM statements into graph db");
 
 		final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
-		final ObjectNode contentSchema;
+		final ContentSchema contentSchema;
 
 		if(contentSchemaBP != null) {
 
@@ -142,7 +152,7 @@ public class GDMResource {
 
 			try {
 
-				contentSchema = objectMapper.readValue(contentSchemaJSONString, ObjectNode.class);
+				contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
 			} catch (final IOException e) {
 
 				final String message = "could not deserialise content schema JSON for write from graph DB request";
@@ -284,7 +294,7 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Model calculateDeltaForDataModel(final Model model, final ObjectNode contentSchema, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
+	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
 
 		final Model deltaModel = new Model();
 
@@ -313,7 +323,7 @@ public class GDMResource {
 			final Model newResourceModel = new Model();
 			newResourceModel.addResource(resource);
 
-			calculateDeltaForResource(existingResourceModel, newResourceModel);
+			calculateDeltaForResource(existingResourceModel, newResourceModel, contentSchema);
 		}
 
 		// TODO change this, i.e., return overall changeset of the datamodel
@@ -321,10 +331,15 @@ public class GDMResource {
 		return null;
 	}
 
-	private Model calculateDeltaForResource(final Model existingResourceModel, final Model newResourceModel) {
+	private Model calculateDeltaForResource(final Model existingResourceModel, final Model newResourceModel, final ContentSchema contentSchema) {
 
 		//final GraphDatabaseService existingModelDB = loadModel(existingResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
 		final GraphDatabaseService newModelDB = loadModel(newResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
+		//enrichModel(existingModelDB, existingResourceModel.getResources().iterator().next().getUri());
+		enrichModel(newModelDB, newResourceModel.getResources().iterator().next().getUri());
+
+		GraphDBUtil.printNodes(newModelDB);
+		GraphDBUtil.printRelationships(newModelDB);
 
 		// TODO: do delta calculation on enriched GDM models in graph
 
@@ -346,4 +361,12 @@ public class GDMResource {
 
 		return impermanentDB;
 	}
+
+	private void enrichModel(final GraphDatabaseService graphDB, final String resourceUri) {
+
+		final GDMWorker worker = new PropertyEnrichGDMWorker(resourceUri, graphDB);
+		worker.work();
+	}
+
+
 }

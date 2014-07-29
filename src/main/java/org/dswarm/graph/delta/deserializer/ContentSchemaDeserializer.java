@@ -1,0 +1,133 @@
+package org.dswarm.graph.delta.deserializer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
+import org.dswarm.graph.delta.Attribute;
+import org.dswarm.graph.delta.AttributePath;
+import org.dswarm.graph.delta.ContentSchema;
+import org.dswarm.graph.delta.DMPStatics;
+import org.dswarm.graph.delta.util.AttributePathUtil;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+/**
+ * Created by tgaengler on 29/07/14.
+ */
+public class ContentSchemaDeserializer extends JsonDeserializer<ContentSchema> {
+
+	private Map<String, Attribute> attributeMap = new HashMap<>();
+	private Map<String, AttributePath> attributePathMap = new HashMap<>();
+
+	@Override
+	public ContentSchema deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException {
+
+		final ObjectCodec oc = jp.getCodec();
+
+		if (oc == null) {
+
+			return null;
+		}
+
+		final JsonNode node = oc.readTree(jp);
+
+		if (node == null) {
+
+			return null;
+		}
+
+		final JsonNode recordIdentifierAttributePathNode = node.get("record_identifier_attribute_path");
+		final AttributePath recordIdentifierAttributePath = parseAttributePathNode(recordIdentifierAttributePathNode);
+
+		final JsonNode keyAttributePathsNode = node.get("key_attribute_paths");
+		final LinkedList<AttributePath> keyAttributePaths = parseAttributePathsNode(keyAttributePathsNode);
+
+		final JsonNode valueAttributePathNode = node.get("value_attribute_path");
+		final AttributePath valueAttributePath = parseAttributePathNode(valueAttributePathNode);
+
+		return new ContentSchema(recordIdentifierAttributePath, keyAttributePaths, valueAttributePath);
+	}
+
+	private LinkedList<AttributePath> parseAttributePathsNode(final JsonNode attributePathsNode) {
+
+		if(attributePathsNode == null || !ArrayNode.class.isInstance(attributePathsNode)) {
+
+			return null;
+		}
+
+		final LinkedList<AttributePath> attributePaths = new LinkedList<>();
+
+		for(final JsonNode attributePathNode : attributePathsNode) {
+
+			final AttributePath attributePath = parseAttributePathNode(attributePathNode);
+
+			if(attributePath != null) {
+
+				attributePaths.add(attributePath);
+			}
+		}
+
+		return attributePaths;
+	}
+
+	private AttributePath parseAttributePathNode(final JsonNode attributePathNode) {
+
+		if (attributePathNode == null) {
+
+			return null;
+		}
+
+		final String attributePathString = attributePathNode.asText();
+
+		return parseAttributePathString(attributePathString);
+	}
+
+	private AttributePath parseAttributePathString(final String attributePathString) {
+
+		final String[] attributes = attributePathString.split(DMPStatics.ATTRIBUTE_DELIMITER.toString());
+
+		if(attributes.length <= 0) {
+
+			return null;
+		}
+
+		final LinkedList<Attribute> attributeList = new LinkedList<>();
+
+		for (final String attributeURI : attributes) {
+
+			final Attribute attribute = getOrCreateAttribute(attributeURI);
+			attributeList.add(attribute);
+		}
+
+		return getOrCreateAttributePath(attributeList);
+	}
+
+	private Attribute getOrCreateAttribute(final String uri) {
+
+		if(!attributeMap.containsKey(uri)) {
+
+			attributeMap.put(uri, new Attribute(uri));
+		}
+
+		return attributeMap.get(uri);
+	}
+
+	private AttributePath getOrCreateAttributePath(final LinkedList<Attribute> attributePath) {
+
+		final String attributePathString = AttributePathUtil.generateAttributePath(attributePath);
+
+		if(!attributePathMap.containsKey(attributePathString)) {
+
+			attributePathMap.put(attributePathString, new AttributePath(attributePath));
+		}
+
+		return attributePathMap.get(attributePathString);
+	}
+}

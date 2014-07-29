@@ -89,7 +89,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		requestJson.put("key_attribute_paths", keyAttributePaths);
 		requestJson
 				.put("value_attribute_path",
-						"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tf\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+						"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 

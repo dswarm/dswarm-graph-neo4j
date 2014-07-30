@@ -55,12 +55,12 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	private final Index<Relationship>	statements;
-	private final Map<Long, String>		nodeResourceMap;
+	private final Index<Relationship> statementHashes;
+	private final Map<Long, String>   nodeResourceMap;
 
-	private Transaction					tx;
+	private Transaction tx;
 
-	private final String				resourceGraphURI;
+	private final String resourceGraphURI;
 
 	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
 
@@ -74,7 +74,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		statements = database.index().forRelationships("statements");
+		statementHashes = database.index().forRelationships("statement_hashes");
 		nodeResourceMap = new HashMap<Long, String>();
 
 		resourceGraphURI = resourceGraphURIArg;
@@ -341,7 +341,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		final Relationship rel;
 
-		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
+		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
 
 		if (hits == null || !hits.hasNext()) {
 
@@ -352,7 +352,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
 			rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 
-			statements.add(rel, GraphStatics.HASH, hash);
+			statementHashes.add(rel, GraphStatics.HASH, hash);
 
 			addedRelationships++;
 

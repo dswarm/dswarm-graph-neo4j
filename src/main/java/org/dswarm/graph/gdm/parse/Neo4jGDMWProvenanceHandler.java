@@ -75,7 +75,7 @@ public class Neo4jGDMWProvenanceHandler implements GDMHandler {
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
 		statementHashes = database.index().forRelationships("statement_hashes");
-		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids");
+		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
 		nodeResourceMap = new HashMap<Long, String>();
 
 		resourceGraphURI = resourceGraphURIArg;

@@ -2,6 +2,7 @@ package org.dswarm.graph.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,7 +14,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.sun.jersey.multipart.BodyPart;
+import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
+import org.dswarm.graph.delta.match.CSEntity;
+import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
@@ -340,6 +344,10 @@ public class GDMResource {
 
 		GraphDBUtil.printNodes(newModelDB);
 		GraphDBUtil.printRelationships(newModelDB);
+		GraphDBUtil.printPaths(newModelDB, newResourceModel.getResources().iterator().next().getUri());
+
+		final AttributePath commonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
+		final Collection<CSEntity> csEntities = GraphDBUtil.getCSEntities(newModelDB, newResourceModel.getResources().iterator().next().getUri(), commonAttributePath, contentSchema);
 
 		// TODO: do delta calculation on enriched GDM models in graph
 

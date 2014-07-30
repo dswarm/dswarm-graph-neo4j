@@ -14,13 +14,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public class ContentSchema {
 
 	@JsonProperty("record_identifier_attribute_path")
-	private AttributePath				recordIdentifierAttributePath;
+	private final AttributePath				recordIdentifierAttributePath;
 
 	@JsonProperty("key_attribute_paths")
-	private LinkedList<AttributePath>	keyAttributePaths;
+	private final LinkedList<AttributePath>	keyAttributePaths;
 
 	@JsonProperty("value_attribute_path")
-	private AttributePath				valueAttributePath;
+	private final AttributePath				valueAttributePath;
 
 	public ContentSchema(final AttributePath recordIdentifierAttributePathArg, final LinkedList<AttributePath> keyAttributePathsArg,
 			final AttributePath valueAttributePathArg) {
@@ -46,7 +46,7 @@ public class ContentSchema {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 
 		if (this == o) {
 			return true;
@@ -55,7 +55,7 @@ public class ContentSchema {
 			return false;
 		}
 
-		ContentSchema that = (ContentSchema) o;
+		final ContentSchema that = (ContentSchema) o;
 
 		if (keyAttributePaths != null ? !keyAttributePaths.equals(that.keyAttributePaths) : that.keyAttributePaths != null) {
 			return false;

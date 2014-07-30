@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.DMPStatics;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
@@ -57,8 +58,6 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	private final Index<Relationship> statementHashes;
 	private final Index<Relationship> statementUUIDs;
 	private final Map<Long, String>    nodeResourceMap;
-
-	private final Label leafLabel = DynamicLabel.label("__LEAF__");
 
 	private Transaction tx;
 
@@ -132,7 +131,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				final LiteralNode literal = (LiteralNode) object;
 				final String value = literal.getValue();
-				final Node objectNode = database.createNode(leafLabel);
+				final Node objectNode = database.createNode(DMPStatics.LEAF_LABEL);
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
 				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
 				objectNode.setProperty("__LEAF__", true);
@@ -166,7 +165,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 						// object is a resource node
 
-						objectNode = database.createNode(leafLabel);
+						objectNode = database.createNode(DMPStatics.LEAF_LABEL);
 						objectNode.setProperty("__LEAF__", true);
 
 						final String objectURI = ((ResourceNode) object).getUri();

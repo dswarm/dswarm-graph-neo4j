@@ -9,9 +9,9 @@ import java.util.LinkedList;
  */
 public class AttributePath {
 
-	private LinkedList<Attribute> attributes;
+	private final LinkedList<Attribute> attributes;
 
-	public AttributePath(LinkedList<Attribute> attributesArg) {
+	public AttributePath(final LinkedList<Attribute> attributesArg) {
 
 		attributes = attributesArg;
 	}
@@ -22,7 +22,7 @@ public class AttributePath {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 
 		if (this == o) {
 			return true;
@@ -31,7 +31,7 @@ public class AttributePath {
 			return false;
 		}
 
-		AttributePath that = (AttributePath) o;
+		final AttributePath that = (AttributePath) o;
 
 		if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) {
 

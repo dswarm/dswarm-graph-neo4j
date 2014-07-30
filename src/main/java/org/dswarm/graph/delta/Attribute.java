@@ -5,7 +5,7 @@ package org.dswarm.graph.delta;
  */
 public class Attribute {
 
-	private String	uri;
+	private final String	uri;
 
 	public Attribute(final String uriArg) {
 
@@ -18,7 +18,7 @@ public class Attribute {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 
 		if (this == o) {
 
@@ -29,7 +29,7 @@ public class Attribute {
 			return false;
 		}
 
-		Attribute attribute = (Attribute) o;
+		final Attribute attribute = (Attribute) o;
 
 		if (!uri.equals(attribute.uri)) {
 

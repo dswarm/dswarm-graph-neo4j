@@ -9,7 +9,8 @@
 
 	<properties>
 		<neo4j.version>2.0.1</neo4j.version>
-		<google.guava.version>14.0.1</google.guava.version>
+		<google.guava.version>17.0</google.guava.version>
+		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.7</java.source.version>
 		<java.target.version>1.7</java.target.version>
@@ -157,6 +158,11 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>googlecode.lambdaj</id>
+			<name>Internal Release Repository</name>
+			<url>https://lambdaj.googlecode.com/svn/repo/releases</url>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
@@ -212,6 +218,16 @@
 			<groupId>org.semanticweb.yars</groupId>
 			<artifactId>nxparser</artifactId>
 			<version>1.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${google.guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.lambdaj</groupId>
+			<artifactId>lambdaj</artifactId>
+			<version>${google.lambdaj.version}</version>
 		</dependency>
 	</dependencies>
 

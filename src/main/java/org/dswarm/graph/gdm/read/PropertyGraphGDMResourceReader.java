@@ -8,7 +8,6 @@ import java.util.Set;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
@@ -18,15 +17,10 @@ import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.utils.GraphUtils;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,26 +29,23 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgaengler
  */
-public class PropertyGraphResourceGDMReader implements GDMReader {
+public abstract class PropertyGraphGDMResourceReader implements GDMResourceReader {
 
-	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphResourceGDMReader.class);
+	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMResourceReader.class);
 
-	private final NodeHandler         nodeHandler;
-	private final NodeHandler         startNodeHandler;
-	private final RelationshipHandler relationshipHandler;
+	private final NodeHandler			nodeHandler;
+	private final NodeHandler			startNodeHandler;
+	private final RelationshipHandler	relationshipHandler;
 
-	private final String recordUri;
-	private final String resourceGraphUri;
+	protected final String				resourceGraphUri;
 
-	private final GraphDatabaseService database;
+	protected final GraphDatabaseService	database;
 
-	private Model    model;
-	private Resource currentResource;
-	private final Map<Long, Statement> currentResourceStatements = new HashMap<Long, Statement>();
+	private Resource					currentResource;
+	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
 
-	public PropertyGraphResourceGDMReader(final String recordUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphGDMResourceReader(final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
-		recordUri = recordUriArg;
 		resourceGraphUri = resourceGraphUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
@@ -63,91 +54,84 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 	}
 
 	@Override
-	public Model read() {
+	public Resource read() {
 
 		final Transaction tx = database.beginTx();
 
-		PropertyGraphResourceGDMReader.LOG.debug("start read GDM TX");
+		PropertyGraphGDMResourceReader.LOG.debug("start read GDM TX");
 
 		try {
 
-			final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			final Node recordNode = getResourceNode();
 
-			final IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, recordUri + resourceGraphUri);
+			if (recordNode == null) {
 
-			if(hits == null) {
-
-				return null;
-			}
-
-			if(!hits.hasNext()) {
+				LOG.debug("could a find a resource node to start traversal");
 
 				return null;
 			}
 
-			model = new Model();
+			final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
-			for (final Node recordNode : hits) {
+			if (resourceUri == null) {
 
-				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+				LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
 
-				if (resourceUri == null) {
+				return null;
+			}
 
-					LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
+			currentResource = new Resource(resourceUri);
+			startNodeHandler.handleNode(recordNode);
 
-					continue;
+			if (!currentResourceStatements.isEmpty()) {
+
+				// note, this is just an integer number (i.e. NOT long)
+				final int mapSize = currentResourceStatements.size();
+
+				long i = 0;
+
+				final Set<Statement> statements = new LinkedHashSet<>();
+
+				while (i < mapSize) {
+
+					i++;
+
+					final Statement statement = currentResourceStatements.get(i);
+
+					statements.add(statement);
 				}
 
-				currentResource = new Resource(resourceUri);
-				startNodeHandler.handleNode(recordNode);
-
-				if (currentResourceStatements != null && !currentResourceStatements.isEmpty()) {
-
-					// note, this is just an integer number (i.e. NOT long)
-					final int mapSize = currentResourceStatements.size();
-
-					long i = 0;
-
-					final Set<Statement> statements = new LinkedHashSet<Statement>();
-
-					while (i < mapSize) {
-
-						i++;
-
-						final Statement statement = currentResourceStatements.get(Long.valueOf(i));
-
-						statements.add(statement);
-					}
-
-					currentResource.setStatements(statements);
-				}
-
-				model.addResource(currentResource);
-
-				currentResourceStatements.clear();
+				currentResource.setStatements(statements);
 			}
 		} catch (final Exception e) {
 
-			PropertyGraphResourceGDMReader.LOG.error("couldn't finished read GDM TX successfully", e);
+			PropertyGraphGDMResourceReader.LOG.error("couldn't finished read GDM TX successfully", e);
 
 			tx.failure();
 			tx.close();
 		} finally {
 
-			PropertyGraphResourceGDMReader.LOG.debug("finished read GDM TX finally");
+			PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX finally");
 
 			tx.success();
 			tx.close();
 		}
 
-		return model;
+		return currentResource;
 	}
 
 	@Override
 	public long countStatements() {
 
-		return model.size();
+		return currentResource.size();
 	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @return
+	 */
+	protected abstract Node getResourceNode();
 
 	private class CBDNodeHandler implements NodeHandler {
 
@@ -191,8 +175,8 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<Long, org.dswarm.graph.json.Node>();
-		final Map<String, ResourceNode>					resourceNodes	= new HashMap<String, ResourceNode>();
+		final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<>();
+		final Map<String, ResourceNode> resourceNodes = new HashMap<>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -222,7 +206,7 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 							final String message = "subject URI can't be null";
 
-							PropertyGraphResourceGDMReader.LOG.error(message);
+							PropertyGraphGDMResourceReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -240,7 +224,7 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 						final String message = "subject node type can only be a resource (or type resource) or bnode (or type bnode)";
 
-						PropertyGraphResourceGDMReader.LOG.error(message);
+						PropertyGraphGDMResourceReader.LOG.error(message);
 
 						throw new DMPGraphException(message);
 				}
@@ -269,7 +253,7 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 							final String message = "object URI can't be null";
 
-							PropertyGraphResourceGDMReader.LOG.error(message);
+							PropertyGraphGDMResourceReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -285,14 +269,13 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 						break;
 					case Literal:
 
-						final Node endNode = objectNode;
-						final String object = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+						final String object = (String) objectNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
 
 						if (object == null) {
 
 							final String message = "object value can't be null";
 
-							PropertyGraphResourceGDMReader.LOG.error(message);
+							PropertyGraphGDMResourceReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -304,7 +287,7 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 						final String message = "unknown node type " + objectNodeType.getName() + " for object node";
 
-						PropertyGraphResourceGDMReader.LOG.error(message);
+						PropertyGraphGDMResourceReader.LOG.error(message);
 
 						throw new DMPGraphException(message);
 				}
@@ -319,10 +302,10 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 				if (order != null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if(order != null && uuid == null) {
+				} else if (order != null && uuid == null) {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if(order == null && uuid != null) {
+				} else if (order == null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
 				} else {
@@ -353,12 +336,12 @@ public class PropertyGraphResourceGDMReader implements GDMReader {
 
 		private org.dswarm.graph.json.Node createResourceFromBNode(final long bnodeId) {
 
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+			if (!bnodes.containsKey(bnodeId)) {
 
-				bnodes.put(Long.valueOf(bnodeId), new org.dswarm.graph.json.Node(bnodeId));
+				bnodes.put(bnodeId, new org.dswarm.graph.json.Node(bnodeId));
 			}
 
-			return bnodes.get(Long.valueOf(bnodeId));
+			return bnodes.get(bnodeId);
 		}
 
 		private ResourceNode createResourceFromURI(final long id, final String uri) {

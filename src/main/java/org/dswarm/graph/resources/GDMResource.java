@@ -13,47 +13,41 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.sun.jersey.multipart.BodyPart;
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
 import org.dswarm.graph.delta.match.CSEntity;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.gdm.parse.GDMHandler;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
+import org.dswarm.graph.gdm.parse.GDMParser;
+import org.dswarm.graph.gdm.parse.GDMResourceParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
-import org.dswarm.graph.gdm.read.PropertyGraphResourceGDMReader;
+import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
+import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceHandler;
+import org.dswarm.graph.gdm.read.GDMModelReader;
+import org.dswarm.graph.gdm.read.GDMResourceReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByIDReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
+import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.json.util.Util;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
-
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.gdm.parse.GDMHandler;
-import org.dswarm.graph.gdm.parse.GDMParser;
-import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceHandler;
-import org.dswarm.graph.gdm.read.GDMReader;
-import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
-import org.dswarm.graph.json.Model;
-import org.dswarm.graph.json.util.Util;
 
 /**
  * @author tgaengler
@@ -111,20 +105,6 @@ public class GDMResource {
 		Model model = null;
 		try {
 			model = mapper.readValue(gdmInputStream, Model.class);
-		} catch (JsonParseException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
-		} catch (JsonMappingException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
 		} catch (IOException e) {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
@@ -209,20 +189,6 @@ public class GDMResource {
 		Model model = null;
 		try {
 			model = mapper.readValue(inputStream, Model.class);
-		} catch (JsonParseException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
-		} catch (JsonMappingException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
 		} catch (IOException e) {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
@@ -283,7 +249,7 @@ public class GDMResource {
 		GDMResource.LOG.debug("try to read GDM statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
 				+ recordClassUri + "' from graph db");
 
-		final GDMReader gdmReader = new PropertyGraphGDMReader(recordClassUri, resourceGraphUri, database);
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, resourceGraphUri, database);
 		final Model model = gdmReader.read();
 
 		String result = null;
@@ -303,18 +269,33 @@ public class GDMResource {
 
 	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
 
+		// TODO: we probably need an own changeset format instead of a model here
 		final Model deltaModel = new Model();
 
 		// calculate delta resource-wise
-		for (Resource resource : model.getResources()) {
+		for (Resource newResource : model.getResources()) {
 
-			// TODO: determine legacy resource identifier via content schema
+			final String resourceURI = newResource.getUri();
+			final GraphDatabaseService newModelDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
 
-			final String resourceURI = resource.getUri();
+			final Resource existingResource;
+			final GDMResourceReader gdmReader;
 
-			// TODO: try to retrieve existing resource via legacy resource identifier in the provenance graph, i.e., build a cypher query with the help of the record identifier attribute path
-			final GDMReader gdmReader = new PropertyGraphResourceGDMReader(resourceURI, resourceGraphURI, permanentDatabase);
-			final Model existingResourceModel = gdmReader.read();
+			if(contentSchema.getRecordIdentifierAttributePath() != null) {
+
+				// determine legacy resource identifier via content schema
+				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newModelDB, contentSchema.getRecordIdentifierAttributePath(),
+						newResource.getUri());
+
+				// try to retrieve existing model via legacy record identifier
+				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, contentSchema.getRecordIdentifierAttributePath(), resourceGraphURI, permanentDatabase);
+			} else {
+
+				// try to retrieve existing model via resource uri
+				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, resourceGraphURI, permanentDatabase);
+			}
+
+			existingResource = gdmReader.read();
 
 //			if (existingResourceModel == null) {
 //
@@ -327,10 +308,10 @@ public class GDMResource {
 //				continue;
 //			}
 
-			final Model newResourceModel = new Model();
-			newResourceModel.addResource(resource);
+//			final Model newResourceModel = new Model();
+//			newResourceModel.addResource(resource);
 
-			calculateDeltaForResource(existingResourceModel, newResourceModel, contentSchema);
+			calculateDeltaForResource(existingResource, newResource, newModelDB, contentSchema);
 		}
 
 		// TODO change this, i.e., return overall changeset of the datamodel
@@ -338,19 +319,18 @@ public class GDMResource {
 		return null;
 	}
 
-	private Model calculateDeltaForResource(final Model existingResourceModel, final Model newResourceModel, final ContentSchema contentSchema) {
+	private Model calculateDeltaForResource(final Resource existingResource, final Resource newResource, final GraphDatabaseService newModelDB, final ContentSchema contentSchema) {
 
 		//final GraphDatabaseService existingModelDB = loadModel(existingResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
-		final GraphDatabaseService newModelDB = loadModel(newResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
 		//enrichModel(existingModelDB, existingResourceModel.getResources().iterator().next().getUri());
-		enrichModel(newModelDB, newResourceModel.getResources().iterator().next().getUri());
+		enrichModel(newModelDB, newResource.getUri());
 
 		GraphDBUtil.printNodes(newModelDB);
 		GraphDBUtil.printRelationships(newModelDB);
-		GraphDBUtil.printPaths(newModelDB, newResourceModel.getResources().iterator().next().getUri());
+		GraphDBUtil.printPaths(newModelDB, newResource.getUri());
 
 		final AttributePath commonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
-		final Collection<CSEntity> csEntities = GraphDBUtil.getCSEntities(newModelDB, newResourceModel.getResources().iterator().next().getUri(), commonAttributePath, contentSchema);
+		final Collection<CSEntity> csEntities = GraphDBUtil.getCSEntities(newModelDB, newResource.getUri(), commonAttributePath, contentSchema);
 
 		// TODO: do delta calculation on enriched GDM models in graph
 		// 1. identify exact matches for cs entities
@@ -374,15 +354,16 @@ public class GDMResource {
 		return null;
 	}
 
-	private GraphDatabaseService loadModel(final Model model, final String impermanentGraphDatabaseDir) {
+	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) {
 
 		// TODO: find proper graph database settings to hold everything in-memory only
 		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)
 				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
 
-		// TODO: implement handler that enriches the GDM model with useful information for changeset detection
+		// TODO: implement handler that enriches the GDM resource with useful information for changeset detection
 		final GDMHandler handler = new Neo4jDeltaGDMHandler(impermanentDB);
-		final GDMParser parser = new GDMModelParser(model);
+
+		final GDMParser parser = new GDMResourceParser(resource);
 		parser.setGDMHandler(handler);
 		parser.parse();
 

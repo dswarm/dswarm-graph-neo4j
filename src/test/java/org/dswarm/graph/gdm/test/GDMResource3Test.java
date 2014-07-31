@@ -38,12 +38,13 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		super(neo4jDBWrapper, "/gdm", dbTypeArg);
 	}
 
-	//@Test
+	@Test
 	public void readGDMFromDBThatWasWrittenAsGDM() throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal("mabxml_dmp.gson", "http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternalWithContentSchema("mabxml_dmp2.gson", "http://data.slub-dresden.de/resources/1");
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -71,11 +72,11 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal(final String resourceGraphURI) throws IOException {
+	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String resourceGraphURI) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
-		final URL fileURL = Resources.getResource("mabxml_dmp.gson");
+		final URL fileURL = Resources.getResource(dataResourceFileName);
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
@@ -98,6 +99,28 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE))
 				.bodyPart(new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE))
 				.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+
+		// POST the request
+		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		multiPart.close();
+
+		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+	}
+
+	private void writeGDMToDBInternal(final String dataResourceFileName, final String resourceGraphURI) throws IOException {
+
+		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
+
+		final URL fileURL = Resources.getResource(dataResourceFileName);
+		final byte[] file = Resources.toByteArray(fileURL);
+
+		// Construct a MultiPart with two body parts
+		final MultiPart multiPart = new MultiPart();
+		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE))
+				.bodyPart(new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

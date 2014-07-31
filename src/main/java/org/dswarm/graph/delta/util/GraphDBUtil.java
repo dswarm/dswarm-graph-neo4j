@@ -9,6 +9,7 @@ import java.util.Map;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
+import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
@@ -225,24 +226,17 @@ public final class GraphDBUtil {
 
 	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI) {
 
-		final ExecutionEngine engine = new ExecutionEngine(graphDB);
+		final String query = buildGetRecordIdentifierQuery(recordIdentifierAP, recordURI);
 
-		final ExecutionResult result;
-		try (final Transaction ignored = graphDB.beginTx()) {
+		return executeQueryWithSingleResult(query, "record_identifier", graphDB);
+	}
 
-			final String query = buildRecordIdentifierQuery(recordIdentifierAP, recordURI);
-			result = engine.execute(query);
+	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String resourceGraphUri,
+			final GraphDatabaseService graphDB) {
 
-			for (Map<String, Object> row : result) {
+		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, resourceGraphUri);
 
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// TODO: FIXME
-		return null;
+		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
@@ -328,11 +322,11 @@ public final class GraphDBUtil {
 
 		final Group<CSEntity> keyGroup = Lambda.group(csEntities, Lambda.by(Lambda.on(CSEntity.class).getKey()));
 
-		for(final Group<CSEntity> csEntityKeyGroup : keyGroup.subgroups()) {
+		for (final Group<CSEntity> csEntityKeyGroup : keyGroup.subgroups()) {
 
 			int i = 1;
 
-			for(final CSEntity csEntity : csEntityKeyGroup.findAll()) {
+			for (final CSEntity csEntity : csEntityKeyGroup.findAll()) {
 
 				csEntity.setEntityOrder((long) i);
 				i++;
@@ -340,8 +334,104 @@ public final class GraphDBUtil {
 		}
 	}
 
-	private static String buildRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String recordURI) {
+	private static String buildGetRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String recordURI) {
 
-		return null;
+		// START n=node:resources(__URI__="http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3")
+		// MATCH (n)-[r:`http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id`]->(o)
+		// WHERE n.__NODETYPE__ = "__RESOURCE__" AND
+		// o.__NODETYPE__ = "__LITERAL__"
+		// RETURN o.__VALUE__ AS record_identifier;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("START n=node:resources(").append(GraphStatics.URI).append("=\"").append(recordURI).append("\")\nMATCH (n)");
+
+		int i = 1;
+		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {
+
+			sb.append("-[:`").append(attribute.getUri()).append("`]->");
+
+			if (i < recordIdentifierAP.getAttributes().size()) {
+
+				sb.append("()");
+			}
+		}
+
+		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\no.")
+				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN o.")
+				.append(GraphStatics.VALUE_PROPERTY).append(" AS record_identifier");
+
+		return sb.toString();
+	}
+
+	private static String buildGetRecordUriQuery(final String recordId, final AttributePath recordIdentifierAP, final String resourceGraphUri) {
+
+		// START n=node:values(__VALUE__="a1280f78-5f96-4fe6-b916-5e38e5d620d3")
+		// MATCH (n)-[r:`http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id`]->(o)
+		// WHERE n.__NODETYPE__ = "__RESOURCE__" AND
+		// o.__NODETYPE__ = "__LITERAL__"
+		// RETURN o.__URI__ AS record_uri;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("START o=node:values(").append(GraphStatics.VALUE).append("=\"").append(recordId).append("\")\nMATCH (n)");
+
+		int i = 1;
+		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {
+
+			sb.append("-[:`").append(attribute.getUri()).append("`]->");
+
+			if (i < recordIdentifierAP.getAttributes().size()) {
+
+				sb.append("()");
+			}
+		}
+
+		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")
+				.append(GraphStatics.PROVENANCE_PROPERTY).append(" = \"").append(resourceGraphUri).append("\" AND\no.")
+				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN n.")
+				.append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+
+		return sb.toString();
+	}
+
+	private static String executeQueryWithSingleResult(final String query, final String resultVariableName, final GraphDatabaseService graphDB) {
+
+		final ExecutionEngine engine = new ExecutionEngine(graphDB);
+
+		final ExecutionResult result;
+		String resultValue = null;
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			result = engine.execute(query);
+
+			if(result != null) {
+
+				for (final Map<String, Object> row : result) {
+
+					for (final Map.Entry<String, Object> column : row.entrySet()) {
+
+						if (column.getValue() != null) {
+
+							if (column.getKey().equals(resultVariableName)) {
+
+								resultValue = column.getValue().toString();
+							}
+						}
+
+						break;
+					}
+
+					break;
+				}
+			}
+
+		} catch (final Exception e) {
+
+			// TODO: log something
+		}
+
+		return resultValue;
 	}
 }

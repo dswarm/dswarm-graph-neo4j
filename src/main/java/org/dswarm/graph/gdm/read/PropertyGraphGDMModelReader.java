@@ -32,24 +32,24 @@ import org.dswarm.graph.utils.GraphUtils;
 /**
  * @author tgaengler
  */
-public class PropertyGraphGDMReader implements GDMReader {
+public class PropertyGraphGDMModelReader implements GDMModelReader {
 
-	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
+	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMModelReader.class);
 
-	private final NodeHandler			nodeHandler;
-	private final NodeHandler			startNodeHandler;
-	private final RelationshipHandler	relationshipHandler;
+	private final NodeHandler         nodeHandler;
+	private final NodeHandler         startNodeHandler;
+	private final RelationshipHandler relationshipHandler;
 
-	private final String				recordClassUri;
-	private final String				resourceGraphUri;
+	private final String recordClassUri;
+	private final String resourceGraphUri;
 
-	private final GraphDatabaseService	database;
+	private final GraphDatabaseService database;
 
-	private Model						model;
-	private Resource					currentResource;
-	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
+	private Model    model;
+	private Resource currentResource;
+	private final Map<Long, Statement> currentResourceStatements = new HashMap<Long, Statement>();
 
-	public PropertyGraphGDMReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
 		resourceGraphUri = resourceGraphUriArg;
@@ -64,7 +64,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 		final Transaction tx = database.beginTx();
 
-		PropertyGraphGDMReader.LOG.debug("start read GDM TX");
+		PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
 
 		try {
 
@@ -121,13 +121,13 @@ public class PropertyGraphGDMReader implements GDMReader {
 			}
 		} catch (final Exception e) {
 
-			PropertyGraphGDMReader.LOG.error("couldn't finished read GDM TX successfully", e);
+			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);
 
 			tx.failure();
 			tx.close();
 		} finally {
 
-			PropertyGraphGDMReader.LOG.debug("finished read GDM TX finally");
+			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX finally");
 
 			tx.success();
 			tx.close();
@@ -215,7 +215,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 							final String message = "subject URI can't be null";
 
-							PropertyGraphGDMReader.LOG.error(message);
+							PropertyGraphGDMModelReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -233,7 +233,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 						final String message = "subject node type can only be a resource (or type resource) or bnode (or type bnode)";
 
-						PropertyGraphGDMReader.LOG.error(message);
+						PropertyGraphGDMModelReader.LOG.error(message);
 
 						throw new DMPGraphException(message);
 				}
@@ -262,7 +262,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 							final String message = "object URI can't be null";
 
-							PropertyGraphGDMReader.LOG.error(message);
+							PropertyGraphGDMModelReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -285,7 +285,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 							final String message = "object value can't be null";
 
-							PropertyGraphGDMReader.LOG.error(message);
+							PropertyGraphGDMModelReader.LOG.error(message);
 
 							throw new DMPGraphException(message);
 						}
@@ -297,7 +297,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 
 						final String message = "unknown node type " + objectNodeType.getName() + " for object node";
 
-						PropertyGraphGDMReader.LOG.error(message);
+						PropertyGraphGDMModelReader.LOG.error(message);
 
 						throw new DMPGraphException(message);
 				}

@@ -185,7 +185,7 @@ public class PropertyGraphGDMReader implements GDMReader {
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
 		final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<Long, org.dswarm.graph.json.Node>();
-		final Map<String, ResourceNode>					resourceNodes	= new HashMap<String, ResourceNode>();
+		final Map<String, ResourceNode>				resourceNodes	= new HashMap<String, ResourceNode>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -220,7 +220,15 @@ public class PropertyGraphGDMReader implements GDMReader {
 							throw new DMPGraphException(message);
 						}
 
-						subjectGDMNode = createResourceFromURI(subjectId, subjectURI);
+						final String provenanceURI = (String) subjectNode.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+
+						if(provenanceURI == null) {
+
+							subjectGDMNode = createResourceFromURI(subjectId, subjectURI);
+						} else {
+
+							subjectGDMNode = createResourceFromURIAndProvenance(subjectId, subjectURI, provenanceURI);
+						}
 
 						break;
 					case BNode:
@@ -267,7 +275,15 @@ public class PropertyGraphGDMReader implements GDMReader {
 							throw new DMPGraphException(message);
 						}
 
-						objectGDMNode = createResourceFromURI(objectId, objectURI);
+						final String provenanceURI = (String) objectNode.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+
+						if(provenanceURI == null) {
+
+							objectGDMNode = createResourceFromURI(objectId, objectURI);
+						} else {
+
+							objectGDMNode = createResourceFromURIAndProvenance(subjectId, objectURI, provenanceURI);
+						}
 
 						break;
 					case BNode:
@@ -312,10 +328,10 @@ public class PropertyGraphGDMReader implements GDMReader {
 				if (order != null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if(order != null && uuid == null) {
+				} else if (order != null && uuid == null) {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if(order == null && uuid != null) {
+				} else if (order == null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
 				} else {
@@ -362,6 +378,16 @@ public class PropertyGraphGDMReader implements GDMReader {
 			}
 
 			return resourceNodes.get(uri);
+		}
+
+		private ResourceNode createResourceFromURIAndProvenance(final long id, final String uri, final String provenance) {
+
+			if (!resourceNodes.containsKey(uri + provenance)) {
+
+				resourceNodes.put(uri + provenance, new ResourceNode(id, uri, provenance));
+			}
+
+			return resourceNodes.get(uri + provenance);
 		}
 	}
 }

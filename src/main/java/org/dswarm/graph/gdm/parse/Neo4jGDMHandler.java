@@ -10,6 +10,11 @@ import java.util.UUID;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.json.LiteralNode;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,12 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-
-import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.model.GraphStatics;
 
 /**
  * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
@@ -52,6 +51,7 @@ public class Neo4jGDMHandler implements GDMHandler {
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
 	private final Index<Node>			resources;
+	private final Index<Node>			resourcesWProvenance;
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
@@ -69,6 +69,7 @@ public class Neo4jGDMHandler implements GDMHandler {
 		LOG.debug("start write TX");
 
 		resources = database.index().forNodes("resources");
+		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
@@ -112,6 +113,15 @@ public class Neo4jGDMHandler implements GDMHandler {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+
+					final String provenanceURI = ((ResourceNode) subject).getProvenance();
+
+					if (provenanceURI != null) {
+
+						subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+						resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subjectURI + provenanceURI);
+					}
+
 					resources.add(subjectNode, GraphStatics.URI, subjectURI);
 				} else {
 
@@ -167,12 +177,18 @@ public class Neo4jGDMHandler implements GDMHandler {
 						// object is a resource node
 
 						final String objectURI = ((ResourceNode) object).getUri();
+						final String provenanceURI = ((ResourceNode) object).getProvenance();
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
 
 						if (!isType) {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+
+							if(provenanceURI != null) {
+
+								objectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+							}
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
@@ -182,6 +198,11 @@ public class Neo4jGDMHandler implements GDMHandler {
 						}
 
 						resources.add(objectNode, GraphStatics.URI, objectURI);
+
+						if(provenanceURI != null) {
+
+							resourcesWProvenance.add(objectNode, GraphStatics.URI_W_PROVENANCE, objectURI + provenanceURI);
+						}
 					} else {
 
 						// object is a blank node
@@ -372,7 +393,13 @@ public class Neo4jGDMHandler implements GDMHandler {
 
 			if (!isType) {
 
-				hits = resources.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				if(((ResourceNode) resource).getProvenance() == null) {
+
+					hits = resources.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				} else {
+
+					hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, ((ResourceNode) resource).getUri() + ((ResourceNode) resource).getProvenance());
+				}
 			} else {
 
 				hits = resourceTypes.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
@@ -470,7 +497,16 @@ public class Neo4jGDMHandler implements GDMHandler {
 
 			case Resource:
 
-				identifier = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+				final String provenance = (String) node.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+
+				if(provenance == null) {
+
+					identifier = uri;
+				} else {
+
+					identifier = uri + provenance;
+				}
 
 				break;
 			case BNode:

@@ -33,7 +33,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#status",
     "o" : {
-      "v" : "n"
+      "v" : "c"
     }
   }, {
     "order" : 1,
@@ -222,7 +222,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "20011121"
+      "v" : "MODIFIED FIELD"
     }
   }, {
     "order" : 5,
@@ -294,7 +294,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "030"
+      "v" : "037"
     }
   }, {
     "order" : 1,
@@ -303,7 +303,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : " "
+      "v" : "z"
     }
   }, {
     "order" : 1,
@@ -312,7 +312,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "az1dcr|||||37"
+      "v" : "dt."
     }
   }, {
     "order" : 7,
@@ -339,7 +339,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "037"
+      "v" : "050"
     }
   }, {
     "order" : 1,
@@ -348,7 +348,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : "z"
+      "v" : " "
     }
   }, {
     "order" : 1,
@@ -357,7 +357,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "dt."
+      "v" : "|||||c||||||||"
     }
   }, {
     "order" : 8,
@@ -384,7 +384,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "050"
+      "v" : "051"
     }
   }, {
     "order" : 1,
@@ -402,7 +402,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "|||||c||||||||"
+      "v" : "n||||||"
     }
   }, {
     "order" : 9,
@@ -429,7 +429,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "051"
+      "v" : "070"
     }
   }, {
     "order" : 1,
@@ -447,7 +447,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "n||||||"
+      "v" : "KNUB"
     }
   }, {
     "order" : 10,
@@ -483,7 +483,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : " "
+      "v" : "b"
     }
   }, {
     "order" : 1,
@@ -492,7 +492,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "KNUB"
+      "v" : "FRhk"
     }
   }, {
     "order" : 11,
@@ -519,7 +519,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "070"
+      "v" : "076"
     }
   }, {
     "order" : 1,
@@ -528,7 +528,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : "b"
+      "v" : "n"
     }
   }, {
     "order" : 1,
@@ -537,7 +537,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "FRhk"
+      "v" : "098301"
     }
   }, {
     "order" : 12,
@@ -573,7 +573,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : "n"
+      "v" : "k"
     }
   }, {
     "order" : 1,
@@ -582,7 +582,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "098301"
+      "v" : "101171"
     }
   }, {
     "order" : 13,
@@ -618,7 +618,7 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
-      "v" : "k"
+      "v" : "v"
     }
   }, {
     "order" : 1,
@@ -627,7 +627,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "101171"
+      "v" : "5"
     }
   }, {
     "order" : 14,
@@ -654,57 +654,12 @@
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
-      "v" : "076"
-    }
-  }, {
-    "order" : 1,
-    "s" : {
-      "id" : 14
-    },
-    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
-    "o" : {
-      "v" : "v"
-    }
-  }, {
-    "order" : 1,
-    "s" : {
-      "id" : 14
-    },
-    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
-    "o" : {
-      "v" : "5"
-    }
-  }, {
-    "order" : 15,
-    "s" : {
-      "uri" : "http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3"
-    },
-    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
-    "o" : {
-      "id" : 15
-    }
-  }, {
-    "order" : 1,
-    "s" : {
-      "id" : 15
-    },
-    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "o" : {
-      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
-    }
-  }, {
-    "order" : 1,
-    "s" : {
-      "id" : 15
-    },
-    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
-    "o" : {
       "v" : "077"
     }
   }, {
     "order" : 1,
     "s" : {
-      "id" : 15
+      "id" : 14
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
@@ -713,7 +668,7 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 15
+      "id" : 14
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
@@ -722,16 +677,16 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 15
+      "id" : 14
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tf",
     "o" : {
-      "id" : 16
+      "id" : 15
     }
   }, {
     "order" : 1,
     "s" : {
-      "id" : 16
+      "id" : 15
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "o" : {
@@ -740,25 +695,25 @@
   }, {
     "order" : 2,
     "s" : {
-      "id" : 15
+      "id" : 14
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
       "v" : "Roll, Gernot"
     }
   }, {
-    "order" : 16,
+    "order" : 15,
     "s" : {
       "uri" : "http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3"
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
     "o" : {
-      "id" : 17
+      "id" : 16
     }
   }, {
     "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 16
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "o" : {
@@ -767,7 +722,7 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 16
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
     "o" : {
@@ -776,7 +731,7 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 16
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
     "o" : {
@@ -785,7 +740,7 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 16
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
@@ -794,9 +749,36 @@
   }, {
     "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 16
     },
     "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tf",
+    "o" : {
+      "id" : 17
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 17
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tfType"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 16
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Thomas, Eugen MODIFIED"
+    }
+  }, {
+    "order" : 16,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
     "o" : {
       "id" : 18
     }
@@ -807,16 +789,34 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "o" : {
-      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#tfType"
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
     }
   }, {
-    "order" : 2,
+    "order" : 1,
     "s" : {
-      "id" : 17
+      "id" : 18
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "088"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "Thomas, Eugen"
+      "v" : "NEW FIELD"
     }
   }, {
     "order" : 17,
@@ -1717,6 +1717,78 @@
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
       "v" : "Fernsehfilm, BRD 1978"
+    }
+  }, {
+    "order" : 37,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 39
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "805"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ns",
+    "o" : {
+      "id" : 40
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nsType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Das"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : " Stuttgarter HutzelmÃ¤nnchen"
     }
   } ]
 } ]

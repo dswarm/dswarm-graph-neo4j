@@ -9,6 +9,7 @@ import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
 import org.dswarm.graph.delta.DMPStatics;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * Created by tgaengler on 29/07/14.
@@ -101,5 +102,4 @@ public final class AttributePathUtil {
 
 		return commonPrefix.substring(0, commonPrefix.length() - 1);
 	}
-
 }

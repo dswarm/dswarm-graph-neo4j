@@ -147,32 +147,35 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
-		final ContentSchema contentSchema;
+		if(multiPart.getBodyParts().size() == 3) {
 
-		if(contentSchemaBP != null) {
+			final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
+			final ContentSchema contentSchema;
 
-			final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
+			if (contentSchemaBP != null) {
 
-			try {
+				final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
 
-				contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
-			} catch (final IOException e) {
+				try {
 
-				final String message = "could not deserialise content schema JSON for write from graph DB request";
+					contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
+				} catch (final IOException e) {
 
-				GDMResource.LOG.debug(message);
+					final String message = "could not deserialise content schema JSON for write from graph DB request";
 
-				throw new DMPGraphException(message);
+					GDMResource.LOG.debug(message);
+
+					throw new DMPGraphException(message);
+				}
+			} else {
+
+				// no content schema available for data model
+
+				contentSchema = null;
 			}
-		} else {
 
-			// no content schema available for data model
-
-			contentSchema = null;
+			calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
 		}
-
-		calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
 		final GDMParser parser = new GDMModelParser(model);
@@ -350,6 +353,22 @@ public class GDMResource {
 		final Collection<CSEntity> csEntities = GraphDBUtil.getCSEntities(newModelDB, newResourceModel.getResources().iterator().next().getUri(), commonAttributePath, contentSchema);
 
 		// TODO: do delta calculation on enriched GDM models in graph
+		// 1. identify exact matches for cs entities
+		// 1.1 hash with key, value + entity order + value order
+		// 1.2 hash with key, value + entity order
+		// 1.3 hash with key, value
+		// 2. identify modifications for cs entities
+		// 2.1 hash with key + entity order + value order
+		// 2.2 hash with key + entity order
+		// 2.3 hash with key
+		// 3. identify exact matches of resource node-based statements or non-hierarchical sub graphs
+		// 4. identify modifications of resource node-based statements or non-hierarchical sub graphs
+		// 5. identify additions in new model graph
+		// 6. identify removals in existing model graph
+		//
+		// note: mark matches or modifications after every step
+		//       maybe utilise confidence value for different matching approaches
+
 
 		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
 		return null;

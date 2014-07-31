@@ -38,7 +38,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		super(neo4jDBWrapper, "/gdm", dbTypeArg);
 	}
 
-	@Test
+	//@Test
 	public void readGDMFromDBThatWasWrittenAsGDM() throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");

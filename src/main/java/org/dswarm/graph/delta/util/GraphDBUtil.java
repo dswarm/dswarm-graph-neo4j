@@ -18,6 +18,8 @@ import org.dswarm.graph.delta.match.CSEntity;
 import org.dswarm.graph.delta.match.KeyEntity;
 import org.dswarm.graph.delta.match.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -221,6 +223,28 @@ public final class GraphDBUtil {
 		return csEntitiesCollection;
 	}
 
+	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI) {
+
+		final ExecutionEngine engine = new ExecutionEngine(graphDB);
+
+		final ExecutionResult result;
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			final String query = buildRecordIdentifierQuery(recordIdentifierAP, recordURI);
+			result = engine.execute(query);
+
+			for (Map<String, Object> row : result) {
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// TODO: FIXME
+		return null;
+	}
+
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
 			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node[] csEntityNodesArray) {
 
@@ -314,5 +338,10 @@ public final class GraphDBUtil {
 				i++;
 			}
 		}
+	}
+
+	private static String buildRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String recordURI) {
+
+		return null;
 	}
 }

@@ -1,13 +1,13 @@
-package org.dswarm.graph.delta.match;
+package org.dswarm.graph.delta.match.model;
 
 /**
  * Created by tgaengler on 30/07/14.
  */
-public class MatchEntity {
+public class CompareEntity {
 
 	private final long nodeId;
 
-	public MatchEntity(final long nodeIdArg) {
+	public CompareEntity(final long nodeIdArg) {
 
 		nodeId = nodeIdArg;
 	}
@@ -19,14 +19,15 @@ public class MatchEntity {
 
 	@Override
 	public boolean equals(Object o) {
+
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof MatchEntity)) {
+		if (!(o instanceof CompareEntity)) {
 			return false;
 		}
 
-		MatchEntity that = (MatchEntity) o;
+		CompareEntity that = (CompareEntity) o;
 
 		return nodeId == that.nodeId;
 

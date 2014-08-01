@@ -3,6 +3,7 @@ package org.dswarm.graph.resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,7 +17,11 @@ import javax.ws.rs.core.Response;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
-import org.dswarm.graph.delta.match.CSEntity;
+import org.dswarm.graph.delta.match.ModificationCSMatcher;
+import org.dswarm.graph.delta.match.model.CSEntity;
+import org.dswarm.graph.delta.match.ExactCSMatcher;
+import org.dswarm.graph.delta.match.ExactCSMatcherUtil;
+import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMHandler;
@@ -55,7 +60,7 @@ import com.sun.jersey.multipart.MultiPart;
 @Path("/gdm")
 public class GDMResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource.class);
+	private static final Logger				LOG								= LoggerFactory.getLogger(GDMResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
@@ -127,7 +132,7 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		if(multiPart.getBodyParts().size() == 3) {
+		if (multiPart.getBodyParts().size() == 3) {
 
 			final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
 			final ContentSchema contentSchema;
@@ -267,7 +272,8 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI, final GraphDatabaseService permanentDatabase) {
+	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
+			final GraphDatabaseService permanentDatabase) {
 
 		// TODO: we probably need an own changeset format instead of a model here
 		final Model deltaModel = new Model();
@@ -276,19 +282,20 @@ public class GDMResource {
 		for (Resource newResource : model.getResources()) {
 
 			final String resourceURI = newResource.getUri();
-			final GraphDatabaseService newModelDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
+			final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
 
 			final Resource existingResource;
 			final GDMResourceReader gdmReader;
 
-			if(contentSchema.getRecordIdentifierAttributePath() != null) {
+			if (contentSchema.getRecordIdentifierAttributePath() != null) {
 
 				// determine legacy resource identifier via content schema
-				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newModelDB, contentSchema.getRecordIdentifierAttributePath(),
-						newResource.getUri());
+				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB,
+						contentSchema.getRecordIdentifierAttributePath(), newResource.getUri());
 
 				// try to retrieve existing model via legacy record identifier
-				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, contentSchema.getRecordIdentifierAttributePath(), resourceGraphURI, permanentDatabase);
+				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, contentSchema.getRecordIdentifierAttributePath(),
+						resourceGraphURI, permanentDatabase);
 			} else {
 
 				// try to retrieve existing model via resource uri
@@ -297,21 +304,21 @@ public class GDMResource {
 
 			existingResource = gdmReader.read();
 
-//			if (existingResourceModel == null) {
-//
-//				// take new resource model, since there was no match in the provenance graph for this resource identifier
-//
-//				deltaModel.addResource(resource);
-//
-//				// we don't need to calculate the delta, since everything is new
-//
-//				continue;
-//			}
+			// if (existingResourceModel == null) {
+			//
+			// // take new resource model, since there was no match in the provenance graph for this resource identifier
+			//
+			// deltaModel.addResource(resource);
+			//
+			// // we don't need to calculate the delta, since everything is new
+			//
+			// continue;
+			// }
 
-//			final Model newResourceModel = new Model();
-//			newResourceModel.addResource(resource);
+			// final Model newResourceModel = new Model();
+			// newResourceModel.addResource(resource);
 
-			calculateDeltaForResource(existingResource, newResource, newModelDB, contentSchema);
+			calculateDeltaForResource(existingResource, newResource, newResourceDB, contentSchema);
 		}
 
 		// TODO change this, i.e., return overall changeset of the datamodel
@@ -319,36 +326,57 @@ public class GDMResource {
 		return null;
 	}
 
-	private Model calculateDeltaForResource(final Resource existingResource, final Resource newResource, final GraphDatabaseService newModelDB, final ContentSchema contentSchema) {
+	private Model calculateDeltaForResource(final Resource existingResource, final Resource newResource, final GraphDatabaseService newResourceDB,
+			final ContentSchema contentSchema) {
 
-		//final GraphDatabaseService existingModelDB = loadModel(existingResourceModel, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
-		//enrichModel(existingModelDB, existingResourceModel.getResources().iterator().next().getUri());
-		enrichModel(newModelDB, newResource.getUri());
+		final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
+		enrichModel(existingResourceDB, existingResource.getUri());
+		enrichModel(newResourceDB, newResource.getUri());
 
-		GraphDBUtil.printNodes(newModelDB);
-		GraphDBUtil.printRelationships(newModelDB);
-		GraphDBUtil.printPaths(newModelDB, newResource.getUri());
+		// GraphDBUtil.printNodes(existingResourceDB);
+		// GraphDBUtil.printRelationships(existingResourceDB);
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
+		// GraphDBUtil.printNodes(newResourceDB);
+		// GraphDBUtil.printRelationships(newResourceDB);
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
 
 		final AttributePath commonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
-		final Collection<CSEntity> csEntities = GraphDBUtil.getCSEntities(newModelDB, newResource.getUri(), commonAttributePath, contentSchema);
+		final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath, contentSchema);
+		final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(), commonAttributePath,
+				contentSchema);
 
 		// TODO: do delta calculation on enriched GDM models in graph
+		// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do for
+		// each exact level all steps first and continue afterwards (?)
 		// 1. identify exact matches for cs entities
-		// 1.1 hash with key, value + entity order + value order
-		// 1.2 hash with key, value + entity order
-		// 1.3 hash with key, value
+		// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
+		// TODO: keep attention to sub entities of CS values
+		final ExactCSMatcher exactCSMatcher = new ExactCSMatcher(existingCSEntities, newCSEntities);
+		final Collection<String> exactCSMatches = exactCSMatcher.getMatches();
+		// TODO: utilise matched CS entities for path marking in graph
+		final Collection<CSEntity> newExactCSMatches = ExactCSMatcherUtil.getMatches(exactCSMatches, exactCSMatcher.getNewCSEntities());
+		final Collection<CSEntity> existingExactCSMatches = ExactCSMatcherUtil.getMatches(exactCSMatches, exactCSMatcher.getExistingCSEntities());
+		// TODO: utilise non-matchted CS entities to continue delta calculation
+		final Collection<CSEntity> newExactCSNonMatches = ExactCSMatcherUtil.getNonMatches(exactCSMatches, exactCSMatcher.getNewCSEntities());
+		final Collection<CSEntity> existingExactCSNonMatches = ExactCSMatcherUtil.getNonMatches(exactCSMatches,
+				exactCSMatcher.getExistingCSEntities());
+		// 1.2 hash with key, value + entity order + value order => matches value entities
+		// 1.3 hash with key, value + entity order => matches value entities
+		// 1.4 hash with key, value => matches value entities
 		// 2. identify modifications for cs entities
-		// 2.1 hash with key + entity order + value order
-		// 2.2 hash with key + entity order
-		// 2.3 hash with key
+		// 2.1 hash with key + entity order + value order => matches value entities
+		final ModificationCSMatcher modificationCSMatcher = new ModificationCSMatcher(existingExactCSNonMatches, newExactCSNonMatches);
+		final Map<ValueEntity, ValueEntity> modifications = modificationCSMatcher.getModifications();
+		// 2.2 hash with key + entity order => matches value entities
+		// 2.3 hash with key => matches value entities
 		// 3. identify exact matches of resource node-based statements or non-hierarchical sub graphs
 		// 4. identify modifications of resource node-based statements or non-hierarchical sub graphs
 		// 5. identify additions in new model graph
 		// 6. identify removals in existing model graph
 		//
 		// note: mark matches or modifications after every step
-		//       maybe utilise confidence value for different matching approaches
-
+		// maybe utilise confidence value for different matching approaches
 
 		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
 		return null;
@@ -375,6 +403,5 @@ public class GDMResource {
 		final GDMWorker worker = new PropertyEnrichGDMWorker(resourceUri, graphDB);
 		worker.work();
 	}
-
 
 }

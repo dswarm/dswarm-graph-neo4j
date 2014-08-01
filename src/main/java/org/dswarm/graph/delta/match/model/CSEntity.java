@@ -1,11 +1,13 @@
-package org.dswarm.graph.delta.match;
+package org.dswarm.graph.delta.match.model;
 
 import java.util.LinkedList;
 
 /**
+ * TODO: impl equals + hashCode
+ *
  * Created by tgaengler on 30/07/14.
  */
-public class CSEntity extends MatchEntity {
+public class CSEntity extends CompareEntity {
 
 
 	private long entityOrder;
@@ -106,4 +108,6 @@ public class CSEntity extends MatchEntity {
 
 		valueEntities.add(valueEntity);
 	}
+
+
 }

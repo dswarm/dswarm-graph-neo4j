@@ -1,6 +1,10 @@
-package org.dswarm.graph.delta.match;
+package org.dswarm.graph.delta.match.model;
+
+import org.dswarm.graph.delta.match.model.KeyEntity;
 
 /**
+ * TODO: impl equals + hashCode
+ *
  * Created by tgaengler on 30/07/14.
  */
 public class ValueEntity extends KeyEntity {

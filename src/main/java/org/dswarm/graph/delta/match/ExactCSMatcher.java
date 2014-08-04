@@ -1,79 +1,79 @@
 package org.dswarm.graph.delta.match;
 
 import org.dswarm.graph.delta.match.model.CSEntity;
-import org.dswarm.graph.delta.match.model.ValueEntity;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by tgaengler on 01/08/14.
  */
-public class ExactCSMatcher extends CSMatcher implements ExcactMatcher {
+public abstract class ExactCSMatcher extends CSEntityMatcher implements MatchResultSet {
+
+	private Set<String> matches;
 
 	public ExactCSMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
 
 		super(existingCSEntitiesArg, newCSEntitiesArg);
 	}
 
-	/**
-	 * hash with key, value(s) + entity order + value(s) order
-	 *
-	 * @param csEntities
-	 * @return
-	 */
-	@Override
-	protected Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities) {
-
-		final Map<String, CSEntity> hashedCSEntities = new HashMap<>();
-
-		for(final CSEntity csEntity : csEntities) {
-
-			final int keyHash = csEntity.getKey().hashCode();
-			Long valueHash = null;
-
-			for(final ValueEntity valueEntity : csEntity.getValueEntities()) {
-
-				if(valueHash == null) {
-
-					valueHash = (long) (valueEntity.getValue().hashCode());
-					valueHash = 31 * valueHash + Long.valueOf(valueEntity.getOrder()).hashCode();
-
-					continue;
-				}
-
-				valueHash = 31 * valueHash + valueEntity.getValue().hashCode();
-				valueHash = 31 * valueHash +  Long.valueOf(valueEntity.getOrder()).hashCode();
-			}
-
-			long hash = keyHash;
-			if(valueHash != null) {
-				hash = 31 * hash + valueHash;
-			}
-			hash = 31 * hash + Long.valueOf(csEntity.getEntityOrder()).hashCode();
-
-			hashedCSEntities.put(Long.valueOf(hash).toString(), csEntity);
-		}
-
-		return hashedCSEntities;
-	}
-
 	@Override
 	public Collection<String> getMatches() {
 
-		final Set<String> matches = new HashSet<>();
+		matches = new HashSet<>();
 
-		for(final String hash : existingCSEntities.keySet()) {
+		for (final String hash : existingCSEntities.keySet()) {
 
-			if(newCSEntities.containsKey(hash)) {
+			if (newCSEntities.containsKey(hash)) {
 
 				matches.add(hash);
 			}
 		}
 
 		return matches;
+	}
+
+	public Collection<CSEntity> getMatches(final Map<String, CSEntity> csEntityMap) {
+
+		if(matches == null || matches.isEmpty()) {
+
+			return null;
+		}
+
+		final List<CSEntity> csEntities = new ArrayList<>();
+
+		for(final String match : matches) {
+
+			if(csEntityMap.containsKey(match)) {
+
+				csEntities.add(csEntityMap.get(match));
+			}
+		}
+
+		return csEntities;
+	}
+
+	public Collection<CSEntity> getNonMatches(final Map<String, CSEntity> csEntityMap) {
+
+		if(matches == null || matches.isEmpty()) {
+
+			return null;
+		}
+
+		final List<CSEntity> csEntities = new ArrayList<>();
+
+		for(final Map.Entry<String, CSEntity> csEntityEntry : csEntityMap.entrySet()) {
+
+			if(!matches.contains(csEntityEntry.getKey())) {
+
+				csEntities.add(csEntityEntry.getValue());
+			}
+		}
+
+		return csEntities;
 	}
 }

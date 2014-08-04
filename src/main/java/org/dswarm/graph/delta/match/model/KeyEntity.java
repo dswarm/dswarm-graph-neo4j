@@ -1,17 +1,12 @@
 package org.dswarm.graph.delta.match.model;
 
-import org.dswarm.graph.delta.match.model.CSEntity;
-import org.dswarm.graph.delta.match.model.CompareEntity;
-
 /**
- * TODO: impl equals + hashCode
- *
- * Created by tgaengler on 30/07/14.
+ * @author tgaengler
  */
 public class KeyEntity extends CompareEntity {
 
-	private final String value;
-	private CSEntity csEntity;
+	private final String	value;
+	private CSEntity		csEntity;
 
 	public KeyEntity(final long nodeIdArg, final String valueArg) {
 
@@ -32,5 +27,36 @@ public class KeyEntity extends CompareEntity {
 	public CSEntity getCSEntity() {
 
 		return csEntity;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+
+		if (this == o) {
+
+			return true;
+		}
+		if (!(o instanceof KeyEntity)) {
+
+			return false;
+		}
+		if (!super.equals(o)) {
+
+			return false;
+		}
+
+		final KeyEntity keyEntity = (KeyEntity) o;
+
+		return !(value != null ? !value.equals(keyEntity.value) : keyEntity.value != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+
+		int result = super.hashCode();
+		result = 31 * result + (value != null ? value.hashCode() : 0);
+
+		return result;
 	}
 }

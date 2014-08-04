@@ -8,12 +8,12 @@ import java.util.Map;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public abstract class CSMatcher {
+public abstract class CSEntityMatcher {
 
 	protected final Map<String, CSEntity> existingCSEntities;
 	protected final Map<String, CSEntity> newCSEntities;
 
-	public CSMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
+	public CSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
 
 		existingCSEntities = generateHashes(existingCSEntitiesArg);
 		newCSEntities = generateHashes(newCSEntitiesArg);

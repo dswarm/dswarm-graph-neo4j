@@ -1,11 +1,11 @@
 package org.dswarm.graph.delta.match.model;
 
 /**
- * Created by tgaengler on 30/07/14.
+ * @author tgaengler
  */
 public class CompareEntity {
 
-	private final long nodeId;
+	private final long	nodeId;
 
 	public CompareEntity(final long nodeIdArg) {
 
@@ -18,7 +18,7 @@ public class CompareEntity {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 
 		if (this == o) {
 			return true;
@@ -27,7 +27,7 @@ public class CompareEntity {
 			return false;
 		}
 
-		CompareEntity that = (CompareEntity) o;
+		final CompareEntity that = (CompareEntity) o;
 
 		return nodeId == that.nodeId;
 
@@ -35,6 +35,7 @@ public class CompareEntity {
 
 	@Override
 	public int hashCode() {
+
 		return (int) (nodeId ^ (nodeId >>> 32));
 	}
 }

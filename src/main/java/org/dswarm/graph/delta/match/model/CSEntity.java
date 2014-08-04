@@ -3,22 +3,19 @@ package org.dswarm.graph.delta.match.model;
 import java.util.LinkedList;
 
 /**
- * TODO: impl equals + hashCode
- *
- * Created by tgaengler on 30/07/14.
+ * @author tgaengler
  */
 public class CSEntity extends CompareEntity {
 
+	private long					entityOrder;
 
-	private long entityOrder;
+	private LinkedList<KeyEntity>	keyEntities;
 
-	private LinkedList<KeyEntity> keyEntities;
+	private LinkedList<ValueEntity>	valueEntities;
 
-	private LinkedList<ValueEntity> valueEntities;
+	private String					key;
 
-	private String key;
-
-	private boolean keyInitialized = false;
+	private boolean					keyInitialized	= false;
 
 	public CSEntity(final long nodeIdArg) {
 
@@ -71,9 +68,9 @@ public class CSEntity extends CompareEntity {
 
 	public String getKey() {
 
-		if(!keyInitialized) {
+		if (!keyInitialized) {
 
-			if(keyEntities == null || keyEntities.isEmpty()) {
+			if (keyEntities == null || keyEntities.isEmpty()) {
 
 				keyInitialized = true;
 
@@ -82,7 +79,7 @@ public class CSEntity extends CompareEntity {
 
 			final StringBuilder sb = new StringBuilder();
 
-			for(final KeyEntity keyEntity : keyEntities) {
+			for (final KeyEntity keyEntity : keyEntities) {
 
 				sb.append(keyEntity.getValue());
 			}
@@ -107,7 +104,41 @@ public class CSEntity extends CompareEntity {
 		}
 
 		valueEntities.add(valueEntity);
+		valueEntity.setCSEntity(this);
 	}
 
+	@Override
+	public boolean equals(final Object o) {
 
+		if (this == o) {
+
+			return true;
+		}
+		if (!(o instanceof CSEntity)) {
+
+			return false;
+		}
+		if (!super.equals(o)) {
+
+			return false;
+		}
+
+		final CSEntity csEntity = (CSEntity) o;
+
+		return entityOrder == csEntity.entityOrder
+				&& !(keyEntities != null ? !keyEntities.equals(csEntity.keyEntities) : csEntity.keyEntities != null)
+				&& !(valueEntities != null ? !valueEntities.equals(csEntity.valueEntities) : csEntity.valueEntities != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+
+		int result = super.hashCode();
+		result = 31 * result + (int) (entityOrder ^ (entityOrder >>> 32));
+		result = 31 * result + (keyEntities != null ? keyEntities.hashCode() : 0);
+		result = 31 * result + (valueEntities != null ? valueEntities.hashCode() : 0);
+
+		return result;
+	}
 }

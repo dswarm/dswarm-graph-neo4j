@@ -14,13 +14,13 @@ public abstract class ValueMatcher {
 	protected final Map<String, ValueEntity> existingValueEntities;
 	protected final Map<String, ValueEntity> newValueEntities;
 
-	public ValueMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
+	public ValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg) {
 
-		existingValueEntities = generateHashes(existingCSEntitiesArg);
-		newValueEntities = generateHashes(newCSEntitiesArg);
+		existingValueEntities = generateHashes(existingValueEntitiesArg);
+		newValueEntities = generateHashes(newValueEntitiesArg);
 	}
 
-	protected abstract Map<String, ValueEntity> generateHashes(final Collection<CSEntity> csEntities);
+	protected abstract Map<String, ValueEntity> generateHashes(final Collection<ValueEntity> valueEntities);
 
 	public Map<String, ValueEntity> getExistingValueEntities() {
 

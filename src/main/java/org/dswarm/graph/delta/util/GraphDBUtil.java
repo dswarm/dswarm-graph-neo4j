@@ -2,10 +2,14 @@ package org.dswarm.graph.delta.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
@@ -14,8 +18,11 @@ import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
 import org.dswarm.graph.delta.DMPStatics;
+import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.evaluator.EntityEvaluator;
+import org.dswarm.graph.delta.evaluator.StatementEvaluator;
 import org.dswarm.graph.delta.match.model.CSEntity;
+import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.KeyEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
@@ -173,6 +180,87 @@ public final class GraphDBUtil {
 		tx.close();
 	}
 
+	public static void markCSEntityPaths(final Collection<CSEntity> matchedCSEntities, final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI) {
+
+		final Set<Long> pathEndNodeIds = new HashSet<>();
+
+		// calc path end nodes
+		for(final CSEntity csEntity : matchedCSEntities) {
+
+			for(final KeyEntity keyEntity : csEntity.getKeyEntities()) {
+
+				pathEndNodeIds.add(keyEntity.getNodeId());
+			}
+
+			for(final ValueEntity valueEntity : csEntity.getValueEntities()) {
+
+				pathEndNodeIds.add(valueEntity.getNodeId());
+			}
+		}
+
+		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
+	}
+
+	public static void markValueEntityPaths(final Collection<ValueEntity> matchedValueEntities, final DeltaState deltaState,
+			final GraphDatabaseService graphDB, final String resourceURI) {
+
+		final Set<Long> pathEndNodeIds = new HashSet<>();
+
+		// calc path end nodes
+		for(final ValueEntity valueEntity : matchedValueEntities) {
+
+			// TODO: what should I do with related key paths here?
+			for(final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
+
+				pathEndNodeIds.add(keyEntity.getNodeId());
+			}
+
+			pathEndNodeIds.add(valueEntity.getNodeId());
+		}
+
+		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
+	}
+
+	private static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
+			final Set<Long> pathEndNodeIds) {
+
+		final Transaction tx = graphDB.beginTx();
+
+		final Iterable<Path> paths = getResourcePaths(graphDB, resourceURI);
+
+		for (final Path path : paths) {
+
+			final long pathEndNodeId = path.endNode().getId();
+
+			if (pathEndNodeIds.contains(pathEndNodeId)) {
+
+				// mark path
+				for (final Relationship rel : path.relationships()) {
+
+					if (!rel.hasProperty("DELTA_STATE")) {
+
+						rel.setProperty("DELTA_STATE", deltaState.toString());
+					}
+
+					rel.setProperty("MATCHED", true);
+				}
+
+				for (final Node node : path.nodes()) {
+
+					if (!node.hasProperty("DELTA_STATE")) {
+
+						node.setProperty("DELTA_STATE", deltaState.toString());
+					}
+
+					node.setProperty("MATCHED", true);
+				}
+			}
+		}
+
+		tx.success();
+		tx.close();
+	}
+
 	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String resourceURI, final AttributePath commonAttributePath, final ContentSchema contentSchema) {
 
 		final Transaction tx = graphDB.beginTx();
@@ -237,6 +325,102 @@ public final class GraphDBUtil {
 		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, resourceGraphUri);
 
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
+	}
+
+	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB) {
+
+		final Transaction tx = graphDB.beginTx();
+
+		final Node resourceNode = getResourceNode(graphDB, resourceURI);
+
+		final Collection<ValueEntity> values = getFlatNodeValues(resourceNode, graphDB);
+
+		tx.success();
+		tx.close();
+
+		return values;
+	}
+
+	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) {
+
+		// determine flat values
+		final Iterable<Path> paths = graphDB.traversalDescription().breadthFirst().evaluator(new StatementEvaluator(node.getId())).traverse(node);
+
+		if(paths == null || !paths.iterator().hasNext()) {
+
+			return null;
+		}
+
+		final Map<String, CSEntity> valuesMap = new HashMap<>();
+
+		for(final Path path : paths) {
+
+			final Relationship rel = path.lastRelationship();
+			final String predicate = rel.getType().name();
+			final long valueNodeId = path.endNode().getId();
+
+			final String nodeTypeString = (String) path.endNode().getProperty(GraphStatics.NODETYPE_PROPERTY, null);
+
+			if(nodeTypeString == null) {
+
+				// skip none typed nodes?
+				continue;
+			}
+
+			final NodeType valueNodeType = NodeType.getByName(nodeTypeString);
+			final String value;
+
+			switch(valueNodeType) {
+
+				case Resource:
+				case TypeResource:
+
+					String tempValue = (String) path.endNode().getProperty(GraphStatics.URI_PROPERTY, null);
+
+					final String provenance = (String) path.endNode().getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+
+					if(provenance != null) {
+
+						tempValue += provenance;
+					}
+
+					value = tempValue;
+
+					break;
+				case Literal:
+
+					value = (String) path.endNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
+
+					break;
+				default:
+
+					value = null;
+			}
+
+			final Long valueOrder = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+
+			final GDMValueEntity valueEntity = new GDMValueEntity(valueNodeId, value, valueOrder, valueNodeType);
+
+			if(!valuesMap.containsKey(predicate)) {
+
+				final CSEntity csEntity = new CSEntity(-1);
+				final KeyEntity keyEntity = new KeyEntity(-1, predicate);
+				csEntity.addKeyEntity(keyEntity);
+
+				valuesMap.put(predicate, csEntity);
+			}
+
+			valuesMap.get(predicate).addValueEntity(valueEntity);
+		}
+		
+		final List<ValueEntity> values = new ArrayList<>();
+		
+		for(final CSEntity csEntity : valuesMap.values()) {
+			
+			values.addAll(csEntity.getValueEntities());
+		}
+
+		return values;
 	}
 
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,

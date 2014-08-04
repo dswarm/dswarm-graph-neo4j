@@ -23,7 +23,6 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 		final NodeType nodeType = NodeType.getByName(nodeTypeString);
 		final StringBuilder sb = new StringBuilder();
 		sb.append("(").append(node.getId()).append(":type='").append(nodeType).append("',");
-
 		switch (nodeType) {
 
 			case Resource:
@@ -41,7 +40,23 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 				break;
 		}
 
-		sb.append("')");
+		sb.append("'");
+
+		final Boolean matched = (Boolean) node.getProperty("MATCHED", null);
+
+		if(matched != null) {
+
+			sb.append(",matched='").append(matched).append("'");
+		}
+
+		final String deltaState = (String) node.getProperty("DELTA_STATE", null);
+
+		if(deltaState != null) {
+
+			sb.append(",delta_state='").append(deltaState).append("'");
+		}
+
+		sb.append(")");
 
 		return sb.toString();
 	}
@@ -73,7 +88,25 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 		}
 
 		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
-		sb.append("index='").append(index).append("']").append(suffix);
+		sb.append("index='").append(index);
+
+		sb.append("'");
+
+		final Boolean matched = (Boolean) relationship.getProperty("MATCHED", null);
+
+		if(matched != null) {
+
+			sb.append(",matched='").append(matched).append("'");
+		}
+
+		final String deltaState = (String) relationship.getProperty("DELTA_STATE", null);
+
+		if(deltaState != null) {
+
+			sb.append(",delta_state='").append(deltaState).append("'");
+		}
+
+		sb.append("]").append(suffix);
 
 		return sb.toString();
 	}

@@ -369,6 +369,7 @@ public class GDMResource {
 				existingFirstDegreeExactCSValueNonMatches, newFirstDegreeExactCSValueNonMatches);
 
 		final Collection<String> exactCSValueMatches = firstDegreeExactCSValueMatcher.getMatches();
+		// TODO: utilise matched CS entities for path marking in graph
 		final Collection<ValueEntity> newExactCSValueMatches = firstDegreeExactCSValueMatcher.getMatches(firstDegreeExactCSValueMatcher
 				.getNewValueEntities());
 		final Collection<ValueEntity> existingExactCSValueMatches = firstDegreeExactCSValueMatcher.getMatches(firstDegreeExactCSValueMatcher
@@ -384,6 +385,7 @@ public class GDMResource {
 		final ModificationCSValueMatcher modificationCSMatcher = new FirstDegreeModificationCSValueMatcher(existingExactCSValueNonMatches,
 				newExactCSValueNonMatches);
 		final Map<ValueEntity, ValueEntity> modifications = modificationCSMatcher.getModifications();
+		// TODO: utilise matched CS entities for path marking in graph
 		final Collection<ValueEntity> newModificationCSMatches = modificationCSMatcher.getMatches(modificationCSMatcher.getNewValueEntities());
 		final Collection<ValueEntity> existingModificationCSMatches = modificationCSMatcher.getMatches(modificationCSMatcher
 				.getExistingValueEntities());

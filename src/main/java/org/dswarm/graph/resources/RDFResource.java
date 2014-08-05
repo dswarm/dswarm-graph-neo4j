@@ -1,5 +1,20 @@
 package org.dswarm.graph.resources;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -7,6 +22,7 @@ import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFLanguages;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,20 +41,7 @@ import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.nx.NxModelParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import org.dswarm.graph.utils.GraphUtils;
 
 /**
  * @author tgaengler
@@ -46,14 +49,12 @@ import javax.ws.rs.core.Response;
 @Path("/rdf")
 public class RDFResource {
 
-	private static final Logger		LOG				= LoggerFactory.getLogger(RDFResource.class);
-
-	private static final MediaType	N_QUADS_TYPE	= new MediaType("application", "n-quads");
+	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper		objectMapper;
+	private final ObjectMapper	objectMapper;
 
 	public RDFResource() {
 
@@ -223,52 +224,157 @@ public class RDFResource {
 	}
 
 	/**
-	 * for triggering a download
-	 *
-	 * @param database the graph database
+	 * for triggering a download of all data models in a given serialization (export) format
+	 *  
+	 * @param database the db to export the data from
+	 * @param exportLanguage the language all data should be serialized in
+	 * @return all data models serialized in exportLanguage 
+	 * 
 	 * @throws DMPGraphException
 	 */
 	@GET
+	// SR TODO rename to /exportall 
 	@Path("/getall")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces({ GraphUtils.N_QUADS, GraphUtils.TRIG })
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
-			@QueryParam("format") @DefaultValue("application/n-quads") String format) throws DMPGraphException {
+			@QueryParam("format") @DefaultValue(GraphUtils.N_QUADS) String format) throws DMPGraphException {
+
+		final MediaType formatType = getFormatType(format, GraphUtils.N_QUADS_TYPE);
+
+		// check for accepted formats (notice "!")
+		if (!(formatType.equals(GraphUtils.N_QUADS_TYPE) || formatType.equals(GraphUtils.TRIG_TYPE))) {
+
+			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
+		}
+
+		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
+		final String fileExtension = exportLanguage.getFileExtensions().get(0);
+
+		LOG.debug("Exporting rdf data to " + formatType.toString());
+
+		final String result = exportAllRDFInternal(database, exportLanguage);
+
+		return Response.ok(result).type(formatType.toString())
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+	}
+
+	@GET
+	@Path("/getall")
+	// SR FIXME MediaType: we can not annotate to produce GraphUtils.N_QUADS here since #exportAllRDFForDownload(...) also
+	// produces GraphUtils.N_QUADS. this is not allowed by Jersey, setting @Produces(GraphUtils.N_QUADS) results in an error
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		final String result = exportAllRDFInternal(database, Lang.NQUADS);
+
+		return Response.ok().entity(result).build();
+	}
+
+	/**
+	 * trigger a download for a given data model and format.
+	 * 
+	 * @param database the graph database
+	 * @param format serialization format
+	 * @param provenanceURI the data model to be exported
+	 * @return a single data model, serialized in exportLanguage
+	 * @throws DMPGraphException
+	 */
+	@GET
+	@Path("/export")
+	@Produces({ GraphUtils.N_QUADS, GraphUtils.RDF_XML, GraphUtils.TRIG, GraphUtils.TURTLE, GraphUtils.N3 })
+	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
+			@QueryParam("format") @DefaultValue(GraphUtils.N_QUADS) String format, @QueryParam("provenanceuri") String provenanceURI)
+			throws DMPGraphException {
+
+		final MediaType formatType = getFormatType(format, GraphUtils.N_QUADS_TYPE);
+
+		// check for accepted formats (notice "!")
+		if (!(formatType.equals(GraphUtils.N_QUADS_TYPE) || formatType.equals(GraphUtils.RDF_XML_TYPE) || formatType.equals(GraphUtils.TRIG_TYPE)
+				|| formatType.equals(GraphUtils.TURTLE_TYPE) || formatType.equals(GraphUtils.N3_TYPE))) {
+
+			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
+		}
+
+		// do some export language processing
+		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
+		final String fileExtension = exportLanguage.getFileExtensions().get(0);
+		LOG.debug("Exporting rdf data to " + formatType.toString());
+
+		// export and serialize data
+		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
+
+		return Response.ok(result).type(formatType.toString())
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+	}
+
+	/**
+	 * build a {@link MediaType} from a {@link String}, assuming format consists of a type and a sub type separated by "/", e.g. "application/n-quads"
+	 * 
+	 * @param format String to build a {@link MediaType} from  
+	 * @param defaultType default to be used if {@link MediaType} can not be built from parameter format
+	 * @return 
+	 */
+	private MediaType getFormatType(final String format, MediaType defaultType) {
+
+		LOG.debug("got format: \"" + format + "\"");
 
 		final String[] formatStrings = format.split("/", 2);
 		final MediaType formatType;
 		if (formatStrings.length == 2) {
 			formatType = new MediaType(formatStrings[0], formatStrings[1]);
 		} else {
-			formatType = N_QUADS_TYPE;
+			formatType = defaultType;
 		}
-
-		LOG.debug("Exporting rdf data into " + formatType);
-
-		final String result = exportAllRDFInternal(database);
-
-		return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM_TYPE)
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export.ttl").build();
+		return formatType;
 	}
 
-	@GET
-	@Path("/getall")
-	@Produces("application/n-quads")
-	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
+	/**
+	 * @param database the db to export the data from
+	 * @param exportLanguage the language the data should be serialized in 
+	 * @param provenanceURI db internal identifier of the data model
+	 * @return a single data model, serialized in exportLanguage 
+	 */
+	private String exportSingleRDFInternal(final GraphDatabaseService database, Lang exportLanguage, String provenanceURI) {
 
-		final String result = exportAllRDFInternal(database);
+		LOG.debug("try to export all RDF statements for provenanceURI \"" + provenanceURI + "\" from graph db to format \""
+				+ exportLanguage.getLabel() + "\"");
 
-		return Response.ok().entity(result).build();
+		// get data from neo4j
+		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
+		final Dataset dataset = rdfExporter.exportByProvenance(provenanceURI);
+		final Model uriModel = dataset.getNamedModel(provenanceURI);
+
+		// serialize (export) model to exportLanguage
+		final StringWriter writer = new StringWriter();
+		RDFDataMgr.write(writer, uriModel, exportLanguage);
+		final String result = writer.toString();
+
+		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
+				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
+				+ "'))");
+
+		// SR TODO remove?
+		LOG.debug("exported result:\n" + result);
+
+		return result;
 	}
-
-	private String exportAllRDFInternal(final GraphDatabaseService database) {
+	
+	/**
+	 * @param database the db to export the data from
+	 * @param exportLanguage the language all data should be serialized in
+	 * @return all data models serialized in exportLanguage 
+	 */
+	private String exportAllRDFInternal(final GraphDatabaseService database, Lang exportLanguage) {
 
 		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
+		// get data from neo4j
 		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
 		final Dataset dataset = rdfExporter.export();
 
+		// serialize (export) model to exportLanguage
 		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, dataset, Lang.NQUADS);
+		RDFDataMgr.write(writer, dataset, exportLanguage);
 		final String result = writer.toString();
 
 		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
@@ -277,4 +383,5 @@ public class RDFResource {
 
 		return result;
 	}
+
 }

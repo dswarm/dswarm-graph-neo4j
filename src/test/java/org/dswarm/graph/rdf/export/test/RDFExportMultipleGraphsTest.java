@@ -7,13 +7,11 @@ import java.net.URL;
 import java.util.Iterator;
 
 import junit.framework.Assert;
-
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -29,9 +27,10 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  * @author polowins
  * @author tgaengler
  */
-public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
+public abstract class RDFExportMultipleGraphsTest extends RDFExportTest {
 
 	static private final Logger	LOG	= LoggerFactory.getLogger(RDFExportMultipleGraphsTest.class);
+	private static final String RDF_N3_FILE = "dmpf_bsp1.n3";
 
 	public RDFExportMultipleGraphsTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -46,9 +45,9 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 		final String provenanceURI1 = "http://data.slub-dresden.de/resources/2";
 		final String provenanceURI2 = "http://data.slub-dresden.de/resources/3";
 
-		writeRDFToDBInternal(provenanceURI1);
-		writeRDFToDBInternal(provenanceURI2);
-
+		writeRDFToDBInternal(provenanceURI1, RDF_N3_FILE);
+		writeRDFToDBInternal(provenanceURI2, RDF_N3_FILE);
+		
 		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
@@ -72,7 +71,7 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 
 		RDFExportMultipleGraphsTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
-		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
+		final URL fileURL = Resources.getResource(RDF_N3_FILE);
 		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();

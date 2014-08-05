@@ -17,24 +17,23 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
 
-public abstract class FullRDFExportTest extends BasicResourceTest {
+public abstract class RDFExportTest extends BasicResourceTest {
 
-	protected static final String	TEST_RDF_FILE	= "dmpf_bsp1.n3";
 	// protected static final String TEST_RDF_FILE = "turtle_untyped.ttl";
 	// protected static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl";
 
-	private static final Logger		LOG				= LoggerFactory.getLogger(FullRDFExportTest.class);
+	private static final Logger		LOG				= LoggerFactory.getLogger(RDFExportTest.class);
 
-	public FullRDFExportTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
+	public RDFExportTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/rdf", dbTypeArg);
 	}
 
-	protected void writeRDFToDBInternal(String resource_graph_uri) throws IOException {
+	protected void writeRDFToDBInternal(String resource_graph_uri, final String rdfN3File) throws IOException {
 
 		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
 
-		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
+		final URL fileURL = Resources.getResource(rdfN3File);
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts

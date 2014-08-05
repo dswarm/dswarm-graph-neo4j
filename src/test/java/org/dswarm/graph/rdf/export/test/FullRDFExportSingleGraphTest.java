@@ -28,9 +28,11 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  * @author polowins
  * @author tgaengler
  */
-public abstract class FullRDFExportSingleGraphTest extends FullRDFExportTest {
+public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(FullRDFExportSingleGraphTest.class);
+	
+	private static final String RDF_N3_FILE = "dmpf_bsp1.n3";
 
 	public FullRDFExportSingleGraphTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -44,7 +46,7 @@ public abstract class FullRDFExportSingleGraphTest extends FullRDFExportTest {
 
 		final String provenanceURI = "http://data.slub-dresden.de/resources/2";
 
-		writeRDFToDBInternal(provenanceURI);
+		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
 
 		// GET the request
 		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
@@ -70,7 +72,7 @@ public abstract class FullRDFExportSingleGraphTest extends FullRDFExportTest {
 
 		FullRDFExportSingleGraphTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
-		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
+		final URL fileURL = Resources.getResource(RDF_N3_FILE);
 		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();

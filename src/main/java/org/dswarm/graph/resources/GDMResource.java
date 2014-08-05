@@ -358,7 +358,8 @@ public class GDMResource {
 		// each exact level all steps first and continue afterwards (?)
 		// 1. identify exact matches for cs entities
 		// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
-		// TODO: keep attention to sub entities of CS values
+		// TODO: keep attention to sub entities of CS values -> note: this needs to be done as part of the the exact cs entity
+		//       matching as well, i.e., we need to be able to calc a hash from sub entities of the cs values
 		final ExactCSMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(existingCSEntities, newCSEntities);
 		final Collection<String> exactCSMatches = exactCSMatcher.getMatches();
 		final Collection<CSEntity> newExactCSMatches = exactCSMatcher.getMatches(exactCSMatcher.getNewCSEntities());
@@ -389,7 +390,6 @@ public class GDMResource {
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
 		GraphDBUtil.markValueEntityPaths(existingExactCSValueMatches, DeltaState.ExactMatch, existingResourceDB, existingResource.getUri());
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
-
 
 		final Collection<ValueEntity> newExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getNonMatches(firstDegreeExactCSValueMatcher
 				.getNewValueEntities());
@@ -428,28 +428,59 @@ public class GDMResource {
 		// 2.3 hash with key => matches value entities
 		// 3. identify exact matches of resource node-based statements or non-hierarchical sub graphs
 		final Collection<ValueEntity> newFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(newResource.getUri(), newResourceDB);
-		final Collection<ValueEntity> existingFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(existingResource.getUri(), existingResourceDB);
+		final Collection<ValueEntity> existingFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(existingResource.getUri(),
+				existingResourceDB);
 		// 3.1 with key (predicate), value + value order => matches value entities
-		final FirstDegreeExactGDMValueMatcher firstDegreeExactGDMValueMatcher = new FirstDegreeExactGDMValueMatcher(existingFlatResourceNodeValueEntities, newFlatResourceNodeValueEntities);
+		final FirstDegreeExactGDMValueMatcher firstDegreeExactGDMValueMatcher = new FirstDegreeExactGDMValueMatcher(
+				existingFlatResourceNodeValueEntities, newFlatResourceNodeValueEntities);
 		final Collection<String> firstDegreeExactGDMValueMatches = firstDegreeExactGDMValueMatcher.getMatches();
-		// TODO: utilise matched value entities for path marking in graph
-		final Collection<ValueEntity> newFirstDegreeExactGDMValueMatches = firstDegreeExactGDMValueMatcher.getMatches(firstDegreeExactGDMValueMatcher.getNewValueEntities());
-		final Collection<ValueEntity> existingFirstDegreeExactGDMValueMatches = firstDegreeExactGDMValueMatcher.getMatches(firstDegreeExactGDMValueMatcher.getExistingValueEntities());
-		final Collection<ValueEntity> newFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher.getNonMatches(
-				firstDegreeExactGDMValueMatcher.getNewValueEntities());
-		final Collection<ValueEntity> existingFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher.getNonMatches(
-				firstDegreeExactGDMValueMatcher.getExistingValueEntities());
+		final Collection<ValueEntity> newFirstDegreeExactGDMValueMatches = firstDegreeExactGDMValueMatcher.getMatches(firstDegreeExactGDMValueMatcher
+				.getNewValueEntities());
+		final Collection<ValueEntity> existingFirstDegreeExactGDMValueMatches = firstDegreeExactGDMValueMatcher
+				.getMatches(firstDegreeExactGDMValueMatcher.getExistingValueEntities());
+
+		// utilise matched value entities for path marking in graph
+		GraphDBUtil.markValueEntityPaths(newFirstDegreeExactGDMValueMatches, DeltaState.ExactMatch, newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(existingFirstDegreeExactGDMValueMatches, DeltaState.ExactMatch, existingResourceDB,
+				existingResource.getUri());
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
+		final Collection<ValueEntity> newFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher
+				.getNonMatches(firstDegreeExactGDMValueMatcher.getNewValueEntities());
+		final Collection<ValueEntity> existingFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher
+				.getNonMatches(firstDegreeExactGDMValueMatcher.getExistingValueEntities());
 		// 4. identify modifications of resource node-based statements or non-hierarchical sub graphs
 		// 4.1 with key (predicate), value + value order => matches value entities
-		final FirstDegreeModificationGDMValueMatcher firstDegreeModificationGDMValueMatcher = new FirstDegreeModificationGDMValueMatcher(existingFirstDegreeExactGDMValueNonMatches, newFirstDegreeExactGDMValueNonMatches);
+		final FirstDegreeModificationGDMValueMatcher firstDegreeModificationGDMValueMatcher = new FirstDegreeModificationGDMValueMatcher(
+				existingFirstDegreeExactGDMValueNonMatches, newFirstDegreeExactGDMValueNonMatches);
 		final Map<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModifications = firstDegreeModificationGDMValueMatcher.getModifications();
-		// TODO: utilise matched value entities for path marking in graph
-		final Collection<ValueEntity> newFirstDegreeModificationGDMValueMatches = firstDegreeModificationGDMValueMatcher.getMatches(firstDegreeModificationGDMValueMatcher.getNewValueEntities());
-		final Collection<ValueEntity> existingFirstDegreeModificationGDMValueMatches = firstDegreeModificationGDMValueMatcher.getMatches(firstDegreeModificationGDMValueMatcher.getExistingValueEntities());
+		final Collection<ValueEntity> newFirstDegreeModificationGDMValueMatches = firstDegreeModificationGDMValueMatcher
+				.getMatches(firstDegreeModificationGDMValueMatcher.getNewValueEntities());
+		final Collection<ValueEntity> existingFirstDegreeModificationGDMValueMatches = firstDegreeModificationGDMValueMatcher
+				.getMatches(firstDegreeModificationGDMValueMatcher.getExistingValueEntities());
+
+		// utilise matched value entities for path marking in graph
+		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueMatches, DeltaState.Modification, newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueMatches, DeltaState.Modification, existingResourceDB,
+				existingResource.getUri());
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
 		// = resource node gdm value entity additions
-		final Collection<ValueEntity> newFirstDegreeModificationGDMValueNonMatches = firstDegreeModificationGDMValueMatcher.getNonMatches(firstDegreeModificationGDMValueMatcher.getNewValueEntities());
+		final Collection<ValueEntity> newFirstDegreeModificationGDMValueNonMatches = firstDegreeModificationGDMValueMatcher
+				.getNonMatches(firstDegreeModificationGDMValueMatcher.getNewValueEntities());
 		// = resource node gdm value entity removals
-		final Collection<ValueEntity> existingFirstDegreeModificationGDMValueNonMatches = firstDegreeModificationGDMValueMatcher.getNonMatches(firstDegreeModificationGDMValueMatcher.getExistingValueEntities());
+		final Collection<ValueEntity> existingFirstDegreeModificationGDMValueNonMatches = firstDegreeModificationGDMValueMatcher
+				.getNonMatches(firstDegreeModificationGDMValueMatcher.getExistingValueEntities());
+
+		// utilise matched value entities for path marking in graph
+		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueNonMatches, DeltaState.ADDITION, newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueNonMatches, DeltaState.DELETION, existingResourceDB,
+				existingResource.getUri());
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
 		// 5. identify additions in new model graph
 		// 6. identify removals in existing model graph
 		//

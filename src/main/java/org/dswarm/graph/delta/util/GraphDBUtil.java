@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UnknownFormatConversionException;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
@@ -41,9 +42,12 @@ import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.index.UniqueFactory;
+import org.neo4j.graphdb.traversal.BranchOrderingPolicies;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
+import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.kernel.Traversal;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -148,7 +152,10 @@ public final class GraphDBUtil {
 
 		final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
-		final Iterable<Path> paths = graphDB.traversalDescription().depthFirst().evaluator(new Evaluator() {
+		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_RECENT).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).traverse(
+				resourceNode);
+
+				/*.depthFirst().evaluator(new Evaluator() {
 
 			@Override
 			public Evaluation evaluate(final Path path) {
@@ -162,7 +169,7 @@ public final class GraphDBUtil {
 
 				return Evaluation.EXCLUDE_AND_CONTINUE;
 			}
-		}).traverse(resourceNode);
+		}).traverse(resourceNode); */
 
 		return paths;
 	}

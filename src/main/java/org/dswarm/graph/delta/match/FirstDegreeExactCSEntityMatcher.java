@@ -12,7 +12,7 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public class FirstDegreeExactCSEntityMatcher extends ExactCSMatcher {
+public class FirstDegreeExactCSEntityMatcher extends CSEntityMatcher {
 
 	public FirstDegreeExactCSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
 

@@ -9,26 +9,10 @@ import java.util.Map;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public abstract class ValueMatcher {
-
-	protected final Map<String, ValueEntity> existingValueEntities;
-	protected final Map<String, ValueEntity> newValueEntities;
+public abstract class ValueMatcher extends Matcher<ValueEntity> {
 
 	public ValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg) {
 
-		existingValueEntities = generateHashes(existingValueEntitiesArg);
-		newValueEntities = generateHashes(newValueEntitiesArg);
-	}
-
-	protected abstract Map<String, ValueEntity> generateHashes(final Collection<ValueEntity> valueEntities);
-
-	public Map<String, ValueEntity> getExistingValueEntities() {
-
-		return existingValueEntities;
-	}
-
-	public Map<String, ValueEntity> getNewValueEntities() {
-
-		return newValueEntities;
+		super(existingValueEntitiesArg, newValueEntitiesArg);
 	}
 }

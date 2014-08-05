@@ -11,7 +11,7 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 /**
  * @author tgaengler
  */
-public class FirstDegreeExactGDMValueMatcher extends CSValueMatcher {
+public class FirstDegreeExactGDMValueMatcher extends ValueMatcher {
 
 	public FirstDegreeExactGDMValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg) {
 
@@ -43,21 +43,5 @@ public class FirstDegreeExactGDMValueMatcher extends CSValueMatcher {
 		}
 
 		return hashedValueEntities;
-	}
-
-	@Override
-	public Collection<String> getMatches() {
-
-		matches = new HashSet<>();
-
-		for (final String hash : existingValueEntities.keySet()) {
-
-			if (newValueEntities.containsKey(hash)) {
-
-				matches.add(hash);
-			}
-		}
-
-		return matches;
 	}
 }

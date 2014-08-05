@@ -8,27 +8,10 @@ import java.util.Map;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public abstract class CSEntityMatcher {
-
-	protected final Map<String, CSEntity> existingCSEntities;
-	protected final Map<String, CSEntity> newCSEntities;
+public abstract class CSEntityMatcher extends Matcher<CSEntity> {
 
 	public CSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
 
-		existingCSEntities = generateHashes(existingCSEntitiesArg);
-		newCSEntities = generateHashes(newCSEntitiesArg);
-	}
-
-	protected abstract Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities);
-
-	public Map<String, CSEntity> getExistingCSEntities() {
-
-		return existingCSEntities;
-	}
-
-	public Map<String, CSEntity> getNewCSEntities() {
-
-		return newCSEntities;
+		super(existingCSEntitiesArg, newCSEntitiesArg);
 	}
 }
-

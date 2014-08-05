@@ -23,22 +23,18 @@ public class ValueEntity extends KeyEntity {
 	public boolean equals(final Object o) {
 
 		if (this == o) {
-
 			return true;
 		}
 		if (!(o instanceof ValueEntity)) {
-
 			return false;
 		}
 		if (!super.equals(o)) {
-
 			return false;
 		}
 
 		final ValueEntity that = (ValueEntity) o;
 
 		return order == that.order;
-
 	}
 
 	@Override

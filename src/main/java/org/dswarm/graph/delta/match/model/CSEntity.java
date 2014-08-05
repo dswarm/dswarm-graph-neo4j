@@ -17,6 +17,8 @@ public class CSEntity extends CompareEntity {
 
 	private boolean					keyInitialized	= false;
 
+	private boolean					hasSubEntities	= false;
+
 	public CSEntity(final long nodeIdArg) {
 
 		super(nodeIdArg);
@@ -39,6 +41,16 @@ public class CSEntity extends CompareEntity {
 	public void setEntityOrder(final long entityOrderArg) {
 
 		entityOrder = entityOrderArg;
+	}
+
+	public void setHasSubEntities(final boolean hasSubEntitiesArg) {
+
+		hasSubEntities = hasSubEntitiesArg;
+	}
+
+	public boolean hasSubEntities() {
+
+		return hasSubEntities;
 	}
 
 	public LinkedList<ValueEntity> getValueEntities() {
@@ -111,21 +123,18 @@ public class CSEntity extends CompareEntity {
 	public boolean equals(final Object o) {
 
 		if (this == o) {
-
 			return true;
 		}
 		if (!(o instanceof CSEntity)) {
-
 			return false;
 		}
 		if (!super.equals(o)) {
-
 			return false;
 		}
 
 		final CSEntity csEntity = (CSEntity) o;
 
-		return entityOrder == csEntity.entityOrder
+		return entityOrder == csEntity.entityOrder && hasSubEntities == csEntity.hasSubEntities
 				&& !(keyEntities != null ? !keyEntities.equals(csEntity.keyEntities) : csEntity.keyEntities != null)
 				&& !(valueEntities != null ? !valueEntities.equals(csEntity.valueEntities) : csEntity.valueEntities != null);
 
@@ -138,6 +147,7 @@ public class CSEntity extends CompareEntity {
 		result = 31 * result + (int) (entityOrder ^ (entityOrder >>> 32));
 		result = 31 * result + (keyEntities != null ? keyEntities.hashCode() : 0);
 		result = 31 * result + (valueEntities != null ? valueEntities.hashCode() : 0);
+		result = 31 * result + (hasSubEntities ? 1 : 0);
 
 		return result;
 	}

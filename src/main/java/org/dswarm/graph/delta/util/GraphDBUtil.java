@@ -24,10 +24,13 @@ import org.dswarm.graph.delta.evaluator.StatementEvaluator;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.KeyEntity;
+import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -50,6 +53,8 @@ import com.google.common.collect.Lists;
  * Created by tgaengler on 29/07/14.
  */
 public final class GraphDBUtil {
+
+	private static final RelationshipType	rdfTypeRelType	= DynamicRelationshipType.withName("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
 
 	/**
 	 * note: should be run in transaction scope
@@ -152,7 +157,7 @@ public final class GraphDBUtil {
 
 				if (hasLeafLabel) {
 
-					return Evaluation.INCLUDE_AND_PRUNE;
+					return Evaluation.INCLUDE_AND_CONTINUE;
 				}
 
 				return Evaluation.EXCLUDE_AND_CONTINUE;
@@ -184,21 +189,52 @@ public final class GraphDBUtil {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 
-		// calc path end nodes
-		for(final CSEntity csEntity : matchedCSEntities) {
+		try (final Transaction ignored = graphDB.beginTx()) {
 
-			for(final KeyEntity keyEntity : csEntity.getKeyEntities()) {
+			// calc path end nodes
+			for (final CSEntity csEntity : matchedCSEntities) {
 
-				pathEndNodeIds.add(keyEntity.getNodeId());
+				// TODO: mark type nodes from other paths as well?
+
+				for (final KeyEntity keyEntity : csEntity.getKeyEntities()) {
+
+					pathEndNodeIds.add(keyEntity.getNodeId());
+				}
+
+				for (final ValueEntity valueEntity : csEntity.getValueEntities()) {
+
+					pathEndNodeIds.add(valueEntity.getNodeId());
+				}
+
+				fetchCSEntityTypeNodes(graphDB, pathEndNodeIds, csEntity);
 			}
+		} catch (final Exception e) {
 
-			for(final ValueEntity valueEntity : csEntity.getValueEntities()) {
-
-				pathEndNodeIds.add(valueEntity.getNodeId());
-			}
+			// TODO: log something
 		}
 
 		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
+	}
+
+	/**
+	 * note: we may need to find a better way to handle those statements
+	 *
+	 * @param graphDB
+	 * @param pathEndNodeIds
+	 * @param csEntity
+	 */
+	private static void fetchCSEntityTypeNodes(final GraphDatabaseService graphDB, final Set<Long> pathEndNodeIds, final CSEntity csEntity) {
+
+		// fetch cs entity type nodes as well
+		final Iterable<Relationship> typeRels = graphDB.getNodeById(csEntity.getNodeId()).getRelationships(Direction.OUTGOING, rdfTypeRelType);
+
+		if (typeRels != null && typeRels.iterator().hasNext()) {
+
+			for (final Relationship typeRel : typeRels) {
+
+				pathEndNodeIds.add(typeRel.getEndNode().getId());
+			}
+		}
 	}
 
 	public static void markValueEntityPaths(final Collection<ValueEntity> matchedValueEntities, final DeltaState deltaState,
@@ -206,16 +242,23 @@ public final class GraphDBUtil {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 
-		// calc path end nodes
-		for(final ValueEntity valueEntity : matchedValueEntities) {
+		try (final Transaction ignored = graphDB.beginTx()) {
 
-			// TODO: what should I do with related key paths here?
-			for(final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
+			// calc path end nodes
+			for(final ValueEntity valueEntity : matchedValueEntities) {
 
-				pathEndNodeIds.add(keyEntity.getNodeId());
+				// TODO: what should I do with related key paths here?
+				for(final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
+
+					pathEndNodeIds.add(keyEntity.getNodeId());
+				}
+
+				pathEndNodeIds.add(valueEntity.getNodeId());
+				fetchCSEntityTypeNodes(graphDB, pathEndNodeIds, valueEntity.getCSEntity());
 			}
+		} catch (final Exception e) {
 
-			pathEndNodeIds.add(valueEntity.getNodeId());
+			// TODO: log something
 		}
 
 		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
@@ -310,6 +353,88 @@ public final class GraphDBUtil {
 		determineCSEntityOrder(csEntitiesCollection);
 
 		return csEntitiesCollection;
+	}
+
+	public static Collection<SubGraphEntity> determineNonMatchedCSEntitySubGraphs(final Collection<CSEntity> csEntities, final GraphDatabaseService graphDB) {
+
+		final Set<SubGraphEntity> subgraphEntities = new HashSet<>();
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			for(final CSEntity csEntity : csEntities) {
+
+				final Node csEntityNode = graphDB.getNodeById(csEntity.getNodeId());
+				final Iterable<Relationship> csEntityOutgoingRels = csEntityNode.getRelationships(Direction.OUTGOING);
+
+				if(csEntityOutgoingRels == null || !csEntityOutgoingRels.iterator().hasNext()) {
+
+					continue;
+				}
+
+				final List<Relationship> nonMatchedRels = new ArrayList<>();
+
+				for(final Relationship csEntityOutgoingRel : csEntityOutgoingRels) {
+
+					if(csEntityOutgoingRel.hasProperty("MATCHED")) {
+
+						continue;
+					}
+
+					nonMatchedRels.add(csEntityOutgoingRel);
+				}
+
+				if(nonMatchedRels.isEmpty()) {
+
+					// everything is already matched
+					continue;
+				}
+
+				final String deltaStateString = (String) csEntityNode.getProperty("DELTA_STATE", null);
+				final DeltaState deltaState;
+
+				if(deltaStateString != null) {
+
+					deltaState = DeltaState.getByName(deltaStateString);
+				} else {
+
+					deltaState = null;
+				}
+
+				for(final Relationship nonMatchedRel : nonMatchedRels) {
+
+					final String predicate = nonMatchedRel.getType().name();
+					final Long order = (Long) nonMatchedRel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+					final long finalOrder;
+
+					if(order != null) {
+
+						finalOrder = order;
+					} else {
+
+						finalOrder = 1;
+					}
+
+					if(predicate.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+
+						final long relId = nonMatchedRel.getId();
+						final String value = (String) nonMatchedRel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
+
+						System.out.println("rel id = '" + relId + "', value = '" + value +"'");
+					}
+
+					final long endNodeId = nonMatchedRel.getEndNode().getId();
+
+					final SubGraphEntity subGraphEntity = new SubGraphEntity(endNodeId, predicate, deltaState, csEntity, finalOrder);
+					subgraphEntities.add(subGraphEntity);
+				}
+			}
+
+		} catch (final Exception e) {
+
+			// TODO: log something
+		}
+		
+		return subgraphEntities;
 	}
 
 	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI) {

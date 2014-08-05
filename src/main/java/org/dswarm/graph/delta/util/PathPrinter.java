@@ -17,7 +17,7 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 	private final static String	SUFFIX			= "-->";
 
 	@Override
-	public String nodeRepresentation(Path path, Node node) {
+	public String nodeRepresentation(final Path path, final Node node) {
 
 		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
 		final NodeType nodeType = NodeType.getByName(nodeTypeString);
@@ -62,7 +62,7 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 	}
 
 	@Override
-	public String relationshipRepresentation(Path path, Node from, Relationship relationship) {
+	public String relationshipRepresentation(final Path path, final Node from, final Relationship relationship) {
 
 		final String prefix;
 		final String suffix;

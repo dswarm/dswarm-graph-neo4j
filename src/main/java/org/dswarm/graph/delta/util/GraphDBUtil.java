@@ -152,7 +152,7 @@ public final class GraphDBUtil {
 
 		final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
-		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_RECENT).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).traverse(
+		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).traverse(
 				resourceNode);
 
 				/*.depthFirst().evaluator(new Evaluator() {

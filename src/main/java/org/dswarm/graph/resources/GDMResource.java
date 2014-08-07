@@ -487,6 +487,9 @@ public class GDMResource {
 		final Collection<SubGraphEntity> newSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(newCSEntities, newResourceDB);
 		final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
 				existingResourceDB);
+
+		// TODO: filter deletions (from existing sub graph entities) and additions (from new sub graph entities), since they can simply be marked as well (?)
+
 		// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
 		// 7.1.1 key + predicate + sub graph hash + order
 		// 7.2 identify of partial matches (paths) of (non-hierarchical) CS entity sub graphs

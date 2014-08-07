@@ -1401,7 +1401,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : "Das"
+      "v" : "Deine"
     }
   }, {
     "order" : 1,
@@ -1410,7 +1410,7 @@
     },
     "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
     "o" : {
-      "v" : " Stuttgarter HutzelmÃ¤nnchen"
+      "v" : " Mutter"
     }
   } ]
 } ]

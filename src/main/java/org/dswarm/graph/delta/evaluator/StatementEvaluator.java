@@ -41,7 +41,7 @@ public class StatementEvaluator implements Evaluator {
 			return Evaluation.EXCLUDE_AND_PRUNE;
 		}
 
-		if(path.lastRelationship().hasProperty("MATCHED") && "true".equals((String) path.lastRelationship().getProperty("MATCHED", null))) {
+		if(path.lastRelationship().hasProperty("MATCHED") && Boolean.TRUE.equals(path.lastRelationship().getProperty("MATCHED", null))) {
 
 			// only non-matched statements
 			return Evaluation.EXCLUDE_AND_PRUNE;

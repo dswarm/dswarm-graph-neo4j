@@ -2,6 +2,7 @@ package org.dswarm.graph.delta.util;
 
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.GraphStatics;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
@@ -23,16 +24,25 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 		final NodeType nodeType = NodeType.getByName(nodeTypeString);
 		final StringBuilder sb = new StringBuilder();
 		sb.append("(").append(node.getId()).append(":type='").append(nodeType).append("',");
+
+		final String labels = getLabels(node);
+
+		sb.append("label='").append(labels);
+
 		switch (nodeType) {
 
 			case Resource:
 			case TypeResource:
+
+				sb.append("',");
 
 				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
 				sb.append("uri='").append(uri);
 
 				break;
 			case Literal:
+
+				sb.append("',");
 
 				final String value = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
 				sb.append("value='").append(value);
@@ -59,6 +69,20 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 		sb.append(")");
 
 		return sb.toString();
+	}
+
+	private String getLabels(final Node node) {
+
+		final StringBuilder sb2 = new StringBuilder();
+
+		for(final Label label : node.getLabels()) {
+
+			sb2.append(label.name()).append(",");
+		}
+
+		final String tempLabels = sb2.toString();
+
+		return tempLabels.substring(0, tempLabels.length() - 1);
 	}
 
 	@Override

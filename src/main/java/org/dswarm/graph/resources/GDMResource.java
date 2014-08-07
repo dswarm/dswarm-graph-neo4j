@@ -21,6 +21,7 @@ import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactGDMValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationCSValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationGDMValueMatcher;
 import org.dswarm.graph.delta.match.ModificationCSValueMatcher;
@@ -47,7 +48,9 @@ import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.util.Util;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.PathExpanderBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
@@ -487,10 +490,8 @@ public class GDMResource {
 		final Collection<SubGraphEntity> newSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(newCSEntities, newResourceDB);
 		final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
 				existingResourceDB);
-
-		// TODO: filter deletions (from existing sub graph entities) and additions (from new sub graph entities), since they can simply be marked as well (?)
-
 		// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
+		final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(existingSubGraphEntities, newSubGraphEntities, existingResourceDB, newResourceDB);
 		// 7.1.1 key + predicate + sub graph hash + order
 		// 7.2 identify of partial matches (paths) of (non-hierarchical) CS entity sub graphs
 		// 7.3 identify modifications of (non-hierarchical) sub graphs

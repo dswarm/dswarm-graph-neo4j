@@ -16,8 +16,8 @@ public abstract class Matcher<ENTITY> implements MatchResultSet {
 
 	protected Set<String>				matches;
 
-	protected final Map<String, ENTITY>	existingEntities;
-	protected final Map<String, ENTITY>	newEntities;
+	protected Map<String, ENTITY>	existingEntities;
+	protected Map<String, ENTITY>	newEntities;
 
 	public Matcher(final Collection<ENTITY> existingEntitiesArg, final Collection<ENTITY> newEntitiesArg) {
 

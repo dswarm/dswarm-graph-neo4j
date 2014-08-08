@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.rdf.export.PropertyGraphRDFExporter;
+import org.dswarm.graph.rdf.export.RDFExporterBase;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 import org.dswarm.graph.utils.GraphUtils;
 
@@ -109,7 +109,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	}
 
 	/**
-	 * {@link PropertyGraphRDFExporter#exportByProvenance(String)} uses a cypher query that makes use of order by, skip and
+	 * {@link RDFExporterBase#exportByProvenance(String)} uses a cypher query that makes use of order by, skip and
 	 * limit to request the data model in slices. This test makes sure the slicing works. <br />
 	 * 
 	 * Additionally, the test does a self-test and fails if the resource file's model contains less statements than one cypher query returns.
@@ -128,7 +128,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 		final Model expectedModel = RDFDataMgr.loadModel(RDF_N3_FILE);
 		Assert.assertNotNull("actual model shouldn't be null", expectedModel);
 		Assert.assertTrue("The cypher limit parameter must be smaller than the number of statements/relationships to be exported by this test.",
-				expectedModel.size() > PropertyGraphRDFExporter.CYPHER_LIMIT);
+				expectedModel.size() > RDFExporterBase.CYPHER_LIMIT);
 
 		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
 

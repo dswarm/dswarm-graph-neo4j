@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.rdf.export.PropertyGraphRDFExporter;
+import org.dswarm.graph.rdf.export.RDFExporterBase;
+import org.dswarm.graph.rdf.export.RDFExporterAllData;
+import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
 import org.dswarm.graph.rdf.export.RDFExporter;
 import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.Neo4jRDFHandler;
@@ -340,13 +342,13 @@ public class RDFResource {
 				+ exportLanguage.getLabel() + "\"");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
-		final Dataset dataset = rdfExporter.exportByProvenance(provenanceURI);
-		final Model uriModel = dataset.getNamedModel(provenanceURI);
+		final RDFExporter rdfExporter = new RDFExporterByProvenance(database, provenanceURI);
+		final Dataset dataset = rdfExporter.export();
+		final Model exportedModel = dataset.getNamedModel(provenanceURI);
 
 		// serialize (export) model to exportLanguage
 		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, uriModel, exportLanguage);
+		RDFDataMgr.write(writer, exportedModel, exportLanguage);
 		final String result = writer.toString();
 
 		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
@@ -369,7 +371,7 @@ public class RDFResource {
 		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new PropertyGraphRDFExporter(database);
+		final RDFExporter rdfExporter = new RDFExporterAllData(database);
 		final Dataset dataset = rdfExporter.export();
 
 		// serialize (export) model to exportLanguage

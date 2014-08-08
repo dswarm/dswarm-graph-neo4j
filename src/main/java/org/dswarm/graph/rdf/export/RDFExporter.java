@@ -17,7 +17,5 @@ public interface RDFExporter {
 
 	public long successfullyProcessedStatements();
 
-	public Dataset exportByProvenance(String provenanceURI);
-
 
 }

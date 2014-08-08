@@ -13,11 +13,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class FirstDegreeExactSubGraphEntityMatcher extends SubGraphEntityMatcher {
 
-	private final GraphDatabaseService existingResourceDB;
-	private final GraphDatabaseService newResourceDB;
+	private final GraphDatabaseService	existingResourceDB;
+	private final GraphDatabaseService	newResourceDB;
 
 	public FirstDegreeExactSubGraphEntityMatcher(final Collection<SubGraphEntity> existingSubGraphEntitiesArg,
-			final Collection<SubGraphEntity> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg) {
+			final Collection<SubGraphEntity> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg) {
 
 		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg);
 
@@ -48,20 +49,33 @@ public class FirstDegreeExactSubGraphEntityMatcher extends SubGraphEntityMatcher
 	 */
 	protected Map<String, SubGraphEntity> generateHashes(final Collection<SubGraphEntity> subGraphEntities, final GraphDatabaseService graphDB) {
 
-		final Map<String, SubGraphEntity> hashedCSEntities = new HashMap<>();
+		final Map<String, SubGraphEntity> hashedSubGraphEntities = new HashMap<>();
 
 		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
 
 			final int keyHash = subGraphEntity.getCSEntity().getKey().hashCode();
 			final long csEntityOrderHash = Long.valueOf(subGraphEntity.getCSEntity().getEntityOrder()).hashCode();
 			final int predicateHash = subGraphEntity.getPredicate().hashCode();
-			Long subGraphHash = null;
 
 			// calc sub graph hash
 			final Map<Long, Long> nodeHashes = new HashMap<>();
 			final Integer deepestLeafHierarchyLevel = GraphDBUtil.calculateEntityLeafHashes(graphDB, subGraphEntity.getNodeId(), nodeHashes);
 
-			// TODO: continue here
+			if(deepestLeafHierarchyLevel != null && deepestLeafHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
+
+				int currentHierarchyLevel = deepestLeafHierarchyLevel - 1;
+
+				while(currentHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
+
+					GraphDBUtil.calculateEntityHierarchyLevelNodesHashes(graphDB, subGraphEntity.getNodeId(), nodeHashes, currentHierarchyLevel);
+
+					currentHierarchyLevel--;
+				}
+
+				GraphDBUtil.calculateSubGraphEntityHash(graphDB, subGraphEntity.getNodeId(), nodeHashes);
+			}
+
+			Long subGraphHash = nodeHashes.get(subGraphEntity.getNodeId());
 
 			long hash = keyHash;
 			hash = 31 * hash + predicateHash;
@@ -73,9 +87,9 @@ public class FirstDegreeExactSubGraphEntityMatcher extends SubGraphEntityMatcher
 			hash = 31 * hash + csEntityOrderHash;
 			hash = 31 * hash +  Long.valueOf(subGraphEntity.getOrder()).hashCode();
 
-			hashedCSEntities.put(Long.valueOf(hash).toString(), subGraphEntity);
+			hashedSubGraphEntities.put(Long.valueOf(hash).toString(), subGraphEntity);
 		}
 
-		return hashedCSEntities;
+		return hashedSubGraphEntities;
 	}
 }

@@ -22,11 +22,13 @@ import org.dswarm.graph.delta.match.FirstDegreeExactCSEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactGDMValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphEntityMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphLeafEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationCSValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationGDMValueMatcher;
 import org.dswarm.graph.delta.match.ModificationCSValueMatcher;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
+import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
@@ -477,7 +479,7 @@ public class GDMResource {
 
 		// utilise matched value entities for path marking in graph
 		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueNonMatches, DeltaState.ADDITION, newResourceDB, newResource.getUri());
-		GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
 		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueNonMatches, DeltaState.DELETION, existingResourceDB,
 				existingResource.getUri());
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
@@ -491,9 +493,46 @@ public class GDMResource {
 		final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
 				existingResourceDB);
 		// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
-		final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(existingSubGraphEntities, newSubGraphEntities, existingResourceDB, newResourceDB);
 		// 7.1.1 key + predicate + sub graph hash + order
+		final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
+				existingSubGraphEntities, newSubGraphEntities, existingResourceDB, newResourceDB);
+		final Collection<String> firstDegreeExactSubGraphEntityMatches = firstDegreeExactSubGraphEntityMatcher.getMatches();
+		final Collection<SubGraphEntity> newFirstDegreeExactSubGraphEntityMatches = firstDegreeExactSubGraphEntityMatcher
+				.getMatches(firstDegreeExactSubGraphEntityMatcher.getNewEntities());
+		final Collection<SubGraphEntity> existingFirstDegreeExactSubGraphEntityMatches = firstDegreeExactSubGraphEntityMatcher
+				.getMatches(firstDegreeExactSubGraphEntityMatcher.getExistingEntities());
+
+		// utilise matched sub graph entities for path marking in graph
+		GraphDBUtil.markSubGraphEntityPaths(newFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markSubGraphEntityPaths(existingFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, existingResourceDB,
+				existingResource.getUri());
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
+		final Collection<SubGraphEntity> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
+				.getNonMatches(firstDegreeExactSubGraphEntityMatcher.getNewEntities());
+		final Collection<SubGraphEntity> existingFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
+				.getNonMatches(firstDegreeExactSubGraphEntityMatcher.getExistingEntities());
+
 		// 7.2 identify of partial matches (paths) of (non-hierarchical) CS entity sub graphs
+
+		final Collection<SubGraphLeafEntity> newSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
+				newFirstDegreeExactSubGraphEntityNonMatches, newResourceDB);
+		final Collection<SubGraphLeafEntity> existingSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
+				existingFirstDegreeExactSubGraphEntityNonMatches, existingResourceDB);
+		// 7.2.1 key + predicate + sub graph leaf path hash + order
+		final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
+				existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB);
+		final Collection<String> firstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher.getMatches();
+		// TODO: utilise matched sub graph entities for path marking in graph
+		final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher
+				.getMatches(firstDegreeExactSubGraphLeafEntityMatcher.getNewEntities());
+		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher
+				.getMatches(firstDegreeExactSubGraphLeafEntityMatcher.getExistingEntities());
+		final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
+				.getNonMatches(firstDegreeExactSubGraphLeafEntityMatcher.getNewEntities());
+		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
+				.getNonMatches(firstDegreeExactSubGraphLeafEntityMatcher.getExistingEntities());
 		// 7.3 identify modifications of (non-hierarchical) sub graphs
 		//
 		// note: mark matches or modifications after every step

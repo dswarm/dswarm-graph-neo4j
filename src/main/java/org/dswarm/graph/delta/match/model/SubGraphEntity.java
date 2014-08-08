@@ -10,16 +10,18 @@ public class SubGraphEntity extends CompareEntity {
 	private final DeltaState	deltaState;
 	private final String		predicate;
 	private long				order;
+	private int hierarchyLevel;
 	private final CSEntity		csEntity;
 
 	public SubGraphEntity(final long nodeIdArg, final String predicateArg, final DeltaState deltaStateArg, final CSEntity csEntityArg,
-			final long orderArg) {
+			final long orderArg, final int hierarchyLevelArg) {
 
 		super(nodeIdArg);
 		predicate = predicateArg;
 		deltaState = deltaStateArg;
 		csEntity = csEntityArg;
 		order = orderArg;
+		hierarchyLevel = hierarchyLevelArg;
 	}
 
 	public String getPredicate() {
@@ -35,6 +37,11 @@ public class SubGraphEntity extends CompareEntity {
 	public long getOrder() {
 
 		return order;
+	}
+
+	public int getHierarchyLevel() {
+
+		return hierarchyLevel;
 	}
 
 	public CSEntity getCSEntity() {
@@ -58,7 +65,7 @@ public class SubGraphEntity extends CompareEntity {
 		final SubGraphEntity that = (SubGraphEntity) o;
 
 		return order == that.order && !(csEntity != null ? !csEntity.equals(that.csEntity) : that.csEntity != null) && deltaState == that.deltaState
-				&& !(predicate != null ? !predicate.equals(that.predicate) : that.predicate != null);
+				&& !(predicate != null ? !predicate.equals(that.predicate) : that.predicate != null) && hierarchyLevel == that.hierarchyLevel;
 
 	}
 
@@ -69,6 +76,7 @@ public class SubGraphEntity extends CompareEntity {
 		result = 31 * result + (deltaState != null ? deltaState.hashCode() : 0);
 		result = 31 * result + (predicate != null ? predicate.hashCode() : 0);
 		result = 31 * result + (int) (order ^ (order >>> 32));
+		result = 31 * result + hierarchyLevel;
 		result = 31 * result + (csEntity != null ? csEntity.hashCode() : 0);
 
 		return result;

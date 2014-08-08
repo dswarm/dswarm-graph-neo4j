@@ -23,12 +23,11 @@ import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.KeyEntity;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
+import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.graphalgo.GraphAlgoFactory;
-import org.neo4j.graphalgo.impl.path.TraversalPathFinder;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -36,6 +35,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.PathExpanderBuilder;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
@@ -154,6 +154,7 @@ public final class GraphDBUtil {
 
 		final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
+		// TODO: maybe replace with gethEntityPaths(GraphdataBaseService, Node)
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
 				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
 				.evaluator(new Evaluator() {
@@ -185,18 +186,23 @@ public final class GraphDBUtil {
 
 		final Node entityNode = graphDB.getNodeById(nodeId);
 
-		//final int entityNodeHierarchyLevel = (int) entityNode.getProperty("__HIERARCHY_LEVEL__");
+		return getEntityPaths(graphDB, entityNode);
+	}
 
-		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
-				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param entityNode
+	 * @return
+	 */
+	private static Iterable<Path> getEntityPaths(final GraphDatabaseService graphDB, final Node entityNode) {
+
+		return graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST)
+				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
 
 					@Override
 					public Evaluation evaluate(final Path path) {
-
-						//				if (entityNodeHierarchyLevel > (int) path.endNode().getProperty("__HIERARCHY_LEVEL__")) {
-						//
-						//					return Evaluation.EXCLUDE_AND_PRUNE;
-						//				}
 
 						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
 
@@ -208,8 +214,156 @@ public final class GraphDBUtil {
 						return Evaluation.EXCLUDE_AND_CONTINUE;
 					}
 				}).traverse(entityNode);
+	}
 
-		return paths;
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param entityId
+	 * @param leafNodeId
+	 * @return
+	 */
+	public static Iterable<Path> getEntityPaths(final GraphDatabaseService graphDB, final long entityId, final long leafNodeId) {
+
+		final Node entityNode = graphDB.getNodeById(entityId);
+
+		return graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST)
+				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
+
+					@Override
+					public Evaluation evaluate(final Path path) {
+
+						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
+
+						if (hasLeafLabel && path.endNode().getId() == leafNodeId) {
+
+							return Evaluation.INCLUDE_AND_PRUNE;
+						}
+
+						return Evaluation.EXCLUDE_AND_CONTINUE;
+					}
+				}).traverse(entityNode);
+	}
+
+	public static void calculateSubGraphEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			calculateEntityHash(graphDB, entityNodeId, nodeHashes);
+		} catch (final Exception e) {
+
+			// TODO: log something
+
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param entityNodeId
+	 * @param nodeHashes
+	 * @return
+	 */
+	private static boolean calculateEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
+
+		final Node entityNode = graphDB.getNodeById(entityNodeId);
+
+		Long hash = calculateNodeHash(entityNode);
+
+		if (hash == null) {
+
+			return false;
+		}
+
+		// add hashed from child nodes
+		for (final Relationship rel : entityNode.getRelationships(Direction.OUTGOING)) {
+
+			final Node endNode = rel.getEndNode();
+			final Long endNodeHash = nodeHashes.get(endNode.getId());
+			hash = calculateRelationshipHash(hash, rel, endNodeHash);
+		}
+
+		nodeHashes.put(entityNode.getId(), hash);
+
+		return true;
+	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param hash
+	 * @param rel
+	 * @param endNodeHash
+	 * @return
+	 */
+	private static long calculateRelationshipHash(long hash, final Relationship rel, final Long endNodeHash) {
+
+		final String predicate = rel.getType().name();
+		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+
+		long childNodeHash = predicate.hashCode();
+
+		if (order != null) {
+
+			childNodeHash = 31 * childNodeHash + order.hashCode();
+		}
+
+		if (endNodeHash != null) {
+
+			childNodeHash = 31 * childNodeHash + endNodeHash;
+		}
+
+		hash = 31 * hash + childNodeHash;
+		return hash;
+	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param node
+	 * @return
+	 */
+	private static Long calculateNodeHash(final Node node) {
+
+		final NodeType nodeType = getNodeType(node);
+
+		if (nodeType == null) {
+
+			// // skip none typed nodes?
+			return null;
+		}
+
+		final String value = getValue(node, nodeType);
+
+		long leafNodeHash = nodeType.hashCode();
+
+		if (value != null) {
+
+			leafNodeHash = 31 * leafNodeHash + value.hashCode();
+		}
+
+		return leafNodeHash;
+	}
+
+	public static void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
+
+		final Collection<String> entityHierarchyLevelNodeIds = getEntityHierarchyLevelNodes(graphDB, entityNodeId, hierarchyLevel);
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			for(final String entityHierarchyLevelNodeId : entityHierarchyLevelNodeIds) {
+
+				calculateEntityHash(graphDB, Long.valueOf(entityHierarchyLevelNodeId), nodeHashes);
+			}
+		} catch (final Exception e) {
+
+			// TODO: log something
+
+			e.printStackTrace();
+		}
 	}
 
 	public static Integer calculateEntityLeafHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
@@ -223,49 +377,12 @@ public final class GraphDBUtil {
 
 				final Node leafNode = graphDB.getNodeById(Long.valueOf(entityLeafNodeId));
 
-				final String nodeTypeString = (String) leafNode.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
 
-				if(nodeTypeString == null) {
+				Long hash = calculateNodeHash(leafNode);
 
-					// skip none typed nodes?
+				if(hash == null) {
+
 					continue;
-				}
-
-				final NodeType valueNodeType = NodeType.getByName(nodeTypeString);
-				final String value;
-
-				switch(valueNodeType) {
-
-					case Resource:
-					case TypeResource:
-
-						String tempValue = (String) leafNode.getProperty(GraphStatics.URI_PROPERTY, null);
-
-						final String provenance = (String) leafNode.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
-
-						if(provenance != null) {
-
-							tempValue += provenance;
-						}
-
-						value = tempValue;
-
-						break;
-					case Literal:
-
-						value = (String) leafNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-						break;
-					default:
-
-						value = null;
-				}
-
-				long hash = valueNodeType.hashCode();
-
-				if(value != null) {
-
-					hash = 31 * hash + value.hashCode();
 				}
 
 				final Integer hierarchyLevel = (Integer) leafNode.getProperty("__HIERARCHY_LEVEL__", null);
@@ -295,8 +412,115 @@ public final class GraphDBUtil {
 		return deepestHierarchyLevel;
 	}
 
+	public static Long calculateSubGraphLeafPathHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+
+			GraphDBUtil.printPaths(entityPaths);
+
+			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
+
+				return null;
+			}
+
+			final Path entityPath = entityPaths.iterator().next();
+			final Iterator<Node> entityPathNodes = entityPath.reverseNodes().iterator();
+
+			Long endNodeHash = calculateNodeHash(entityPathNodes.next());
+
+			if(endNodeHash == null) {
+
+				return null;
+			}
+
+			Long subGraphLeafPathHash = (long) 0;
+
+			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
+
+			for(final Relationship entityPathRel : entityPathRels) {
+
+				subGraphLeafPathHash = calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
+
+				final Node endNode = entityPathNodes.next();
+				endNodeHash = calculateNodeHash(endNode);
+			}
+
+			return subGraphLeafPathHash;
+		} catch (final Exception e) {
+
+			// TODO: log something
+
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	private static NodeType getNodeType(final Node node) {
+
+		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
+
+		if (nodeTypeString == null) {
+
+			return null;
+		}
+
+		final NodeType nodeType = NodeType.getByName(nodeTypeString);
+
+		return nodeType;
+	}
+
+	private static String getValue(final Node node, final NodeType nodeType) {
+
+		final String value;
+
+		switch (nodeType) {
+
+			case Resource:
+			case TypeResource:
+
+				String tempValue = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+
+				final String provenance = (String) node.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+
+				if (provenance != null) {
+
+					tempValue += provenance;
+				}
+
+				value = tempValue;
+
+				break;
+			case Literal:
+
+				value = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
+
+				break;
+			default:
+
+				value = null;
+		}
+
+		return value;
+	}
+
 	/**
-	 *
+	 * @param graphDB
+	 * @param nodeId
+	 * @return
+	 */
+	private static Collection<String> getEntityHierarchyLevelNodes(final GraphDatabaseService graphDB, final long nodeId, final int hierarchyLevel) {
+
+		final String entitHierarchyLevelNodesQuery = buildGetEntityHierarchyLevelNodesQuery(nodeId, hierarchyLevel);
+		final Collection<String> entityHierarchyLevelNodeIds = executeQueryWithMultipleResults(entitHierarchyLevelNodesQuery, "hierarchy_level_node",
+				graphDB);
+
+		return entityHierarchyLevelNodeIds;
+	}
+
+	/**
 	 * @param graphDB
 	 * @param nodeId
 	 * @return
@@ -460,9 +684,18 @@ public final class GraphDBUtil {
 				if(csEntityNodeId >= 0) {
 
 
-					final Set<Long> pathEndNodeIdsFromCSEntity = new HashSet<>();
-					;
+					final Set<Long> pathEndNodeIdsFromCSEntity;
+
+					if(pathEndNodesIdsFromCSEntityMap.containsKey(valueEntity.getCSEntity())) {
+
+						pathEndNodeIdsFromCSEntity = pathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity());
+					} else {
+
+						pathEndNodeIdsFromCSEntity = new HashSet<>();
+					}
+
 					fetchEntityTypeNodes(graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);
+					// TODO: we can't do this here, or? - I think we'll probably mark too much
 					determineNonMatchedSubGraphPathEndNodes(deltaState, graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);
 
 					pathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), pathEndNodeIdsFromCSEntity);
@@ -480,6 +713,60 @@ public final class GraphDBUtil {
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 
 			markPaths(deltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNideIdsFromCSEntityEntry.getValue());
+		}
+	}
+
+	/**
+	 * note: we could also include everything from a sub entity that was marked as deleted or added, since then the whole sub
+	 * entity is affected to this state
+	 *
+	 * @param matchedSubGraphEntities
+	 * @param deltaState
+	 * @param graphDB
+	 * @param resourceURI
+	 */
+	public static void markSubGraphEntityPaths(final Collection<SubGraphEntity> matchedSubGraphEntities, final DeltaState deltaState,
+			final GraphDatabaseService graphDB, final String resourceURI) {
+
+		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
+
+			// calc path end nodes
+			for(final SubGraphEntity subGraphEntity : matchedSubGraphEntities) {
+				
+				try (final Transaction ignored = graphDB.beginTx()) {
+
+					final Collection<String> leafNodes = getEntityLeafs(graphDB, subGraphEntity.getNodeId());
+
+					if(leafNodes != null && !leafNodes.isEmpty()) {
+
+						final Set<Long> pathEndNodeIds;
+
+						if(pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
+
+							pathEndNodeIds = pathEndNodesIdsFromCSEntityMap.get(subGraphEntity.getCSEntity().getNodeId());
+						} else {
+
+							pathEndNodeIds = new HashSet<>();
+						}
+
+						for(final String leafNode : leafNodes) {
+
+							pathEndNodeIds.add(Long.valueOf(leafNode));
+						}
+
+						pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);
+					}
+				} catch (final Exception e) {
+
+					// TODO: log something
+
+					e.printStackTrace();
+				}
+			}
+
+		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
+
+			markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
 		}
 	}
 
@@ -522,7 +809,6 @@ public final class GraphDBUtil {
 		markPaths(deltaState, pathEndNodeIds, paths);
 
 		tx.success();
-		tx.close();
 	}
 
 	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) {
@@ -608,6 +894,30 @@ public final class GraphDBUtil {
 		return csEntitiesCollection;
 	}
 
+	public static Collection<SubGraphLeafEntity> getSubGraphLeafEntities(final Collection<SubGraphEntity> subGraphEntities, final GraphDatabaseService graphDB) {
+
+		final Set<SubGraphLeafEntity> subGraphLeafEntities = new HashSet<>();
+
+		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
+
+			final Collection<String> subGraphLeafNodeIds = GraphDBUtil.getEntityLeafs(graphDB, subGraphEntity.getNodeId());
+
+			if(subGraphLeafNodeIds == null || subGraphLeafNodeIds.isEmpty()) {
+
+				continue;
+			}
+
+			for(final String subGraphLeafNodeId : subGraphLeafNodeIds) {
+
+				final SubGraphLeafEntity subGraphLeafEntity = new SubGraphLeafEntity(Long.valueOf(subGraphLeafNodeId), subGraphEntity);
+
+				subGraphLeafEntities.add(subGraphLeafEntity);
+			}
+		}
+
+		return subGraphLeafEntities;
+	}
+
 	/**
 	 * note: should be executed in transaction scope
 	 *
@@ -619,18 +929,19 @@ public final class GraphDBUtil {
 
 		final Node entityNode = graphDB.getNodeById(nodeId);
 
-		//		final int entityNodeHierarchyLevel = (int) entityNode.getProperty("__HIERARCHY_LEVEL__");
+		// final int entityNodeHierarchyLevel = (int) entityNode.getProperty("__HIERARCHY_LEVEL__");
 
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
-				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
+				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
+				.evaluator(new Evaluator() {
 
 					@Override
 					public Evaluation evaluate(final Path path) {
 
-						//				if (entityNodeHierarchyLevel > (int) path.endNode().getProperty("__HIERARCHY_LEVEL__")) {
+						// if (entityNodeHierarchyLevel > (int) path.endNode().getProperty("__HIERARCHY_LEVEL__")) {
 						//
-						//					return Evaluation.EXCLUDE_AND_PRUNE;
-						//				}
+						// return Evaluation.EXCLUDE_AND_PRUNE;
+						// }
 
 						if (path.lastRelationship() == null && path.endNode().hasLabel(DMPStatics.LEAF_LABEL)) {
 
@@ -731,8 +1042,9 @@ public final class GraphDBUtil {
 					}
 
 					final long endNodeId = nonMatchedRel.getEndNode().getId();
+					final int endNodeHierarchyLevel = (int) nonMatchedRel.getEndNode().getProperty("__HIERARCHY_LEVEL__");
 
-					final SubGraphEntity subGraphEntity = new SubGraphEntity(endNodeId, predicate, deltaState, csEntity, finalOrder);
+					final SubGraphEntity subGraphEntity = new SubGraphEntity(endNodeId, predicate, deltaState, csEntity, finalOrder, endNodeHierarchyLevel);
 					subgraphEntities.add(subGraphEntity);
 				}
 			}
@@ -1010,6 +1322,18 @@ public final class GraphDBUtil {
 				.append(GraphStatics.PROVENANCE_PROPERTY).append(" = \"").append(resourceGraphUri).append("\" AND\no.")
 				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN n.")
 				.append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+
+		return sb.toString();
+	}
+
+	private static String buildGetEntityHierarchyLevelNodesQuery(final long nodeId, final int hierarchyLevel) {
+
+		// START n= node(2062) MATCH (n)-[r*]->(m) RETURN m;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m)").append("\nWHERE m.__HIERARCHY_LEVEL__ = ").append(hierarchyLevel)
+				.append("\nRETURN id(m) AS hierarchy_level_node");
 
 		return sb.toString();
 	}

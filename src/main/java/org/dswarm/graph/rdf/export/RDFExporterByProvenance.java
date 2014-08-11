@@ -3,6 +3,8 @@ package org.dswarm.graph.rdf.export;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dswarm.graph.model.GraphStatics;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.query.Dataset;
@@ -15,7 +17,10 @@ import org.neo4j.graphdb.GraphDatabaseService;
 
 public class RDFExporterByProvenance extends RDFExporterBase {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFExporterByProvenance.class);
+	private static final Logger	LOG				= LoggerFactory.getLogger(RDFExporterByProvenance.class);
+
+	public static final int		CYPHER_LIMIT	= 1000;
+
 	private final String		provenanceURI;
 
 	public RDFExporterByProvenance(GraphDatabaseService databaseArg, final String provenanceURIArg) {
@@ -49,7 +54,7 @@ public class RDFExporterByProvenance extends RDFExporterBase {
 
 			while (requestResults) {
 
-				ExecutionResult result = engine.execute("MATCH (n)-[r]->(m) WHERE r.__PROVENANCE__ = \"" + provenanceURI
+				ExecutionResult result = engine.execute("MATCH (n)-[r]->(m) WHERE r." + GraphStatics.PROVENANCE_PROPERTY + " = \"" + provenanceURI
 						+ "\" RETURN DISTINCT r ORDER BY id(r) SKIP " + start + " LIMIT " + CYPHER_LIMIT);
 
 				start += CYPHER_LIMIT;

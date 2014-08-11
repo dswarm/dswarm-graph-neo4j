@@ -43,8 +43,6 @@ public abstract class RDFExporterBase implements RDFExporter {
 
 	protected long							successfullyProcessedStatements	= 0;
 
-	public static final int					CYPHER_LIMIT					= 1000;
-
 	protected static final int				JENA_MODEL_WARNING_SIZE			= 1000000;
 
 	public RDFExporterBase(final GraphDatabaseService databaseArg) {

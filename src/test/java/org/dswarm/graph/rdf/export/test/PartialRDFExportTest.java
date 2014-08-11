@@ -16,8 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.rdf.export.RDFExporterBase;
+import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
 import org.dswarm.graph.test.Neo4jDBWrapper;
-import org.dswarm.graph.utils.GraphUtils;
+import org.dswarm.graph.utils.MediaTypeUtil;
 
 public abstract class PartialRDFExportTest extends RDFExportTest {
 
@@ -51,7 +52,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToN3() throws IOException {
 
-		final String exportLanguage = GraphUtils.N3.toString();
+		final String exportLanguage = MediaTypeUtil.N3.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3);
 	}
@@ -64,7 +65,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToRDF_XML() throws IOException {
 
-		final String exportLanguage = GraphUtils.RDF_XML.toString();
+		final String exportLanguage = MediaTypeUtil.RDF_XML.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3);
 	}
@@ -77,7 +78,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToN_QUADS() throws IOException {
 
-		final String exportLanguage = GraphUtils.N_QUADS.toString();
+		final String exportLanguage = MediaTypeUtil.N_QUADS.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3);
 	}
@@ -90,7 +91,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToTRIG() throws IOException {
 
-		final String exportLanguage = GraphUtils.TRIG.toString();
+		final String exportLanguage = MediaTypeUtil.TRIG.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3);
 	}
@@ -103,13 +104,13 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToTURTLE() throws IOException {
 
-		final String exportLanguage = GraphUtils.TURTLE.toString();
+		final String exportLanguage = MediaTypeUtil.TURTLE.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3);
 	}
 
 	/**
-	 * {@link RDFExporterBase#exportByProvenance(String)} uses a cypher query that makes use of order by, skip and
+	 * {@link RDFExporterByProvenance#export()} uses a cypher query that makes use of order by, skip and
 	 * limit to request the data model in slices. This test makes sure the slicing works. <br />
 	 * 
 	 * Additionally, the test does a self-test and fails if the resource file's model contains less statements than one cypher query returns.
@@ -128,11 +129,11 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 		final Model expectedModel = RDFDataMgr.loadModel(RDF_N3_FILE);
 		Assert.assertNotNull("actual model shouldn't be null", expectedModel);
 		Assert.assertTrue("The cypher limit parameter must be smaller than the number of statements/relationships to be exported by this test.",
-				expectedModel.size() > RDFExporterBase.CYPHER_LIMIT);
+				expectedModel.size() > RDFExporterByProvenance.CYPHER_LIMIT);
 
 		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
 
-		final String exportLanguage = GraphUtils.N3.toString();
+		final String exportLanguage = MediaTypeUtil.N3.toString();
 
 		exportRDFByFormatFromDBInternal(exportLanguage, provenanceURI, RDF_N3_FILE);
 	}

@@ -31,10 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.rdf.export.RDFExporterBase;
+import org.dswarm.graph.rdf.export.RDFExporter;
 import org.dswarm.graph.rdf.export.RDFExporterAllData;
 import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
-import org.dswarm.graph.rdf.export.RDFExporter;
 import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.Neo4jRDFHandler;
 import org.dswarm.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
@@ -43,7 +42,7 @@ import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.nx.NxModelParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
-import org.dswarm.graph.utils.GraphUtils;
+import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author tgaengler
@@ -237,14 +236,14 @@ public class RDFResource {
 	@GET
 	// SR TODO rename to /exportall 
 	@Path("/getall")
-	@Produces({ GraphUtils.N_QUADS, GraphUtils.TRIG })
+	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.TRIG })
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
-			@QueryParam("format") @DefaultValue(GraphUtils.N_QUADS) String format) throws DMPGraphException {
+			@QueryParam("format") @DefaultValue(MediaTypeUtil.N_QUADS) String format) throws DMPGraphException {
 
-		final MediaType formatType = getFormatType(format, GraphUtils.N_QUADS_TYPE);
+		final MediaType formatType = MediaTypeUtil.getMediaType(format, MediaTypeUtil.N_QUADS_TYPE);
 
 		// check for accepted formats (notice "!")
-		if (!(formatType.equals(GraphUtils.N_QUADS_TYPE) || formatType.equals(GraphUtils.TRIG_TYPE))) {
+		if (!(formatType.equals(MediaTypeUtil.N_QUADS_TYPE) || formatType.equals(MediaTypeUtil.TRIG_TYPE))) {
 
 			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
 		}
@@ -283,16 +282,16 @@ public class RDFResource {
 	 */
 	@GET
 	@Path("/export")
-	@Produces({ GraphUtils.N_QUADS, GraphUtils.RDF_XML, GraphUtils.TRIG, GraphUtils.TURTLE, GraphUtils.N3 })
+	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.RDF_XML, MediaTypeUtil.TRIG, MediaTypeUtil.TURTLE, MediaTypeUtil.N3 })
 	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
-			@QueryParam("format") @DefaultValue(GraphUtils.N_QUADS) String format, @QueryParam("provenanceuri") String provenanceURI)
+			@QueryParam("format") @DefaultValue(MediaTypeUtil.N_QUADS) String format, @QueryParam("provenanceuri") String provenanceURI)
 			throws DMPGraphException {
 
-		final MediaType formatType = getFormatType(format, GraphUtils.N_QUADS_TYPE);
+		final MediaType formatType = MediaTypeUtil.getMediaType(format, MediaTypeUtil.N_QUADS_TYPE);
 
 		// check for accepted formats (notice "!")
-		if (!(formatType.equals(GraphUtils.N_QUADS_TYPE) || formatType.equals(GraphUtils.RDF_XML_TYPE) || formatType.equals(GraphUtils.TRIG_TYPE)
-				|| formatType.equals(GraphUtils.TURTLE_TYPE) || formatType.equals(GraphUtils.N3_TYPE))) {
+		if (!(formatType.equals(MediaTypeUtil.N_QUADS_TYPE) || formatType.equals(MediaTypeUtil.RDF_XML_TYPE) || formatType.equals(MediaTypeUtil.TRIG_TYPE)
+				|| formatType.equals(MediaTypeUtil.TURTLE_TYPE) || formatType.equals(MediaTypeUtil.N3_TYPE))) {
 
 			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
 		}
@@ -309,26 +308,6 @@ public class RDFResource {
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
 	}
 
-	/**
-	 * build a {@link MediaType} from a {@link String}, assuming format consists of a type and a sub type separated by "/", e.g. "application/n-quads"
-	 * 
-	 * @param format String to build a {@link MediaType} from  
-	 * @param defaultType default to be used if {@link MediaType} can not be built from parameter format
-	 * @return 
-	 */
-	private MediaType getFormatType(final String format, MediaType defaultType) {
-
-		LOG.debug("got format: \"" + format + "\"");
-
-		final String[] formatStrings = format.split("/", 2);
-		final MediaType formatType;
-		if (formatStrings.length == 2) {
-			formatType = new MediaType(formatStrings[0], formatStrings[1]);
-		} else {
-			formatType = defaultType;
-		}
-		return formatType;
-	}
 
 	/**
 	 * @param database the db to export the data from
@@ -355,8 +334,7 @@ public class RDFResource {
 				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
 				+ "'))");
 
-		// SR TODO remove?
-		LOG.debug("exported result:\n" + result);
+		//LOG.debug("exported result:\n" + result);
 
 		return result;
 	}

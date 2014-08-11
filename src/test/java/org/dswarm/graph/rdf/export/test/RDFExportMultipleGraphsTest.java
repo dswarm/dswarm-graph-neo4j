@@ -22,6 +22,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.test.Neo4jDBWrapper;
+import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author polowins
@@ -48,7 +49,7 @@ public abstract class RDFExportMultipleGraphsTest extends RDFExportTest {
 		writeRDFToDBInternal(provenanceURI1, RDF_N3_FILE);
 		writeRDFToDBInternal(provenanceURI2, RDF_N3_FILE);
 		
-		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
+		final ClientResponse response = service().path("/rdf/getall").accept(MediaTypeUtil.N_QUADS).get(ClientResponse.class);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 

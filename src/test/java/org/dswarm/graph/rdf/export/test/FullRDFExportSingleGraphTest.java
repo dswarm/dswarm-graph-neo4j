@@ -5,14 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import junit.framework.Assert;
-
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -20,9 +12,16 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
+import junit.framework.Assert;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.test.Neo4jDBWrapper;
+import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author polowins
@@ -30,17 +29,75 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  */
 public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(FullRDFExportSingleGraphTest.class);
-	
-	private static final String RDF_N3_FILE = "dmpf_bsp1.n3";
+	private static final Logger	LOG			= LoggerFactory.getLogger(FullRDFExportSingleGraphTest.class);
+
+	private static final String	RDF_N3_FILE	= "dmpf_bsp1.n3";
 
 	public FullRDFExportSingleGraphTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, dbTypeArg);
 	}
 
+	/**
+	 * request to export all data in n-quads format 
+	 * 
+	 * @throws IOException
+	 */
 	@Test
-	public void readAllRDFFromDB() throws IOException {
+	public void readAllRDFFromDBAcceptNquads() throws IOException {
+
+		readAllRDFFromDBinternal(MediaTypeUtil.N_QUADS, Lang.NQUADS, 200);
+	}
+
+	/**
+	 * request to export all data in trig format 
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void readAllRDFFromDBAcceptTriG() throws IOException {
+
+		readAllRDFFromDBinternal(MediaTypeUtil.TRIG, Lang.TRIG, 200);
+	}
+
+	/**
+	 * Test the fallback to default format n-quads in case the accept header is empty  
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void readAllRDFFromDBEmptyAcceptHeader() throws IOException {
+
+		// we need to send an empty accept header. In case we omit this header field at all, the current jersey implementation
+		// adds a standard header "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2"
+		readAllRDFFromDBinternal("", Lang.NQUADS, 200);
+	}
+
+	/**
+	 * request to export all data in rdf+xml format. This format is not supported, a HTTP 406 (not acceptable) response is expected.
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void readAllRDFFromDBUnsupportedFormat() throws IOException {
+
+		readAllRDFFromDBinternal(MediaTypeUtil.RDF_XML, Lang.NQUADS, 406);
+	}
+	
+
+	/**
+	 * request to export all data in a not existing format by sending some "random" accept header value. A HTTP 406 (not acceptable) response is expected.
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void readAllRDFFromDBRandomFormat() throws IOException {
+
+		readAllRDFFromDBinternal("ajhdjsdh", Lang.NQUADS, 406);
+	}
+	
+
+	private void readAllRDFFromDBinternal(String acceptHeader, Lang expectedResponseFormat, int expectedHTTPResponseCode) throws IOException {
 
 		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
 
@@ -48,10 +105,14 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
 
-		// GET the request
-		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
+		final ClientResponse response = service().path("/rdf/getall").accept(acceptHeader).get(ClientResponse.class);
 
-		Assert.assertEquals("expected 200", 200, response.getStatus());
+		Assert.assertEquals("expected " + expectedHTTPResponseCode, expectedHTTPResponseCode, response.getStatus());
+
+		// in case we requested an unsupported format, stop processing here since there is no exported data to verify
+		if (expectedHTTPResponseCode == 406) {
+			return;
+		}
 
 		final String body = response.getEntity(String.class);
 
@@ -64,7 +125,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		Assert.assertNotNull("input stream (from body) shouldn't be null", stream);
 
 		final Dataset dataset = DatasetFactory.createMem();
-		RDFDataMgr.read(dataset, stream, Lang.NQUADS);
+		RDFDataMgr.read(dataset, stream, expectedResponseFormat);
 
 		Assert.assertNotNull("dataset shouldn't be null", dataset);
 
@@ -93,7 +154,8 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",
 				model.isIsomorphicWith(modelFromOriginalRDFile));
 
-		FullRDFExportSingleGraphTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
+		FullRDFExportSingleGraphTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType
+				+ " DB using a single rdf file");
 	}
 
 }

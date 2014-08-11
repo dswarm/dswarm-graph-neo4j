@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -225,95 +226,64 @@ public class RDFResource {
 	}
 
 	/**
-	 * for triggering a download of all data models in a given serialization (export) format
-	 *  
-	 * @param database the db to export the data from
-	 * @param exportLanguage the language all data should be serialized in
-	 * @return all data models serialized in exportLanguage 
+	 * for triggering a download of all data models. The serialization (export) format is provided via the accept header field. If
+	 * no format is provided, {@link MediaTypeUtil#N_QUADS} is used as default. In case the format is not supported a 406 response
+	 * is sent.
 	 * 
-	 * @throws DMPGraphException
+	 * @param database the db to export the data from
+	 * @param exportFormat serialization format all data should be serialized in, injected from accept header field
+	 * @return all data models serialized in exportLanguage
 	 */
 	@GET
-	// SR TODO rename to /exportall 
+	// SR TODO rename to /exportall
 	@Path("/getall")
 	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.TRIG })
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
-			@QueryParam("format") @DefaultValue(MediaTypeUtil.N_QUADS) String format) throws DMPGraphException {
+			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
-		final MediaType formatType = MediaTypeUtil.getMediaType(format, MediaTypeUtil.N_QUADS_TYPE);
-
-		// check for accepted formats (notice "!")
-		if (!(formatType.equals(MediaTypeUtil.N_QUADS_TYPE) || formatType.equals(MediaTypeUtil.TRIG_TYPE))) {
-
-			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
-		}
+		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
-		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-
 		LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
-	}
-
-	@GET
-	@Path("/getall")
-	// SR FIXME MediaType: we can not annotate to produce GraphUtils.N_QUADS here since #exportAllRDFForDownload(...) also
-	// produces GraphUtils.N_QUADS. this is not allowed by Jersey, setting @Produces(GraphUtils.N_QUADS) results in an error
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response exportAllRDF(@Context final GraphDatabaseService database) throws DMPGraphException {
-
-		final String result = exportAllRDFInternal(database, Lang.NQUADS);
-
-		return Response.ok().entity(result).build();
+		return Response.ok(result).type(formatType.toString()).build();
 	}
 
 	/**
-	 * trigger a download for a given data model and format.
+	 * trigger a download for a given data model and format. The serialization (export) format is provided via the accept header
+	 * field. If no format is provided, {@link MediaTypeUtil#N_QUADS} is used as default. In case the format is not supported a
+	 * 406 response is sent.
 	 * 
 	 * @param database the graph database
-	 * @param format serialization format
+	 * @param exportFormat serialization format the data model should be serialized in, injected from accept header field
 	 * @param provenanceURI the data model to be exported
 	 * @return a single data model, serialized in exportLanguage
-	 * @throws DMPGraphException
 	 */
 	@GET
 	@Path("/export")
 	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.RDF_XML, MediaTypeUtil.TRIG, MediaTypeUtil.TURTLE, MediaTypeUtil.N3 })
 	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
-			@QueryParam("format") @DefaultValue(MediaTypeUtil.N_QUADS) String format, @QueryParam("provenanceuri") String provenanceURI)
-			throws DMPGraphException {
+			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat, @QueryParam("provenanceuri") String provenanceURI) {
 
-		final MediaType formatType = MediaTypeUtil.getMediaType(format, MediaTypeUtil.N_QUADS_TYPE);
-
-		// check for accepted formats (notice "!")
-		if (!(formatType.equals(MediaTypeUtil.N_QUADS_TYPE) || formatType.equals(MediaTypeUtil.RDF_XML_TYPE) || formatType.equals(MediaTypeUtil.TRIG_TYPE)
-				|| formatType.equals(MediaTypeUtil.TURTLE_TYPE) || formatType.equals(MediaTypeUtil.N3_TYPE))) {
-
-			throw new DMPGraphException("Unsupported media type \"" + formatType + "\", can not export data.");
-		}
+		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
 		// do some export language processing
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
-		final String fileExtension = exportLanguage.getFileExtensions().get(0);
 		LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+		return Response.ok(result).type(formatType.toString()).build();
 	}
-
 
 	/**
 	 * @param database the db to export the data from
-	 * @param exportLanguage the language the data should be serialized in 
+	 * @param exportLanguage the language the data should be serialized in
 	 * @param provenanceURI db internal identifier of the data model
-	 * @return a single data model, serialized in exportLanguage 
+	 * @return a single data model, serialized in exportLanguage
 	 */
 	private String exportSingleRDFInternal(final GraphDatabaseService database, Lang exportLanguage, String provenanceURI) {
 
@@ -334,15 +304,15 @@ public class RDFResource {
 				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
 				+ "'))");
 
-		//LOG.debug("exported result:\n" + result);
+		// LOG.debug("exported result:\n" + result);
 
 		return result;
 	}
-	
+
 	/**
 	 * @param database the db to export the data from
 	 * @param exportLanguage the language all data should be serialized in
-	 * @return all data models serialized in exportLanguage 
+	 * @return all data models serialized in exportLanguage
 	 */
 	private String exportAllRDFInternal(final GraphDatabaseService database, Lang exportLanguage) {
 

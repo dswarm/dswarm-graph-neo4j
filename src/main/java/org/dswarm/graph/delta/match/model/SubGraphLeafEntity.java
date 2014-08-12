@@ -3,7 +3,7 @@ package org.dswarm.graph.delta.match.model;
 /**
  * @author tgaengler
  */
-public class SubGraphLeafEntity extends CompareEntity {
+public class SubGraphLeafEntity extends Entity {
 
 	private final String			value;
 	private final SubGraphEntity	subGraphEntity;

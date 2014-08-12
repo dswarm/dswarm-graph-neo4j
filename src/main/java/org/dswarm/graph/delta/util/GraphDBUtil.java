@@ -35,7 +35,6 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.PathExpanderBuilder;
-import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
@@ -440,9 +439,6 @@ public final class GraphDBUtil {
 		try (final Transaction ignored = graphDB.beginTx()) {
 
 			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
-
-			GraphDBUtil.printPaths(entityPaths);
-
 			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
 
 				return null;
@@ -486,8 +482,6 @@ public final class GraphDBUtil {
 		try (final Transaction ignored = graphDB.beginTx()) {
 
 			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
-
-			GraphDBUtil.printPaths(entityPaths);
 
 			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
 
@@ -631,7 +625,7 @@ public final class GraphDBUtil {
 	 *
 	 * @param paths
 	 */
-	private static void printPaths(final Iterable<Path> paths) {
+	public static void printPaths(final Iterable<Path> paths) {
 
 		final Traversal.PathDescriptor<Path> pathPrinter = new PathPrinter();
 
@@ -864,12 +858,12 @@ public final class GraphDBUtil {
 
 		for(final SubGraphLeafEntity subGraphLeafEntity : matchedSubGraphLeafEntities) {
 
-			if(!pathEndNodesIdsFromCSEntityMap.containsKey(subGraphLeafEntity.getSubGraphEntity().getNodeId())) {
+			if(!pathEndNodesIdsFromCSEntityMap.containsKey(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId())) {
 
-				pathEndNodesIdsFromCSEntityMap.put(subGraphLeafEntity.getSubGraphEntity().getNodeId(), new HashSet<Long>());
+				pathEndNodesIdsFromCSEntityMap.put(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId(), new HashSet<Long>());
 			}
 
-			pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getNodeId()).add(subGraphLeafEntity.getNodeId());
+			pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId()).add(subGraphLeafEntity.getNodeId());
 		}
 
 		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
@@ -953,7 +947,7 @@ public final class GraphDBUtil {
 
 							case ADDITION:
 							case DELETION:
-							case Modification:
+							case MODIFICATION:
 
 								// modify delta state if a "higher" delta state was determined
 								node.setProperty("DELTA_STATE", deltaState.toString());

@@ -48,12 +48,12 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByIDReader;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
+import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PathExpanderBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
@@ -411,9 +411,9 @@ public class GDMResource {
 		final Collection<ValueEntity> existingModificationCSMatches = modificationCSMatcher.getMatches(modificationCSMatcher.getExistingEntities());
 
 		// utilise matched value entities for path marking in graph
-		GraphDBUtil.markValueEntityPaths(newModificationCSMatches, DeltaState.Modification, newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(newModificationCSMatches, DeltaState.MODIFICATION, newResourceDB, newResource.getUri());
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
-		GraphDBUtil.markValueEntityPaths(existingModificationCSMatches, DeltaState.Modification, existingResourceDB, existingResource.getUri());
+		GraphDBUtil.markValueEntityPaths(existingModificationCSMatches, DeltaState.MODIFICATION, existingResourceDB, existingResource.getUri());
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 
 		// = cs value entity additions
@@ -465,9 +465,9 @@ public class GDMResource {
 				.getMatches(firstDegreeModificationGDMValueMatcher.getExistingEntities());
 
 		// utilise matched value entities for path marking in graph
-		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueMatches, DeltaState.Modification, newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueMatches, DeltaState.MODIFICATION, newResourceDB, newResource.getUri());
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
-		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueMatches, DeltaState.Modification, existingResourceDB,
+		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueMatches, DeltaState.MODIFICATION, existingResourceDB,
 				existingResource.getUri());
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 
@@ -552,9 +552,9 @@ public class GDMResource {
 				.getMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getExistingEntities());
 
 		// utilise matched sub graph leaf entities for path marking in graph
-		GraphDBUtil.markSubGraphLeafEntityPaths(newFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.Modification, newResourceDB);
-		GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
-		GraphDBUtil.markSubGraphLeafEntityPaths(existingFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.Modification, existingResourceDB);
+		GraphDBUtil.markSubGraphLeafEntityPaths(newFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.MODIFICATION, newResourceDB);
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markSubGraphLeafEntityPaths(existingFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.MODIFICATION, existingResourceDB);
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 
 		// = sub graph leaf entity additions
@@ -564,20 +564,24 @@ public class GDMResource {
 		final Collection<SubGraphLeafEntity> existingFirstDegreeModificationSubGraphLeafEntityNonMatches = firstDegreeModificationSubGraphLeafEntityMatcher
 				.getNonMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getExistingEntities());
 
-		// utilise matched value entities for path marking in graph
-		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueMatches, DeltaState.Modification, newResourceDB, newResource.getUri());
-		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
-		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueMatches, DeltaState.Modification, existingResourceDB,
-				existingResource.getUri());
-		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
-
 		// TODO: mark resource graphs with additions + deletions
 
 		//
 		// note: mark matches or modifications after every step
 		// maybe utilise confidence value for different matching approaches
 
-		// TODO: traverse resource graphs to extract changeset
+		// traverse resource graphs to extract changeset
+		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.ADDITION, newResourceDB);
+		final Map<Long, Collection<Statement>> addedStatements = addedStatementsPGDGDMSGWorker.work();
+
+		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.DELETION, existingResourceDB);
+		final Map<Long, Collection<Statement>> removedStatements = removedStatementsPGDGDMSGWorker.work();
+
+		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.MODIFICATION, newResourceDB);
+		final Map<Long, Collection<Statement>> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
+
+		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
+		final Map<Long, Collection<Statement>> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
 		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
 		return null;

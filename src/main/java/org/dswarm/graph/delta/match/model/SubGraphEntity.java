@@ -5,7 +5,7 @@ import org.dswarm.graph.delta.DeltaState;
 /**
  * @author tgaengler
  */
-public class SubGraphEntity extends CompareEntity {
+public class SubGraphEntity extends Entity {
 
 	private final DeltaState	deltaState;
 	private final String		predicate;

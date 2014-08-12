@@ -5,7 +5,7 @@ import java.util.LinkedList;
 /**
  * @author tgaengler
  */
-public class CSEntity extends CompareEntity {
+public class CSEntity extends Entity {
 
 	private long					entityOrder;
 

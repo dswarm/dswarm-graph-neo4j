@@ -3,11 +3,11 @@ package org.dswarm.graph.delta;
 public enum DeltaState {
 
 	ExactMatch("EXACT_MATCH"),
-	Modification("MODIFICATION"),
+	MODIFICATION("MODIFICATION"),
 	ADDITION("ADDITION"),
 	DELETION("DELETION");
 
-	private final String	name;
+	private final String name;
 
 	public String getName() {
 

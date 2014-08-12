@@ -3,7 +3,7 @@ package org.dswarm.graph.delta.match.model;
 /**
  * @author tgaengler
  */
-public class KeyEntity extends CompareEntity {
+public class KeyEntity extends Entity {
 
 	private final String	value;
 	protected CSEntity		csEntity;

@@ -3,11 +3,11 @@ package org.dswarm.graph.delta.match.model;
 /**
  * @author tgaengler
  */
-public class CompareEntity {
+public class Entity {
 
 	private final long	nodeId;
 
-	public CompareEntity(final long nodeIdArg) {
+	public Entity(final long nodeIdArg) {
 
 		nodeId = nodeIdArg;
 	}
@@ -23,11 +23,11 @@ public class CompareEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof CompareEntity)) {
+		if (!(o instanceof Entity)) {
 			return false;
 		}
 
-		final CompareEntity that = (CompareEntity) o;
+		final Entity that = (Entity) o;
 
 		return nodeId == that.nodeId;
 

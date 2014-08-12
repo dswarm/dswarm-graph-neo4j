@@ -20,9 +20,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
 
+import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.test.Neo4jDBWrapper;
-import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author polowins

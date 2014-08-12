@@ -17,9 +17,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
 import org.dswarm.graph.test.Neo4jDBWrapper;
-import org.dswarm.graph.utils.MediaTypeUtil;
 
 public abstract class PartialRDFExportTest extends RDFExportTest {
 

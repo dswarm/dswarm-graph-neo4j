@@ -19,9 +19,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.test.Neo4jDBWrapper;
-import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author polowins

@@ -213,6 +213,11 @@
 			<artifactId>nxparser</artifactId>
 			<version>1.2.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.dswarm</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

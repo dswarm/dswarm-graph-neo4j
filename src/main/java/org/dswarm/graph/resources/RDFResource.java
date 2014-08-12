@@ -31,6 +31,7 @@ import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.rdf.export.RDFExporter;
 import org.dswarm.graph.rdf.export.RDFExporterAllData;
@@ -43,7 +44,6 @@ import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.nx.NxModelParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
-import org.dswarm.graph.utils.MediaTypeUtil;
 
 /**
  * @author tgaengler

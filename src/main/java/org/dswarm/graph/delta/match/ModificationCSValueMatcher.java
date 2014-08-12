@@ -10,7 +10,7 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 /**
  * @author tgaengler
  */
-public abstract class ModificationCSValueMatcher extends ValueMatcher implements ModificationResultSet {
+public abstract class ModificationCSValueMatcher extends ValueMatcher implements ModificationResultSet<ValueEntity> {
 
 	public ModificationCSValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg) {
 

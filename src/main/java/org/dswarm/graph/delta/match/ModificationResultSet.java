@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public interface ModificationResultSet {
+public interface ModificationResultSet<VALUEENTITY> {
 
 	/**
 	 * returns a map of modified value entities, where the keys are the value entities from the existing resource and the values
@@ -16,6 +16,6 @@ public interface ModificationResultSet {
 	 *
 	 * @return
 	 */
-	Map<ValueEntity, ValueEntity> getModifications();
+	Map<VALUEENTITY, VALUEENTITY> getModifications();
 
 }

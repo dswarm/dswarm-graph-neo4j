@@ -6,7 +6,7 @@ package org.dswarm.graph.delta.match.model;
 public class KeyEntity extends CompareEntity {
 
 	private final String	value;
-	private CSEntity		csEntity;
+	protected CSEntity		csEntity;
 
 	public KeyEntity(final long nodeIdArg, final String valueArg) {
 

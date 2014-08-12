@@ -5,12 +5,19 @@ package org.dswarm.graph.delta.match.model;
  */
 public class SubGraphLeafEntity extends CompareEntity {
 
+	private final String			value;
 	private final SubGraphEntity	subGraphEntity;
 
-	public SubGraphLeafEntity(final long nodeIdArg, final SubGraphEntity subGraphEntityArg) {
+	public SubGraphLeafEntity(final long nodeIdArg, final String valueArg, final SubGraphEntity subGraphEntityArg) {
 
 		super(nodeIdArg);
+		value = valueArg;
 		subGraphEntity = subGraphEntityArg;
+	}
+
+	public String getValue() {
+
+		return value;
 	}
 
 	public SubGraphEntity getSubGraphEntity() {
@@ -19,7 +26,7 @@ public class SubGraphLeafEntity extends CompareEntity {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 
 		if (this == o) {
 			return true;
@@ -33,7 +40,8 @@ public class SubGraphLeafEntity extends CompareEntity {
 
 		final SubGraphLeafEntity that = (SubGraphLeafEntity) o;
 
-		return !(subGraphEntity != null ? !subGraphEntity.equals(that.subGraphEntity) : that.subGraphEntity != null);
+		return !(subGraphEntity != null ? !subGraphEntity.equals(that.subGraphEntity) : that.subGraphEntity != null)
+				&& !(value != null ? !value.equals(that.value) : that.value != null);
 
 	}
 
@@ -41,6 +49,7 @@ public class SubGraphLeafEntity extends CompareEntity {
 	public int hashCode() {
 
 		int result = super.hashCode();
+		result = 31 * result + (value != null ? value.hashCode() : 0);
 		result = 31 * result + (subGraphEntity != null ? subGraphEntity.hashCode() : 0);
 
 		return result;

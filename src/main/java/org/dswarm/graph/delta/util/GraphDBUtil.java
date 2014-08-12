@@ -348,6 +348,29 @@ public final class GraphDBUtil {
 		return leafNodeHash;
 	}
 
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param node
+	 * @return
+	 */
+	private static Long calculateSimpleNodeHash(final Node node) {
+
+		final NodeType nodeType = getNodeType(node);
+
+		if (nodeType == null) {
+
+			// // skip none typed nodes?
+			return null;
+		}
+
+		final String value = getValue(node, nodeType);
+
+		final long leafNodeHash = nodeType.hashCode();
+
+		return leafNodeHash;
+	}
+
 	public static void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
 
 		final Collection<String> entityHierarchyLevelNodeIds = getEntityHierarchyLevelNodes(graphDB, entityNodeId, hierarchyLevel);
@@ -458,6 +481,52 @@ public final class GraphDBUtil {
 		return null;
 	}
 
+	public static Long calculateSubGraphLeafPathModificationHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+
+			GraphDBUtil.printPaths(entityPaths);
+
+			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
+
+				return null;
+			}
+
+			final Path entityPath = entityPaths.iterator().next();
+			final Iterator<Node> entityPathNodes = entityPath.reverseNodes().iterator();
+
+			Long endNodeHash = calculateSimpleNodeHash(entityPathNodes.next());
+
+			if(endNodeHash == null) {
+
+				return null;
+			}
+
+			Long subGraphLeafPathHash = (long) 0;
+
+			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
+
+			for(final Relationship entityPathRel : entityPathRels) {
+
+				subGraphLeafPathHash = calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
+
+				final Node endNode = entityPathNodes.next();
+				endNodeHash = calculateNodeHash(endNode);
+			}
+
+			return subGraphLeafPathHash;
+		} catch (final Exception e) {
+
+			// TODO: log something
+
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	private static NodeType getNodeType(final Node node) {
 
 		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
@@ -531,6 +600,19 @@ public final class GraphDBUtil {
 		final Collection<String> entityLeafNodeIds = executeQueryWithMultipleResults(entityLeafsQuery, "leaf_node", graphDB);
 
 		return entityLeafNodeIds;
+	}
+
+	/**
+	 * @param graphDB
+	 * @param nodeId
+	 * @return
+	 */
+	private static Map<String, String> getEntityLeafsWithValue(final GraphDatabaseService graphDB, final long nodeId) {
+
+		final String entityLeafsQuery = buildGetEntityLeafsWithValueQuery(nodeId);
+		final Map<String, String> entityLeafs = executeQueryWithMultipleResultsWithValues(entityLeafsQuery, "leaf_node", "leaf_uri", "leaf_value", graphDB);
+
+		return entityLeafs;
 	}
 
 	public static void printPaths(final GraphDatabaseService graphDB, final String resourceURI) {
@@ -723,10 +805,9 @@ public final class GraphDBUtil {
 	 * @param matchedSubGraphEntities
 	 * @param deltaState
 	 * @param graphDB
-	 * @param resourceURI
 	 */
 	public static void markSubGraphEntityPaths(final Collection<SubGraphEntity> matchedSubGraphEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB, final String resourceURI) {
+			final GraphDatabaseService graphDB) {
 
 		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
@@ -763,6 +844,33 @@ public final class GraphDBUtil {
 					e.printStackTrace();
 				}
 			}
+
+		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
+
+			markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
+		}
+	}
+
+	/**
+	 *
+	 * @param matchedSubGraphLeafEntities
+	 * @param deltaState
+	 * @param graphDB
+	 */
+	public static void markSubGraphLeafEntityPaths(final Collection<SubGraphLeafEntity> matchedSubGraphLeafEntities, final DeltaState deltaState,
+			final GraphDatabaseService graphDB) {
+
+		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
+
+		for(final SubGraphLeafEntity subGraphLeafEntity : matchedSubGraphLeafEntities) {
+
+			if(!pathEndNodesIdsFromCSEntityMap.containsKey(subGraphLeafEntity.getSubGraphEntity().getNodeId())) {
+
+				pathEndNodesIdsFromCSEntityMap.put(subGraphLeafEntity.getSubGraphEntity().getNodeId(), new HashSet<Long>());
+			}
+
+			pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getNodeId()).add(subGraphLeafEntity.getNodeId());
+		}
 
 		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 
@@ -835,6 +943,23 @@ public final class GraphDBUtil {
 					if (!node.hasProperty("DELTA_STATE")) {
 
 						node.setProperty("DELTA_STATE", deltaState.toString());
+					} else if(deltaState.equals(DeltaState.ExactMatch)) {
+
+
+						final String deltaStateString = (String) node.getProperty("DELTA_STATE");
+						final DeltaState currentDeltaState = DeltaState.getByName(deltaStateString);
+
+						switch(currentDeltaState) {
+
+							case ADDITION:
+							case DELETION:
+							case Modification:
+
+								// modify delta state if a "higher" delta state was determined
+								node.setProperty("DELTA_STATE", deltaState.toString());
+
+								break;
+						}
 					}
 
 					node.setProperty("MATCHED", true);
@@ -900,16 +1025,16 @@ public final class GraphDBUtil {
 
 		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
 
-			final Collection<String> subGraphLeafNodeIds = GraphDBUtil.getEntityLeafs(graphDB, subGraphEntity.getNodeId());
+			final Map<String, String> subGraphLeafs = GraphDBUtil.getEntityLeafsWithValue(graphDB, subGraphEntity.getNodeId());
 
-			if(subGraphLeafNodeIds == null || subGraphLeafNodeIds.isEmpty()) {
+			if(subGraphLeafs == null || subGraphLeafs.isEmpty()) {
 
 				continue;
 			}
 
-			for(final String subGraphLeafNodeId : subGraphLeafNodeIds) {
+			for(final Map.Entry<String, String> subGraphLeafEntry : subGraphLeafs.entrySet()) {
 
-				final SubGraphLeafEntity subGraphLeafEntity = new SubGraphLeafEntity(Long.valueOf(subGraphLeafNodeId), subGraphEntity);
+				final SubGraphLeafEntity subGraphLeafEntity = new SubGraphLeafEntity(Long.valueOf(subGraphLeafEntry.getKey()), subGraphLeafEntry.getValue(), subGraphEntity);
 
 				subGraphLeafEntities.add(subGraphLeafEntity);
 			}
@@ -1349,6 +1474,17 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
+	private static String buildGetEntityLeafsWithValueQuery(final long nodeId) {
+
+		// START n= node(2062) MATCH (n)-[r*]->(m) RETURN m;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append("__LEAF__").append("`)\nRETURN id(m) AS leaf_node, m.").append(GraphStatics.URI_PROPERTY).append(" AS leaf_uri, m.").append(GraphStatics.VALUE_PROPERTY).append(" AS leaf_value");
+
+		return sb.toString();
+	}
+
 	private static String executeQueryWithSingleResult(final String query, final String resultVariableName, final GraphDatabaseService graphDB) {
 
 		final ExecutionEngine engine = new ExecutionEngine(graphDB);
@@ -1415,6 +1551,57 @@ public final class GraphDBUtil {
 								resultSet.add(column.getValue().toString());
 							}
 						}
+					}
+				}
+			}
+
+		} catch (final Exception e) {
+
+			// TODO: log something
+
+			e.printStackTrace();
+		}
+
+		return resultSet;
+	}
+
+	private static Map<String, String> executeQueryWithMultipleResultsWithValues(final String query, final String resultVariableName, final String uriVariableName, final String valueVariableName, final GraphDatabaseService graphDB) {
+
+		final Map<String, String> resultSet = new HashMap<>();
+		final ExecutionEngine engine = new ExecutionEngine(graphDB);
+
+		final ExecutionResult result;
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			result = engine.execute(query);
+
+			if(result != null) {
+
+				for (final Map<String, Object> row : result) {
+
+					String identifier = null;
+					String value = null;
+
+					for (final Map.Entry<String, Object> column : row.entrySet()) {
+
+						if (column.getValue() != null) {
+
+							if (column.getKey().equals(resultVariableName)) {
+
+								identifier = column.getValue().toString();
+							}
+
+							if(column.getKey().equals(uriVariableName) || column.getKey().equals(valueVariableName)) {
+
+								value = column.getValue().toString();
+							}
+						}
+					}
+
+					if(identifier != null && value != null) {
+
+						resultSet.put(identifier, value);
 					}
 				}
 			}

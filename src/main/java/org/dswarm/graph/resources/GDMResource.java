@@ -25,6 +25,7 @@ import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphLeafEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationCSValueMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeModificationGDMValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeModificationSubGraphLeafEntityMatcher;
 import org.dswarm.graph.delta.match.ModificationCSValueMatcher;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
@@ -503,10 +504,9 @@ public class GDMResource {
 				.getMatches(firstDegreeExactSubGraphEntityMatcher.getExistingEntities());
 
 		// utilise matched sub graph entities for path marking in graph
-		GraphDBUtil.markSubGraphEntityPaths(newFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, newResourceDB, newResource.getUri());
+		GraphDBUtil.markSubGraphEntityPaths(newFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, newResourceDB);
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
-		GraphDBUtil.markSubGraphEntityPaths(existingFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, existingResourceDB,
-				existingResource.getUri());
+		GraphDBUtil.markSubGraphEntityPaths(existingFirstDegreeExactSubGraphEntityMatches, DeltaState.ExactMatch, existingResourceDB);
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 
 		final Collection<SubGraphEntity> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
@@ -529,14 +529,55 @@ public class GDMResource {
 				.getMatches(firstDegreeExactSubGraphLeafEntityMatcher.getNewEntities());
 		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher
 				.getMatches(firstDegreeExactSubGraphLeafEntityMatcher.getExistingEntities());
+
+		// utilise matched sub graph leaf entities for path marking in graph
+		GraphDBUtil.markSubGraphLeafEntityPaths(newFirstDegreeExactSubGraphLeafEntityMatches, DeltaState.ExactMatch, newResourceDB);
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markSubGraphLeafEntityPaths(existingFirstDegreeExactSubGraphLeafEntityMatches, DeltaState.ExactMatch, existingResourceDB);
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
 		final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
 				.getNonMatches(firstDegreeExactSubGraphLeafEntityMatcher.getNewEntities());
 		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
 				.getNonMatches(firstDegreeExactSubGraphLeafEntityMatcher.getExistingEntities());
 		// 7.3 identify modifications of (non-hierarchical) sub graphs
+		final FirstDegreeModificationSubGraphLeafEntityMatcher firstDegreeModificationSubGraphLeafEntityMatcher = new FirstDegreeModificationSubGraphLeafEntityMatcher(
+				existingFirstDegreeExactSubGraphLeafEntityNonMatches, newFirstDegreeExactSubGraphLeafEntityNonMatches, existingResourceDB,
+				newResourceDB);
+		final Map<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModifications = firstDegreeModificationSubGraphLeafEntityMatcher
+				.getModifications();
+		final Collection<SubGraphLeafEntity> newFirstDegreeModificationSubGraphLeafEntityMatches = firstDegreeModificationSubGraphLeafEntityMatcher
+				.getMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getNewEntities());
+		final Collection<SubGraphLeafEntity> existingFirstDegreeModificationSubGraphLeafEntityMatches = firstDegreeModificationSubGraphLeafEntityMatcher
+				.getMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getExistingEntities());
+
+		// utilise matched sub graph leaf entities for path marking in graph
+		GraphDBUtil.markSubGraphLeafEntityPaths(newFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.Modification, newResourceDB);
+		GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markSubGraphLeafEntityPaths(existingFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.Modification, existingResourceDB);
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
+		// = sub graph leaf entity additions
+		final Collection<SubGraphLeafEntity> newFirstDegreeModificationSubGraphLeafEntityNonMatches = firstDegreeModificationSubGraphLeafEntityMatcher
+				.getNonMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getNewEntities());
+		// = sub graph leaf entity removals
+		final Collection<SubGraphLeafEntity> existingFirstDegreeModificationSubGraphLeafEntityNonMatches = firstDegreeModificationSubGraphLeafEntityMatcher
+				.getNonMatches(firstDegreeModificationSubGraphLeafEntityMatcher.getExistingEntities());
+
+		// utilise matched value entities for path marking in graph
+		GraphDBUtil.markValueEntityPaths(newFirstDegreeModificationGDMValueMatches, DeltaState.Modification, newResourceDB, newResource.getUri());
+		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		GraphDBUtil.markValueEntityPaths(existingFirstDegreeModificationGDMValueMatches, DeltaState.Modification, existingResourceDB,
+				existingResource.getUri());
+		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+
+		// TODO: mark resource graphs with additions + deletions
+
 		//
 		// note: mark matches or modifications after every step
 		// maybe utilise confidence value for different matching approaches
+
+		// TODO: traverse resource graphs to extract changeset
 
 		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
 		return null;

@@ -39,7 +39,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	}
 
 	/**
-	 * request to export all data in n-quads format 
+	 * request to export all data in n-quads format
 	 * 
 	 * @throws IOException
 	 */
@@ -50,7 +50,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	}
 
 	/**
-	 * request to export all data in trig format 
+	 * request to export all data in trig format
 	 * 
 	 * @throws IOException
 	 */
@@ -61,7 +61,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	}
 
 	/**
-	 * Test the fallback to default format n-quads in case the accept header is empty  
+	 * Test the fallback to default format n-quads in case the accept header is empty
 	 * 
 	 * @throws IOException
 	 */
@@ -74,7 +74,8 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	}
 
 	/**
-	 * request to export all data in rdf+xml format. This format is not supported, a HTTP 406 (not acceptable) response is expected.
+	 * request to export all data in rdf+xml format. This format is not supported, a HTTP 406 (not acceptable) response is
+	 * expected.
 	 * 
 	 * @throws IOException
 	 */
@@ -83,10 +84,10 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		readAllRDFFromDBinternal(MediaTypeUtil.RDF_XML, Lang.NQUADS, 406);
 	}
-	
 
 	/**
-	 * request to export all data in a not existing format by sending some "random" accept header value. A HTTP 406 (not acceptable) response is expected.
+	 * request to export all data in a not existing format by sending some "random" accept header value. A HTTP 406 (not
+	 * acceptable) response is expected.
 	 * 
 	 * @throws IOException
 	 */
@@ -95,15 +96,15 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		readAllRDFFromDBinternal("ajhdjsdh", Lang.NQUADS, 406);
 	}
-	
 
-	private void readAllRDFFromDBinternal(String acceptHeader, Lang expectedResponseFormat, int expectedHTTPResponseCode) throws IOException {
+	private void readAllRDFFromDBinternal(final String acceptHeader, final Lang expectedResponseFormat, final int expectedHTTPResponseCode)
+			throws IOException {
 
 		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
 
 		final String provenanceURI = "http://data.slub-dresden.de/resources/2";
 
-		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
+		writeRDFToDBInternal(provenanceURI, FullRDFExportSingleGraphTest.RDF_N3_FILE);
 
 		final ClientResponse response = service().path("/rdf/getall").accept(acceptHeader).get(ClientResponse.class);
 
@@ -133,7 +134,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		FullRDFExportSingleGraphTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
-		final URL fileURL = Resources.getResource(RDF_N3_FILE);
+		final URL fileURL = Resources.getResource(FullRDFExportSingleGraphTest.RDF_N3_FILE);
 		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();

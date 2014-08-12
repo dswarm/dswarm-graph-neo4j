@@ -1,20 +1,19 @@
 package org.dswarm.graph.rdf.export;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RDFExporterAllData extends RDFExporterBase {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(RDFExporterAllData.class);
-	
-	public RDFExporterAllData(GraphDatabaseService databaseArg) {
+
+	public RDFExporterAllData(final GraphDatabaseService databaseArg) {
 		super(databaseArg);
 	}
 
@@ -51,19 +50,20 @@ public class RDFExporterAllData extends RDFExporterBase {
 				// please also note that the Jena model implementation has its size limits (~1 mio statements (?) -> so one graph
 				// (of
 				// one data resource) need to keep this size in mind)
-				if (JENA_MODEL_WARNING_SIZE == successfullyProcessedStatements) {
-					LOG.warn("reached " + JENA_MODEL_WARNING_SIZE + " statements. This is approximately the jena model implementation size limit.");
+				if (RDFExporterBase.JENA_MODEL_WARNING_SIZE == successfullyProcessedStatements) {
+					RDFExporterAllData.LOG.warn("reached " + RDFExporterBase.JENA_MODEL_WARNING_SIZE
+							+ " statements. This is approximately the jena model implementation size limit.");
 				}
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finish read RDF TX successfully", e);
+			RDFExporterAllData.LOG.error("couldn't finish read RDF TX successfully", e);
 
 			tx.failure();
 			tx.close();
 		} finally {
 
-			LOG.debug("finished read RDF TX finally");
+			RDFExporterAllData.LOG.debug("finished read RDF TX finally");
 
 			tx.success();
 			tx.close();
@@ -71,5 +71,5 @@ public class RDFExporterAllData extends RDFExporterBase {
 
 		return dataset;
 	}
-	
+
 }

@@ -109,10 +109,11 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
 	}
-	
+
 	/**
-	 * Export the graph identified by {@code provenanceURI_datamodel4} to text/plain format. This format is not supported, a HTTP 406 (not acceptable) response is expected.
-	 *  
+	 * Export the graph identified by {@code provenanceURI_datamodel4} to text/plain format. This format is not supported, a HTTP
+	 * 406 (not acceptable) response is expected.
+	 * 
 	 * @throws IOException
 	 */
 	@Test
@@ -122,7 +123,6 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 406);
 	}
-	
 
 	/**
 	 * Export the graph identified by {@code provenanceURI_datamodel4} to a not existing format by sending some "random" accept
@@ -168,7 +168,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	}
 
 	private void exportRDFByFormatFromDBInternal(final String acceptHeaderArg, final String expectedExportLanguage, final String provenanceURI,
-			String expectedModelFile, int expectedHTTPResponseCode) throws IOException {
+			final String expectedModelFile, final int expectedHTTPResponseCode) throws IOException {
 
 		writeMultipleRDFToDBInternal();
 

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -13,8 +12,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +47,6 @@ public abstract class RDFExporterBase implements RDFExporter {
 		database = databaseArg;
 		relationshipHandler = new CBDRelationshipHandler();
 	}
-
-	
 
 	@Override
 	public long countStatements() {

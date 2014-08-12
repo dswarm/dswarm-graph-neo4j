@@ -67,7 +67,7 @@ public class RDFResource {
 	@Path("/ping")
 	public String ping() {
 
-		LOG.debug("ping was called");
+		RDFResource.LOG.debug("ping was called");
 
 		return "pong";
 	}
@@ -77,7 +77,7 @@ public class RDFResource {
 	@Consumes("multipart/mixed")
 	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) {
 
-		LOG.debug("try to process RDF statements and write them into graph db");
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
@@ -87,16 +87,16 @@ public class RDFResource {
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(rdfInputStream, null, "N3");
 
-		LOG.debug("deserialized RDF statements that were serialised as Turtle or N3");
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as Turtle or N3");
 
-		LOG.debug("try to write RDF statements into graph db");
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
 		final RDFHandler handler = new Neo4jRDFWProvenanceHandler(database, resourceGraphURI);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements ('"
+		RDFResource.LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements ('"
 				+ ((Neo4jRDFWProvenanceHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for resource graph URI '"
 				+ resourceGraphURI + "'");
 
@@ -108,21 +108,21 @@ public class RDFResource {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) {
 
-		LOG.debug("try to process RDF statements and write them into graph db");
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(inputStream, null, "N3");
 
-		LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as Turtle and N3");
 
-		LOG.debug("try to write RDF statements into graph db");
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
 		final RDFHandler handler = new Neo4jRDFHandler(database);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+		RDFResource.LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
 
 		return Response.ok().build();
 	}
@@ -132,20 +132,20 @@ public class RDFResource {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) {
 
-		LOG.debug("try to process RDF statements and write them into graph db");
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final NxParser nxParser = new NxParser(inputStream);
 
-		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 
-		LOG.debug("try to write RDF statements into graph db");
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
 		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFHandler(database);
 		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements()
+		RDFResource.LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements()
 				+ " RDF statements into graph db");
 
 		return Response.ok().build();
@@ -156,7 +156,7 @@ public class RDFResource {
 	@Consumes("multipart/mixed")
 	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) {
 
-		LOG.debug("try to process RDF statements and write them into graph db");
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
@@ -165,9 +165,9 @@ public class RDFResource {
 
 		final NxParser nxParser = new NxParser(rdfInputStream);
 
-		LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 
-		LOG.debug("try to write RDF statements into graph db");
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
 		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler(database,
 				resourceGraphURI);
@@ -175,7 +175,7 @@ public class RDFResource {
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
+		RDFResource.LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
 				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
@@ -187,18 +187,18 @@ public class RDFResource {
 	@Produces("application/n-triples")
 	public Response readRDF(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
 
-		LOG.debug("try to read RDF statements from graph db");
+		RDFResource.LOG.debug("try to read RDF statements from graph db");
 
 		final ObjectNode json;
 
 		try {
 
 			json = objectMapper.readValue(jsonObjectString, ObjectNode.class);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 
 			final String message = "could not deserialise request JSON for read from graph DB request";
 
-			LOG.debug(message);
+			RDFResource.LOG.debug(message);
 
 			throw new DMPGraphException(message, e);
 		}
@@ -206,8 +206,8 @@ public class RDFResource {
 		final String recordClassUri = json.get("record_class_uri").asText();
 		final String resourceGraphUri = json.get("resource_graph_uri").asText();
 
-		LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+		RDFResource.LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
+				+ recordClassUri + "' from graph db");
 
 		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
 		final Model model = rdfReader.read();
@@ -218,7 +218,7 @@ public class RDFResource {
 		model.write(writer, "N-TRIPLE");
 		final String result = writer.toString();
 
-		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
+		RDFResource.LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
 				+ "' via RDF reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
@@ -244,7 +244,7 @@ public class RDFResource {
 		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
-		LOG.debug("Exporting rdf data to " + formatType.toString());
+		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
@@ -265,13 +265,14 @@ public class RDFResource {
 	@Path("/export")
 	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.RDF_XML, MediaTypeUtil.TRIG, MediaTypeUtil.TURTLE, MediaTypeUtil.N3 })
 	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
-			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat, @QueryParam("provenanceuri") String provenanceURI) {
+			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
+			@QueryParam("provenanceuri") final String provenanceURI) {
 
 		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
 		// do some export language processing
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
-		LOG.debug("Exporting rdf data to " + formatType.toString());
+		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
@@ -285,9 +286,9 @@ public class RDFResource {
 	 * @param provenanceURI db internal identifier of the data model
 	 * @return a single data model, serialized in exportLanguage
 	 */
-	private String exportSingleRDFInternal(final GraphDatabaseService database, Lang exportLanguage, String provenanceURI) {
+	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String provenanceURI) {
 
-		LOG.debug("try to export all RDF statements for provenanceURI \"" + provenanceURI + "\" from graph db to format \""
+		RDFResource.LOG.debug("try to export all RDF statements for provenanceURI \"" + provenanceURI + "\" from graph db to format \""
 				+ exportLanguage.getLabel() + "\"");
 
 		// get data from neo4j
@@ -300,7 +301,7 @@ public class RDFResource {
 		RDFDataMgr.write(writer, exportedModel, exportLanguage);
 		final String result = writer.toString();
 
-		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
+		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
 				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
 				+ "'))");
 
@@ -314,9 +315,9 @@ public class RDFResource {
 	 * @param exportLanguage the language all data should be serialized in
 	 * @return all data models serialized in exportLanguage
 	 */
-	private String exportAllRDFInternal(final GraphDatabaseService database, Lang exportLanguage) {
+	private String exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) {
 
-		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
+		RDFResource.LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
 		// get data from neo4j
 		final RDFExporter rdfExporter = new RDFExporterAllData(database);
@@ -327,7 +328,7 @@ public class RDFResource {
 		RDFDataMgr.write(writer, dataset, exportLanguage);
 		final String result = writer.toString();
 
-		LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
+		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
 				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
 				+ "'))");
 

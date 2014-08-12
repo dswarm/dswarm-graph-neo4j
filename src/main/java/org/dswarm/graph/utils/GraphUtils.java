@@ -1,21 +1,20 @@
 package org.dswarm.graph.utils;
 
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
  */
 public class GraphUtils {
 
-	private static final Logger		LOG				= LoggerFactory.getLogger(GraphUtils.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(GraphUtils.class);
 
-	
 	public static NodeType determineNodeType(final Node node) throws DMPGraphException {
 
 		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);

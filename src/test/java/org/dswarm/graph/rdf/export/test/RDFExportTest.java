@@ -5,33 +5,32 @@ import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
-import junit.framework.Assert;
-
-import org.dswarm.graph.test.BasicResourceTest;
-import org.dswarm.graph.test.Neo4jDBWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import junit.framework.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.test.BasicResourceTest;
+import org.dswarm.graph.test.Neo4jDBWrapper;
 
 public abstract class RDFExportTest extends BasicResourceTest {
 
 	// protected static final String TEST_RDF_FILE = "turtle_untyped.ttl";
 	// protected static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl";
 
-	private static final Logger		LOG				= LoggerFactory.getLogger(RDFExportTest.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(RDFExportTest.class);
 
 	public RDFExportTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/rdf", dbTypeArg);
 	}
 
-	protected void writeRDFToDBInternal(String resource_graph_uri, final String rdfN3File) throws IOException {
+	protected void writeRDFToDBInternal(final String resource_graph_uri, final String rdfN3File) throws IOException {
 
-		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		RDFExportTest.LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
 
 		final URL fileURL = Resources.getResource(rdfN3File);
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -48,7 +47,7 @@ public abstract class RDFExportTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		RDFExportTest.LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
 	}
 
 }

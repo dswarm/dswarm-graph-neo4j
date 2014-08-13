@@ -93,6 +93,8 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 			GraphDBUtil.printPaths(subGraphPaths);
 
+			// TODO: convert paths to statement collections
+
 			tx.success();
 			tx.close();
 		}

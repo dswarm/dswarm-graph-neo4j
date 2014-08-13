@@ -652,6 +652,7 @@ public final class GraphDBUtil {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
+		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
 		try (final Transaction ignored = graphDB.beginTx()) {
 
@@ -667,7 +668,18 @@ public final class GraphDBUtil {
 
 				for (final ValueEntity valueEntity : csEntity.getValueEntities()) {
 
-					pathEndNodeIds.add(valueEntity.getNodeId());
+					if(!deltaState.equals(DeltaState.MODIFICATION)) {
+
+						pathEndNodeIds.add(valueEntity.getNodeId());
+					} else {
+
+						if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(csEntity)) {
+
+							modifiedPathEndNodesIdsFromCSEntityMap.put(csEntity, new HashSet<Long>());
+						}
+
+						modifiedPathEndNodesIdsFromCSEntityMap.get(csEntity).add(valueEntity.getNodeId());
+					}
 				}
 
 				final Set<Long> pathEndNodeIdsFromCSEntity = new HashSet<>();
@@ -686,11 +698,26 @@ public final class GraphDBUtil {
 			e.printStackTrace();
 		}
 
-		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
+		final DeltaState finalDeltaState;
 
-		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
+		if(!deltaState.equals(DeltaState.MODIFICATION)) {
 
-			markPaths(deltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNideIdsFromCSEntityEntry.getValue());
+			finalDeltaState = deltaState;
+		} else {
+
+			finalDeltaState = DeltaState.ExactMatch;
+		}
+
+		markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
+
+		for(final Map.Entry<CSEntity, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
+
+			markPaths(finalDeltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNodeIdsFromCSEntityEntry.getValue());
+		}
+
+		for(final Map.Entry<CSEntity, Set<Long>> modifiedPathEndNodeIdsFromCSEntityEntry : modifiedPathEndNodesIdsFromCSEntityMap.entrySet()) {
+
+			markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), modifiedPathEndNodeIdsFromCSEntityEntry.getValue());
 		}
 	}
 
@@ -741,6 +768,7 @@ public final class GraphDBUtil {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
+		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
 		try (final Transaction ignored = graphDB.beginTx()) {
 
@@ -753,9 +781,23 @@ public final class GraphDBUtil {
 					pathEndNodeIds.add(keyEntity.getNodeId());
 				}
 
-				pathEndNodeIds.add(valueEntity.getNodeId());
-
 				final long csEntityNodeId = valueEntity.getCSEntity().getNodeId();
+
+				if(!deltaState.equals(DeltaState.MODIFICATION)) {
+
+					pathEndNodeIds.add(valueEntity.getNodeId());
+				} else if(csEntityNodeId >= 0) {
+
+					if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(valueEntity.getCSEntity())) {
+
+						modifiedPathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), new HashSet<Long>());
+					}
+
+					modifiedPathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity()).add(valueEntity.getNodeId());
+				} else {
+
+					pathEndNodeIds.add(valueEntity.getNodeId());
+				}
 
 				if(csEntityNodeId >= 0) {
 
@@ -784,11 +826,26 @@ public final class GraphDBUtil {
 			e.printStackTrace();
 		}
 
-		markPaths(deltaState, graphDB, resourceURI, pathEndNodeIds);
+		final DeltaState finalDeltaState;
+
+		if(!deltaState.equals(DeltaState.MODIFICATION)) {
+
+			finalDeltaState = deltaState;
+		} else {
+
+			finalDeltaState = DeltaState.ExactMatch;
+		}
+
+		markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
 
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 
-			markPaths(deltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNideIdsFromCSEntityEntry.getValue());
+			markPaths(finalDeltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNideIdsFromCSEntityEntry.getValue());
+		}
+
+		for(final Map.Entry<CSEntity, Set<Long>> modifiedPathEndNodeIdsFromCSEntityEntry : modifiedPathEndNodesIdsFromCSEntityMap.entrySet()) {
+
+			markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), modifiedPathEndNodeIdsFromCSEntityEntry.getValue());
 		}
 	}
 

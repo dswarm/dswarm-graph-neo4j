@@ -142,6 +142,133 @@ public final class GraphDBUtil {
 		tx.close();
 	}
 
+	public static void printDeltaRelationships(final GraphDatabaseService graphDB) {
+
+		Transaction tx = graphDB.beginTx();
+
+		final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
+
+		for (final Relationship relationship : relationships) {
+
+			final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+			final String startNodeString = printNode(relationship.getStartNode());
+			final String relString = printRelationship(relationship);
+			final String endNodeString = printNode(relationship.getEndNode());
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append(index).append(" : ").append(startNodeString).append("-").append(relString).append("->").append(endNodeString);
+
+			System.out.println(sb.toString());
+		}
+
+		tx.success();
+		tx.close();
+	}
+
+	private static String getLabels(final Node node) {
+
+		final StringBuilder sb2 = new StringBuilder();
+
+		for(final Label label : node.getLabels()) {
+
+			sb2.append(label.name()).append(",");
+		}
+
+		final String tempLabels = sb2.toString();
+
+		return tempLabels.substring(0, tempLabels.length() - 1);
+	}
+
+	public static String printNode(final Node node) {
+
+		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
+		final NodeType nodeType = NodeType.getByName(nodeTypeString);
+		final StringBuilder sb = new StringBuilder();
+		sb.append("(").append(node.getId()).append(":type='").append(nodeType).append("',");
+
+		final String labels = getLabels(node);
+
+		sb.append("label='").append(labels);
+
+		switch (nodeType) {
+
+			case Resource:
+			case TypeResource:
+
+				sb.append("',");
+
+				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+				sb.append("uri='").append(uri);
+
+				break;
+			case Literal:
+
+				sb.append("',");
+
+				final String value = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
+				sb.append("value='").append(value);
+
+				break;
+		}
+
+		sb.append("'");
+
+		final Boolean matched = (Boolean) node.getProperty("MATCHED", null);
+
+		if(matched != null) {
+
+			sb.append(",matched='").append(matched).append("'");
+		}
+
+		final String deltaState = (String) node.getProperty("DELTA_STATE", null);
+
+		if(deltaState != null) {
+
+			sb.append(",delta_state='").append(deltaState).append("'");
+		}
+
+		sb.append(")");
+
+		return sb.toString();
+	}
+
+	public static String printRelationship(final Relationship relationship) {
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[").append(relationship.getId()).append(":").append(relationship.getType().name()).append(",");
+
+		final Long order = (Long) relationship.getProperty(GraphStatics.ORDER_PROPERTY, null);
+
+		if (order != null) {
+
+			sb.append("order='").append(order).append("',");
+		}
+
+		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+		sb.append("index='").append(index);
+
+		sb.append("'");
+
+		final Boolean matched = (Boolean) relationship.getProperty("MATCHED", null);
+
+		if(matched != null) {
+
+			sb.append(",matched='").append(matched).append("'");
+		}
+
+		final String deltaState = (String) relationship.getProperty("DELTA_STATE", null);
+
+		if(deltaState != null) {
+
+			sb.append(",delta_state='").append(deltaState).append("'");
+		}
+
+		sb.append("]");
+
+		return sb.toString();
+	}
+
 	/**
 	 * note: should be run in transaction scope
 	 *
@@ -767,6 +894,7 @@ public final class GraphDBUtil {
 			final GraphDatabaseService graphDB, final String resourceURI) {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
+		final Set<Long> modifiedPathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
@@ -796,7 +924,7 @@ public final class GraphDBUtil {
 					modifiedPathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity()).add(valueEntity.getNodeId());
 				} else {
 
-					pathEndNodeIds.add(valueEntity.getNodeId());
+					modifiedPathEndNodeIds.add(valueEntity.getNodeId());
 				}
 
 				if(csEntityNodeId >= 0) {
@@ -837,6 +965,12 @@ public final class GraphDBUtil {
 		}
 
 		markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
+
+
+		if(!modifiedPathEndNodeIds.isEmpty()) {
+
+			markPaths(deltaState, graphDB, resourceURI, modifiedPathEndNodeIds);
+		}
 
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 

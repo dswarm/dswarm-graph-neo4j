@@ -3,6 +3,7 @@ package org.dswarm.graph.resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.AttributePath;
+import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.ContentSchema;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSEntityMatcher;
@@ -171,7 +173,8 @@ public class GDMResource {
 				contentSchema = null;
 			}
 
-			calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
+			// = new resources model, since existing, modified resources were already written to the DB
+			model = calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
 		}
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
@@ -285,10 +288,9 @@ public class GDMResource {
 	}
 
 	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
-			final GraphDatabaseService permanentDatabase) {
+			final GraphDatabaseService permanentDatabase) throws DMPGraphException {
 
-		// TODO: we probably need an own changeset format instead of a model here
-		final Model deltaModel = new Model();
+		final Model newResourcesModel = new Model();
 
 		// calculate delta resource-wise
 		for (Resource newResource : model.getResources()) {
@@ -316,32 +318,34 @@ public class GDMResource {
 
 			existingResource = gdmReader.read();
 
-			// if (existingResourceModel == null) {
-			//
-			// // take new resource model, since there was no match in the provenance graph for this resource identifier
-			//
-			// deltaModel.addResource(resource);
-			//
-			// // we don't need to calculate the delta, since everything is new
-			//
-			// continue;
-			// }
+			if (existingResource == null) {
+
+				// take new resource model, since there was no match in the provenance graph for this resource identifier
+				newResourcesModel.addResource(newResource);
+
+				newResourceDB.shutdown();
+
+				// we don't need to calculate the delta, since everything is new
+				continue;
+			}
 
 			// final Model newResourceModel = new Model();
 			// newResourceModel.addResource(resource);
 
-			calculateDeltaForResource(existingResource, newResource, newResourceDB, contentSchema);
+			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
+
+			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
+
+			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
 		}
 
-		// TODO change this, i.e., return overall changeset of the datamodel
-
-		return null;
+		// return only model with new, non-existing resources
+		return newResourcesModel;
 	}
 
-	private Model calculateDeltaForResource(final Resource existingResource, final Resource newResource, final GraphDatabaseService newResourceDB,
-			final ContentSchema contentSchema) {
+	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB, final Resource newResource, final GraphDatabaseService newResourceDB,
+			final ContentSchema contentSchema) throws DMPGraphException {
 
-		final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
 		enrichModel(existingResourceDB, existingResource.getUri());
 		enrichModel(newResourceDB, newResource.getUri());
 
@@ -358,12 +362,12 @@ public class GDMResource {
 		final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(), commonAttributePath,
 				contentSchema);
 
-		// TODO: do delta calculation on enriched GDM models in graph
+		// do delta calculation on enriched GDM models in graph
 		// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do for
 		// each exact level all steps first and continue afterwards (?)
 		// 1. identify exact matches for cs entities
 		// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
-		// TODO: keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity
+		// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity => see step 7
 		// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
 		final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(existingCSEntities, newCSEntities);
 		final Collection<String> exactCSMatches = exactCSMatcher.getMatches();
@@ -524,7 +528,6 @@ public class GDMResource {
 		final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
 				existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB);
 		final Collection<String> firstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher.getMatches();
-		// TODO: utilise matched sub graph entities for path marking in graph
 		final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher
 				.getMatches(firstDegreeExactSubGraphLeafEntityMatcher.getNewEntities());
 		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityMatches = firstDegreeExactSubGraphLeafEntityMatcher
@@ -554,6 +557,7 @@ public class GDMResource {
 		// utilise matched sub graph leaf entities for path marking in graph
 		GraphDBUtil.markSubGraphLeafEntityPaths(newFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.MODIFICATION, newResourceDB);
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		// GraphDBUtil.printDeltaRelationships(newResourceDB);
 		GraphDBUtil.markSubGraphLeafEntityPaths(existingFirstDegreeModificationSubGraphLeafEntityMatches, DeltaState.MODIFICATION, existingResourceDB);
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 
@@ -583,8 +587,27 @@ public class GDMResource {
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
 		final Map<Long, Collection<Statement>> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
-		// TODO: return a changeset model (i.e. with information for add, delete, update per triple)
-		return null;
+		final Map<Long, Long> changesetModifications = new HashMap<>();
+
+		for(final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modifications.entrySet()) {
+
+			changesetModifications.put(modificationEntry.getKey().getNodeId(), modificationEntry.getValue().getNodeId());
+		}
+
+		for(final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueModifications.entrySet()) {
+
+			changesetModifications.put(firstDegreeModificationGDMValueModificationEntry.getKey().getNodeId(), firstDegreeModificationGDMValueModificationEntry.getValue().getNodeId());
+		}
+
+		for(final Map.Entry<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModificationEntry : firstDegreeModificationSubGraphLeafEntityModifications.entrySet()) {
+
+			changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(), firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
+		}
+
+		final Changeset changeset = new Changeset(addedStatements, removedStatements, changesetModifications, existingModifiedStatements, newModifiedStatements);
+
+		// return a changeset model (i.e. with information for add, delete, update per triple)
+		return changeset;
 	}
 
 	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) {

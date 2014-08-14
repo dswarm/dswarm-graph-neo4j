@@ -55,10 +55,10 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	private final Index<Relationship>	statements;
-	private final Map<Long, String>		nodeResourceMap;
+	private final Index<Relationship> statementHashes;
+	private final Map<Long, String>   nodeResourceMap;
 
-	private Transaction					tx;
+	private Transaction tx;
 
 	public Neo4jRDFHandler(final GraphDatabaseService database) {
 
@@ -71,7 +71,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		resourceTypes = database.index().forNodes("resource_types");
 		values = database.index().forNodes("values");
 		bnodes = new HashMap<String, Node>();
-		statements = database.index().forRelationships("statements");
+		statementHashes = database.index().forRelationships("statement_hashes");
 		nodeResourceMap = new HashMap<Long, String>();
 	}
 
@@ -333,14 +333,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		final Relationship rel;
 
-		IndexHits<Relationship> hits = statements.get(GraphStatics.HASH, hash);
+		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
 
 		if (hits == null || !hits.hasNext()) {
 
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
 
-			statements.add(rel, GraphStatics.HASH, hash);
+			statementHashes.add(rel, GraphStatics.HASH, hash);
 
 			addedRelationships++;
 

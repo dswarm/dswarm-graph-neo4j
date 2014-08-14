@@ -5,7 +5,7 @@
 
 	<groupId>org.dswarm</groupId>
 	<artifactId>graph</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<properties>
 		<neo4j.version>2.0.3</neo4j.version>
@@ -207,7 +207,7 @@
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-json</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>

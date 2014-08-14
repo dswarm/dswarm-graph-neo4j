@@ -26,6 +26,7 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
 /**
  * @author polowins
  * @author tgaengler
+ * @author reichert
  */
 public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
@@ -104,8 +105,10 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		final String provenanceURI = "http://data.slub-dresden.de/resources/2";
 
+		// prepare: write data to graph
 		writeRDFToDBInternal(provenanceURI, FullRDFExportSingleGraphTest.RDF_N3_FILE);
 
+		// request export from end point
 		final ClientResponse response = service().path("/rdf/getall").accept(acceptHeader).get(ClientResponse.class);
 
 		Assert.assertEquals("expected " + expectedHTTPResponseCode, expectedHTTPResponseCode, response.getStatus());
@@ -115,11 +118,12 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 			return;
 		}
 
+		// verify exported data
 		final String body = response.getEntity(String.class);
 
 		Assert.assertNotNull("response body (n-quads) shouldn't be null", body);
 
-		FullRDFExportSingleGraphTest.LOG.trace("Response body : " + body);
+//		FullRDFExportSingleGraphTest.LOG.trace("Response body : " + body);
 
 		final InputStream stream = new ByteArrayInputStream(body.getBytes("UTF-8"));
 

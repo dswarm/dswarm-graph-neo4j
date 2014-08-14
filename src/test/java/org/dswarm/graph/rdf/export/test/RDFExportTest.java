@@ -13,6 +13,7 @@ import junit.framework.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
@@ -28,6 +29,13 @@ public abstract class RDFExportTest extends BasicResourceTest {
 		super(neo4jDBWrapper, "/rdf", dbTypeArg);
 	}
 
+	/**
+	 * used as a prepare step to put some data in the graph 
+	 * 
+	 * @param resource_graph_uri the URI used as {@link GraphStatics#PROVENANCE_PROPERTY}.
+	 * @param rdfN3File the data to be stored in the graph
+	 * @throws IOException
+	 */
 	protected void writeRDFToDBInternal(final String resource_graph_uri, final String rdfN3File) throws IOException {
 
 		RDFExportTest.LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");

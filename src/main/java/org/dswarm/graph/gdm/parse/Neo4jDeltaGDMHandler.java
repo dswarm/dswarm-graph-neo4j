@@ -244,6 +244,11 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 	}
 
+	@Override public void setResourceUri(String resourceUri) {
+
+		// nothing TODO here
+	}
+
 	@Override
 	public void closeTransaction() {
 

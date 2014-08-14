@@ -13,6 +13,8 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -58,6 +60,10 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 	protected Transaction					tx;
 
+	protected String resourceUri;
+
+	private final Range						range				= Range.range(1);
+
 	public Neo4jBaseGDMHandler(final GraphDatabaseService database) {
 
 		this.database = database;
@@ -72,6 +78,12 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		bnodes = new HashMap<>();
 		statementHashes = database.index().forRelationships("statement_hashes");
 		nodeResourceMap = new HashMap<>();
+	}
+
+	@Override
+	public void setResourceUri(final String resourceUriArg) {
+
+		resourceUri = resourceUriArg;
 	}
 
 	@Override
@@ -108,6 +120,11 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 					// subject is a resource node
 
 					final String subjectURI = ((ResourceNode) subject).getUri();
+
+					if(resourceUri != null && resourceUri.equals(subjectURI)) {
+
+						subjectNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
+					}
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
@@ -349,6 +366,8 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		}
 
 		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
+		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, range.from());
+		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, range.to());
 
 		return rel;
 	}

@@ -1,24 +1,13 @@
 /**
- * Copyright (c) 2002-2011 "Neo Technology,"
- * Network Engine for Objects in Lund AB [http://neotechnology.com]
- *
- * This file is part of Neo4j.
- *
- * Neo4j is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (c) 2002-2011 "Neo Technology," Network Engine for Objects in Lund AB [http://neotechnology.com] This file is part of
+ * Neo4j. Neo4j is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details. You should
+ * have received a copy of the GNU Affero General Public License aint with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.dswarm.graph.versioning;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +21,10 @@ public class Range implements Comparable<Range> {
 
 	public static final Range	NIL	= new Range(-1, -1);
 
-	private final long			from;
-	private final long			to;
+	private final int			from;
+	private final int			to;
 
-	public Range(final long from, final long to) {
+	public Range(final int from, final int to) {
 		if (from > to) {
 			throw new IllegalArgumentException(String.format("From [%d] was after To [%d].", from, to));
 		}
@@ -43,11 +32,11 @@ public class Range implements Comparable<Range> {
 		this.to = to;
 	}
 
-	public long from() {
+	public int from() {
 		return from;
 	}
 
-	public long to() {
+	public int to() {
 		return to;
 	}
 
@@ -61,8 +50,8 @@ public class Range implements Comparable<Range> {
 		if (from == other.to) {
 			return new Range(from, from);
 		}
-		final long newFrom = Math.max(from, other.from);
-		final long newTo = Math.min(to, other.to);
+		final int newFrom = Math.max(from, other.from);
+		final int newTo = Math.min(to, other.to);
 		return new Range(newFrom, newTo);
 	}
 
@@ -81,8 +70,8 @@ public class Range implements Comparable<Range> {
 	}
 
 	private Range realUnion(final Range other) {
-		final long newFrom = Math.min(from, other.from);
-		final long newTo = Math.max(to, other.to);
+		final int newFrom = Math.min(from, other.from);
+		final int newTo = Math.max(to, other.to);
 		return new Range(newFrom, newTo);
 	}
 
@@ -90,7 +79,7 @@ public class Range implements Comparable<Range> {
 		return !intersect(other).equals(Range.NIL);
 	}
 
-	public boolean contains(final long point) {
+	public boolean contains(final int point) {
 		return point >= from && point <= to;
 	}
 
@@ -126,7 +115,7 @@ public class Range implements Comparable<Range> {
 		if (o == null) {
 			return -1;
 		}
-		return Long.valueOf(from).compareTo(o.from);
+		return Integer.valueOf(from).compareTo(o.from);
 	}
 
 	public static List<Range> compactRanges(final Collection<Range> ranges) {
@@ -156,11 +145,11 @@ public class Range implements Comparable<Range> {
 		return first;
 	}
 
-	public static Range range(final long from, final long to) {
+	public static Range range(final int from, final int to) {
 		return new Range(from, to);
 	}
 
-	public static Range range(final long from) {
-		return new Range(from, Long.MAX_VALUE);
+	public static Range range(final int from) {
+		return new Range(from, Integer.MAX_VALUE);
 	}
 }

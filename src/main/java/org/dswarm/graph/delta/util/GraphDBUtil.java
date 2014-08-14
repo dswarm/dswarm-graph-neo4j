@@ -150,20 +150,27 @@ public final class GraphDBUtil {
 
 		for (final Relationship relationship : relationships) {
 
-			final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
-			final String startNodeString = printNode(relationship.getStartNode());
-			final String relString = printRelationship(relationship);
-			final String endNodeString = printNode(relationship.getEndNode());
+			final String sb = printDeltaRelationship(relationship);
 
-			final StringBuilder sb = new StringBuilder();
-
-			sb.append(index).append(" : ").append(startNodeString).append("-").append(relString).append("->").append(endNodeString);
-
-			System.out.println(sb.toString());
+			System.out.println(sb);
 		}
 
 		tx.success();
 		tx.close();
+	}
+
+	public static String printDeltaRelationship(final Relationship relationship) {
+
+		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+		final String startNodeString = printNode(relationship.getStartNode());
+		final String relString = printRelationship(relationship);
+		final String endNodeString = printNode(relationship.getEndNode());
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(index).append(" : ").append(startNodeString).append("-").append(relString).append("->").append(endNodeString);
+
+		return sb.toString();
 	}
 
 	private static String getLabels(final Node node) {

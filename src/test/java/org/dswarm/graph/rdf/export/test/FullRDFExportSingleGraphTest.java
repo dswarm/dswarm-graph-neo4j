@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.http.HttpStatus;
-
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -103,8 +102,8 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	/**
 	 * @param requestedExportLanguage the serialization format neo4j should export the data to. (this value is used as accept
 	 *            header arg to query neo4j)
-	 * @param expectedFileEnding the expected file ending to be received from neo4j (ignored if expectedHTTPResponseCode !=
-	 *            {@link HttpStatus.SC_OK})
+	 * @param expectedHTTPResponseCode the expected HTTP status code of the response, e.g. {@link HttpStatus.SC_OK} or
+	 *            {@link HttpStatus.SC_NOT_ACCEPTABLE}
 	 * @param expectedExportLanguage the language the exported data is expected to be serialized in. hint: language may differ
 	 *            from {@code requestedExportLanguage} to test for default values. (ignored if expectedHTTPResponseCode !=
 	 *            {@link HttpStatus.SC_OK})

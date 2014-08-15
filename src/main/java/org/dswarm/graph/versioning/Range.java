@@ -80,7 +80,7 @@ public class Range implements Comparable<Range> {
 	}
 
 	public boolean contains(final int point) {
-		return point >= from && point <= to;
+		return point >= from && point < to;
 	}
 
 	@Override

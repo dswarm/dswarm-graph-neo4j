@@ -1,5 +1,6 @@
 package org.dswarm.graph.delta.evaluator;
 
+import org.dswarm.graph.delta.DeltaStatics;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.Evaluation;
@@ -41,7 +42,7 @@ public class StatementEvaluator implements Evaluator {
 			return Evaluation.EXCLUDE_AND_PRUNE;
 		}
 
-		if(path.lastRelationship().hasProperty("MATCHED") && Boolean.TRUE.equals(path.lastRelationship().getProperty("MATCHED", null))) {
+		if(path.lastRelationship().hasProperty(DeltaStatics.MATCHED_PROPERTY) && Boolean.TRUE.equals(path.lastRelationship().getProperty(DeltaStatics.MATCHED_PROPERTY, null))) {
 
 			// only non-matched statements
 			return Evaluation.EXCLUDE_AND_PRUNE;

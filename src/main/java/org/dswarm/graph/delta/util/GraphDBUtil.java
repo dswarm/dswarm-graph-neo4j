@@ -17,6 +17,7 @@ import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.ContentSchema;
 import org.dswarm.graph.delta.DMPStatics;
 import org.dswarm.graph.delta.DeltaState;
+import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.evaluator.EntityEvaluator;
 import org.dswarm.graph.delta.evaluator.StatementEvaluator;
 import org.dswarm.graph.delta.match.model.CSEntity;
@@ -177,7 +178,7 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb2 = new StringBuilder();
 
-		for(final Label label : node.getLabels()) {
+		for (final Label label : node.getLabels()) {
 
 			sb2.append(label.name()).append(",");
 		}
@@ -221,16 +222,16 @@ public final class GraphDBUtil {
 
 		sb.append("'");
 
-		final Boolean matched = (Boolean) node.getProperty("MATCHED", null);
+		final Boolean matched = (Boolean) node.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
 
-		if(matched != null) {
+		if (matched != null) {
 
 			sb.append(",matched='").append(matched).append("'");
 		}
 
-		final String deltaState = (String) node.getProperty("DELTA_STATE", null);
+		final String deltaState = (String) node.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
 
-		if(deltaState != null) {
+		if (deltaState != null) {
 
 			sb.append(",delta_state='").append(deltaState).append("'");
 		}
@@ -257,16 +258,16 @@ public final class GraphDBUtil {
 
 		sb.append("'");
 
-		final Boolean matched = (Boolean) relationship.getProperty("MATCHED", null);
+		final Boolean matched = (Boolean) relationship.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
 
-		if(matched != null) {
+		if (matched != null) {
 
 			sb.append(",matched='").append(matched).append("'");
 		}
 
-		final String deltaState = (String) relationship.getProperty("DELTA_STATE", null);
+		final String deltaState = (String) relationship.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
 
-		if(deltaState != null) {
+		if (deltaState != null) {
 
 			sb.append(",delta_state='").append(deltaState).append("'");
 		}
@@ -738,7 +739,8 @@ public final class GraphDBUtil {
 	private static Map<String, String> getEntityLeafsWithValue(final GraphDatabaseService graphDB, final long nodeId) {
 
 		final String entityLeafsQuery = buildGetEntityLeafsWithValueQuery(nodeId);
-		final Map<String, String> entityLeafs = executeQueryWithMultipleResultsWithValues(entityLeafsQuery, "leaf_node", "leaf_uri", "leaf_value", graphDB);
+		final Map<String, String> entityLeafs = executeQueryWithMultipleResultsWithValues(entityLeafsQuery, "leaf_node", "leaf_uri", "leaf_value",
+				graphDB);
 
 		return entityLeafs;
 	}
@@ -1044,7 +1046,6 @@ public final class GraphDBUtil {
 	}
 
 	/**
-	 *
 	 * @param matchedSubGraphLeafEntities
 	 * @param deltaState
 	 * @param graphDB
@@ -1122,39 +1123,38 @@ public final class GraphDBUtil {
 				// mark path
 				for (final Relationship rel : path.relationships()) {
 
-					if (!rel.hasProperty("DELTA_STATE")) {
+					if (!rel.hasProperty(DeltaStatics.DELTA_STATE_PROPERTY)) {
 
-						rel.setProperty("DELTA_STATE", deltaState.toString());
+						rel.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
 					}
 
-					rel.setProperty("MATCHED", true);
+					rel.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
 				}
 
 				for (final Node node : path.nodes()) {
 
-					if (!node.hasProperty("DELTA_STATE")) {
+					if (!node.hasProperty(DeltaStatics.DELTA_STATE_PROPERTY)) {
 
-						node.setProperty("DELTA_STATE", deltaState.toString());
-					} else if(deltaState.equals(DeltaState.ExactMatch)) {
+						node.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
+					} else if (deltaState.equals(DeltaState.ExactMatch)) {
 
-
-						final String deltaStateString = (String) node.getProperty("DELTA_STATE");
+						final String deltaStateString = (String) node.getProperty(DeltaStatics.DELTA_STATE_PROPERTY);
 						final DeltaState currentDeltaState = DeltaState.getByName(deltaStateString);
 
-						switch(currentDeltaState) {
+						switch (currentDeltaState) {
 
 							case ADDITION:
 							case DELETION:
 							case MODIFICATION:
 
 								// modify delta state if a "higher" delta state was determined
-								node.setProperty("DELTA_STATE", deltaState.toString());
+								node.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
 
 								break;
 						}
 					}
 
-					node.setProperty("MATCHED", true);
+					node.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
 				}
 			}
 		}
@@ -1270,7 +1270,7 @@ public final class GraphDBUtil {
 							return Evaluation.EXCLUDE_AND_CONTINUE;
 						}
 
-						if (path.lastRelationship().hasProperty("MATCHED")) {
+						if (path.lastRelationship().hasProperty(DeltaStatics.MATCHED_PROPERTY)) {
 
 							// include only non-matched relationships (paths)
 							return Evaluation.EXCLUDE_AND_PRUNE;
@@ -1310,7 +1310,7 @@ public final class GraphDBUtil {
 
 				for(final Relationship csEntityOutgoingRel : csEntityOutgoingRels) {
 
-					if(csEntityOutgoingRel.hasProperty("MATCHED")) {
+					if(csEntityOutgoingRel.hasProperty(DeltaStatics.MATCHED_PROPERTY)) {
 
 						continue;
 					}
@@ -1324,7 +1324,7 @@ public final class GraphDBUtil {
 					continue;
 				}
 
-				final String deltaStateString = (String) csEntityNode.getProperty("DELTA_STATE", null);
+				final String deltaStateString = (String) csEntityNode.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
 				final DeltaState deltaState;
 
 				if(deltaStateString != null) {
@@ -1672,7 +1672,8 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append("__LEAF__").append("`)\nRETURN id(m) AS leaf_node, m.").append(GraphStatics.URI_PROPERTY).append(" AS leaf_uri, m.").append(GraphStatics.VALUE_PROPERTY).append(" AS leaf_value");
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append("__LEAF__").append("`)\nRETURN id(m) AS leaf_node, m.")
+				.append(GraphStatics.URI_PROPERTY).append(" AS leaf_uri, m.").append(GraphStatics.VALUE_PROPERTY).append(" AS leaf_value");
 
 		return sb.toString();
 	}
@@ -1806,5 +1807,56 @@ public final class GraphDBUtil {
 		}
 
 		return resultSet;
+	}
+
+	/**
+	 * note: should be executed in transaction scope
+	 *
+	 * @param query
+	 * @param resultVariableName
+	 * @param graphDB
+	 * @return
+	 */
+	public static Relationship executeQueryWithSingleRelationshipResult(final String query, final String resultVariableName,
+			final GraphDatabaseService graphDB) {
+
+		final ExecutionEngine engine = new ExecutionEngine(graphDB);
+
+		final ExecutionResult result = engine.execute(query);
+
+		if (result == null) {
+
+			return null;
+		}
+
+		final Iterator<Map<String, Object>> resultIter = result.iterator();
+
+		if (resultIter == null || !resultIter.hasNext()) {
+
+			return null;
+		}
+
+		final Map<String, Object> row = resultIter.next();
+
+		final Iterator<Map.Entry<String, Object>> rowIter = row.entrySet().iterator();
+
+		if (!rowIter.hasNext()) {
+
+			return null;
+		}
+
+		final Map.Entry<String, Object> column = rowIter.next();
+
+		if (column.getValue() == null) {
+
+			return null;
+		}
+
+		if (!column.getKey().equals(resultVariableName) || !Relationship.class.isInstance(column.getValue())) {
+
+			return null;
+		}
+
+		return (Relationship) column.getValue();
 	}
 }

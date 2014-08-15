@@ -36,13 +36,17 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
 import org.dswarm.graph.gdm.parse.GDMParser;
 import org.dswarm.graph.gdm.parse.GDMResourceParser;
+import org.dswarm.graph.gdm.parse.GDMUpdateHandler;
+import org.dswarm.graph.gdm.parse.GDMUpdateParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
 import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceHandler;
+import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceUpdateHandler;
 import org.dswarm.graph.gdm.read.GDMModelReader;
 import org.dswarm.graph.gdm.read.GDMResourceReader;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
@@ -337,6 +341,14 @@ public class GDMResource {
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
 			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
+//			final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
+//			final GDMParser parser = new GDMModelParser(model);
+//			parser.setGDMHandler(handler);
+//			parser.parse();
+			final GDMUpdateHandler gdmHandler = new Neo4jGDMWProvenanceUpdateHandler(permanentDatabase, resourceGraphURI);
+			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
+			parser.setGDMHandler(gdmHandler);
+			parser.parse();
 		}
 
 		// return only model with new, non-existing resources

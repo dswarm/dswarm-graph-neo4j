@@ -7,16 +7,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaState;
+import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
@@ -285,7 +284,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 		@Override
 		public void handleRelationship(final Relationship rel, final Path path) throws DMPGraphException {
 
-			final String deltaStateString = (String) rel.getProperty("DELTA_STATE", null);
+			final String deltaStateString = (String) rel.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
 
 			if (deltaStateString == null) {
 

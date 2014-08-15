@@ -36,18 +36,18 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMModelReader.class);
 
-	private final NodeHandler         nodeHandler;
-	private final NodeHandler         startNodeHandler;
-	private final RelationshipHandler relationshipHandler;
+	private final NodeHandler			nodeHandler;
+	private final NodeHandler			startNodeHandler;
+	private final RelationshipHandler	relationshipHandler;
 
-	private final String recordClassUri;
-	private final String resourceGraphUri;
+	private final String				recordClassUri;
+	private final String				resourceGraphUri;
 
-	private final GraphDatabaseService database;
+	private final GraphDatabaseService	database;
 
-	private Model    model;
-	private Resource currentResource;
-	private final Map<Long, Statement> currentResourceStatements = new HashMap<Long, Statement>();
+	private Model						model;
+	private Resource					currentResource;
+	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
@@ -184,8 +184,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<Long, org.dswarm.graph.json.Node>();
-		final Map<String, ResourceNode>				resourceNodes	= new HashMap<String, ResourceNode>();
+		private final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -199,52 +198,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				// subject
 
 				final Node subjectNode = rel.getStartNode();
-				final long subjectId = subjectNode.getId();
-				final NodeType subjectNodeType = GraphUtils.determineNodeType(subjectNode);
-
-				final org.dswarm.graph.json.Node subjectGDMNode;
-
-				switch (subjectNodeType) {
-
-					case Resource:
-					case TypeResource:
-
-						final String subjectURI = (String) subjectNode.getProperty(GraphStatics.URI_PROPERTY, null);
-
-						if (subjectURI == null) {
-
-							final String message = "subject URI can't be null";
-
-							PropertyGraphGDMModelReader.LOG.error(message);
-
-							throw new DMPGraphException(message);
-						}
-
-						final String provenanceURI = (String) subjectNode.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
-
-						if(provenanceURI == null) {
-
-							subjectGDMNode = createResourceFromURI(subjectId, subjectURI);
-						} else {
-
-							subjectGDMNode = createResourceFromURIAndProvenance(subjectId, subjectURI, provenanceURI);
-						}
-
-						break;
-					case BNode:
-					case TypeBNode:
-
-						subjectGDMNode = createResourceFromBNode(subjectId);
-
-						break;
-					default:
-
-						final String message = "subject node type can only be a resource (or type resource) or bnode (or type bnode)";
-
-						PropertyGraphGDMModelReader.LOG.error(message);
-
-						throw new DMPGraphException(message);
-				}
+				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readSubject(subjectNode);
 
 				// predicate
 
@@ -254,69 +208,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				// object
 
 				final Node objectNode = rel.getEndNode();
-				final long objectId = rel.getEndNode().getId();
-				final NodeType objectNodeType = GraphUtils.determineNodeType(objectNode);
-
-				final org.dswarm.graph.json.Node objectGDMNode;
-
-				switch (objectNodeType) {
-
-					case Resource:
-					case TypeResource:
-
-						final String objectURI = (String) objectNode.getProperty(GraphStatics.URI_PROPERTY, null);
-
-						if (objectURI == null) {
-
-							final String message = "object URI can't be null";
-
-							PropertyGraphGDMModelReader.LOG.error(message);
-
-							throw new DMPGraphException(message);
-						}
-
-						final String provenanceURI = (String) objectNode.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
-
-						if(provenanceURI == null) {
-
-							objectGDMNode = createResourceFromURI(objectId, objectURI);
-						} else {
-
-							objectGDMNode = createResourceFromURIAndProvenance(subjectId, objectURI, provenanceURI);
-						}
-
-						break;
-					case BNode:
-					case TypeBNode:
-
-						objectGDMNode = createResourceFromBNode(objectId);
-
-						break;
-					case Literal:
-
-						final Node endNode = objectNode;
-						final String object = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-						if (object == null) {
-
-							final String message = "object value can't be null";
-
-							PropertyGraphGDMModelReader.LOG.error(message);
-
-							throw new DMPGraphException(message);
-						}
-
-						objectGDMNode = new LiteralNode(objectId, object);
-
-						break;
-					default:
-
-						final String message = "unknown node type " + objectNodeType.getName() + " for object node";
-
-						PropertyGraphGDMModelReader.LOG.error(message);
-
-						throw new DMPGraphException(message);
-				}
+				final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(objectNode);
 
 				// qualified properties at relationship (statement)
 
@@ -352,42 +244,12 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 					currentResource.addStatement(statement);
 				}
 
-				if (!objectNodeType.equals(NodeType.Literal)) {
+				if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
 
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());
 				}
 			}
-		}
-
-		private org.dswarm.graph.json.Node createResourceFromBNode(final long bnodeId) {
-
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
-
-				bnodes.put(Long.valueOf(bnodeId), new org.dswarm.graph.json.Node(bnodeId));
-			}
-
-			return bnodes.get(Long.valueOf(bnodeId));
-		}
-
-		private ResourceNode createResourceFromURI(final long id, final String uri) {
-
-			if (!resourceNodes.containsKey(uri)) {
-
-				resourceNodes.put(uri, new ResourceNode(id, uri));
-			}
-
-			return resourceNodes.get(uri);
-		}
-
-		private ResourceNode createResourceFromURIAndProvenance(final long id, final String uri, final String provenance) {
-
-			if (!resourceNodes.containsKey(uri + provenance)) {
-
-				resourceNodes.put(uri + provenance, new ResourceNode(id, uri, provenance));
-			}
-
-			return resourceNodes.get(uri + provenance);
 		}
 	}
 }

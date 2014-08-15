@@ -1,6 +1,7 @@
 package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -75,10 +76,10 @@ public class Neo4jGDMWProvenanceHandler extends Neo4jBaseGDMHandler {
 	}
 
 	@Override
-	protected Relationship prepareRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String statementUUID,
-			final Long order, final long index) {
+	protected Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
+			final long index) {
 
-		final Relationship rel = super.prepareRelationship(subjectNode, predicateName, objectNode, statementUUID, order, index);
+		final Relationship rel = super.prepareRelationship(subjectNode, objectNode, statementUUID, statement, index);
 
 		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 

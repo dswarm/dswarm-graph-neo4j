@@ -13,8 +13,6 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.Range;
-import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -60,9 +58,9 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 	protected Transaction					tx;
 
-	protected String resourceUri;
+	protected String						resourceUri;
 
-	private final Range						range				= Range.range(1);
+	// private final Range range = Range.range(1);
 
 	public Neo4jBaseGDMHandler(final GraphDatabaseService database) {
 
@@ -104,9 +102,6 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 			final org.dswarm.graph.json.Node object = st.getObject();
 
-			final String statementUUID = st.getUUID();
-			final Long order = st.getOrder();
-
 			// Check index for subject
 			// TODO: what should we do, if the subject is a resource type?
 			Node subjectNode = determineNode(subject, false);
@@ -121,10 +116,10 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 					final String subjectURI = ((ResourceNode) subject).getUri();
 
-					if(resourceUri != null && resourceUri.equals(subjectURI)) {
-
-						subjectNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
-					}
+					// if(resourceUri != null && resourceUri.equals(subjectURI)) {
+					//
+					// subjectNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
+					// }
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
@@ -148,7 +143,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 			if (object instanceof LiteralNode) {
 
-				handleLiteral(r, index, subject, predicateName, object, statementUUID, order, subjectNode);
+				handleLiteral(r, index, st, subjectNode);
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -208,7 +203,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 				final Relationship rel = getStatement(hash);
 				if (rel == null) {
 
-					addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, hash);
+					addRelationship(subjectNode, objectNode, resourceUri, r, st, index, hash);
 				}
 			}
 
@@ -303,13 +298,13 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		return resourceUri;
 	}
 
-	protected void handleLiteral(final Resource r, final long index, final org.dswarm.graph.json.Node subject, final String predicateName,
-			final org.dswarm.graph.json.Node object, final String statementUUID, final Long order, final Node subjectNode) throws DMPGraphException {
+	protected void handleLiteral(final Resource r, final long index, final Statement statement, final Node subjectNode) throws DMPGraphException {
 
-		final LiteralNode literal = (LiteralNode) object;
+		final LiteralNode literal = (LiteralNode) statement.getObject();
 		final String value = literal.getValue();
 
-		final String hash = generateStatementHash(subjectNode, predicateName, value, subject.getType(), object.getType());
+		final String hash = generateStatementHash(subjectNode, statement.getPredicate().getUri(), value, statement.getSubject().getType(), statement
+				.getObject().getType());
 
 		final Relationship rel = getStatement(hash);
 
@@ -322,11 +317,11 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
 			values.add(objectNode, GraphStatics.VALUE, value);
 
-			final String resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
+			final String resourceUri = addResourceProperty(subjectNode, statement.getSubject(), objectNode, r);
 
 			addedNodes++;
 
-			addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, hash);
+			addRelationship(subjectNode, objectNode, resourceUri, r, statement, index, hash);
 		}
 	}
 
@@ -352,50 +347,54 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		}
 	}
 
-	protected Relationship prepareRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String statementUUID,
-			final Long order, final long index) {
+	protected Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
+			final long index) {
 
-		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
+		final RelationshipType relType = DynamicRelationshipType.withName(statement.getPredicate().getUri());
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 
 		rel.setProperty(GraphStatics.UUID_PROPERTY, statementUUID);
 
-		if (order != null) {
+		if (statement.getOrder() != null) {
 
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, order);
+			rel.setProperty(GraphStatics.ORDER_PROPERTY, statement.getOrder());
 		}
 
 		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
-		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, range.from());
-		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, range.to());
+		// rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, range.from());
+		// rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, range.to());
+
+		if (statement.getEvidence() != null) {
+
+			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
+		}
 
 		return rel;
 	}
 
 	protected abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
 
-	protected Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final org.dswarm.graph.json.Node subject, final Resource resource, final String statementUUID, final Long order, final long index,
-			final String hash) throws DMPGraphException {
+	protected Relationship addRelationship(final Node subjectNode, final Node objectNode, final String resourceUri, final Resource resource,
+			final Statement statement, final long index, final String hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
-		if (statementUUID == null) {
+		if (statement.getUUID() == null) {
 
 			finalStatementUUID = UUID.randomUUID().toString();
 		} else {
 
-			finalStatementUUID = statementUUID;
+			finalStatementUUID = statement.getUUID();
 		}
 
-		final Relationship rel = prepareRelationship(subjectNode, predicateName, objectNode, finalStatementUUID, order, index);
+		final Relationship rel = prepareRelationship(subjectNode, objectNode, finalStatementUUID, statement, index);
 
 		statementHashes.add(rel, GraphStatics.HASH, hash);
 		addStatementToIndex(rel, finalStatementUUID);
 
 		addedRelationships++;
 
-		addResourceProperty(subjectNode, subject, rel, resourceUri, resource);
+		addResourceProperty(subjectNode, statement.getSubject(), rel, resourceUri, resource);
 
 		return rel;
 	}

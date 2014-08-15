@@ -13,6 +13,8 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -36,17 +38,17 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  */
 public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
-	private static final Logger				LOG					= LoggerFactory.getLogger(Neo4jBaseGDMHandler.class);
+	private static final Logger				LOG							= LoggerFactory.getLogger(Neo4jBaseGDMHandler.class);
 
-	protected int							totalTriples		= 0;
-	protected int							addedNodes			= 0;
-	protected int							addedLabels			= 0;
-	protected int							addedRelationships	= 0;
-	protected int							sinceLastCommit		= 0;
-	protected int							i					= 0;
-	protected int							literals			= 0;
+	protected int							totalTriples				= 0;
+	protected int							addedNodes					= 0;
+	protected int							addedLabels					= 0;
+	protected int							addedRelationships			= 0;
+	protected int							sinceLastCommit				= 0;
+	protected int							i							= 0;
+	protected int							literals					= 0;
 
-	protected long							tick				= System.currentTimeMillis();
+	protected long							tick						= System.currentTimeMillis();
 	protected final GraphDatabaseService	database;
 	protected final Index<Node>				resources;
 	protected final Index<Node>				resourcesWProvenance;
@@ -60,7 +62,9 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 	protected String						resourceUri;
 
-	// private final Range range = Range.range(1);
+	private final Range						range						= Range.range(1);
+
+	protected boolean						latestVersionInitialized	= false;
 
 	public Neo4jBaseGDMHandler(final GraphDatabaseService database) {
 
@@ -116,15 +120,15 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 					final String subjectURI = ((ResourceNode) subject).getUri();
 
-					// if(resourceUri != null && resourceUri.equals(subjectURI)) {
-					//
-					// subjectNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
-					// }
-
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
 					final String provenanceURI = ((ResourceNode) subject).getProvenance();
+
+					if (resourceUri != null && resourceUri.equals(subjectURI)) {
+
+						setLatestVersion(provenanceURI);
+					}
 
 					handleSubjectProvenance(subjectNode, subjectURI, provenanceURI);
 
@@ -277,6 +281,65 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		return literals;
 	}
 
+	protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
+
+		if (!latestVersionInitialized) {
+
+			if (provenanceURI == null) {
+
+				return;
+			}
+
+			Node dataModelNode = determineNode(new ResourceNode(provenanceURI), false);
+
+			if (dataModelNode != null) {
+
+				latestVersionInitialized = true;
+
+				return;
+			}
+
+			dataModelNode = database.createNode();
+			addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, provenanceURI);
+			dataModelNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
+
+			Node dataModelTypeNode = determineNode(new ResourceNode(VersioningStatics.DATA_MODEL_TYPE), true);
+
+			if (dataModelTypeNode == null) {
+
+				dataModelTypeNode = database.createNode();
+				addLabel(dataModelTypeNode, RDFS.Class.getURI());
+				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
+				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
+			}
+
+			final String hash = generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, org.dswarm.graph.json.NodeType.Resource,
+					org.dswarm.graph.json.NodeType.Resource);
+
+			Relationship rel = getStatement(hash);
+
+			if (rel == null) {
+
+				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
+				rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
+				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
+				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+
+				final String uuid = UUID.randomUUID().toString();
+
+				rel.setProperty(GraphStatics.UUID_PROPERTY, uuid);
+
+				statementHashes.add(rel, GraphStatics.HASH, hash);
+				addStatementToIndex(rel, uuid);
+			}
+
+			latestVersionInitialized = true;
+		}
+	}
+
 	protected String handleBNode(final Resource r, final org.dswarm.graph.json.Node subject, final org.dswarm.graph.json.Node object,
 			final Node subjectNode, final boolean isType, final Node objectNode) {
 
@@ -361,8 +424,8 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		}
 
 		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
-		// rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, range.from());
-		// rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, range.to());
+		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, range.from());
+		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, range.to());
 
 		if (statement.getEvidence() != null) {
 

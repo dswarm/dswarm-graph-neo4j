@@ -1,5 +1,6 @@
 package org.dswarm.graph.gdm.parse;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
@@ -29,6 +30,21 @@ public class Neo4jGDMWProvenanceHandler extends Neo4jBaseGDMHandler {
 		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
 
 		resourceGraphURI = resourceGraphURIArg;
+	}
+
+	@Override protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
+
+		final String finalProvenanceURI;
+
+		if(provenanceURI != null) {
+
+			finalProvenanceURI = provenanceURI;
+		} else {
+
+			finalProvenanceURI = resourceGraphURI;
+		}
+
+		super.setLatestVersion(finalProvenanceURI);
 	}
 
 	@Override

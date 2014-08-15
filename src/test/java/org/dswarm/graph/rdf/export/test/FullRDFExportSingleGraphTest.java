@@ -68,7 +68,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void readAllRDFFromDBEmptyAcceptHeader() throws IOException {
+	public void readAllRDFFromDBDefaultFormat() throws IOException {
 
 		// we need to send an empty accept header. In case we omit this header field at all, the current jersey implementation
 		// adds a standard header "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2"

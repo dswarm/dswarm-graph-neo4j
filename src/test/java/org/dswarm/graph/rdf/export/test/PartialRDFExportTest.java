@@ -24,7 +24,6 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
 
 /**
  * @author reichert
- *
  */
 public abstract class PartialRDFExportTest extends RDFExportTest {
 
@@ -107,6 +106,18 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	}
 
 	/**
+	 * Export the graph identified by {@code provenanceURI_datamodel4} to the default format that is chosen in case no format is
+	 * requested (i.e. empty accept parameter)
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testExportGraphDatamodel4FromDBToDefaultFormat() throws IOException {
+
+		exportRDFByFormatFromDBInternal("", provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.NQUADS, file_datamodel4_n3, ".nq");
+	}
+
+	/**
 	 * Export the graph identified by {@code provenanceURI_datamodel4} to text/plain format. This format is not supported, a HTTP
 	 * 406 (not acceptable) response is expected.
 	 * 
@@ -158,6 +169,8 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	}
 
 	/**
+	 * TODO: add doc
+	 * 
 	 * @param requestedExportLanguage the serialization format neo4j should export the data to. (this value is used as accept
 	 *            header arg to query neo4j)
 	 * @param provenanceURI identifier of the graph to export

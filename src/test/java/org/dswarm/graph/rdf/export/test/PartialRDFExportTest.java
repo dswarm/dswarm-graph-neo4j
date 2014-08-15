@@ -10,9 +10,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
 import junit.framework.Assert;
+import org.apache.http.HttpStatus;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFLanguages;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,10 @@ import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
+/**
+ * @author reichert
+ *
+ */
 public abstract class PartialRDFExportTest extends RDFExportTest {
 
 	private static final Logger	LOG							= LoggerFactory.getLogger(PartialRDFExportTest.class);
@@ -39,7 +44,8 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 	}
 
-	private void writeMultipleRDFToDBInternal() throws IOException {
+	@Before
+	public void writeMultipleRDFToDBInternal() throws IOException {
 		writeRDFToDBInternal(provenanceURI_datamodel2, file_datamodel2_n3);
 		writeRDFToDBInternal(provenanceURI_datamodel4, file_datamodel4_n3);
 		writeRDFToDBInternal(provenanceURI_datamodel5, file_datamodel5_n3);
@@ -53,9 +59,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToN3() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.N3;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.N3, provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.N3, file_datamodel4_n3, ".n3");
 	}
 
 	/**
@@ -66,9 +70,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToRDF_XML() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.RDF_XML;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.RDF_XML, provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.RDFXML, file_datamodel4_n3, ".rdf");
 	}
 
 	/**
@@ -79,9 +81,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToN_QUADS() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.N_QUADS;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.N_QUADS, provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.NQUADS, file_datamodel4_n3, ".nq");
 	}
 
 	/**
@@ -92,9 +92,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToTRIG() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.TRIG;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.TRIG, provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.TRIG, file_datamodel4_n3, ".trig");
 	}
 
 	/**
@@ -105,9 +103,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToTURTLE() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.TURTLE;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.TURTLE, provenanceURI_datamodel4, HttpStatus.SC_OK, Lang.TURTLE, file_datamodel4_n3, ".ttl");
 	}
 
 	/**
@@ -119,9 +115,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToUnsupportedFormat() throws IOException {
 
-		final String exportLanguage = MediaType.TEXT_PLAIN;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 406);
+		exportRDFByFormatFromDBInternal(MediaType.TEXT_PLAIN, provenanceURI_datamodel4, HttpStatus.SC_NOT_ACCEPTABLE, null, null, null);
 	}
 
 	/**
@@ -133,9 +127,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	@Test
 	public void testExportGraphDatamodel4FromDBToRandomFormat() throws IOException {
 
-		final String exportLanguage = MediaTypeUtil.N_QUADS;
-
-		exportRDFByFormatFromDBInternal("isdfks", exportLanguage, provenanceURI_datamodel4, file_datamodel4_n3, 406);
+		exportRDFByFormatFromDBInternal("khlav/kalash", provenanceURI_datamodel4, HttpStatus.SC_NOT_ACCEPTABLE, null, null, null);
 	}
 
 	/**
@@ -162,28 +154,46 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 		writeRDFToDBInternal(provenanceURI, RDF_N3_FILE);
 
-		final String exportLanguage = MediaTypeUtil.N3;
-
-		exportRDFByFormatFromDBInternal(exportLanguage, exportLanguage, provenanceURI, RDF_N3_FILE, 200);
+		exportRDFByFormatFromDBInternal(MediaTypeUtil.N3, provenanceURI, HttpStatus.SC_OK, Lang.N3, RDF_N3_FILE, ".n3");
 	}
 
-	private void exportRDFByFormatFromDBInternal(final String acceptHeaderArg, final String expectedExportLanguage, final String provenanceURI,
-			final String expectedModelFile, final int expectedHTTPResponseCode) throws IOException {
+	/**
+	 * @param requestedExportLanguage the serialization format neo4j should export the data to. (this value is used as accept
+	 *            header arg to query neo4j)
+	 * @param provenanceURI identifier of the graph to export
+	 * @param expectedHTTPResponseCode the expected HTTP status code of the response, e.g. {@link HttpStatus.SC_OK} or
+	 *            {@link HttpStatus.SC_NOT_ACCEPTABLE}
+	 * @param expectedExportLanguage the language the exported data is expected to be serialized in. hint: language may differ
+	 *            from {@code requestedExportLanguage} to test for default values. (ignored if expectedHTTPResponseCode !=
+	 *            {@link HttpStatus.SC_OK})
+	 * @param expectedModelFile name of file containing a serialized model, this (expected) model is equal to the actual model
+	 *            exported by neo4j. (ignored if expectedHTTPResponseCode != {@link HttpStatus.SC_OK})
+	 * @param expectedFileEnding the expected file ending to be received from neo4j (ignored if expectedHTTPResponseCode !=
+	 *            {@link HttpStatus.SC_OK})
+	 * @throws IOException
+	 */
+	private void exportRDFByFormatFromDBInternal(final String requestedExportLanguage, final String provenanceURI,
+			final int expectedHTTPResponseCode, final Lang expectedExportLanguage, final String expectedModelFile, final String expectedFileEnding)
+			throws IOException {
 
-		writeMultipleRDFToDBInternal();
+		PartialRDFExportTest.LOG.trace("requesting export language: \"" + requestedExportLanguage + "\"");
 
-		PartialRDFExportTest.LOG.trace("requesting export language: \"" + acceptHeaderArg + "\"");
-
-		final ClientResponse response = service().path("/rdf/export").queryParam("provenanceuri", provenanceURI).accept(acceptHeaderArg)
+		// request export from neo4j
+		final ClientResponse response = service().path("/rdf/export").queryParam("provenanceuri", provenanceURI).accept(requestedExportLanguage)
 				.get(ClientResponse.class);
 
+		// check response
 		Assert.assertEquals("expected " + expectedHTTPResponseCode, expectedHTTPResponseCode, response.getStatus());
 
 		// in case we requested an unsupported format, stop processing here since there is no exported data to verify
-		if (expectedHTTPResponseCode == 406) {
+		if (expectedHTTPResponseCode == HttpStatus.SC_NOT_ACCEPTABLE) {
 			return;
 		}
 
+		// check Content-Disposition header for correct file ending
+		ExportUtils.checkContentDispositionHeader(response, expectedFileEnding);
+
+		// start check exported data
 		final String body = response.getEntity(String.class);
 
 		Assert.assertNotNull("response body shouldn't be null", body);
@@ -194,11 +204,9 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 		Assert.assertNotNull("input stream (from body) shouldn't be null", inputStream);
 
-		final Lang exportLang = RDFLanguages.contentTypeToLang(expectedExportLanguage);
-
 		// read actual model from response body
 		final Model actualModel = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(actualModel, inputStream, exportLang);
+		RDFDataMgr.read(actualModel, inputStream, expectedExportLanguage);
 
 		Assert.assertNotNull("actual model shouldn't be null", actualModel);
 		PartialRDFExportTest.LOG.debug("exported '" + actualModel.size() + "' statements");
@@ -207,8 +215,10 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 		final Model expectedModel = RDFDataMgr.loadModel(expectedModelFile);
 		Assert.assertNotNull("expected model shouldn't be null", expectedModel);
 
+		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",
 				actualModel.isIsomorphicWith(expectedModel));
+		// end check exported data
 	}
 
 }

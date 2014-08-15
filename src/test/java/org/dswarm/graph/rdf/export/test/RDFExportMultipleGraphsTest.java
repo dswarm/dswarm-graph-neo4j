@@ -53,6 +53,10 @@ public abstract class RDFExportMultipleGraphsTest extends RDFExportTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
+		//check Content-Disposition header for correct file ending
+		ExportUtils.checkContentDispositionHeader(response, ".nq");
+		
+		
 		final String body = response.getEntity(String.class);
 
 		Assert.assertNotNull("response body (n-quads) shouldn't be null", body);

@@ -243,12 +243,15 @@ public class RDFResource {
 
 		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
+		// determine export language and file extension
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
+		final String fileExtension = exportLanguage.getFileExtensions().get(0);
 		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
-		return Response.ok(result).type(formatType.toString()).build();
+		return Response.ok(result).type(formatType.toString())
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
 	}
 
 	/**
@@ -270,14 +273,16 @@ public class RDFResource {
 
 		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
 
-		// do some export language processing
+		// determine export language and file extension
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
+		final String fileExtension = exportLanguage.getFileExtensions().get(0);
 		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
 
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
 
-		return Response.ok(result).type(formatType.toString()).build();
+		return Response.ok(result).type(formatType.toString())
+				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
 	}
 
 	/**

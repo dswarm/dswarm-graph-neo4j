@@ -233,6 +233,7 @@ public class RDFResource {
 	 * @param database the db to export the data from
 	 * @param exportFormat serialization format all data should be serialized in, injected from accept header field
 	 * @return all data models serialized in exportLanguage
+	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType} 
 	 */
 	@GET
 	// SR TODO rename to /exportall
@@ -241,7 +242,12 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
-		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
+		final MediaType formatType;
+		try {
+			formatType = MediaType.valueOf(exportFormat);
+		} catch (IllegalArgumentException wrongFormat) {
+			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
+		}
 
 		// determine export language and file extension
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
@@ -260,20 +266,26 @@ public class RDFResource {
 	 * 406 response is sent.
 	 * 
 	 * @param database the graph database
-	 * @param exportFormat serialization format the data model should be serialized in, injected from accept header field
+	 * @param exportFormat serialization format ({@link MediaType}) the data model should be serialized in, injected from accept
+	 *            header field
 	 * @param provenanceURI the data model to be exported
 	 * @return a single data model, serialized in exportLanguage
+	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType} 
 	 */
 	@GET
 	@Path("/export")
 	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.RDF_XML, MediaTypeUtil.TRIG, MediaTypeUtil.TURTLE, MediaTypeUtil.N3 })
 	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
-			@QueryParam("provenanceuri") final String provenanceURI) {
-
-		final MediaType formatType = MediaTypeUtil.getMediaType(exportFormat, MediaTypeUtil.N_QUADS_TYPE);
+			@QueryParam("provenanceuri") final String provenanceURI) throws DMPGraphException {
 
 		// determine export language and file extension
+		final MediaType formatType;
+		try {
+			formatType = MediaType.valueOf(exportFormat);
+		} catch (IllegalArgumentException wrongFormat) {
+			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
+		}
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
 		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());

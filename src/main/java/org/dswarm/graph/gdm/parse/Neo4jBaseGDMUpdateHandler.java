@@ -73,7 +73,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 	protected final int						latestVersion;
 
-	protected final PropertyGraphGDMReader propertyGraphGDMReader = new PropertyGraphGDMReader();
+	protected final PropertyGraphGDMReader	propertyGraphGDMReader		= new PropertyGraphGDMReader();
 
 	public Neo4jBaseGDMUpdateHandler(final GraphDatabaseService database) {
 
@@ -103,7 +103,6 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 	@Override
 	public void handleStatement(final Statement st, final Resource r, final long index) {
-
 		// utilise r for the resource property
 
 		i++;
@@ -260,6 +259,26 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	}
 
 	@Override
+	public void handleStatement(final String stmtUUID, final Resource resource, final long index) throws DMPGraphException {
+
+		// TODO: process/ utilise stmt order
+
+		final Relationship rel = getRelationship(stmtUUID);
+		final Node subject = rel.getStartNode();
+		final Node object = rel.getEndNode();
+		final Statement stmt = propertyGraphGDMReader.readStatement(rel);
+
+		// reset stmt uuid, so that a new stmt uuid will be assigned when relationship will be added
+		stmt.setUUID(null);
+		final String predicate = stmt.getPredicate().getUri();
+
+		// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the index be update with the new stmt (?)
+		final String hash = generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+
+		addRelationship(subject, object, resource.getUri(), resource, stmt, index, hash);
+	}
+
+	@Override
 	public void deprecateStatement(long index) {
 
 		// TODO:
@@ -268,20 +287,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	@Override
 	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
 
-		final StringBuilder sb = new StringBuilder();
-
-		final String resultVariable = "rel";
-
-		sb.append("MATCH ()-[r{").append(GraphStatics.UUID_PROPERTY).append(": \"").append(uuid).append("\"}]->()\nRETURN r AS rel");
-
-		final String query = sb.toString();
-
-		final Relationship rel = GraphDBUtil.executeQueryWithSingleRelationshipResult(query, resultVariable, database);
-
-		if(rel == null) {
-
-			throw new DMPGraphException("could not find a statement for '" + uuid + "'");
-		}
+		final Relationship rel = getRelationship(uuid);
 
 		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
 
@@ -712,5 +718,25 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 		}
 
 		return identifier;
+	}
+
+	private Relationship getRelationship(final String uuid) throws DMPGraphException {
+
+		final StringBuilder sb = new StringBuilder();
+
+		final String resultVariable = "rel";
+
+		sb.append("MATCH ()-[r{").append(GraphStatics.UUID_PROPERTY).append(": \"").append(uuid).append("\"}]->()\nRETURN r AS rel");
+
+		final String query = sb.toString();
+
+		final Relationship rel = GraphDBUtil.executeQueryWithSingleRelationshipResult(query, resultVariable, database);
+
+		if (rel == null) {
+
+			throw new DMPGraphException("could not find a statement for '" + uuid + "'");
+		}
+
+		return rel;
 	}
 }

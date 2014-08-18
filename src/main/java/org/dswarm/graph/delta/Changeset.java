@@ -4,21 +4,22 @@ import org.dswarm.graph.json.Statement;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * @author tgaengler
  */
 public class Changeset {
 
-	private final Map<Long, Collection<Statement>>	additions;
-	private final Map<Long, Collection<Statement>>	deletions;
+	private final Map<String, Statement>	additions;
+	private final Map<String, Statement>	deletions;
 	private final Map<Long, Long>					modifications;
-	private final Map<Long, Collection<Statement>>	existingModifiedStatements;
-	private final Map<Long, Collection<Statement>>	newModifiedStatements;
+	private final Map<Long, Statement>	existingModifiedStatements;
+	private final Map<Long, Statement>	newModifiedStatements;
 
-	public Changeset(final Map<Long, Collection<Statement>> additions, final Map<Long, Collection<Statement>> deletions,
-			final Map<Long, Long> modifications, final Map<Long, Collection<Statement>> existingModifiedStatements,
-			final Map<Long, Collection<Statement>> newModifiedStatements) {
+	public Changeset(final Map<String, Statement> additions, final Map<String, Statement> deletions,
+			final Map<Long, Long> modifications, final Map<Long, Statement> existingModifiedStatements,
+			final Map<Long, Statement> newModifiedStatements) {
 
 		this.additions = additions;
 		this.deletions = deletions;
@@ -27,12 +28,12 @@ public class Changeset {
 		this.newModifiedStatements = newModifiedStatements;
 	}
 
-	public Map<Long, Collection<Statement>> getAdditions() {
+	public Map<String, Statement> getAdditions() {
 
 		return additions;
 	}
 
-	public Map<Long, Collection<Statement>> getDeletions() {
+	public Map<String, Statement> getDeletions() {
 
 		return deletions;
 	}
@@ -42,12 +43,12 @@ public class Changeset {
 		return modifications;
 	}
 
-	public Map<Long, Collection<Statement>> getExistingModifiedStatements() {
+	public Map<Long, Statement> getExistingModifiedStatements() {
 
 		return existingModifiedStatements;
 	}
 
-	public Map<Long, Collection<Statement>> getNewModifiedStatements() {
+	public Map<Long, Statement> getNewModifiedStatements() {
 
 		return newModifiedStatements;
 	}

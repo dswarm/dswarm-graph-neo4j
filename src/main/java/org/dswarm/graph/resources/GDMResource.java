@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,6 +36,7 @@ import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
+import org.dswarm.graph.delta.util.ChangesetUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
@@ -341,10 +343,10 @@ public class GDMResource {
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
 			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
-//			final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
-//			final GDMParser parser = new GDMModelParser(model);
-//			parser.setGDMHandler(handler);
-//			parser.parse();
+			// final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
+			// final GDMParser parser = new GDMModelParser(model);
+			// parser.setGDMHandler(handler);
+			// parser.parse();
 			final GDMUpdateHandler gdmHandler = new Neo4jGDMWProvenanceUpdateHandler(permanentDatabase, resourceGraphURI);
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
 			parser.setGDMHandler(gdmHandler);
@@ -588,16 +590,16 @@ public class GDMResource {
 
 		// traverse resource graphs to extract changeset
 		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.ADDITION, newResourceDB);
-		final Map<Long, Collection<Statement>> addedStatements = addedStatementsPGDGDMSGWorker.work();
+		final Map<String, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.DELETION, existingResourceDB);
-		final Map<Long, Collection<Statement>> removedStatements = removedStatementsPGDGDMSGWorker.work();
+		final Map<String, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.MODIFICATION, newResourceDB);
-		final Map<Long, Collection<Statement>> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
+		final Map<String, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
-		final Map<Long, Collection<Statement>> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
+		final Map<String, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
 		final Map<Long, Long> changesetModifications = new HashMap<>();
 
@@ -616,10 +618,11 @@ public class GDMResource {
 			changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(), firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
 		}
 
-		final Changeset changeset = new Changeset(addedStatements, removedStatements, changesetModifications, existingModifiedStatements, newModifiedStatements);
+		final Map<Long, Statement> preparedExistingModifiedStatements = ChangesetUtil.providedModifiedStatements(existingModifiedStatements);
+		final Map<Long, Statement> preparedNewModifiedStatements = ChangesetUtil.providedModifiedStatements(newModifiedStatements);
 
 		// return a changeset model (i.e. with information for add, delete, update per triple)
-		return changeset;
+		return new Changeset(addedStatements, removedStatements, changesetModifications, preparedExistingModifiedStatements, preparedNewModifiedStatements);
 	}
 
 	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) {

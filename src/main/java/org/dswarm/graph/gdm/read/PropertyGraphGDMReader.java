@@ -6,10 +6,13 @@ import java.util.Map;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.json.LiteralNode;
+import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.utils.GraphUtils;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,7 @@ public class PropertyGraphGDMReader {
 
 	final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<>();
 	final Map<String, ResourceNode>                resourceNodes     = new HashMap<>();
+	final Map<String, Predicate> predicates = new HashMap<>();
 
 	public org.dswarm.graph.json.Node readSubject(final Node subjectNode) throws DMPGraphException {
 
@@ -105,6 +109,37 @@ public class PropertyGraphGDMReader {
 
 		return objectGDMNode;
 	}
+
+	public Statement readStatement(final Relationship rel) throws DMPGraphException {
+
+		final org.dswarm.graph.json.Node subject = readObject(rel.getStartNode());
+		final Predicate predicate = getPredicate(rel.getType().name());
+		final org.dswarm.graph.json.Node object = readObject(rel.getEndNode());
+		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+
+		final Statement statement;
+
+		if (uuid != null) {
+
+			statement = new Statement(uuid, subject, predicate, object);
+		} else {
+
+			statement = new Statement(subject, predicate, object);
+		}
+
+		return statement;
+	}
+
+	private Predicate getPredicate(final String predicateName) {
+
+		if(!predicates.containsKey(predicateName)) {
+
+			predicates.put(predicateName, new Predicate(predicateName));
+		}
+
+		return predicates.get(predicateName);
+	}
+
 
 	private ResourceNode readResource(final Node node) throws DMPGraphException {
 

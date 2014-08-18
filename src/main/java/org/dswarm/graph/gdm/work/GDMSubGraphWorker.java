@@ -5,8 +5,9 @@ import org.dswarm.graph.json.Statement;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Queue;
 
 public interface GDMSubGraphWorker {
 
-	public Map<Long, Collection<Statement>> work() throws DMPGraphException;
+	public Map<String, Statement> work() throws DMPGraphException;
 }

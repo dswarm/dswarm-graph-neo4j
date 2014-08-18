@@ -1,9 +1,7 @@
 package org.dswarm.graph.gdm.work;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Iterables;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaState;
@@ -34,6 +31,8 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+
 /**
  * @author tgaengler
  */
@@ -50,7 +49,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 	private final GraphDatabaseService			database;
 
-	private final Map<Long, Collection<Statement>>			currentSubGraphs	= new HashMap<>();
+	private final Map<String, Statement>			currentSubGraphs	= new LinkedHashMap<>();
 	private final List<Path> subGraphPaths = new ArrayList<>();
 
 	final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<Long, org.dswarm.graph.json.Node>();
@@ -68,7 +67,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 	}
 
 	@Override
-	public Map<Long, Collection<Statement>> work() throws DMPGraphException {
+	public Map<String, Statement> work() throws DMPGraphException {
 
 		final Transaction tx = database.beginTx();
 
@@ -101,24 +100,24 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 			// convert paths to statement collections
 			for (final Path subGraphPath : subGraphPaths) {
 
-				final long nodeId;
+				String stmtIdentifier = null;
 
-				if(!deltaState.equals(DeltaState.MODIFICATION)) {
+				if(deltaState.equals(DeltaState.MODIFICATION)) {
 
-					nodeId = subGraphPath.startNode().getId();
-				} else {
-
-					nodeId = subGraphPath.endNode().getId();
+					stmtIdentifier = Long.valueOf(subGraphPath.endNode().getId()).toString();
 				}
-
-				if (!currentSubGraphs.containsKey(nodeId)) {
-
-					currentSubGraphs.put(nodeId, new HashSet<Statement>());
-				}
-
-				final Collection<Statement> subGraphStatements = currentSubGraphs.get(nodeId);
 
 				for (final Relationship rel : subGraphPath.relationships()) {
+
+					if(!deltaState.equals(DeltaState.MODIFICATION)) {
+
+						stmtIdentifier = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+					}
+
+					if (currentSubGraphs.containsKey(stmtIdentifier)) {
+
+						continue;
+					}
 
 					final org.dswarm.graph.json.Node subject = getNode(rel.getStartNode());
 					final Predicate predicate = getPredicate(rel.getType().name());
@@ -135,7 +134,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 						statement = new Statement(subject, predicate, object);
 					}
 
-					subGraphStatements.add(statement);
+					currentSubGraphs.put(stmtIdentifier, statement);
 				}
 			}
 

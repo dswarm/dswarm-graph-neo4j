@@ -1,0 +1,14 @@
+<http://data.slub-dresden.de/datamodels/4/records/f2c364eb-ad81-46b8-a706-ea5f8ecc1911>
+        a       <http://purl.org/ontology/bibo/Document> ;
+        <http://purl.org/dc/elements/1.1/title>
+                "John" .
+
+<http://data.slub-dresden.de/datamodels/4/records/52d59f83-5a2f-479b-bc4b-71d930225bd3>
+        a       <http://purl.org/ontology/bibo/Document> ;
+        <http://purl.org/dc/elements/1.1/title>
+                "Frank" .
+
+<http://data.slub-dresden.de/datamodels/4/records/912e0e1d-840c-41d3-9609-257bbd6b470f>
+        a       <http://purl.org/ontology/bibo/Document> ;
+        <http://purl.org/dc/elements/1.1/title>
+                "Jane" .

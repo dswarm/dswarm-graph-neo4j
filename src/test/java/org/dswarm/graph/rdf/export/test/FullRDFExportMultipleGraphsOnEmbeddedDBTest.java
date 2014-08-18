@@ -6,7 +6,7 @@ import org.dswarm.graph.test.Neo4jEmbeddedDBWrapper;
  * @author polowins
  * @author tgaengler
  */
-public class FullRDFExportMultipleGraphsOnEmbeddedDBTest extends RDFExportMultipleGraphsTest {
+public class FullRDFExportMultipleGraphsOnEmbeddedDBTest extends FullRDFExportMultipleGraphsTest {
 
 	public FullRDFExportMultipleGraphsOnEmbeddedDBTest() {
 

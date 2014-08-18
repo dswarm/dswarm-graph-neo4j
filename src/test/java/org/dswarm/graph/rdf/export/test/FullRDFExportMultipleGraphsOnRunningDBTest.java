@@ -6,7 +6,7 @@ import org.dswarm.graph.test.Neo4jRunningDBWrapper;
  * @author polowins
  * @author tgaengler
  */
-public class FullRDFExportMultipleGraphsOnRunningDBTest extends RDFExportMultipleGraphsTest {
+public class FullRDFExportMultipleGraphsOnRunningDBTest extends FullRDFExportMultipleGraphsTest {
 
 	public FullRDFExportMultipleGraphsOnRunningDBTest() {
 

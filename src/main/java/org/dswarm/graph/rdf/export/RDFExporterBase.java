@@ -3,26 +3,22 @@ package org.dswarm.graph.rdf.export;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.rdf.utils.RDFUtils;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.utils.GraphUtils;
 
@@ -30,73 +26,26 @@ import org.dswarm.graph.utils.GraphUtils;
  * @author polowins
  * @author tgaengler
  */
-public class PropertyGraphRDFExporter implements RDFExporter {
+public abstract class RDFExporterBase implements RDFExporter {
 
-	private static final Logger			LOG								= LoggerFactory.getLogger(PropertyGraphRDFExporter.class);
+	private static final Logger				LOG								= LoggerFactory.getLogger(RDFExporterBase.class);
 
-	private final RelationshipHandler	relationshipHandler;
+	protected final RelationshipHandler		relationshipHandler;
 
-	private final GraphDatabaseService	database;
+	protected final GraphDatabaseService	database;
 
-	private Dataset						dataset;
+	protected Dataset						dataset;
 
-	private long						processedStatements				= 0;
+	private long							processedStatements				= 0;
 
-	private long						successfullyProcessedStatements	= 0;
+	protected long							successfullyProcessedStatements	= 0;
 
-	public PropertyGraphRDFExporter(final GraphDatabaseService databaseArg) {
+	protected static final int				JENA_MODEL_WARNING_SIZE			= 1000000;
+
+	public RDFExporterBase(final GraphDatabaseService databaseArg) {
 
 		database = databaseArg;
 		relationshipHandler = new CBDRelationshipHandler();
-	}
-
-	@Override
-	public Dataset export() {
-
-		final Transaction tx = database.beginTx();
-
-		try {
-
-			/*
-			 * // all nodes would also return endnodes without further outgoing relations final Iterable<Node> recordNodes;
-			 * GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database); recordNodes =
-			 * globalGraphOperations.getAllNodes();
-			 */
-
-			final GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(database);
-
-			// TODO: maybe slice this a bit, and deliver the whole graph in pieces
-			// please also note that the Jena model implementation has its size limits (~1 mio statements (?) -> so one graph (of
-			// one data resource) need to keep this size in mind)
-
-			final Iterable<Relationship> relations = globalGraphOperations.getAllRelationships();
-
-			if (relations == null) {
-
-				return null;
-			}
-
-			dataset = DatasetFactory.createMem();
-
-			for (final Relationship recordNode : relations) {
-
-				relationshipHandler.handleRelationship(recordNode);
-			}
-		} catch (final Exception e) {
-
-			PropertyGraphRDFExporter.LOG.error("couldn't finish read RDF TX successfully", e);
-
-			tx.failure();
-			tx.close();
-		} finally {
-
-			PropertyGraphRDFExporter.LOG.debug("finished read RDF TX finally");
-
-			tx.success();
-			tx.close();
-		}
-
-		return dataset;
 	}
 
 	@Override
@@ -125,7 +74,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 				final String message = "provenance URI can't be null (relationship id = '" + rel.getId() + "'";
 
-				PropertyGraphRDFExporter.LOG.error(message);
+				RDFExporterBase.LOG.error(message);
 
 				throw new DMPGraphException(message);
 			}
@@ -146,7 +95,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 				final String message = "RDF model for graph '" + provenanceURI + "' can't be null (relationship id = '" + rel.getId() + "'";
 
-				PropertyGraphRDFExporter.LOG.error(message);
+				RDFExporterBase.LOG.error(message);
 
 				throw new DMPGraphException(message);
 			}
@@ -169,7 +118,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 						final String message = "subject URI can't be null";
 
-						PropertyGraphRDFExporter.LOG.error(message);
+						RDFExporterBase.LOG.error(message);
 
 						throw new DMPGraphException(message);
 					}
@@ -188,7 +137,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 					final String message = "subject node type can only be a resource (or type resource) or bnode (or type bnode)";
 
-					PropertyGraphRDFExporter.LOG.error(message);
+					RDFExporterBase.LOG.error(message);
 
 					throw new DMPGraphException(message);
 			}
@@ -196,7 +145,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 			// predicate
 
 			final String predicate = rel.getType().name();
-					//.getProperty(GraphStatics.URI_PROPERTY, null);
+			// .getProperty(GraphStatics.URI_PROPERTY, null);
 			final Property predicateProperty = model.createProperty(predicate);
 
 			// object
@@ -217,7 +166,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 						final String message = "object URI can't be null";
 
-						PropertyGraphRDFExporter.LOG.error(message);
+						RDFExporterBase.LOG.error(message);
 
 						throw new DMPGraphException(message);
 					}
@@ -242,7 +191,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 						final String message = "object value can't be null";
 
-						PropertyGraphRDFExporter.LOG.error(message);
+						RDFExporterBase.LOG.error(message);
 
 						throw new DMPGraphException(message);
 					}
@@ -270,7 +219,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 					final String message = "unknown node type " + objectNodeType.getName() + " for object node";
 
-					PropertyGraphRDFExporter.LOG.error(message);
+					RDFExporterBase.LOG.error(message);
 
 					throw new DMPGraphException(message);
 			}
@@ -280,7 +229,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 				final String message = "couldn't determine the complete statement (subject-predicate-object + provenance) for relationship '"
 						+ rel.getId() + "'";
 
-				PropertyGraphRDFExporter.LOG.error(message);
+				RDFExporterBase.LOG.error(message);
 
 				throw new DMPGraphException(message);
 			}

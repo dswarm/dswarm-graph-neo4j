@@ -3,7 +3,10 @@ package org.dswarm.graph.rdf.read;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dswarm.graph.model.GraphStatics;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -15,12 +18,8 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
 
@@ -57,7 +56,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		final Transaction tx = database.beginTx();
 
-		LOG.debug("start read RDF TX");
+		PropertyGraphRDFReader.LOG.debug("start read RDF TX");
 
 		try {
 
@@ -79,13 +78,13 @@ public class PropertyGraphRDFReader implements RDFReader {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished read RDF TX successfully", e);
+			PropertyGraphRDFReader.LOG.error("couldn't finish read RDF TX successfully", e);
 
 			tx.failure();
 			tx.close();
 		} finally {
 
-			LOG.debug("finished read RDF TX finally");
+			PropertyGraphRDFReader.LOG.debug("finished read RDF TX finally");
 
 			tx.success();
 			tx.close();
@@ -167,7 +166,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 				}
 
 				final String predicate = rel.getType().name();
-						//.getProperty(GraphStatics.URI_PROPERTY, null);
+				// .getProperty(GraphStatics.URI_PROPERTY, null);
 				final Property predicateProperty = model.createProperty(predicate);
 
 				final String object;

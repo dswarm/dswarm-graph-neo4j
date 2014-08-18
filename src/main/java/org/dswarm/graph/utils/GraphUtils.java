@@ -1,11 +1,12 @@
 package org.dswarm.graph.utils;
 
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler

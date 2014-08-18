@@ -6,14 +6,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
-import junit.framework.Assert;
-
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -21,7 +13,14 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
+import junit.framework.Assert;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.rdf.utils.RDFUtils;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
@@ -29,11 +28,12 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  * @author polowins
  * @author tgaengler
  */
-public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
+public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
-	static private final Logger	LOG	= LoggerFactory.getLogger(RDFExportMultipleGraphsTest.class);
+	static private final Logger	LOG			= LoggerFactory.getLogger(FullRDFExportMultipleGraphsTest.class);
+	private static final String	RDF_N3_FILE	= "dmpf_bsp1.n3";
 
-	public RDFExportMultipleGraphsTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
+	public FullRDFExportMultipleGraphsTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, dbTypeArg);
 	}
@@ -41,23 +41,27 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 	@Test
 	public void readAllRDFFromDB() throws IOException {
 
-		RDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB");
+		FullRDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB");
 
 		final String provenanceURI1 = "http://data.slub-dresden.de/resources/2";
 		final String provenanceURI2 = "http://data.slub-dresden.de/resources/3";
 
-		writeRDFToDBInternal(provenanceURI1);
-		writeRDFToDBInternal(provenanceURI2);
+		writeRDFToDBInternal(provenanceURI1, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
+		writeRDFToDBInternal(provenanceURI2, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
 
-		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
+		final ClientResponse response = service().path("/rdf/getall").accept(MediaTypeUtil.N_QUADS).get(ClientResponse.class);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
+		//check Content-Disposition header for correct file ending
+		ExportUtils.checkContentDispositionHeader(response, ".nq");
+		
+		
 		final String body = response.getEntity(String.class);
 
 		Assert.assertNotNull("response body (n-quads) shouldn't be null", body);
 
-		RDFExportMultipleGraphsTest.LOG.trace("Response body : " + body);
+		FullRDFExportMultipleGraphsTest.LOG.trace("Response body : " + body);
 
 		final InputStream stream = new ByteArrayInputStream(body.getBytes("UTF-8"));
 
@@ -70,9 +74,9 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 
 		final long statementsInExportedRDFModel = RDFUtils.determineDatasetSize(dataset);
 
-		RDFExportMultipleGraphsTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
+		FullRDFExportMultipleGraphsTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
-		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
+		final URL fileURL = Resources.getResource(FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
 		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
@@ -113,7 +117,7 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 				+ " that read 2 times the original RDF file (" + statementsInOriginalRDFFileAfter2ndRead + ")",
 				statementsInOriginalRDFFileAfter2ndRead, statementsInExportedRDFModel);
 
-		RDFExportMultipleGraphsTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType + " DB");
+		FullRDFExportMultipleGraphsTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType + " DB");
 	}
 
 }

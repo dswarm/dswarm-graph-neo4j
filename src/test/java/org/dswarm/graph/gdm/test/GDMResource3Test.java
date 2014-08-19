@@ -2,11 +2,9 @@ package org.dswarm.graph.gdm.test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import junit.framework.Assert;
 
 import org.dswarm.graph.json.util.Util;
@@ -16,11 +14,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -111,9 +108,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		keyAttributePaths
 				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
 		requestJson.put("key_attribute_paths", keyAttributePaths);
-		requestJson
-				.put("value_attribute_path",
-						"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
+		requestJson.put("value_attribute_path",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -142,8 +138,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE))
-				.bodyPart(new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
+		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

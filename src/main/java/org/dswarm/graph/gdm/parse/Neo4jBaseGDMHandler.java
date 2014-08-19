@@ -302,9 +302,11 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			dataModelNode = database.createNode();
 			addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
 			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, provenanceURI);
-			dataModelNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+			dataModelNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
+
+			resources.add(dataModelNode, GraphStatics.URI, provenanceURI);
 
 			Node dataModelTypeNode = determineNode(new ResourceNode(VersioningStatics.DATA_MODEL_TYPE), true);
 
@@ -314,6 +316,9 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 				addLabel(dataModelTypeNode, RDFS.Class.getURI());
 				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
 				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
+
+				resourceTypes.add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
+				resources.add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
 			}
 
 			final String hash = generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, org.dswarm.graph.json.NodeType.Resource,
@@ -326,7 +331,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
 				rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
-				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
 				final String uuid = UUID.randomUUID().toString();
 

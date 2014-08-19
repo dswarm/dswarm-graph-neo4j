@@ -12,13 +12,15 @@ public interface GDMUpdateHandler {
 
 	public void handleStatement(Statement st, Resource resource, long index);
 
-	public void handleStatement(String stmtUUID, Resource resource, long index) throws DMPGraphException;
+	public void handleStatement(String stmtUUID, Resource resource, long index, long order) throws DMPGraphException;
 
 	public void deprecateStatement(long index);
 
 	public Node deprecateStatement(String uuid) throws DMPGraphException;
 
 	public int getLatestVersion();
+
+	public void updateLatestVersion();
 
 	public void setResourceUri(String resourceUri);
 

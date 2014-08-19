@@ -84,25 +84,27 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 			long index = 1;
 			Relationship existingRelationship = existingRelationshipsIter.next();
-			boolean							increaseNewRelationship	= true;
 			Relationship newRelationship = null;
 
 			do {
 
-				final Long indexFromDB = (Long) existingRelationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+				final Long indexFromDB;
+
+				if(existingRelationship != null) {
+					indexFromDB = (Long) existingRelationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+				} else if (newRelationship != null) {
+
+					indexFromDB = (Long) newRelationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
+				} else {
+
+					indexFromDB = null;
+				}
 
 				if (indexFromDB == null) {
 
 					// TODO: we should probably should throw an exception instead
 
 					break;
-				}
-
-				if(indexFromDB < index) {
-
-					// TODO: should we do something here, e.g., shift every forthcoming statement further (because overall resource order has changed (?))
-
-					System.out.println("there");
 				}
 
 				if (!newRelationshipsIter.hasNext()) {
@@ -117,14 +119,14 @@ public class GDMChangesetParser implements GDMUpdateParser {
 				final DeltaState finalDeltaState;
 				boolean increaseExistingRelationship = true;
 
-				if(existingRelDeltaState.equals(DeltaState.ExactMatch)) {
+				if(existingRelDeltaState == null || DeltaState.ExactMatch.equals(existingRelDeltaState)) {
 
-					if(increaseNewRelationship) {
+					newRelationship = getNewRel(newRelationshipsIter, alreadyAddedStatementUUIDs, alreadyDeletedStatementUUIDs,
+							alreadyModifiedNewStatementUUIDs);
 
-						newRelationship = getNewRel(newRelationshipsIter, alreadyAddedStatementUUIDs, alreadyDeletedStatementUUIDs,
-								alreadyModifiedNewStatementUUIDs);
+					if(newRelationship == null) {
 
-						increaseNewRelationship = true;
+						break;
 					}
 
 					finalDeltaState = getDeltaState(newRelationship);
@@ -137,7 +139,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 						// skip already processed existing stmt
 
-						existingRelationship = existingRelationshipsIter.next();
+						existingRelationship = increaseRelationship(existingRelationshipsIter);
 
 						continue;
 					}
@@ -255,7 +257,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 					if(increaseExistingRelationship) {
 
-						existingRelationship = existingRelationshipsIter.next();
+						existingRelationship = increaseRelationship(existingRelationshipsIter);
 					}
 
 					continue;
@@ -263,47 +265,38 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 				if(newRelationship == null) {
 
-					newRelationship = newRelationshipsIter.next();
+					newRelationship = increaseRelationship(newRelationshipsIter);
 				}
 
 				final String existingRelationshipPrint = GraphDBUtil.printRelationship(existingRelationship);
 				final String newRelationshipPrint = GraphDBUtil.printRelationship(newRelationship);
 
-				if (existingRelationshipPrint.equals(newRelationshipPrint) && index == indexFromDB) {
+				if (!(existingRelationshipPrint.equals(newRelationshipPrint) && index == indexFromDB)) {
 
-					index++;
-
-					existingRelationship = existingRelationshipsIter.next();
-
-					continue;
-				} else {
+					// note: we don't really know how equal/unequal the statements are at this moment, so it's better to compare them more in detail (? - once again?) - we could also hold a map of exact matched statements
 
 					// deprecate old statement and write it as new statement with a different index
-					// TODO: propertyGraphGDMReader and GDMUpdateHandler need to share the same map for the bnodes + then we still need to ensure to do this mapping correctly
-					// => we could also utilise the existing nodes of the bnodes of a statement, i.e., we need to read the existing stmt from the permanent DB instead of from the delta DB
 					final String existingStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
+					final Long newStmtOrder = (Long) newRelationship.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
 					gdmHandler.deprecateStatement(existingStmtUUID);
 
-					gdmHandler.handleStatement(existingStmtUUID, existingResource, index);
-
-					index++;
-
-					increaseNewRelationship = false;
-					existingRelationship = existingRelationshipsIter.next();
-
-					// TODO: remove this, when continuing implementation
-					break;
+					gdmHandler.handleStatement(existingStmtUUID, existingResource, index, newStmtOrder);
 				}
 
-			} while (newRelationshipsIter.hasNext());
+				index++;
 
-			System.out.print(index);
+				existingRelationship = increaseRelationship(existingRelationshipsIter);
+
+			} while (newRelationshipsIter.hasNext() || existingRelationshipsIter.hasNext());
+
+			// System.out.println("index = '" + (index -1) + "'");
 
 			newResourceDBTX.success();
 			existingResourceDBTX.success();
 		} catch (final Exception e) {
 
+			// TODO: move this to log
 			e.printStackTrace();
 
 			newResourceDBTX.failure();
@@ -318,30 +311,18 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		// afterwards and deprecated the existing ones (i.e. update their valid to value)
 		// for added + modified statements utilise the current version for valid from
 
-		// if (resource == null || resource.getStatements() == null || resource.getStatements().isEmpty()) {
-		//
-		// LOG.debug("there are no statements in the GDM resource");
-		//
-		// return;
-		// }
-		//
-		// long i = 0;
-		//
-		// for (final Statement statement : resource.getStatements()) {
-		//
-		// i++;
-		//
-		// // note: just increasing the counter probably won't work at an update ;)
-		//
-		// gdmHandler.handleStatement(statement, resource, i);
-		// }
-
 		gdmHandler.closeTransaction();
+		gdmHandler.updateLatestVersion();
 		newResourceDB.shutdown();
 		existingResourceDB.shutdown();
 	}
 
 	private DeltaState getDeltaState(final Relationship relationship) {
+
+		if (relationship == null) {
+
+			return null;
+		}
 
 		final String deltaStateString = (String) relationship.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
 
@@ -350,6 +331,11 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 	private boolean checkStmt(final Relationship rel, final DeltaState deltaState, final Set<String> alreadyAddedStatementUUIDs,
 			final Set<String> alreadyDeletedStatementUUIDs, final Set<String> alreadyModifiedStatementUUIDs) {
+
+		if (rel == null) {
+
+			return false;
+		}
 
 		final String newStmtUUID = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
@@ -389,7 +375,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 	private Relationship getNewRel(final Iterator<Relationship> newRelationshipsIter, final Set<String> alreadyAddedStatementUUIDs,
 			final Set<String> alreadyDeletedStatementUUIDs, final Set<String> alreadyModifiedNewStatementUUIDs) {
 
-		final Relationship newRelationship = newRelationshipsIter.next();
+		final Relationship newRelationship = increaseRelationship(newRelationshipsIter);
 		final DeltaState deltaState = getDeltaState(newRelationship);
 
 		final boolean stmtAlreadyProcessed = checkStmt(newRelationship, deltaState, alreadyAddedStatementUUIDs, alreadyDeletedStatementUUIDs,
@@ -402,5 +388,15 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		}
 
 		return newRelationship;
+	}
+
+	private Relationship increaseRelationship(final Iterator<Relationship> relationshipIterator) {
+
+		if (relationshipIterator.hasNext()) {
+
+			return relationshipIterator.next();
+		}
+
+		return null;
 	}
 }

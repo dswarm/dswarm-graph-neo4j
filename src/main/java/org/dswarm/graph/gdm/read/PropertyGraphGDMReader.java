@@ -116,15 +116,16 @@ public class PropertyGraphGDMReader {
 		final Predicate predicate = getPredicate(rel.getType().name());
 		final org.dswarm.graph.json.Node object = readObject(rel.getEndNode());
 		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
 		final Statement statement;
 
 		if (uuid != null) {
 
-			statement = new Statement(uuid, subject, predicate, object);
+			statement = new Statement(uuid, subject, predicate, object, order);
 		} else {
 
-			statement = new Statement(subject, predicate, object);
+			statement = new Statement(subject, predicate, object, order);
 		}
 
 		return statement;

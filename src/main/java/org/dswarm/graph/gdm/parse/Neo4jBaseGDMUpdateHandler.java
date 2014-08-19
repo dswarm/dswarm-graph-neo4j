@@ -3,7 +3,6 @@ package org.dswarm.graph.gdm.parse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,8 +17,6 @@ import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -259,17 +256,19 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	}
 
 	@Override
-	public void handleStatement(final String stmtUUID, final Resource resource, final long index) throws DMPGraphException {
-
-		// TODO: process/ utilise stmt order
+	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException {
 
 		final Relationship rel = getRelationship(stmtUUID);
 		final Node subject = rel.getStartNode();
 		final Node object = rel.getEndNode();
 		final Statement stmt = propertyGraphGDMReader.readStatement(rel);
+		addBNode(stmt.getSubject(), subject);
+		addBNode(stmt.getObject(), object);
 
 		// reset stmt uuid, so that a new stmt uuid will be assigned when relationship will be added
 		stmt.setUUID(null);
+		// set actual order of the stmt
+		stmt.setOrder(order);
 		final String predicate = stmt.getPredicate().getUri();
 
 		// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the index be update with the new stmt (?)
@@ -291,7 +290,12 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
 
-		return propertyGraphGDMReader.readObject(rel.getStartNode());
+		final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readObject(rel.getStartNode());
+		final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(rel.getEndNode());
+		addBNode(subjectGDMNode, rel.getStartNode());
+		addBNode(objectGDMNode, rel.getEndNode());
+
+		return subjectGDMNode;
 	}
 
 	protected abstract void addObjectToResourceWProvenanceIndex(final Node node, final String URI, final String provenanceURI);
@@ -738,5 +742,17 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 		}
 
 		return rel;
+	}
+
+	private void addBNode(final org.dswarm.graph.json.Node gdmNode, final Node node) {
+
+		switch(gdmNode.getType()) {
+
+			case BNode:
+
+				bnodes.put("" + gdmNode.getId(), node);
+
+				break;
+		}
 	}
 }

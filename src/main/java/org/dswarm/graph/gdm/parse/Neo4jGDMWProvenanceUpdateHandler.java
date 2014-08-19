@@ -23,9 +23,9 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMWProvenanceUpdateHandler.class);
 
-	private final Index<Relationship> statementUUIDsWProvenance;
+	private final Index<Relationship>	statementUUIDsWProvenance;
 
-	private final String resourceGraphURI;
+	private final String				resourceGraphURI;
 
 	public Neo4jGDMWProvenanceUpdateHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
 
@@ -36,7 +36,8 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 		resourceGraphURI = resourceGraphURIArg;
 	}
 
-	@Override protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
+	@Override
+	protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
 
 		final String finalProvenanceURI;
 
@@ -115,20 +116,20 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	@Override
 	protected int retrieveLatestVersion() {
 
-
 		final Transaction tx = database.beginTx();
 		int latestVersion = 1;
 
 		try {
 
-			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE), GraphStatics.URI_PROPERTY, resourceGraphURI);
+			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
+					GraphStatics.URI_PROPERTY, resourceGraphURI);
 
-			if(hits != null && hits.iterator().hasNext()) {
+			if (hits != null && hits.iterator().hasNext()) {
 
 				final Node dataModelNode = hits.iterator().next();
 				final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
-				if(lastestVersionFromDB != null) {
+				if (lastestVersionFromDB != null) {
 
 					latestVersion = lastestVersionFromDB;
 				}
@@ -144,5 +145,32 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 		}
 
 		return latestVersion;
+	}
+
+	@Override
+	public void updateLatestVersion() {
+
+		final Transaction tx = database.beginTx();
+
+		try {
+
+			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
+					GraphStatics.URI_PROPERTY, resourceGraphURI);
+
+			if (hits != null && hits.iterator().hasNext()) {
+
+				final Node dataModelNode = hits.iterator().next();
+				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+			}
+
+			tx.success();
+		} catch (final Exception e) {
+
+			tx.failure();
+		} finally {
+
+			tx.close();
+		}
+
 	}
 }

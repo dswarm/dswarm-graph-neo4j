@@ -8,6 +8,8 @@ import java.util.Set;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -49,6 +51,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private Resource					currentResource;
 	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
 
+	private final int					latestVersion;
+
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
@@ -57,6 +61,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
+		latestVersion = getLatestVersion();
 	}
 
 	@Override
@@ -156,6 +161,18 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				for (final Relationship relationship : relationships) {
 
+					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
+					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
+
+					if (validFrom != null && validTo != null) {
+
+						if (Range.range(validFrom, validTo).contains(latestVersion)) {
+
+							relationshipHandler.handleRelationship(relationship);
+						}
+					}
+
+					// TODO: remove this later, when every stmt is versioned
 					relationshipHandler.handleRelationship(relationship);
 				}
 			}
@@ -176,6 +193,18 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				for (final Relationship relationship : relationships) {
 
+					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
+					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
+
+					if (validFrom != null && validTo != null) {
+
+						if (Range.range(validFrom, validTo).contains(latestVersion)) {
+
+							relationshipHandler.handleRelationship(relationship);
+						}
+					}
+
+					// TODO: remove this later, when every stmt is versioned
 					relationshipHandler.handleRelationship(relationship);
 				}
 			}
@@ -251,5 +280,38 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				}
 			}
 		}
+	}
+
+	private int getLatestVersion() {
+
+		final Transaction tx = database.beginTx();
+		int latestVersion = 1;
+
+		try {
+
+			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
+					GraphStatics.URI_PROPERTY, resourceGraphUri);
+
+			if (hits != null && hits.iterator().hasNext()) {
+
+				final Node dataModelNode = hits.iterator().next();
+				final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
+
+				if (lastestVersionFromDB != null) {
+
+					latestVersion = lastestVersionFromDB;
+				}
+			}
+
+			tx.success();
+		} catch (final Exception e) {
+
+			tx.failure();
+		} finally {
+
+			tx.close();
+		}
+
+		return latestVersion;
 	}
 }

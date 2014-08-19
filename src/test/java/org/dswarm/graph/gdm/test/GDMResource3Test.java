@@ -67,7 +67,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		LOG.debug("read '" + model.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 190", 190, model.size());
+		Assert.assertEquals("the number of statements should be 157", 157, model.size());
 
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}

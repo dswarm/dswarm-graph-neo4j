@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 
 import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
@@ -21,6 +23,9 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  * @author tgaengler
@@ -311,10 +316,25 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		// afterwards and deprecated the existing ones (i.e. update their valid to value)
 		// for added + modified statements utilise the current version for valid from
 
-		gdmHandler.closeTransaction();
 		gdmHandler.updateLatestVersion();
-		newResourceDB.shutdown();
-		existingResourceDB.shutdown();
+		gdmHandler.closeTransaction();
+
+		GDMChangesetParser.LOG.debug("start shutting down working graph data model DBs for resources");
+
+		// should probably be delegated to a background worker thread, since it looks like that shutting down the working graph DBs take some (for whatever reason)
+		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
+		service.submit(new Callable<Void>() {
+
+			public Void call() {
+
+				newResourceDB.shutdown();
+				existingResourceDB.shutdown();
+
+				return null;
+			}
+		});
+
+		GDMChangesetParser.LOG.debug("finished shutting down working graph data model DBs for resources");
 	}
 
 	private DeltaState getDeltaState(final Relationship relationship) {

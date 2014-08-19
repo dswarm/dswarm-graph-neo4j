@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -88,7 +89,7 @@ public class GDMResource {
 	 */
 	private final ObjectMapper				objectMapper;
 	private final TestGraphDatabaseFactory	impermanentGraphDatabaseFactory;
-	private static final String				IMPERMANENT_GRAPH_DATABASE_PATH	= "target/test-data/impermanent-db";
+	private static final String				IMPERMANENT_GRAPH_DATABASE_PATH	= "target/test-data/impermanent-db/";
 
 	public GDMResource() {
 
@@ -307,13 +308,16 @@ public class GDMResource {
 	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
 			final GraphDatabaseService permanentDatabase) throws DMPGraphException {
 
+		GDMResource.LOG.debug("start calculating delta for model");
+
 		final Model newResourcesModel = new Model();
 
 		// calculate delta resource-wise
 		for (Resource newResource : model.getResources()) {
 
 			final String resourceURI = newResource.getUri();
-			final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + "2");
+			final String hash = UUID.randomUUID().toString();
+			final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
 
 			final Resource existingResource;
 			final GDMResourceReader gdmReader;
@@ -349,20 +353,18 @@ public class GDMResource {
 			// final Model newResourceModel = new Model();
 			// newResourceModel.addResource(resource);
 
-			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + "1");
+			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
 
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
 			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
-			// final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
-			// final GDMParser parser = new GDMModelParser(model);
-			// parser.setGDMHandler(handler);
-			// parser.parse();
 			final GDMUpdateHandler gdmHandler = new Neo4jGDMWProvenanceUpdateHandler(permanentDatabase, resourceGraphURI);
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
 			parser.setGDMHandler(gdmHandler);
 			parser.parse();
 		}
+
+		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 
 		// return only model with new, non-existing resources
 		return newResourcesModel;

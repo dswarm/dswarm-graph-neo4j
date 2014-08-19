@@ -5,12 +5,9 @@ import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersioningStatics;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -34,6 +31,8 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
 
 		resourceGraphURI = resourceGraphURIArg;
+
+		init();
 	}
 
 	@Override
@@ -116,61 +115,46 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	@Override
 	protected int retrieveLatestVersion() {
 
-		final Transaction tx = database.beginTx();
 		int latestVersion = 1;
 
-		try {
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphURI);
 
-			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
-					GraphStatics.URI_PROPERTY, resourceGraphURI);
+		if (hits != null && hits.hasNext()) {
 
-			if (hits != null && hits.iterator().hasNext()) {
+			final Node dataModelNode = hits.next();
+			final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
-				final Node dataModelNode = hits.iterator().next();
-				final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
+			if (lastestVersionFromDB != null) {
 
-				if (lastestVersionFromDB != null) {
-
-					latestVersion = lastestVersionFromDB;
-				}
+				latestVersion = lastestVersionFromDB;
 			}
-
-			tx.success();
-		} catch (final Exception e) {
-
-			tx.failure();
-		} finally {
-
-			tx.close();
 		}
 
 		return latestVersion;
 	}
 
 	@Override
-	public void updateLatestVersion() {
+	protected Relationship getRelationship(final String uuid) throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		final IndexHits<Relationship> hits = statementUUIDsWProvenance.get(GraphStatics.UUID_W_PROVENANCE, resourceGraphURI + "." + uuid);
 
-		try {
+		if (hits != null && hits.hasNext()) {
 
-			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
-					GraphStatics.URI_PROPERTY, resourceGraphURI);
-
-			if (hits != null && hits.iterator().hasNext()) {
-
-				final Node dataModelNode = hits.iterator().next();
-				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
-			}
-
-			tx.success();
-		} catch (final Exception e) {
-
-			tx.failure();
-		} finally {
-
-			tx.close();
+			return hits.next();
 		}
 
+		return null;
+	}
+
+	@Override
+	public void updateLatestVersion() {
+
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphURI);
+
+		if (hits != null && hits.hasNext()) {
+
+			final Node dataModelNode = hits.next();
+			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+		}
 	}
 }

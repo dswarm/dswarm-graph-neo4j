@@ -5,8 +5,14 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.json.Model;
+import org.dswarm.graph.json.Predicate;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.read.NodeHandler;
+import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.Direction;
@@ -17,15 +23,10 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.dswarm.graph.json.Model;
-import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.read.NodeHandler;
-import org.dswarm.graph.read.RelationshipHandler;
 
 /**
  * @author tgaengler
@@ -49,6 +50,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 	private final int					version;
 
+	private Transaction					tx							= null;
+
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final Integer versionArg,
 			final GraphDatabaseService databaseArg) {
 
@@ -63,6 +66,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			version = versionArg;
 		} else {
+
+			tx = database.beginTx();
 			version = getLatestVersion();
 		}
 	}
@@ -70,7 +75,10 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	@Override
 	public Model read() {
 
-		final Transaction tx = database.beginTx();
+		if (tx == null) {
+
+			tx = database.beginTx();
+		}
 
 		PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
 
@@ -289,32 +297,20 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 	private int getLatestVersion() {
 
-		final Transaction tx = database.beginTx();
 		int latestVersion = 1;
 
-		try {
+		final Index<Node> resources = database.index().forNodes("resources");
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphUri);
 
-			ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(DynamicLabel.label(VersioningStatics.DATA_MODEL_TYPE),
-					GraphStatics.URI_PROPERTY, resourceGraphUri);
+		if (hits != null && hits.iterator().hasNext()) {
 
-			if (hits != null && hits.iterator().hasNext()) {
+			final Node dataModelNode = hits.iterator().next();
+			final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
-				final Node dataModelNode = hits.iterator().next();
-				final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
+			if (lastestVersionFromDB != null) {
 
-				if (lastestVersionFromDB != null) {
-
-					latestVersion = lastestVersionFromDB;
-				}
+				latestVersion = lastestVersionFromDB;
 			}
-
-			tx.success();
-		} catch (final Exception e) {
-
-			tx.failure();
-		} finally {
-
-			tx.close();
 		}
 
 		return latestVersion;

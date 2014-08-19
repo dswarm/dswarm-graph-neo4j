@@ -69,6 +69,29 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		Assert.assertEquals("the number of statements should be 157", 157, model.size());
 
+		// read first version
+		final ObjectNode requestJson2 = objectMapper.createObjectNode();
+
+		requestJson2.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
+		requestJson2.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson2.put("version", 1);
+
+		final String requestJsonString2 = objectMapper.writeValueAsString(requestJson2);
+
+		// POST the request
+		final ClientResponse response2 = target().path("/get").type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, requestJsonString2);
+
+		Assert.assertEquals("expected 200", 200, response2.getStatus());
+
+		final String body2 = response2.getEntity(String.class);
+
+		final org.dswarm.graph.json.Model model2 = objectMapper.readValue(body2, org.dswarm.graph.json.Model.class);
+
+		LOG.debug("read '" + model2.size() + "' statements");
+
+		Assert.assertEquals("the number of statements should be 149", 149, model2.size());
+
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 

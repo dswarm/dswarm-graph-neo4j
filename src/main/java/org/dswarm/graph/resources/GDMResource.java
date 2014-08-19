@@ -16,6 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.Changeset;
@@ -271,11 +272,21 @@ public class GDMResource {
 
 		final String recordClassUri = json.get("record_class_uri").asText();
 		final String resourceGraphUri = json.get("resource_graph_uri").asText();
+		final JsonNode versionNode = json.get("version");
+		final Integer version;
+
+		if (versionNode != null) {
+
+			version = versionNode.asInt();
+		} else {
+
+			version = null;
+		}
 
 		GDMResource.LOG.debug("try to read GDM statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
 				+ recordClassUri + "' from graph db");
 
-		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, resourceGraphUri, database);
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, resourceGraphUri, version, database);
 		final Model model = gdmReader.read();
 
 		String result = null;

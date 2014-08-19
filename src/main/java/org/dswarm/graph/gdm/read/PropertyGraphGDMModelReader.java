@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.Direction;
@@ -21,15 +20,12 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
-import org.dswarm.graph.utils.GraphUtils;
 
 /**
  * @author tgaengler
@@ -51,9 +47,10 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private Resource					currentResource;
 	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
 
-	private final int					latestVersion;
+	private final int					version;
 
-	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final Integer versionArg,
+			final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
 		resourceGraphUri = resourceGraphUriArg;
@@ -61,7 +58,13 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
-		latestVersion = getLatestVersion();
+
+		if (versionArg != null) {
+
+			version = versionArg;
+		} else {
+			version = getLatestVersion();
+		}
 	}
 
 	@Override
@@ -166,14 +169,15 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 					if (validFrom != null && validTo != null) {
 
-						if (Range.range(validFrom, validTo).contains(latestVersion)) {
+						if (Range.range(validFrom, validTo).contains(version)) {
 
 							relationshipHandler.handleRelationship(relationship);
 						}
-					}
+					} else {
 
-					// TODO: remove this later, when every stmt is versioned
-					relationshipHandler.handleRelationship(relationship);
+						// TODO: remove this later, when every stmt is versioned
+						relationshipHandler.handleRelationship(relationship);
+					}
 				}
 			}
 		}
@@ -198,14 +202,15 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 					if (validFrom != null && validTo != null) {
 
-						if (Range.range(validFrom, validTo).contains(latestVersion)) {
+						if (Range.range(validFrom, validTo).contains(version)) {
 
 							relationshipHandler.handleRelationship(relationship);
 						}
-					}
+					} else {
 
-					// TODO: remove this later, when every stmt is versioned
-					relationshipHandler.handleRelationship(relationship);
+						// TODO: remove this later, when every stmt is versioned
+						relationshipHandler.handleRelationship(relationship);
+					}
 				}
 			}
 		}

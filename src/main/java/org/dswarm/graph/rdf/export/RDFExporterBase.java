@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.rdf.utils.RDFUtils;
+import org.dswarm.common.rdf.utils.RDFUtils;
 import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.utils.GraphUtils;
 

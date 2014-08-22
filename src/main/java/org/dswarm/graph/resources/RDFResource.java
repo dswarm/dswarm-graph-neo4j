@@ -233,7 +233,7 @@ public class RDFResource {
 	 * @param database the db to export the data from
 	 * @param exportFormat serialization format all data should be serialized in, injected from accept header field
 	 * @return all data models serialized in exportLanguage
-	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType} 
+	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType}
 	 */
 	@GET
 	// SR TODO rename to /exportall
@@ -242,10 +242,14 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
+		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"" + exportFormat + "\"");
+
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
 		} catch (IllegalArgumentException wrongFormat) {
+			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
+					+ wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 
@@ -256,6 +260,8 @@ public class RDFResource {
 
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
+		RDFResource.LOG.debug("End processing request to export all rdf data to format \"" + exportFormat + "\"");
+		
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
 	}
@@ -270,7 +276,7 @@ public class RDFResource {
 	 *            header field
 	 * @param provenanceURI the data model to be exported
 	 * @return a single data model, serialized in exportLanguage
-	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType} 
+	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType}
 	 */
 	@GET
 	@Path("/export")
@@ -279,19 +285,28 @@ public class RDFResource {
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
 			@QueryParam("provenanceuri") final String provenanceURI) throws DMPGraphException {
 
+		RDFResource.LOG.debug("Start processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \"" + exportFormat
+				+ "\"");
+
 		// determine export language and file extension
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
 		} catch (IllegalArgumentException wrongFormat) {
+			// SR TODO remove log (antipattern log+throw)
+			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
+					+ wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
+		RDFResource.LOG.debug("Interpreting requested format \"" + exportFormat + "\" as \"" + formatType.toString() + "\"");
 
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
+
+		RDFResource.LOG.debug("End processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \""
+				+ exportFormat + "\"");
 
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();

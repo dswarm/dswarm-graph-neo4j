@@ -242,6 +242,11 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
+		// SR FIXME remove!
+		RDFResource.LOG.debug("This is a long message created for bug hunting in DD-668. It is created "
+				+ "to see whether the size/hash of graph-1.0-jar-with-dependencies.jar"
+				+ " that is build and deployed changes since we it seems that jenkins does not build and deploy the most recent code. ");
+
 		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"" + exportFormat + "\"");
 
 		final MediaType formatType;
@@ -261,7 +266,7 @@ public class RDFResource {
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
 		RDFResource.LOG.debug("End processing request to export all rdf data to format \"" + exportFormat + "\"");
-		
+
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
 	}
@@ -305,8 +310,8 @@ public class RDFResource {
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
 
-		RDFResource.LOG.debug("End processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \""
-				+ exportFormat + "\"");
+		RDFResource.LOG.debug("End processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \"" + exportFormat
+				+ "\"");
 
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();

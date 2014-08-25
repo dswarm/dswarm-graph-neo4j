@@ -2,46 +2,24 @@ package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
-import org.dswarm.graph.delta.match.model.GDMValueEntity;
+import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
-import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author tgaengler
  */
-public class FirstDegreeModificationSubGraphLeafEntityMatcher extends SubGraphLeafEntityMatcher implements ModificationResultSet<SubGraphLeafEntity> {
-
-	private final GraphDatabaseService	existingResourceDB;
-	private final GraphDatabaseService	newResourceDB;
+public class FirstDegreeModificationSubGraphLeafEntityMatcher extends ModificationMatcher<SubGraphLeafEntity> {
 
 	public FirstDegreeModificationSubGraphLeafEntityMatcher(final Collection<SubGraphLeafEntity> existingSubGraphLeafEntitiesArg,
 			final Collection<SubGraphLeafEntity> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg) {
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
-		super(existingSubGraphLeafEntitiesArg, newSubGraphLeafEntitiesArg);
-
-		existingResourceDB = existingResourceDBArg;
-		newResourceDB = newResourceDBArg;
-
-		existingEntities = generateHashes(existingSubGraphLeafEntitiesArg, existingResourceDB);
-		newEntities = generateHashes(newSubGraphLeafEntitiesArg, newResourceDB);
-	}
-
-	/**
-	 * note: we need another method signature for calculating the hashes
-	 *
-	 * @param subGraphLeafEntities
-	 * @return
-	 */
-	@Override
-	protected Map<String, SubGraphLeafEntity> generateHashes(final Collection<SubGraphLeafEntity> subGraphLeafEntities) {
-
-		return null;
+		super(existingSubGraphLeafEntitiesArg, newSubGraphLeafEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,
+				newResourceURIArg, new SubGraphLeafEntityMarker());
 	}
 
 	/**
@@ -50,6 +28,7 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends SubGraphLe
 	 * @param subGraphLeafEntities
 	 * @return
 	 */
+	@Override
 	protected Map<String, SubGraphLeafEntity> generateHashes(Collection<SubGraphLeafEntity> subGraphLeafEntities, final GraphDatabaseService graphDB) {
 
 		final Map<String, SubGraphLeafEntity> hashedSubGraphLeafEntities = new HashMap<>();
@@ -80,35 +59,5 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends SubGraphLe
 		}
 
 		return hashedSubGraphLeafEntities;
-	}
-
-	@Override 
-	public Map<SubGraphLeafEntity, SubGraphLeafEntity> getModifications() {
-
-		final Map<SubGraphLeafEntity, SubGraphLeafEntity> modifications = new HashMap<>();
-		matches = new HashSet<>();
-
-		for (final Map.Entry<String, SubGraphLeafEntity> existingValueEntityEntry : existingEntities.entrySet()) {
-
-			if (newEntities.containsKey(existingValueEntityEntry.getKey())) {
-
-				final SubGraphLeafEntity existingValueEntity = existingValueEntityEntry.getValue();
-				final SubGraphLeafEntity newValueEntity = newEntities.get(existingValueEntityEntry.getKey());
-
-				if(existingValueEntity.getValue() != null && newValueEntity.getValue() != null && !existingValueEntity.getValue().equals(newValueEntity.getValue())) {
-
-					modifications.put(existingValueEntity, newValueEntity);
-					matches.add(existingValueEntityEntry.getKey());
-				}
-			}
-		}
-
-		return modifications;
-	}
-
-	@Override
-	public Collection<String> getMatches() {
-
-		return matches;
 	}
 }

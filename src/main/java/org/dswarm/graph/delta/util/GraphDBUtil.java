@@ -723,7 +723,7 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 * @return
 	 */
-	private static Collection<String> getEntityLeafs(final GraphDatabaseService graphDB, final long nodeId) {
+	public static Collection<String> getEntityLeafs(final GraphDatabaseService graphDB, final long nodeId) {
 
 		final String entityLeafsQuery = buildGetEntityLeafsQuery(nodeId);
 		final Collection<String> entityLeafNodeIds = executeQueryWithMultipleResults(entityLeafsQuery, "leaf_node", graphDB);
@@ -784,79 +784,6 @@ public final class GraphDBUtil {
 		tx.close();
 	}
 
-	public static void markCSEntityPaths(final Collection<CSEntity> matchedCSEntities, final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI) {
-
-		final Set<Long> pathEndNodeIds = new HashSet<>();
-		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
-		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			// calc path end nodes
-			for (final CSEntity csEntity : matchedCSEntities) {
-
-				// TODO: mark type nodes from other paths as well?
-
-				for (final KeyEntity keyEntity : csEntity.getKeyEntities()) {
-
-					pathEndNodeIds.add(keyEntity.getNodeId());
-				}
-
-				for (final ValueEntity valueEntity : csEntity.getValueEntities()) {
-
-					if(!deltaState.equals(DeltaState.MODIFICATION)) {
-
-						pathEndNodeIds.add(valueEntity.getNodeId());
-					} else {
-
-						if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(csEntity)) {
-
-							modifiedPathEndNodesIdsFromCSEntityMap.put(csEntity, new HashSet<Long>());
-						}
-
-						modifiedPathEndNodesIdsFromCSEntityMap.get(csEntity).add(valueEntity.getNodeId());
-					}
-				}
-
-				final Set<Long> pathEndNodeIdsFromCSEntity = new HashSet<>();
-
-				//markEntityTypeNodes(graphDB, deltaState, csEntity.getNodeId());
-				fetchEntityTypeNodes(graphDB, pathEndNodeIdsFromCSEntity, csEntity.getNodeId());
-
-				determineNonMatchedSubGraphPathEndNodes(deltaState, graphDB, pathEndNodeIdsFromCSEntity, csEntity.getNodeId());
-
-				pathEndNodesIdsFromCSEntityMap.put(csEntity, pathEndNodeIdsFromCSEntity);
-			}
-		} catch (final Exception e) {
-
-			// TODO: log something
-
-			e.printStackTrace();
-		}
-
-		final DeltaState finalDeltaState;
-
-		if(!deltaState.equals(DeltaState.MODIFICATION)) {
-
-			finalDeltaState = deltaState;
-		} else {
-
-			finalDeltaState = DeltaState.ExactMatch;
-		}
-
-		markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
-
-		for(final Map.Entry<CSEntity, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(finalDeltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNodeIdsFromCSEntityEntry.getValue());
-		}
-
-		for(final Map.Entry<CSEntity, Set<Long>> modifiedPathEndNodeIdsFromCSEntityEntry : modifiedPathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), modifiedPathEndNodeIdsFromCSEntityEntry.getValue());
-		}
-	}
-
 	/**
 	 * note: we may need to find a better way to handle those statements
 	 *
@@ -876,7 +803,7 @@ public final class GraphDBUtil {
 	 * @param pathEndNodeIds
 	 * @param nodeId
 	 */
-	private static void fetchEntityTypeNodes(final GraphDatabaseService graphDB, final Set<Long> pathEndNodeIds, final long nodeId) {
+	public static void fetchEntityTypeNodes(final GraphDatabaseService graphDB, final Set<Long> pathEndNodeIds, final long nodeId) {
 
 		// fetch type nodes as well
 		final Iterable<Relationship> typeRels = graphDB.getNodeById(nodeId).getRelationships(Direction.OUTGOING, rdfTypeRelType);
@@ -890,188 +817,7 @@ public final class GraphDBUtil {
 		}
 	}
 
-	/**
-	 * note: we could also include everything from a sub entity that was marked as deleted or added, since then the whole sub
-	 * entity is affected to this state
-	 *
-	 * @param matchedValueEntities
-	 * @param deltaState
-	 * @param graphDB
-	 * @param resourceURI
-	 */
-	public static void markValueEntityPaths(final Collection<ValueEntity> matchedValueEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB, final String resourceURI) {
-
-		final Set<Long> pathEndNodeIds = new HashSet<>();
-		final Set<Long> modifiedPathEndNodeIds = new HashSet<>();
-		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
-		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			// calc path end nodes
-			for(final ValueEntity valueEntity : matchedValueEntities) {
-
-				// TODO: what should I do with related key paths here?
-				for(final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
-
-					pathEndNodeIds.add(keyEntity.getNodeId());
-				}
-
-				final long csEntityNodeId = valueEntity.getCSEntity().getNodeId();
-
-				if(!deltaState.equals(DeltaState.MODIFICATION)) {
-
-					pathEndNodeIds.add(valueEntity.getNodeId());
-				} else if(csEntityNodeId >= 0) {
-
-					if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(valueEntity.getCSEntity())) {
-
-						modifiedPathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), new HashSet<Long>());
-					}
-
-					modifiedPathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity()).add(valueEntity.getNodeId());
-				} else {
-
-					modifiedPathEndNodeIds.add(valueEntity.getNodeId());
-				}
-
-				if(csEntityNodeId >= 0) {
-
-
-					final Set<Long> pathEndNodeIdsFromCSEntity;
-
-					if(pathEndNodesIdsFromCSEntityMap.containsKey(valueEntity.getCSEntity())) {
-
-						pathEndNodeIdsFromCSEntity = pathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity());
-					} else {
-
-						pathEndNodeIdsFromCSEntity = new HashSet<>();
-					}
-
-					fetchEntityTypeNodes(graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);
-					// TODO: we can't do this here, or? - I think we'll probably mark too much
-					determineNonMatchedSubGraphPathEndNodes(deltaState, graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);
-
-					pathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), pathEndNodeIdsFromCSEntity);
-				}
-			}
-		} catch (final Exception e) {
-
-			// TODO: log something
-
-			e.printStackTrace();
-		}
-
-		final DeltaState finalDeltaState;
-
-		if(!deltaState.equals(DeltaState.MODIFICATION)) {
-
-			finalDeltaState = deltaState;
-		} else {
-
-			finalDeltaState = DeltaState.ExactMatch;
-		}
-
-		markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
-
-
-		if(!modifiedPathEndNodeIds.isEmpty()) {
-
-			markPaths(deltaState, graphDB, resourceURI, modifiedPathEndNodeIds);
-		}
-
-		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(finalDeltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(), pathEndNideIdsFromCSEntityEntry.getValue());
-		}
-
-		for(final Map.Entry<CSEntity, Set<Long>> modifiedPathEndNodeIdsFromCSEntityEntry : modifiedPathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(), modifiedPathEndNodeIdsFromCSEntityEntry.getValue());
-		}
-	}
-
-	/**
-	 * note: we could also include everything from a sub entity that was marked as deleted or added, since then the whole sub
-	 * entity is affected to this state
-	 *
-	 * @param matchedSubGraphEntities
-	 * @param deltaState
-	 * @param graphDB
-	 */
-	public static void markSubGraphEntityPaths(final Collection<SubGraphEntity> matchedSubGraphEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB) {
-
-		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
-
-			// calc path end nodes
-			for(final SubGraphEntity subGraphEntity : matchedSubGraphEntities) {
-				
-				try (final Transaction ignored = graphDB.beginTx()) {
-
-					final Collection<String> leafNodes = getEntityLeafs(graphDB, subGraphEntity.getNodeId());
-
-					if(leafNodes != null && !leafNodes.isEmpty()) {
-
-						final Set<Long> pathEndNodeIds;
-
-						if(pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
-
-							pathEndNodeIds = pathEndNodesIdsFromCSEntityMap.get(subGraphEntity.getCSEntity().getNodeId());
-						} else {
-
-							pathEndNodeIds = new HashSet<>();
-						}
-
-						for(final String leafNode : leafNodes) {
-
-							pathEndNodeIds.add(Long.valueOf(leafNode));
-						}
-
-						pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);
-					}
-				} catch (final Exception e) {
-
-					// TODO: log something
-
-					e.printStackTrace();
-				}
-			}
-
-		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
-		}
-	}
-
-	/**
-	 * @param matchedSubGraphLeafEntities
-	 * @param deltaState
-	 * @param graphDB
-	 */
-	public static void markSubGraphLeafEntityPaths(final Collection<SubGraphLeafEntity> matchedSubGraphLeafEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB) {
-
-		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
-
-		for(final SubGraphLeafEntity subGraphLeafEntity : matchedSubGraphLeafEntities) {
-
-			if(!pathEndNodesIdsFromCSEntityMap.containsKey(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId())) {
-
-				pathEndNodesIdsFromCSEntityMap.put(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId(), new HashSet<Long>());
-			}
-
-			pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId()).add(subGraphLeafEntity.getNodeId());
-		}
-
-		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
-
-			markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
-		}
-	}
-
-	private static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
+	public static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
 			final Set<Long> pathEndNodeIds, final long nodeId) {
 
 		if (deltaState.equals(DeltaState.ADDITION) || deltaState.equals(DeltaState.DELETION)) {
@@ -1088,7 +834,7 @@ public final class GraphDBUtil {
 		}
 	}
 
-	private static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
+	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
 			final Set<Long> pathEndNodeIds) {
 
 		final Transaction tx = graphDB.beginTx();
@@ -1101,7 +847,7 @@ public final class GraphDBUtil {
 		tx.close();
 	}
 
-	private static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds) {
+	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds) {
 
 		final Transaction tx = graphDB.beginTx();
 

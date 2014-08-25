@@ -2,21 +2,22 @@ package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import org.dswarm.graph.delta.match.mark.CSEntityMarker;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * Created by tgaengler on 01/08/14.
  */
-public class FirstDegreeExactCSEntityMatcher extends CSEntityMatcher {
+public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 
-	public FirstDegreeExactCSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg) {
+	public FirstDegreeExactCSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg, final String existingResourcURIArg, final String newResourceURIArg) {
 
-		super(existingCSEntitiesArg, newCSEntitiesArg);
+		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg, new CSEntityMarker());
 	}
 
 	/**
@@ -26,7 +27,7 @@ public class FirstDegreeExactCSEntityMatcher extends CSEntityMatcher {
 	 * @return
 	 */
 	@Override
-	protected Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities) {
+	protected Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities, final GraphDatabaseService resourceD) {
 
 		final Map<String, CSEntity> hashedCSEntities = new HashMap<>();
 

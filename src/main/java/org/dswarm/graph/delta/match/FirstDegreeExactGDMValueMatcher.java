@@ -5,17 +5,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author tgaengler
  */
-public class FirstDegreeExactGDMValueMatcher extends ValueMatcher {
+public class FirstDegreeExactGDMValueMatcher extends Matcher<ValueEntity> {
 
-	public FirstDegreeExactGDMValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg) {
+	public FirstDegreeExactGDMValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg,
+			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
+			final String newResourceURIArg) {
 
-		super(existingValueEntitiesArg, newValueEntitiesArg);
+		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
+				new ValueEntityMarker());
 	}
 
 	/**
@@ -24,7 +29,7 @@ public class FirstDegreeExactGDMValueMatcher extends ValueMatcher {
 	 * @param valueEntities
 	 * @return
 	 */
-	@Override protected Map<String, ValueEntity> generateHashes(final Collection<ValueEntity> valueEntities) {
+	@Override protected Map<String, ValueEntity> generateHashes(final Collection<ValueEntity> valueEntities, final GraphDatabaseService resourceD) {
 		
 		final Map<String, ValueEntity> hashedValueEntities = new HashMap<>();
 

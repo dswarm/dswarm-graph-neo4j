@@ -4,18 +4,22 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author tgaengler
  */
-public class FirstDegreeModificationGDMValueMatcher extends ModificationCSValueMatcher {
+public class FirstDegreeModificationGDMValueMatcher extends ModificationMatcher<ValueEntity> {
 
 	public FirstDegreeModificationGDMValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg,
-			final Collection<ValueEntity> newValueEntitiesArg) {
+			final Collection<ValueEntity> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
-		super(existingValueEntitiesArg, newValueEntitiesArg);
+		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
+				new ValueEntityMarker());
 	}
 
 	/**
@@ -25,7 +29,7 @@ public class FirstDegreeModificationGDMValueMatcher extends ModificationCSValueM
 	 * @return
 	 */
 	@Override
-	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities) {
+	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities, final GraphDatabaseService resourceD) {
 
 		final Map<String, ValueEntity> hashedValueEntities = new HashMap<>();
 

@@ -4,17 +4,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author tgaengler
  */
-public class FirstDegreeModificationCSValueMatcher extends ModificationCSValueMatcher {
+public class FirstDegreeModificationCSValueMatcher extends ModificationMatcher<ValueEntity> {
 
 	public FirstDegreeModificationCSValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg,
-			final Collection<ValueEntity> newValueEntitiesArg) {
+			final Collection<ValueEntity> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
-		super(existingValueEntitiesArg, newValueEntitiesArg);
+		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
+				new ValueEntityMarker());
 	}
 
 	/**
@@ -24,7 +28,7 @@ public class FirstDegreeModificationCSValueMatcher extends ModificationCSValueMa
 	 * @return
 	 */
 	@Override
-	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities) {
+	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities, final GraphDatabaseService graphDB) {
 
 		final Map<String, ValueEntity> hashedValueEntities = new HashMap<>();
 

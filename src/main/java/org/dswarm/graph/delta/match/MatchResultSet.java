@@ -5,8 +5,11 @@ import java.util.Collection;
 /**
  * Created by tgaengler on 01/08/14.
  */
-public interface MatchResultSet {
+public interface MatchResultSet<ENTITY> {
 
-	Collection<String> getMatches();
+	void match();
 
+	Collection<ENTITY> getExistingEntitiesNonMatches();
+
+	Collection<ENTITY> getNewEntitiesNonMatches();
 }

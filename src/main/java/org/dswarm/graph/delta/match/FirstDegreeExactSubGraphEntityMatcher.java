@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dswarm.graph.delta.match.mark.SubGraphEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -11,34 +12,14 @@ import org.neo4j.graphdb.GraphDatabaseService;
 /**
  * @author tgaengler
  */
-public class FirstDegreeExactSubGraphEntityMatcher extends SubGraphEntityMatcher {
-
-	private final GraphDatabaseService	existingResourceDB;
-	private final GraphDatabaseService	newResourceDB;
+public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntity> {
 
 	public FirstDegreeExactSubGraphEntityMatcher(final Collection<SubGraphEntity> existingSubGraphEntitiesArg,
 			final Collection<SubGraphEntity> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg) {
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
-		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg);
-
-		existingResourceDB = existingResourceDBArg;
-		newResourceDB = newResourceDBArg;
-
-		existingEntities = generateHashes(existingSubGraphEntitiesArg, existingResourceDB);
-		newEntities = generateHashes(newSubGraphEntitiesArg, newResourceDB);
-	}
-
-	/**
-	 * note: we need another method signature for calculating the hashes
-	 *
-	 * @param subGraphEntities
-	 * @return
-	 */
-	@Override
-	protected Map<String, SubGraphEntity> generateHashes(final Collection<SubGraphEntity> subGraphEntities) {
-
-		return null;
+		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,
+				newResourceURIArg, new SubGraphEntityMarker());
 	}
 
 	/**
@@ -47,6 +28,7 @@ public class FirstDegreeExactSubGraphEntityMatcher extends SubGraphEntityMatcher
 	 * @param subGraphEntities
 	 * @return
 	 */
+	@Override
 	protected Map<String, SubGraphEntity> generateHashes(final Collection<SubGraphEntity> subGraphEntities, final GraphDatabaseService graphDB) {
 
 		final Map<String, SubGraphEntity> hashedSubGraphEntities = new HashMap<>();

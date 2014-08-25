@@ -17,5 +17,4 @@ public interface ModificationResultSet<VALUEENTITY> {
 	 * @return
 	 */
 	Map<VALUEENTITY, VALUEENTITY> getModifications();
-
 }

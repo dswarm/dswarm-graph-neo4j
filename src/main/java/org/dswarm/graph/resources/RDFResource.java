@@ -242,11 +242,6 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
-		// SR FIXME remove!
-		RDFResource.LOG.debug("This is a long message created for bug hunting in DD-668. It is created "
-				+ "to see whether the size/hash of graph-1.0-jar-with-dependencies.jar"
-				+ " that is build and deployed changes since we it seems that jenkins does not build and deploy the most recent code. ");
-
 		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"" + exportFormat + "\"");
 
 		final MediaType formatType;

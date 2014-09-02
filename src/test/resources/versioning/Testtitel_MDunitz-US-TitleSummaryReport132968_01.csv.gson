@@ -1,0 +1,283 @@
+[ {
+  "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c" : [ {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EBL+ID",
+    "o" : {
+      "v" : "181561"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Title",
+    "o" : {
+      "v" : "False Messengers : How Addictive Drugs Change the Brain"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Publisher",
+    "o" : {
+      "v" : "CRC Press, A Martin Dunitz Book"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#PubDate",
+    "o" : {
+      "v" : "1999-09-21"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#eISBN",
+    "o" : {
+      "v" : "9780203304976"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ISBN",
+    "o" : {
+      "v" : "9789057025143"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Category",
+    "o" : {
+      "v" : "Medicine; Pharmacy"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Dewey",
+    "o" : {
+      "v" : "346.42029;347.42077; 615.788"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#LCC",
+    "o" : {
+      "v" : "RC564.F75 1999eb"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Visible",
+    "o" : {
+      "v" : "False"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Owned",
+    "o" : {
+      "v" : "False"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fund+Code",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Copies",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Purchase+Type",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Purchase+Price",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Lending+Model",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Date+Purchased",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Renewal+Date",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Owned+Loans",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Owned+Loan+Days",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Current+Loan+Days+Remaining",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Unowned+Loans",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Browse+Sessions",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Browse+Time",
+    "o" : {
+      "v" : "0:00:00"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Read+Online+Sessions",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Read+Online+Time",
+    "o" : {
+      "v" : "0:00:00"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Downloads",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Days+Downloaded",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Avg+Download+Length",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Turnaways",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Pages+Printed",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Pages+Copied",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Total+Unique+Users",
+    "o" : {
+      "v" : "0"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ebook+Status",
+    "o" : {
+      "v" : "True"
+    }
+  } ]
+} ]

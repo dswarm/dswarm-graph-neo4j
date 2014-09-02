@@ -40,8 +40,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal("mabxml_dmp.gson", "http://data.slub-dresden.de/resources/1");
-		writeGDMToDBInternalWithContentSchema("mabxml_dmp2.gson", "http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal("versioning/mabxml_dmp.gson", "http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternalWithContentSchema("versioning/mabxml_dmp2.gson", "http://data.slub-dresden.de/resources/1");
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

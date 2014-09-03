@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
-import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.Node;
 import org.dswarm.graph.json.Resource;
@@ -273,8 +273,8 @@ public class GDMChangesetParser implements GDMUpdateParser {
 					newRelationship = increaseRelationship(newRelationshipsIter);
 				}
 
-				final String existingRelationshipPrint = GraphDBUtil.printRelationship(existingRelationship);
-				final String newRelationshipPrint = GraphDBUtil.printRelationship(newRelationship);
+				final String existingRelationshipPrint = GraphDBPrintUtil.printRelationship(existingRelationship);
+				final String newRelationshipPrint = GraphDBPrintUtil.printRelationship(newRelationship);
 
 				if (!(existingRelationshipPrint.equals(newRelationshipPrint) && index == indexFromDB)) {
 

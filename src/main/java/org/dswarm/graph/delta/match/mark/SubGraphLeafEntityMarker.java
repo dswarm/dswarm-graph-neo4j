@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
-import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.delta.util.GraphDBMarkUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -33,7 +33,7 @@ public class SubGraphLeafEntityMarker implements Marker<SubGraphLeafEntity> {
 
 		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 
-			GraphDBUtil.markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
+			GraphDBMarkUtil.markPaths(deltaState, graphDB, pathEndNodeIdsFromCSEntityEntry.getKey(), pathEndNodeIdsFromCSEntityEntry.getValue());
 		}
 	}
 }

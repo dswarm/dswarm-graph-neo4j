@@ -47,15 +47,14 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.neo4j.kernel.Traversal;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
@@ -92,96 +91,7 @@ public final class GraphDBUtil {
 		return hits.next();
 	}
 
-	public static void printNodes(final GraphDatabaseService graphDB) {
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
-
-			for (final Node node : nodes) {
-
-				final Iterable<Label> labels = node.getLabels();
-
-				for (final Label label : labels) {
-
-					System.out.println("node = '" + node.getId() + "' :: label = '" + label.name());
-				}
-
-				final Iterable<String> propertyKeys = node.getPropertyKeys();
-
-				for (final String propertyKey : propertyKeys) {
-
-					final Object value = node.getProperty(propertyKey);
-
-					System.out.println("node = '" + node.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
-				}
-			}
-
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't print nodes", e);
-		}
-	}
-
-	public static void printRelationships(final GraphDatabaseService graphDB) {
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
-
-			for (final Relationship relationship : relationships) {
-
-				final RelationshipType type = relationship.getType();
-
-				System.out.println("relationship = '" + relationship.getId() + "' :: relationship type = '" + type.name());
-
-				final Iterable<String> propertyKeys = relationship.getPropertyKeys();
-
-				for (final String propertyKey : propertyKeys) {
-
-					final Object value = relationship.getProperty(propertyKey);
-
-					System.out.println("relationship = '" + relationship.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
-				}
-			}
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't print relationships", e);
-		}
-	}
-
-	public static void printDeltaRelationships(final GraphDatabaseService graphDB) {
-
-		Transaction tx = graphDB.beginTx();
-
-		final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
-
-		for (final Relationship relationship : relationships) {
-
-			final String sb = printDeltaRelationship(relationship);
-
-			System.out.println(sb);
-		}
-
-		tx.success();
-		tx.close();
-	}
-
-	public static String printDeltaRelationship(final Relationship relationship) {
-
-		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
-		final String startNodeString = printNode(relationship.getStartNode());
-		final String relString = printRelationship(relationship);
-		final String endNodeString = printNode(relationship.getEndNode());
-
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append(index).append(" : ").append(startNodeString).append("-").append(relString).append("->").append(endNodeString);
-
-		return sb.toString();
-	}
-
-	private static String getLabels(final Node node) {
+	static String getLabels(final Node node) {
 
 		final StringBuilder sb2 = new StringBuilder();
 
@@ -193,95 +103,6 @@ public final class GraphDBUtil {
 		final String tempLabels = sb2.toString();
 
 		return tempLabels.substring(0, tempLabels.length() - 1);
-	}
-
-	public static String printNode(final Node node) {
-
-		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
-		final NodeType nodeType = NodeType.getByName(nodeTypeString);
-		final StringBuilder sb = new StringBuilder();
-		sb.append("(").append(node.getId()).append(":type='").append(nodeType).append("',");
-
-		final String labels = getLabels(node);
-
-		sb.append("label='").append(labels);
-
-		switch (nodeType) {
-
-			case Resource:
-			case TypeResource:
-
-				sb.append("',");
-
-				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
-				sb.append("uri='").append(uri);
-
-				break;
-			case Literal:
-
-				sb.append("',");
-
-				final String value = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
-				sb.append("value='").append(value);
-
-				break;
-		}
-
-		sb.append("'");
-
-		final Boolean matched = (Boolean) node.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
-
-		if (matched != null) {
-
-			sb.append(",matched='").append(matched).append("'");
-		}
-
-		final String deltaState = (String) node.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
-
-		if (deltaState != null) {
-
-			sb.append(",delta_state='").append(deltaState).append("'");
-		}
-
-		sb.append(")");
-
-		return sb.toString();
-	}
-
-	public static String printRelationship(final Relationship relationship) {
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append("[").append(relationship.getId()).append(":").append(relationship.getType().name()).append(",");
-
-		final Long order = (Long) relationship.getProperty(GraphStatics.ORDER_PROPERTY, null);
-
-		if (order != null) {
-
-			sb.append("order='").append(order).append("',");
-		}
-
-		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
-		sb.append("index='").append(index);
-
-		sb.append("'");
-
-		final Boolean matched = (Boolean) relationship.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
-
-		if (matched != null) {
-
-			sb.append(",matched='").append(matched).append("'");
-		}
-
-		final String deltaState = (String) relationship.getProperty(DeltaStatics.DELTA_STATE_PROPERTY, null);
-
-		if (deltaState != null) {
-
-			sb.append(",delta_state='").append(deltaState).append("'");
-		}
-
-		sb.append("]");
-
-		return sb.toString();
 	}
 
 	/**
@@ -461,17 +282,6 @@ public final class GraphDBUtil {
 				}).traverse(entityNode);
 	}
 
-	public static void calculateSubGraphEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			calculateEntityHash(graphDB, entityNodeId, nodeHashes);
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't print nodes", e);
-		}
-	}
-
 	/**
 	 * note: should be run in transaction scope
 	 *
@@ -480,7 +290,7 @@ public final class GraphDBUtil {
 	 * @param nodeHashes
 	 * @return
 	 */
-	private static boolean calculateEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
+	public static boolean calculateEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
 
 		final Node entityNode = graphDB.getNodeById(entityNodeId);
 
@@ -512,7 +322,7 @@ public final class GraphDBUtil {
 	 * @param endNodeHash
 	 * @return
 	 */
-	private static long calculateRelationshipHash(long hash, final Relationship rel, final Long endNodeHash) {
+	public static long calculateRelationshipHash(long hash, final Relationship rel, final Long endNodeHash) {
 
 		final String predicate = rel.getType().name();
 		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
@@ -539,7 +349,7 @@ public final class GraphDBUtil {
 	 * @param node
 	 * @return
 	 */
-	private static Long calculateNodeHash(final Node node) {
+	public static Long calculateNodeHash(final Node node) {
 
 		final NodeType nodeType = getNodeType(node);
 
@@ -567,7 +377,7 @@ public final class GraphDBUtil {
 	 * @param node
 	 * @return
 	 */
-	private static Long calculateSimpleNodeHash(final Node node) {
+	public static Long calculateSimpleNodeHash(final Node node) {
 
 		final NodeType nodeType = getNodeType(node);
 
@@ -580,149 +390,6 @@ public final class GraphDBUtil {
 		return (long) nodeType.hashCode();
 	}
 
-	public static void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
-
-		final Collection<String> entityHierarchyLevelNodeIds = getEntityHierarchyLevelNodes(graphDB, entityNodeId, hierarchyLevel);
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			for(final String entityHierarchyLevelNodeId : entityHierarchyLevelNodeIds) {
-
-				calculateEntityHash(graphDB, Long.valueOf(entityHierarchyLevelNodeId), nodeHashes);
-			}
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't calculate simple node hashes", e);
-		}
-	}
-
-	public static Integer calculateEntityLeafHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
-
-		final Collection<String> entityLeafNodeIds = getEntityLeafs(graphDB, entityNodeId);
-		Integer deepestHierarchyLevel = null;
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			for(final String entityLeafNodeId : entityLeafNodeIds) {
-
-				final Node leafNode = graphDB.getNodeById(Long.valueOf(entityLeafNodeId));
-
-
-				Long hash = calculateNodeHash(leafNode);
-
-				if(hash == null) {
-
-					continue;
-				}
-
-				final Integer hierarchyLevel = (Integer) leafNode.getProperty("__HIERARCHY_LEVEL__", null);
-
-				if(hierarchyLevel != null) {
-
-					hash = 31 * hash + hierarchyLevel;
-
-					if(deepestHierarchyLevel != null && deepestHierarchyLevel < hierarchyLevel) {
-
-						deepestHierarchyLevel = hierarchyLevel;
-					} else {
-
-						deepestHierarchyLevel = hierarchyLevel;
-					}
-				}
-
-				nodeHashes.put(leafNode.getId(), hash);
-			}
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't calculated entity leaf hashes", e);
-		}
-
-		return deepestHierarchyLevel;
-	}
-
-	public static Long calculateSubGraphLeafPathHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
-			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
-
-				return null;
-			}
-
-			final Path entityPath = entityPaths.iterator().next();
-			final Iterator<Node> entityPathNodes = entityPath.reverseNodes().iterator();
-
-			Long endNodeHash = calculateNodeHash(entityPathNodes.next());
-
-			if(endNodeHash == null) {
-
-				return null;
-			}
-
-			Long subGraphLeafPathHash = (long) 0;
-
-			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
-
-			for(final Relationship entityPathRel : entityPathRels) {
-
-				subGraphLeafPathHash = calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
-
-				final Node endNode = entityPathNodes.next();
-				endNodeHash = calculateNodeHash(endNode);
-			}
-
-			return subGraphLeafPathHash;
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't calculate sub graph leaf path hashes", e);
-		}
-
-		return null;
-	}
-
-	public static Long calculateSubGraphLeafPathModificationHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
-
-		try (final Transaction ignored = graphDB.beginTx()) {
-
-			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
-
-			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
-
-				return null;
-			}
-
-			final Path entityPath = entityPaths.iterator().next();
-			final Iterator<Node> entityPathNodes = entityPath.reverseNodes().iterator();
-
-			Long endNodeHash = calculateSimpleNodeHash(entityPathNodes.next());
-
-			if(endNodeHash == null) {
-
-				return null;
-			}
-
-			Long subGraphLeafPathHash = (long) 0;
-
-			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
-
-			for(final Relationship entityPathRel : entityPathRels) {
-
-				subGraphLeafPathHash = calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
-
-				final Node endNode = entityPathNodes.next();
-				endNodeHash = calculateNodeHash(endNode);
-			}
-
-			return subGraphLeafPathHash;
-		} catch (final Exception e) {
-
-			GraphDBUtil.LOG.error("couldn't calculated sub graph leaf path modification hashes", e);
-		}
-
-		return null;
-	}
-
 	private static NodeType getNodeType(final Node node) {
 
 		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
@@ -732,9 +399,7 @@ public final class GraphDBUtil {
 			return null;
 		}
 
-		final NodeType nodeType = NodeType.getByName(nodeTypeString);
-
-		return nodeType;
+		return NodeType.getByName(nodeTypeString);
 	}
 
 	private static String getValue(final Node node, final NodeType nodeType) {
@@ -776,26 +441,11 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 * @return
 	 */
-	private static Collection<String> getEntityHierarchyLevelNodes(final GraphDatabaseService graphDB, final long nodeId, final int hierarchyLevel) {
-
-		final String entitHierarchyLevelNodesQuery = buildGetEntityHierarchyLevelNodesQuery(nodeId, hierarchyLevel);
-		final Collection<String> entityHierarchyLevelNodeIds = executeQueryWithMultipleResults(entitHierarchyLevelNodesQuery, "hierarchy_level_node",
-				graphDB);
-
-		return entityHierarchyLevelNodeIds;
-	}
-
-	/**
-	 * @param graphDB
-	 * @param nodeId
-	 * @return
-	 */
 	public static Collection<String> getEntityLeafs(final GraphDatabaseService graphDB, final long nodeId) {
 
 		final String entityLeafsQuery = buildGetEntityLeafsQuery(nodeId);
-		final Collection<String> entityLeafNodeIds = executeQueryWithMultipleResults(entityLeafsQuery, "leaf_node", graphDB);
 
-		return entityLeafNodeIds;
+		return executeQueryWithMultipleResults(entityLeafsQuery, "leaf_node", graphDB);
 	}
 
 	/**
@@ -806,63 +456,8 @@ public final class GraphDBUtil {
 	private static Map<String, String> getEntityLeafsWithValue(final GraphDatabaseService graphDB, final long nodeId) {
 
 		final String entityLeafsQuery = buildGetEntityLeafsWithValueQuery(nodeId);
-		final Map<String, String> entityLeafs = executeQueryWithMultipleResultsWithValues(entityLeafsQuery, "leaf_node", "leaf_uri", "leaf_value",
-				graphDB);
 
-		return entityLeafs;
-	}
-
-	public static void printPaths(final GraphDatabaseService graphDB, final String resourceURI) {
-
-		final Transaction tx = graphDB.beginTx();
-
-		final Iterable<Path> paths = getResourcePaths(graphDB, resourceURI);
-		printPaths(paths);
-
-		tx.success();
-		tx.close();
-	}
-
-	/**
-	 * note: should be run in transaction scope
-	 *
-	 * @param paths
-	 */
-	public static void printPaths(final Iterable<Path> paths) {
-
-		final Traversal.PathDescriptor<Path> pathPrinter = new PathPrinter();
-
-		for (final Path path : paths) {
-
-			final String pathString = Traversal.pathToString(path, pathPrinter);
-
-			System.out.println(pathString);
-		}
-	}
-
-	public static void printEntityPaths(final GraphDatabaseService graphDB, final long nodeId) {
-
-		final Transaction tx = graphDB.beginTx();
-
-		final Iterable<Path> paths = getEntityPaths(graphDB, nodeId);
-		printPaths(paths);
-
-		tx.success();
-		tx.close();
-	}
-
-	/**
-	 * note: we may need to find a better way to handle those statements
-	 *
-	 * @param graphDB
-	 * @param nodeId
-	 */
-	private static void markEntityTypeNodes(final GraphDatabaseService graphDB, final DeltaState deltaState, final long nodeId) {
-
-		final Set<Long> pathEndNodeIds = new HashSet<>();
-
-		fetchEntityTypeNodes(graphDB, pathEndNodeIds, nodeId);
-		markPaths(deltaState, graphDB, nodeId, pathEndNodeIds);
+		return executeQueryWithMultipleResultsWithValues(entityLeafsQuery, "leaf_node", "leaf_uri", "leaf_value", graphDB);
 	}
 
 	/**
@@ -896,78 +491,6 @@ public final class GraphDBUtil {
 				for (final Path nonMatchtedSubGraphPath : nonMatchedSubGraphPaths) {
 
 					pathEndNodeIds.add(nonMatchtedSubGraphPath.endNode().getId());
-				}
-			}
-		}
-	}
-
-	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
-			final Set<Long> pathEndNodeIds) {
-
-		final Transaction tx = graphDB.beginTx();
-
-		final Iterable<Path> paths = getResourcePaths(graphDB, resourceURI);
-
-		markPaths(deltaState, pathEndNodeIds, paths);
-
-		tx.success();
-		tx.close();
-	}
-
-	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds) {
-
-		final Transaction tx = graphDB.beginTx();
-
-		final Iterable<Path> paths = getEntityPaths(graphDB, nodeId);
-
-		markPaths(deltaState, pathEndNodeIds, paths);
-
-		tx.success();
-	}
-
-	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) {
-
-		for (final Path path : paths) {
-
-			final long pathEndNodeId = path.endNode().getId();
-
-			if (pathEndNodeIds.contains(pathEndNodeId)) {
-
-				// mark path
-				for (final Relationship rel : path.relationships()) {
-
-					if (!rel.hasProperty(DeltaStatics.DELTA_STATE_PROPERTY)) {
-
-						rel.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
-					}
-
-					rel.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
-				}
-
-				for (final Node node : path.nodes()) {
-
-					if (!node.hasProperty(DeltaStatics.DELTA_STATE_PROPERTY)) {
-
-						node.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
-					} else if (deltaState.equals(DeltaState.ExactMatch)) {
-
-						final String deltaStateString = (String) node.getProperty(DeltaStatics.DELTA_STATE_PROPERTY);
-						final DeltaState currentDeltaState = DeltaState.getByName(deltaStateString);
-
-						switch (currentDeltaState) {
-
-							case ADDITION:
-							case DELETION:
-							case MODIFICATION:
-
-								// modify delta state if a "higher" delta state was determined
-								node.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
-
-								break;
-						}
-					}
-
-					node.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
 				}
 			}
 		}
@@ -1466,18 +989,6 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetEntityHierarchyLevelNodesQuery(final long nodeId, final int hierarchyLevel) {
-
-		// START n= node(2062) MATCH (n)-[r*]->(m) RETURN m;
-
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m)").append("\nWHERE m.__HIERARCHY_LEVEL__ = ").append(hierarchyLevel)
-				.append("\nRETURN id(m) AS hierarchy_level_node");
-
-		return sb.toString();
-	}
-
 	private static String buildGetEntityLeafsQuery(final long nodeId) {
 
 		// START n= node(2062) MATCH (n)-[r*]->(m) RETURN m;
@@ -1541,7 +1052,8 @@ public final class GraphDBUtil {
 		return resultValue;
 	}
 
-	private static Collection<String> executeQueryWithMultipleResults(final String query, final String resultVariableName, final GraphDatabaseService graphDB) {
+	public static Collection<String> executeQueryWithMultipleResults(final String query, final String resultVariableName,
+			final GraphDatabaseService graphDB) {
 
 		final Set<String> resultSet = new HashSet<>();
 		final ExecutionEngine engine = new ExecutionEngine(graphDB);

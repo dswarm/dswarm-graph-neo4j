@@ -2,17 +2,26 @@ package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
 public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphLeafEntity> {
+
+	private static final Logger	LOG	= LoggerFactory.getLogger(FirstDegreeExactSubGraphLeafEntityMatcher.class);
 
 	public FirstDegreeExactSubGraphLeafEntityMatcher(final Collection<SubGraphLeafEntity> existingSubGraphLeafEntitiesArg,
 			final Collection<SubGraphLeafEntity> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
@@ -40,7 +49,8 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 			final int predicateHash = subGraphLeafEntity.getSubGraphEntity().getPredicate().hashCode();
 
 			// calc sub graph leaf path hash
-			final Long subGraphLeafPathHash = GraphDBUtil.calculateSubGraphLeafPathHash(subGraphLeafEntity.getNodeId(), subGraphLeafEntity.getSubGraphEntity().getNodeId(), graphDB);
+			final Long subGraphLeafPathHash = calculateSubGraphLeafPathHash(subGraphLeafEntity.getNodeId(),
+					subGraphLeafEntity.getSubGraphEntity().getNodeId(), graphDB);
 
 			long hash = keyHash;
 			hash = 31 * hash + predicateHash;
@@ -57,5 +67,46 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 		}
 
 		return hashedSubGraphLeafEntities;
+	}
+
+	private Long calculateSubGraphLeafPathHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
+
+				return null;
+			}
+
+			final Path entityPath = entityPaths.iterator().next();
+			final Iterator<Node> entityPathNodes = entityPath.reverseNodes().iterator();
+
+			Long endNodeHash = GraphDBUtil.calculateNodeHash(entityPathNodes.next());
+
+			if(endNodeHash == null) {
+
+				return null;
+			}
+
+			Long subGraphLeafPathHash = (long) 0;
+
+			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
+
+			for(final Relationship entityPathRel : entityPathRels) {
+
+				subGraphLeafPathHash = GraphDBUtil.calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
+
+				final Node endNode = entityPathNodes.next();
+				endNodeHash = GraphDBUtil.calculateNodeHash(endNode);
+			}
+
+			return subGraphLeafPathHash;
+		} catch (final Exception e) {
+
+			FirstDegreeExactSubGraphLeafEntityMatcher.LOG.error("couldn't calculate sub graph leaf path hashes", e);
+		}
+
+		return null;
 	}
 }

@@ -17,7 +17,7 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 	@Override
 	public String nodeRepresentation(final Path path, final Node node) {
 
-		return GraphDBUtil.printNode(node);
+		return GraphDBPrintUtil.printNode(node);
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class PathPrinter implements Traversal.PathDescriptor<Path> {
 		}
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append(prefix).append(GraphDBUtil.printRelationship(relationship)).append(suffix);
+		sb.append(prefix).append(GraphDBPrintUtil.printRelationship(relationship)).append(suffix);
 
 		return sb.toString();
 	}

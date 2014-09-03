@@ -10,6 +10,7 @@ import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.KeyEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.dswarm.graph.delta.util.GraphDBMarkUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -92,23 +93,23 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 			finalDeltaState = DeltaState.ExactMatch;
 		}
 
-		GraphDBUtil.markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
+		GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
 
 
 		if(!modifiedPathEndNodeIds.isEmpty()) {
 
-			GraphDBUtil.markPaths(deltaState, graphDB, resourceURI, modifiedPathEndNodeIds);
+			GraphDBMarkUtil.markPaths(deltaState, graphDB, resourceURI, modifiedPathEndNodeIds);
 		}
 
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 
-			GraphDBUtil.markPaths(finalDeltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(),
+			GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, pathEndNideIdsFromCSEntityEntry.getKey().getNodeId(),
 					pathEndNideIdsFromCSEntityEntry.getValue());
 		}
 
 		for(final Map.Entry<CSEntity, Set<Long>> modifiedPathEndNodeIdsFromCSEntityEntry : modifiedPathEndNodesIdsFromCSEntityMap.entrySet()) {
 
-			GraphDBUtil.markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(),
+			GraphDBMarkUtil.markPaths(deltaState, graphDB, modifiedPathEndNodeIdsFromCSEntityEntry.getKey().getNodeId(),
 					modifiedPathEndNodeIdsFromCSEntityEntry.getValue());
 		}
 	}

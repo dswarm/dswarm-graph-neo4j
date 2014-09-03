@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
@@ -38,7 +39,12 @@ public final class AttributePathUtil {
 		return sb.toString();
 	}
 
-	public static AttributePath determineCommonAttributePath(final ContentSchema contentSchema) {
+	public static Optional<AttributePath> determineCommonAttributePath(final ContentSchema contentSchema) {
+
+		if(contentSchema.getKeyAttributePaths() == null && contentSchema.getValueAttributePath() == null) {
+
+			return Optional.absent();
+		}
 
 		final Map<String, AttributePath> attributePaths = new HashMap<>();
 		final Map<String, Attribute> attributes = new HashMap<>();
@@ -55,13 +61,14 @@ public final class AttributePathUtil {
 
 			fillMaps(contentSchema.getValueAttributePath(), attributePaths, attributes);
 		}
+
 		final String commonPrefix = StringUtils.getCommonPrefix(attributePaths.keySet().toArray(new String[attributePaths.size()]));
 
 		final String commonAttributePathString = cleanCommonPrefix(commonPrefix);
 
 		if(attributePaths.containsKey(commonAttributePathString)) {
 
-			return attributePaths.get(commonAttributePathString);
+			return Optional.fromNullable(attributePaths.get(commonAttributePathString));
 		}
 
 		final String[] attributeURIs = commonAttributePathString.split(DMPStatics.ATTRIBUTE_DELIMITER.toString());
@@ -74,7 +81,7 @@ public final class AttributePathUtil {
 			apAttributes.add(attribute);
 		}
 
-		return new AttributePath(apAttributes);
+		return Optional.of(new AttributePath(apAttributes));
 	}
 
 	private static void fillMaps(final AttributePath attributePath, final Map<String, AttributePath> attributePaths,

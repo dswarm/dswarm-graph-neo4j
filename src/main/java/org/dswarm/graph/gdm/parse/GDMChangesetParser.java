@@ -284,9 +284,19 @@ public class GDMChangesetParser implements GDMUpdateParser {
 					final String existingStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
 					final Long newStmtOrder = (Long) newRelationship.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
+					final long finalNewStmtOrder;
+
+					if(newStmtOrder != null) {
+
+						finalNewStmtOrder = newStmtOrder;
+					} else {
+
+						finalNewStmtOrder = (long) 1;
+					}
+
 					gdmHandler.deprecateStatement(existingStmtUUID);
 
-					gdmHandler.handleStatement(existingStmtUUID, existingResource, index, newStmtOrder);
+					gdmHandler.handleStatement(existingStmtUUID, existingResource, index, finalNewStmtOrder);
 				}
 
 				index++;

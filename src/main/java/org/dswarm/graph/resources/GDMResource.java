@@ -61,6 +61,8 @@ import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -378,47 +380,112 @@ public class GDMResource {
 		// GraphDBUtil.printNodes(existingResourceDB);
 		// GraphDBUtil.printRelationships(existingResourceDB);
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
+		// GraphDBUtil.printDeltaRelationships(existingResourceDB);
 
 		// GraphDBUtil.printNodes(newResourceDB);
 		// GraphDBUtil.printRelationships(newResourceDB);
 		// GraphDBUtil.printPaths(newResourceDB, newResource.getUri());
+		// GraphDBUtil.printDeltaRelationships(newResourceDB);
 
-		final AttributePath commonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
-		final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath, contentSchema);
-		final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(), commonAttributePath,
-				contentSchema);
+		final Map<Long, Long> changesetModifications = new HashMap<>();
 
-		// do delta calculation on enriched GDM models in graph
-		// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do for
-		// each exact level all steps first and continue afterwards (?)
-		// 1. identify exact matches for cs entities
-		// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
-		// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity => see step 7
-		// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
-		final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(existingCSEntities, newCSEntities, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
-		exactCSMatcher.match();
+		final Optional<AttributePath> optionalCommonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
 
-		final Collection<CSEntity> newExactCSNonMatches = exactCSMatcher.getNewEntitiesNonMatches();
-		final Collection<CSEntity> existingExactCSNonMatches = exactCSMatcher.getExistingEntitiesNonMatches();
-		final Collection<ValueEntity> newFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(newExactCSNonMatches);
-		final Collection<ValueEntity> existingFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(existingExactCSNonMatches);
-		// 1.2 hash with key, value + entity order + value order => matches value entities
-		final FirstDegreeExactCSValueMatcher firstDegreeExactCSValueMatcher = new FirstDegreeExactCSValueMatcher(
-				existingFirstDegreeExactCSValueNonMatches, newFirstDegreeExactCSValueNonMatches, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
-		firstDegreeExactCSValueMatcher.match();
+		if(optionalCommonAttributePath.isPresent()) {
 
-		final Collection<ValueEntity> newExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getNewEntitiesNonMatches();
-		final Collection<ValueEntity> existingExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getExistingEntitiesNonMatches();
-		// 1.3 hash with key, value + entity order => matches value entities
-		// 1.4 hash with key, value => matches value entities
-		// 2. identify modifications for cs entities
-		// 2.1 hash with key + entity order + value order => matches value entities
-		final ModificationMatcher<ValueEntity> modificationCSMatcher = new FirstDegreeModificationCSValueMatcher(existingExactCSValueNonMatches,
-				newExactCSValueNonMatches, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
-		modificationCSMatcher.match();
+			// do specific processing with content schema knowledge
 
-		// 2.2 hash with key + entity order => matches value entities
-		// 2.3 hash with key => matches value entities
+			final AttributePath commonAttributePath = optionalCommonAttributePath.get();
+
+			final Collection<CSEntity> newCSEntities = GraphDBUtil
+					.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath, contentSchema);
+			final Collection<CSEntity> existingCSEntities = GraphDBUtil
+					.getCSEntities(existingResourceDB, existingResource.getUri(), commonAttributePath,
+							contentSchema);
+
+			// do delta calculation on enriched GDM models in graph
+			// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do for
+			// each exact level all steps first and continue afterwards (?)
+			// 1. identify exact matches for cs entities
+			// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
+			// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity => see step 7
+			// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
+			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(existingCSEntities, newCSEntities,
+					existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+			exactCSMatcher.match();
+
+			final Collection<CSEntity> newExactCSNonMatches = exactCSMatcher.getNewEntitiesNonMatches();
+			final Collection<CSEntity> existingExactCSNonMatches = exactCSMatcher.getExistingEntitiesNonMatches();
+			final Collection<ValueEntity> newFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(newExactCSNonMatches);
+			final Collection<ValueEntity> existingFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(existingExactCSNonMatches);
+			// 1.2 hash with key, value + entity order + value order => matches value entities
+			final FirstDegreeExactCSValueMatcher firstDegreeExactCSValueMatcher = new FirstDegreeExactCSValueMatcher(
+					existingFirstDegreeExactCSValueNonMatches, newFirstDegreeExactCSValueNonMatches, existingResourceDB, newResourceDB,
+					existingResource.getUri(), newResource.getUri());
+			firstDegreeExactCSValueMatcher.match();
+
+			final Collection<ValueEntity> newExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getNewEntitiesNonMatches();
+			final Collection<ValueEntity> existingExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getExistingEntitiesNonMatches();
+			// 1.3 hash with key, value + entity order => matches value entities
+			// 1.4 hash with key, value => matches value entities
+			// 2. identify modifications for cs entities
+			// 2.1 hash with key + entity order + value order => matches value entities
+			final ModificationMatcher<ValueEntity> modificationCSMatcher = new FirstDegreeModificationCSValueMatcher(existingExactCSValueNonMatches,
+					newExactCSValueNonMatches, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+			modificationCSMatcher.match();
+
+			// 2.2 hash with key + entity order => matches value entities
+			// 2.3 hash with key => matches value entities
+
+			// 7. identify non-matched CS entity sub graphs
+			final Collection<SubGraphEntity> newSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(newCSEntities, newResourceDB);
+			final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
+					existingResourceDB);
+			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
+			// 7.1.1 key + predicate + sub graph hash + order
+			final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
+					existingSubGraphEntities, newSubGraphEntities, existingResourceDB, newResourceDB, existingResource.getUri(),
+					newResource.getUri());
+			firstDegreeExactSubGraphEntityMatcher.match();
+
+			final Collection<SubGraphEntity> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
+					.getNewEntitiesNonMatches();
+			final Collection<SubGraphEntity> existingFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
+					.getExistingEntitiesNonMatches();
+
+			// 7.2 identify of partial matches (paths) of (non-hierarchical) CS entity sub graphs
+
+			final Collection<SubGraphLeafEntity> newSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
+					newFirstDegreeExactSubGraphEntityNonMatches, newResourceDB);
+			final Collection<SubGraphLeafEntity> existingSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
+					existingFirstDegreeExactSubGraphEntityNonMatches, existingResourceDB);
+			// 7.2.1 key + predicate + sub graph leaf path hash + order
+			final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
+					existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, existingResource.getUri(),
+					newResource.getUri());
+			firstDegreeExactSubGraphLeafEntityMatcher.match();
+
+			final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
+					.getNewEntitiesNonMatches();
+			final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
+					.getExistingEntitiesNonMatches();
+			// 7.3 identify modifications of (non-hierarchical) sub graphs
+			final FirstDegreeModificationSubGraphLeafEntityMatcher firstDegreeModificationSubGraphLeafEntityMatcher = new FirstDegreeModificationSubGraphLeafEntityMatcher(
+					existingFirstDegreeExactSubGraphLeafEntityNonMatches, newFirstDegreeExactSubGraphLeafEntityNonMatches, existingResourceDB,
+					newResourceDB, existingResource.getUri(), newResource.getUri());
+			firstDegreeModificationSubGraphLeafEntityMatcher.match();
+
+			for(final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modificationCSMatcher.getModifications().entrySet()) {
+
+				changesetModifications.put(modificationEntry.getKey().getNodeId(), modificationEntry.getValue().getNodeId());
+			}
+
+			for(final Map.Entry<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModificationEntry : firstDegreeModificationSubGraphLeafEntityMatcher.getModifications().entrySet()) {
+
+				changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(), firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
+			}
+		}
+
 		// 3. identify exact matches of resource node-based statements
 		final Collection<ValueEntity> newFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(newResource.getUri(), newResourceDB);
 		final Collection<ValueEntity> existingFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(existingResource.getUri(),
@@ -442,46 +509,27 @@ public class GDMResource {
 		// => see above
 		// 6. identify removals in existing model graph
 		// => see above
-		// 7. identify non-matched CS entity sub graphs
-		final Collection<SubGraphEntity> newSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(newCSEntities, newResourceDB);
-		final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
-				existingResourceDB);
-		// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
-		// 7.1.1 key + predicate + sub graph hash + order
-		final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
-				existingSubGraphEntities, newSubGraphEntities, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
-		firstDegreeExactSubGraphEntityMatcher.match();
 
-		final Collection<SubGraphEntity> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
-				.getNewEntitiesNonMatches();
-		final Collection<SubGraphEntity> existingFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
-				.getExistingEntitiesNonMatches();
-
-		// 7.2 identify of partial matches (paths) of (non-hierarchical) CS entity sub graphs
-
-		final Collection<SubGraphLeafEntity> newSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
-				newFirstDegreeExactSubGraphEntityNonMatches, newResourceDB);
-		final Collection<SubGraphLeafEntity> existingSubGraphLeafEntities = GraphDBUtil.getSubGraphLeafEntities(
-				existingFirstDegreeExactSubGraphEntityNonMatches, existingResourceDB);
-		// 7.2.1 key + predicate + sub graph leaf path hash + order
-		final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
-				existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
-		firstDegreeExactSubGraphLeafEntityMatcher.match();
-
-
-		final Collection<SubGraphLeafEntity> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
-				.getNewEntitiesNonMatches();
-		final Collection<SubGraphLeafEntity> existingFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
-				.getExistingEntitiesNonMatches();
-		// 7.3 identify modifications of (non-hierarchical) sub graphs
-		final FirstDegreeModificationSubGraphLeafEntityMatcher firstDegreeModificationSubGraphLeafEntityMatcher = new FirstDegreeModificationSubGraphLeafEntityMatcher(
-				existingFirstDegreeExactSubGraphLeafEntityNonMatches, newFirstDegreeExactSubGraphLeafEntityNonMatches, existingResourceDB,
-				newResourceDB, existingResource.getUri(), newResource.getUri());
-		firstDegreeModificationSubGraphLeafEntityMatcher.match();
+		// TODO: do sub graph matching for node-based statements (?)
 
 		//
 		// note: mark matches or modifications after every step
 		// maybe utilise confidence value for different matching approaches
+
+		// check graph matching completeness
+		final boolean isExistingResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(existingResourceDB);
+
+		if(!isExistingResourceMatchedCompletely) {
+
+			throw new DMPGraphException("existing resource wasn't matched completely by the delta algo");
+		}
+
+		final boolean isNewResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(newResourceDB);
+
+		if(!isNewResourceMatchedCompletely) {
+
+			throw new DMPGraphException("new resource wasn't matched completely by the delta algo");
+		}
 
 		// traverse resource graphs to extract changeset
 		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.ADDITION, newResourceDB);
@@ -496,21 +544,9 @@ public class GDMResource {
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
 		final Map<String, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
-		final Map<Long, Long> changesetModifications = new HashMap<>();
-
-		for(final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modificationCSMatcher.getModifications().entrySet()) {
-
-			changesetModifications.put(modificationEntry.getKey().getNodeId(), modificationEntry.getValue().getNodeId());
-		}
-
 		for(final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher.getModifications().entrySet()) {
 
 			changesetModifications.put(firstDegreeModificationGDMValueModificationEntry.getKey().getNodeId(), firstDegreeModificationGDMValueModificationEntry.getValue().getNodeId());
-		}
-
-		for(final Map.Entry<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModificationEntry : firstDegreeModificationSubGraphLeafEntityMatcher.getModifications().entrySet()) {
-
-			changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(), firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
 		}
 
 		final Map<Long, Statement> preparedExistingModifiedStatements = ChangesetUtil.providedModifiedStatements(existingModifiedStatements);

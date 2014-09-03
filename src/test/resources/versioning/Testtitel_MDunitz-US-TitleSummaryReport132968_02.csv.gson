@@ -279,5 +279,13 @@
     "o" : {
       "v" : "WITH NEW VALUE"
     }
-  } ]
+  }, {
+       "s" : {
+         "uri" : "http://data.slub-dresden.de/datamodels/4/records/acde2aaa-c9bf-4d23-bc6a-be5ff5b10f6c"
+       },
+       "p" : "http://data.slub-dresden.de/resources/1/schema#NEW+COLUMN+2",
+       "o" : {
+         "v" : "WITH NEW VALUE 2"
+       }
+     } ]
 } ]

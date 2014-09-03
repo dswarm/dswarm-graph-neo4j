@@ -30,25 +30,59 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource3Test.class);
 
+	private final ObjectMapper	objectMapper;
+
 	public GDMResource3Test(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/gdm", dbTypeArg);
+
+		objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
 	@Test
-	public void readGDMFromDBThatWasWrittenAsGDM() throws IOException {
+	public void mabxmlVersioningTest() throws IOException {
+
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+		requestJson.put("record_identifier_attribute_path", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id");
+		final ArrayNode keyAttributePaths = objectMapper.createArrayNode();
+		keyAttributePaths.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr");
+		keyAttributePaths
+				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
+		requestJson.put("key_attribute_paths", keyAttributePaths);
+		requestJson.put("value_attribute_path",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
+
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/mabxml_dmp.gson", "versioning/mabxml_dmp2.gson",
+				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149);
+	}
+
+	@Test
+	public void csvVersioningTest() throws IOException {
+
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+		requestJson.put("record_identifier_attribute_path", "http://data.slub-dresden.de/resources/1/schema#EBL+ID");
+
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson",
+				"versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_02.csv.gson", "http://data.slub-dresden.de/resources/2",
+				"http://data.slub-dresden.de/resources/1/schema#RecordType", 36, 35);
+	}
+
+	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,
+			final String resourcePathV2, final String resourceGraphURI, final String recordClassURI, final long statementCountCurrentVersion,
+			final long statementCountV1) throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal("versioning/mabxml_dmp.gson", "http://data.slub-dresden.de/resources/1");
-		writeGDMToDBInternalWithContentSchema("versioning/mabxml_dmp2.gson", "http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal(resourcePathV1, resourceGraphURI);
+		writeGDMToDBInternalWithContentSchema(resourcePathV2, resourceGraphURI, contentSchemaRequestJSON);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
-		requestJson.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("record_class_uri", recordClassURI);
+		requestJson.put("resource_graph_uri", resourceGraphURI);
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -64,13 +98,13 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		LOG.debug("read '" + model.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 157", 157, model.size());
+		Assert.assertEquals("the number of statements should be " + statementCountCurrentVersion, statementCountCurrentVersion, model.size());
 
 		// read first version
 		final ObjectNode requestJson2 = objectMapper.createObjectNode();
 
-		requestJson2.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
-		requestJson2.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson2.put("record_class_uri", recordClassURI);
+		requestJson2.put("resource_graph_uri", resourceGraphURI);
 		requestJson2.put("version", 1);
 
 		final String requestJsonString2 = objectMapper.writeValueAsString(requestJson2);
@@ -87,31 +121,20 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		LOG.debug("read '" + model2.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 149", 149, model2.size());
+		Assert.assertEquals("the number of statements should be " + statementCountV1, statementCountV1, model2.size());
 
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String resourceGraphURI) throws IOException {
+	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String resourceGraphURI,
+			final ObjectNode contentSchemaRequestJSON) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
 		final URL fileURL = Resources.getResource(dataResourceFileName);
 		final byte[] file = Resources.toByteArray(fileURL);
 
-		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		final ObjectNode requestJson = objectMapper.createObjectNode();
-		requestJson.put("record_identifier_attribute_path", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id");
-		final ArrayNode keyAttributePaths = objectMapper.createArrayNode();
-		keyAttributePaths.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr");
-		keyAttributePaths
-				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
-		requestJson.put("key_attribute_paths", keyAttributePaths);
-		requestJson.put("value_attribute_path",
-				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
-
-		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
+		final String requestJsonString = objectMapper.writeValueAsString(contentSchemaRequestJSON);
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();

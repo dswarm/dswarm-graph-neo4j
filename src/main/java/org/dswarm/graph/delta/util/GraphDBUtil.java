@@ -54,11 +54,15 @@ import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by tgaengler on 29/07/14.
+ * @author tgaengler
  */
 public final class GraphDBUtil {
+
+	private static final Logger				LOG				= LoggerFactory.getLogger(GraphDBUtil.class);
 
 	private static final RelationshipType	rdfTypeRelType	= DynamicRelationshipType.withName("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
 
@@ -90,57 +94,64 @@ public final class GraphDBUtil {
 
 	public static void printNodes(final GraphDatabaseService graphDB) {
 
-		Transaction tx = graphDB.beginTx();
+		try (final Transaction ignored = graphDB.beginTx()) {
 
-		final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
+			final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
 
-		for (final Node node : nodes) {
+			for (final Node node : nodes) {
 
-			final Iterable<Label> labels = node.getLabels();
+				final Iterable<Label> labels = node.getLabels();
 
-			for (final Label label : labels) {
+				for (final Label label : labels) {
 
-				System.out.println("node = '" + node.getId() + "' :: label = '" + label.name());
+					System.out.println("node = '" + node.getId() + "' :: label = '" + label.name());
+				}
+
+				final Iterable<String> propertyKeys = node.getPropertyKeys();
+
+				for (final String propertyKey : propertyKeys) {
+
+					final Object value = node.getProperty(propertyKey);
+
+					System.out.println("node = '" + node.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
+				}
 			}
 
-			final Iterable<String> propertyKeys = node.getPropertyKeys();
+		} catch (final Exception e) {
 
-			for (final String propertyKey : propertyKeys) {
+			// TODO: log something
 
-				final Object value = node.getProperty(propertyKey);
-
-				System.out.println("node = '" + node.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
-			}
+			e.printStackTrace();
 		}
-
-		tx.success();
-		tx.close();
 	}
 
 	public static void printRelationships(final GraphDatabaseService graphDB) {
 
-		Transaction tx = graphDB.beginTx();
+		try (final Transaction ignored = graphDB.beginTx()) {
 
-		final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
+			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
-		for (final Relationship relationship : relationships) {
+			for (final Relationship relationship : relationships) {
 
-			final RelationshipType type = relationship.getType();
+				final RelationshipType type = relationship.getType();
 
-			System.out.println("relationship = '" + relationship.getId() + "' :: relationship type = '" + type.name());
+				System.out.println("relationship = '" + relationship.getId() + "' :: relationship type = '" + type.name());
 
-			final Iterable<String> propertyKeys = relationship.getPropertyKeys();
+				final Iterable<String> propertyKeys = relationship.getPropertyKeys();
 
-			for (final String propertyKey : propertyKeys) {
+				for (final String propertyKey : propertyKeys) {
 
-				final Object value = relationship.getProperty(propertyKey);
+					final Object value = relationship.getProperty(propertyKey);
 
-				System.out.println("relationship = '" + relationship.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
+					System.out.println("relationship = '" + relationship.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
+				}
 			}
-		}
+		} catch (final Exception e) {
 
-		tx.success();
-		tx.close();
+			// TODO: log something
+
+			e.printStackTrace();
+		}
 	}
 
 	public static void printDeltaRelationships(final GraphDatabaseService graphDB) {
@@ -307,6 +318,80 @@ public final class GraphDBUtil {
 				}).traverse(resourceNode);
 
 		return paths;
+	}
+
+	/**
+	 * @param graphDB
+	 * @return
+	 */
+	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB) {
+
+		try (final Transaction ignored = graphDB.beginTx()) {
+
+		final Iterable<Relationship> rels = GlobalGraphOperations.at(graphDB).getAllRelationships();
+
+		boolean incomplete = false;
+
+		for(final Relationship rel : rels) {
+
+			final Boolean relMatchedState = (Boolean) rel.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+			final boolean finalRelMatchedState = checkMatchedState(relMatchedState, rel.getId(), DeltaStatics.RELATIONSHIP_TYPE);
+
+			if(!finalRelMatchedState) {
+
+				incomplete = true;
+
+				break;
+			}
+
+			final Boolean subjectMatchedState = (Boolean) rel.getStartNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+			final boolean finalSubjectMatchedState = checkMatchedState(subjectMatchedState, rel.getStartNode().getId(), DeltaStatics.NODE_TYPE);
+
+			if(!finalSubjectMatchedState) {
+
+				incomplete = true;
+
+				break;
+			}
+
+			final Boolean objectMatchedState = (Boolean) rel.getEndNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+			final boolean finalObjectMatchedState = checkMatchedState(objectMatchedState, rel.getEndNode().getId(), DeltaStatics.NODE_TYPE);
+
+			if(!finalObjectMatchedState) {
+
+				incomplete = true;
+
+				break;
+			}
+		}
+
+		return !incomplete;
+
+		} catch (final Exception e) {
+
+			GraphDBUtil.LOG.error("couldn't complete the graph matching completeness check for graph DB '" + graphDB.toString() + "'", e);
+		}
+
+		return false;
+	}
+
+	private static boolean checkMatchedState(final Boolean matchedState, final long id, final String type) {
+
+		if (matchedState == null) {
+
+			GraphDBUtil.LOG.debug(type + " '" + id + "' couldn't be matched, i.e., there was no match state available");
+
+			return false;
+		}
+
+		if (!matchedState) {
+
+			GraphDBUtil.LOG.debug(type + " '" + id + "' couldn't be matched, i.e., there was no match state was 'false'");
+
+			return false;
+		}
+
+		return matchedState;
 	}
 
 	/**
@@ -1139,16 +1224,20 @@ public final class GraphDBUtil {
 
 	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB) {
 
-		final Transaction tx = graphDB.beginTx();
+		try (final Transaction ignored = graphDB.beginTx()) {
 
 		final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
-		final Collection<ValueEntity> values = getFlatNodeValues(resourceNode, graphDB);
+			return getFlatNodeValues(resourceNode, graphDB);
 
-		tx.success();
-		tx.close();
+		} catch (final Exception e) {
 
-		return values;
+			// TODO: log something
+
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) {
@@ -1209,7 +1298,17 @@ public final class GraphDBUtil {
 
 			final Long valueOrder = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
-			final GDMValueEntity valueEntity = new GDMValueEntity(valueNodeId, value, valueOrder, valueNodeType);
+			final long finalValueOrder;
+
+			if(valueOrder != null) {
+
+				finalValueOrder = valueOrder;
+			} else {
+
+				finalValueOrder = (long) 1;
+			}
+
+			final GDMValueEntity valueEntity = new GDMValueEntity(valueNodeId, value, finalValueOrder, valueNodeType);
 
 			if(!valuesMap.containsKey(predicate)) {
 

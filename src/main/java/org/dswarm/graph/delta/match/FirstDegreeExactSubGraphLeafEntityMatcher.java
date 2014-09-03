@@ -8,6 +8,8 @@ import java.util.Map;
 import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -23,8 +25,8 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(FirstDegreeExactSubGraphLeafEntityMatcher.class);
 
-	public FirstDegreeExactSubGraphLeafEntityMatcher(final Collection<SubGraphLeafEntity> existingSubGraphLeafEntitiesArg,
-			final Collection<SubGraphLeafEntity> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	public FirstDegreeExactSubGraphLeafEntityMatcher(final Optional<? extends Collection<SubGraphLeafEntity>> existingSubGraphLeafEntitiesArg,
+			final Optional<? extends Collection<SubGraphLeafEntity>> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
 		super(existingSubGraphLeafEntitiesArg, newSubGraphLeafEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,

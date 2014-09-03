@@ -8,15 +8,18 @@ import java.util.Map;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.dswarm.graph.delta.match.model.ModificationEntity;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 public abstract class ModificationMatcher<ENTITY extends ModificationEntity> extends Matcher<ENTITY> implements ModificationResultSet<ENTITY> {
 
 	private Map<ENTITY, ENTITY>	modifications;
 
-	public ModificationMatcher(final Collection<ENTITY> existingEntitiesArg, final Collection<ENTITY> newEntitiesArg,
-			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
-			final String newResourceURIArg, final Marker<ENTITY> markerArg) {
+	public ModificationMatcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg,
+			final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg,
+			final Marker<ENTITY> markerArg) {
 
 		super(existingEntitiesArg, newEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg, markerArg);
 	}
@@ -37,18 +40,21 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 			modifications = new HashMap<>();
 			matches = new HashSet<>();
 
-			for (final Map.Entry<String, ENTITY> existingEntityEntry : existingEntities.entrySet()) {
+			if(existingEntities.isPresent() && newEntities.isPresent()) {
 
-				if (newEntities.containsKey(existingEntityEntry.getKey())) {
+				for (final Map.Entry<String, ENTITY> existingEntityEntry : existingEntities.get().entrySet()) {
 
-					final ENTITY existingEntity = existingEntityEntry.getValue();
-					final ENTITY newEntity = newEntities.get(existingEntityEntry.getKey());
+					if (newEntities.get().containsKey(existingEntityEntry.getKey())) {
 
-					if (existingEntity.getValue() != null && newEntity.getValue() != null && !existingEntity.getValue()
-							.equals(newEntity.getValue())) {
+						final ENTITY existingEntity = existingEntityEntry.getValue();
+						final ENTITY newEntity = newEntities.get().get(existingEntityEntry.getKey());
 
-						modifications.put(existingEntity, newEntity);
-						matches.add(existingEntityEntry.getKey());
+						if (existingEntity.getValue() != null && newEntity.getValue() != null && !existingEntity.getValue()
+								.equals(newEntity.getValue())) {
+
+							modifications.put(existingEntity, newEntity);
+							matches.add(existingEntityEntry.getKey());
+						}
 					}
 				}
 			}

@@ -14,11 +14,15 @@ import org.dswarm.graph.delta.util.GraphDBMarkUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
 public class CSEntityMarker implements Marker<CSEntity> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CSEntityMarker.class);
 
 	@Override
 	public void markPaths(final Collection<CSEntity> csEntities, final DeltaState deltaState, final GraphDatabaseService graphDB,
@@ -28,7 +32,9 @@ public class CSEntityMarker implements Marker<CSEntity> {
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			// calc path end nodes
 			for (final CSEntity csEntity : csEntities) {
@@ -65,11 +71,16 @@ public class CSEntityMarker implements Marker<CSEntity> {
 
 				pathEndNodesIdsFromCSEntityMap.put(csEntity, pathEndNodeIdsFromCSEntity);
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
-			// TODO: log something
+			tx.failure();
 
-			e.printStackTrace();
+			CSEntityMarker.LOG.error("couldn't identify paths for marking successfully", e);
+		} finally {
+
+			tx.close();
 		}
 
 		final DeltaState finalDeltaState;

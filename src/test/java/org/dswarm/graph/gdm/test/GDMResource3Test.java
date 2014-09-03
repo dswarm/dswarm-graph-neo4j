@@ -40,24 +40,16 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
-	@Test
+	//@Test
 	public void mabxmlVersioningTest() throws IOException {
 
-		final ObjectNode requestJson = objectMapper.createObjectNode();
-		requestJson.put("record_identifier_attribute_path", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id");
-		final ArrayNode keyAttributePaths = objectMapper.createArrayNode();
-		keyAttributePaths.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr");
-		keyAttributePaths
-				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
-		requestJson.put("key_attribute_paths", keyAttributePaths);
-		requestJson.put("value_attribute_path",
-				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
+		final ObjectNode requestJson = getMABXMLContentSchema();
 
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/mabxml_dmp.gson", "versioning/mabxml_dmp2.gson",
 				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149);
 	}
 
-	@Test
+	//@Test
 	public void csvVersioningTest() throws IOException {
 
 		final ObjectNode requestJson = objectMapper.createObjectNode();
@@ -66,6 +58,15 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson",
 				"versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_02.csv.gson", "http://data.slub-dresden.de/resources/2",
 				"http://data.slub-dresden.de/resources/1/schema#RecordType", 36, 35);
+	}
+
+	@Test
+	public void selectedMabxmlVersioning01Test() throws IOException {
+
+		final ObjectNode requestJson = getMABXMLContentSchema();
+
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_01_v1.xml.gson", "versioning/selectedUpdates_01_v2.xml.gson",
+				"http://data.slub-dresden.de/resources/3", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149);
 	}
 
 	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,
@@ -172,5 +173,20 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		multiPart.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+	}
+
+	private ObjectNode getMABXMLContentSchema() {
+
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+		requestJson.put("record_identifier_attribute_path", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id");
+		final ArrayNode keyAttributePaths = objectMapper.createArrayNode();
+		keyAttributePaths.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr");
+		keyAttributePaths
+				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
+		requestJson.put("key_attribute_paths", keyAttributePaths);
+		requestJson.put("value_attribute_path",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
+
+		return requestJson;
 	}
 }

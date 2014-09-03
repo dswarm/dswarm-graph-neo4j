@@ -8,6 +8,8 @@ import java.util.Map;
 import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -15,9 +17,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class FirstDegreeExactGDMValueMatcher extends Matcher<ValueEntity> {
 
-	public FirstDegreeExactGDMValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg, final Collection<ValueEntity> newValueEntitiesArg,
-			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
-			final String newResourceURIArg) {
+	public FirstDegreeExactGDMValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
+			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
 		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
 				new ValueEntityMarker());

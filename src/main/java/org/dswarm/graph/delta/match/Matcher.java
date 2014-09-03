@@ -18,21 +18,21 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
-	protected Set<String>					matches;
-	protected boolean						matchesCalculated	= false;
+	protected Set<String>							matches;
+	protected boolean								matchesCalculated	= false;
 
-	protected final Map<String, ENTITY>		existingEntities;
-	protected final Map<String, ENTITY>		newEntities;
+	protected final Optional<Map<String, ENTITY>>	existingEntities;
+	protected final Optional<Map<String, ENTITY>>	newEntities;
 
-	protected final GraphDatabaseService	existingResourceDB;
-	protected final GraphDatabaseService	newResourceDB;
+	protected final GraphDatabaseService			existingResourceDB;
+	protected final GraphDatabaseService			newResourceDB;
 
-	protected final String					existingResourceURI;
-	protected final String					newResourceURI;
+	protected final String							existingResourceURI;
+	protected final String							newResourceURI;
 
-	protected final Marker<ENTITY>			marker;
+	protected final Marker<ENTITY>					marker;
 
-	public Matcher(final Collection<ENTITY> existingEntitiesArg, final Collection<ENTITY> newEntitiesArg,
+	public Matcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg, final Optional<? extends Collection<ENTITY>> newEntitiesArg,
 			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
 			final String newResourceURIArg, final Marker<ENTITY> markerArg) {
 
@@ -44,8 +44,21 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 		marker = markerArg;
 
-		existingEntities = generateHashes(existingEntitiesArg, existingResourceDB);
-		newEntities = generateHashes(newEntitiesArg, newResourceDB);
+		if (existingEntitiesArg.isPresent()) {
+
+			existingEntities = Optional.fromNullable(generateHashes(existingEntitiesArg.get(), existingResourceDB));
+		} else {
+
+			existingEntities = Optional.absent();
+		}
+
+		if (newEntitiesArg.isPresent()) {
+
+			newEntities = Optional.fromNullable(generateHashes(newEntitiesArg.get(), newResourceDB));
+		} else {
+
+			newEntities = Optional.absent();
+		}
 	}
 
 	protected abstract Map<String, ENTITY> generateHashes(final Collection<ENTITY> entities, final GraphDatabaseService resourceDB);
@@ -57,51 +70,56 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 		markMatchedPaths();
 	}
 
-	public Collection<ENTITY> getExistingEntitiesNonMatches() {
+	public Optional<? extends Collection<ENTITY>> getExistingEntitiesNonMatches() {
 
 		return getNonMatches(existingEntities);
 	}
 
-	public Collection<ENTITY> getNewEntitiesNonMatches() {
+	public Optional<? extends Collection<ENTITY>> getNewEntitiesNonMatches() {
 
 		return getNonMatches(newEntities);
 	}
 
-	protected Collection<String> getMatches() {
+	protected Optional<? extends Collection<String>> getMatches() {
 
 		calculateMatches();
 
-		return matches;
+		return Optional.fromNullable(matches);
 	}
 
-	protected Map<String, ENTITY> getExistingEntities() {
+	protected Optional<Map<String, ENTITY>> getExistingEntities() {
 
 		return existingEntities;
 	}
 
-	protected Map<String, ENTITY> getNewEntities() {
+	protected Optional<Map<String, ENTITY>> getNewEntities() {
 
 		return newEntities;
 	}
 
-	protected Collection<ENTITY> getMatches(final Map<String, ENTITY> entityMap) {
+	protected Optional<? extends Collection<ENTITY>> getMatches(final Optional<Map<String, ENTITY>> entityMap) {
 
 		if(matches == null || matches.isEmpty()) {
 
-			return null;
+			return Optional.absent();
+		}
+
+		if(!entityMap.isPresent()) {
+
+			return Optional.absent();
 		}
 
 		final List<ENTITY> entities = new ArrayList<>();
 
 		for(final String match : matches) {
 
-			if(entityMap.containsKey(match)) {
+			if(entityMap.get().containsKey(match)) {
 
-				entities.add(entityMap.get(match));
+				entities.add(entityMap.get().get(match));
 			}
 		}
 
-		return entities;
+		return Optional.fromNullable(entities);
 	}
 
 	protected void calculateMatches() {
@@ -110,11 +128,14 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 			matches = new HashSet<>();
 
-			for (final String hash : existingEntities.keySet()) {
+			if(existingEntities.isPresent() && newEntities.isPresent()) {
 
-				if (newEntities.containsKey(hash)) {
+				for (final String hash : existingEntities.get().keySet()) {
 
-					matches.add(hash);
+					if (newEntities.get().containsKey(hash)) {
+
+						matches.add(hash);
+					}
 				}
 			}
 
@@ -122,16 +143,21 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 		}
 	}
 
-	protected Collection<ENTITY> getNonMatches(final Map<String, ENTITY> entityMap) {
+	protected Optional<? extends Collection<ENTITY>> getNonMatches(final Optional<Map<String, ENTITY>> entityMap) {
 
 		if(matches == null || matches.isEmpty()) {
 
-			return null;
+			return Optional.absent();
+		}
+
+		if(!entityMap.isPresent()) {
+
+			return Optional.absent();
 		}
 
 		final List<ENTITY> valueEntities = new ArrayList<>();
 
-		for(final Map.Entry<String, ENTITY> entityEntry : entityMap.entrySet()) {
+		for(final Map.Entry<String, ENTITY> entityEntry : entityMap.get().entrySet()) {
 
 			if(!matches.contains(entityEntry.getKey())) {
 
@@ -139,7 +165,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 			}
 		}
 
-		return valueEntities;
+		return Optional.fromNullable(valueEntities);
 	}
 
 	protected void markMatchedPaths() {
@@ -148,14 +174,12 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 		markPaths(getMatches(newEntities), DeltaState.ExactMatch, newResourceDB, newResourceURI);
 	}
 
-	protected void markPaths(final Collection<ENTITY> entities, final DeltaState deltaState, final GraphDatabaseService graphDB,
+	protected void markPaths(final Optional<? extends Collection<ENTITY>> entities, final DeltaState deltaState, final GraphDatabaseService graphDB,
 			final String resourceURI) {
 
-		final Optional<Collection<ENTITY>> optionalEntities = Optional.fromNullable(entities);
+		if (entities.isPresent()) {
 
-		if (optionalEntities.isPresent()) {
-
-			marker.markPaths(optionalEntities.get(), deltaState, graphDB, resourceURI);
+			marker.markPaths(entities.get(), deltaState, graphDB, resourceURI);
 		}
 	}
 }

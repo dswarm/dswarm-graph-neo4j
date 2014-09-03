@@ -7,6 +7,8 @@ import java.util.Map;
 import org.dswarm.graph.delta.match.mark.CSEntityMarker;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -14,10 +16,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 
-	public FirstDegreeExactCSEntityMatcher(final Collection<CSEntity> existingCSEntitiesArg, final Collection<CSEntity> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	public FirstDegreeExactCSEntityMatcher(final Optional<? extends Collection<CSEntity>> existingCSEntitiesArg,
+			final Optional<? extends Collection<CSEntity>> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg, final String existingResourcURIArg, final String newResourceURIArg) {
 
-		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg, new CSEntityMarker());
+		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg,
+				new CSEntityMarker());
 	}
 
 	/**

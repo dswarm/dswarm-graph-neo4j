@@ -2,14 +2,18 @@ package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
 
+import com.google.common.base.Optional;
+
 /**
- * Created by tgaengler on 01/08/14.
+ * @author tgaengler
+ *
+ * @param <ENTITY>
  */
 public interface MatchResultSet<ENTITY> {
 
 	void match();
 
-	Collection<ENTITY> getExistingEntitiesNonMatches();
+	Optional<? extends Collection<ENTITY>> getExistingEntitiesNonMatches();
 
-	Collection<ENTITY> getNewEntitiesNonMatches();
+	Optional<? extends Collection<ENTITY>> getNewEntitiesNonMatches();
 }

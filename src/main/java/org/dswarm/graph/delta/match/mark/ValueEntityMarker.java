@@ -14,26 +14,33 @@ import org.dswarm.graph.delta.util.GraphDBMarkUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
 public class ValueEntityMarker implements Marker<ValueEntity> {
 
-	public void markPaths(final Collection<ValueEntity> valueEntities, final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI) {
+	private static final Logger	LOG	= LoggerFactory.getLogger(ValueEntityMarker.class);
+
+	public void markPaths(final Collection<ValueEntity> valueEntities, final DeltaState deltaState, final GraphDatabaseService graphDB,
+			final String resourceURI) {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Set<Long> modifiedPathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			// calc path end nodes
-			for(final ValueEntity valueEntity : valueEntities) {
+			for (final ValueEntity valueEntity : valueEntities) {
 
 				// TODO: what should I do with related key paths here?
-				for(final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
+				for (final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
 
 					pathEndNodeIds.add(keyEntity.getNodeId());
 				}
@@ -76,11 +83,15 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 					pathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), pathEndNodeIdsFromCSEntity);
 				}
 			}
+			tx.success();
 		} catch (final Exception e) {
 
-			// TODO: log something
+			tx.failure();
 
-			e.printStackTrace();
+			ValueEntityMarker.LOG.error("couldn't identify paths for marking successfully", e);
+		} finally {
+
+			tx.close();
 		}
 
 		final DeltaState finalDeltaState;

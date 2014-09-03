@@ -8,6 +8,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
@@ -17,28 +19,51 @@ import org.dswarm.graph.delta.DeltaStatics;
  */
 public final class GraphDBMarkUtil {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GraphDBMarkUtil.class);
+
 	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
 			final Set<Long> pathEndNodeIds) {
 
 		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
+		try {
 
-		markPaths(deltaState, pathEndNodeIds, paths);
+			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
 
-		tx.success();
-		tx.close();
+			markPaths(deltaState, pathEndNodeIds, paths);
+
+			tx.success();
+		} catch (final Exception e) {
+
+			tx.failure();
+
+			GraphDBMarkUtil.LOG.error("couldn't mark paths successfully", e);
+		} finally {
+
+			tx.close();
+		}
 	}
 
 	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds) {
 
 		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
+		try {
 
-		markPaths(deltaState, pathEndNodeIds, paths);
+			final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
 
-		tx.success();
+			markPaths(deltaState, pathEndNodeIds, paths);
+
+			tx.success();
+		} catch (final Exception e) {
+
+			tx.failure();
+
+			GraphDBMarkUtil.LOG.error("couldn't mark paths successfully", e);
+		} finally {
+
+			tx.close();
+		}
 	}
 
 	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) {

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -13,8 +15,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class FirstDegreeModificationCSValueMatcher extends ModificationMatcher<ValueEntity> {
 
-	public FirstDegreeModificationCSValueMatcher(final Collection<ValueEntity> existingValueEntitiesArg,
-			final Collection<ValueEntity> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	public FirstDegreeModificationCSValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
+			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
 
 		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,

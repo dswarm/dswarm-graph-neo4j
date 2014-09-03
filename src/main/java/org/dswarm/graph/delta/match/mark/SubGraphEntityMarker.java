@@ -12,11 +12,15 @@ import org.dswarm.graph.delta.util.GraphDBMarkUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
 public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
+
+	private static final Logger	LOG	= LoggerFactory.getLogger(SubGraphEntityMarker.class);
 
 	@Override public void markPaths(final Collection<SubGraphEntity> subGraphEntities, final DeltaState deltaState,
 			final GraphDatabaseService graphDB, final String resourceURI) {
@@ -24,17 +28,19 @@ public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
 		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
 		// calc path end nodes
-		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
+		for (final SubGraphEntity subGraphEntity : subGraphEntities) {
 
-			try (final Transaction ignored = graphDB.beginTx()) {
+			final Transaction tx = graphDB.beginTx();
+
+			try {
 
 				final Collection<String> leafNodes = GraphDBUtil.getEntityLeafs(graphDB, subGraphEntity.getNodeId());
 
-				if(leafNodes != null && !leafNodes.isEmpty()) {
+				if (leafNodes != null && !leafNodes.isEmpty()) {
 
 					final Set<Long> pathEndNodeIds;
 
-					if(pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
+					if (pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
 
 						pathEndNodeIds = pathEndNodesIdsFromCSEntityMap.get(subGraphEntity.getCSEntity().getNodeId());
 					} else {
@@ -49,11 +55,16 @@ public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
 
 					pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);
 				}
+
+				tx.success();
 			} catch (final Exception e) {
 
-				// TODO: log something
+				tx.failure();
 
-				e.printStackTrace();
+				SubGraphEntityMarker.LOG.error("couldn't identify paths for marking successfully", e);
+			} finally {
+
+				tx.close();
 			}
 		}
 

@@ -27,6 +27,8 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
+
+import com.google.common.base.Optional;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.Direction;
@@ -547,11 +549,16 @@ public final class GraphDBUtil {
 		return csEntitiesCollection;
 	}
 
-	public static Collection<SubGraphLeafEntity> getSubGraphLeafEntities(final Collection<SubGraphEntity> subGraphEntities, final GraphDatabaseService graphDB) {
+	public static Optional<? extends Collection<SubGraphLeafEntity>> getSubGraphLeafEntities(final Optional<? extends Collection<SubGraphEntity>> subGraphEntities, final GraphDatabaseService graphDB) {
+
+		if(!subGraphEntities.isPresent()) {
+
+			return Optional.absent();
+		}
 
 		final Set<SubGraphLeafEntity> subGraphLeafEntities = new HashSet<>();
 
-		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
+		for(final SubGraphEntity subGraphEntity : subGraphEntities.get()) {
 
 			final Map<String, String> subGraphLeafs = GraphDBUtil.getEntityLeafsWithValue(graphDB, subGraphEntity.getNodeId());
 
@@ -568,7 +575,7 @@ public final class GraphDBUtil {
 			}
 		}
 
-		return subGraphLeafEntities;
+		return Optional.of(subGraphLeafEntities);
 	}
 
 	/**

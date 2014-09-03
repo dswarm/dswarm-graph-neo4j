@@ -22,6 +22,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +102,7 @@ public class MaintainResource {
 	}
 
 	private long deleteSomeStatements(final GraphDatabaseService database) {
+
 
 		final ExecutionEngine engine = new ExecutionEngine(database);
 

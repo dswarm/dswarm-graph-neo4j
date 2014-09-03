@@ -257,16 +257,6 @@
 			</properties>
 			<dependencies>
 				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j</artifactId>
-					<version>${neo4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>server-api</artifactId>
-					<version>${neo4j.version}</version>
-				</dependency>
-				<dependency>
 					<groupId>org.neo4j.app</groupId>
 					<artifactId>neo4j-server</artifactId>
 					<version>${neo4j.version}</version>
@@ -290,18 +280,6 @@
 				<env>release</env>
 			</properties>
 			<dependencies>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j</artifactId>
-					<version>${neo4j.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>server-api</artifactId>
-					<version>${neo4j.version}</version>
-					<scope>provided</scope>
-				</dependency>
 				<dependency>
 					<groupId>org.neo4j.app</groupId>
 					<artifactId>neo4j-server</artifactId>

@@ -119,9 +119,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't print nodes", e);
 		}
 	}
 
@@ -148,9 +146,7 @@ public final class GraphDBUtil {
 			}
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't print relationships", e);
 		}
 	}
 
@@ -472,9 +468,7 @@ public final class GraphDBUtil {
 			calculateEntityHash(graphDB, entityNodeId, nodeHashes);
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't print nodes", e);
 		}
 	}
 
@@ -583,11 +577,7 @@ public final class GraphDBUtil {
 			return null;
 		}
 
-		final String value = getValue(node, nodeType);
-
-		final long leafNodeHash = nodeType.hashCode();
-
-		return leafNodeHash;
+		return (long) nodeType.hashCode();
 	}
 
 	public static void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
@@ -602,9 +592,7 @@ public final class GraphDBUtil {
 			}
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't calculate simple node hashes", e);
 		}
 	}
 
@@ -646,9 +634,7 @@ public final class GraphDBUtil {
 			}
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't calculated entity leaf hashes", e);
 		}
 
 		return deepestHierarchyLevel;
@@ -689,9 +675,7 @@ public final class GraphDBUtil {
 			return subGraphLeafPathHash;
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't calculate sub graph leaf path hashes", e);
 		}
 
 		return null;
@@ -733,9 +717,7 @@ public final class GraphDBUtil {
 			return subGraphLeafPathHash;
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't calculated sub graph leaf path modification hashes", e);
 		}
 
 		return null;
@@ -1199,9 +1181,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't determine non-matched cs entity sub graphs", e);
 		}
 
 		return subgraphEntities;
@@ -1232,9 +1212,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't determine record uri", e);
 		}
 
 		return null;
@@ -1557,9 +1535,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't execute query with single result", e);
 		}
 
 		return resultValue;
@@ -1595,9 +1571,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't execute query with multiple results", e);
 		}
 
 		return resultSet;
@@ -1646,9 +1620,7 @@ public final class GraphDBUtil {
 
 		} catch (final Exception e) {
 
-			// TODO: log something
-
-			e.printStackTrace();
+			GraphDBUtil.LOG.error("couldn't execute query with multiple results with values", e);
 		}
 
 		return resultSet;

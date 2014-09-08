@@ -439,7 +439,11 @@ public class GDMResource {
 			// 2.3 hash with key => matches value entities
 
 			// 7. identify non-matched CS entity sub graphs
+			// TODO: remove this later
+			GDMResource.LOG.debug("determine non-matched cs entity sub graphs for new cs entities");
 			final Collection<SubGraphEntity> newSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(newCSEntities, newResourceDB);
+			// TODO: remove this later
+			GDMResource.LOG.debug("determine non-matched cs entity sub graphs for existing entities");
 			final Collection<SubGraphEntity> existingSubGraphEntities = GraphDBUtil.determineNonMatchedCSEntitySubGraphs(existingCSEntities,
 					existingResourceDB);
 			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs

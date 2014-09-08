@@ -30,41 +30,26 @@ public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
 		// calc path end nodes
 		for (final SubGraphEntity subGraphEntity : subGraphEntities) {
 
-			final Transaction tx = graphDB.beginTx();
+			final Collection<String> leafNodes = GraphDBUtil.getEntityLeafs(graphDB, subGraphEntity.getNodeId());
 
-			try {
+			if (leafNodes != null && !leafNodes.isEmpty()) {
 
-				final Collection<String> leafNodes = GraphDBUtil.getEntityLeafs(graphDB, subGraphEntity.getNodeId());
+				final Set<Long> pathEndNodeIds;
 
-				if (leafNodes != null && !leafNodes.isEmpty()) {
+				if (pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
 
-					final Set<Long> pathEndNodeIds;
+					pathEndNodeIds = pathEndNodesIdsFromCSEntityMap.get(subGraphEntity.getCSEntity().getNodeId());
+				} else {
 
-					if (pathEndNodesIdsFromCSEntityMap.containsKey(subGraphEntity.getCSEntity().getNodeId())) {
-
-						pathEndNodeIds = pathEndNodesIdsFromCSEntityMap.get(subGraphEntity.getCSEntity().getNodeId());
-					} else {
-
-						pathEndNodeIds = new HashSet<>();
-					}
-
-					for(final String leafNode : leafNodes) {
-
-						pathEndNodeIds.add(Long.valueOf(leafNode));
-					}
-
-					pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);
+					pathEndNodeIds = new HashSet<>();
 				}
 
-				tx.success();
-			} catch (final Exception e) {
+				for(final String leafNode : leafNodes) {
 
-				tx.failure();
+					pathEndNodeIds.add(Long.valueOf(leafNode));
+				}
 
-				SubGraphEntityMarker.LOG.error("couldn't identify paths for marking successfully", e);
-			} finally {
-
-				tx.close();
+				pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);
 			}
 		}
 

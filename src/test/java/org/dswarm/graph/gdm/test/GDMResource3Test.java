@@ -40,7 +40,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
-	//@Test
+	@Test
 	public void mabxmlVersioningTest() throws IOException {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
@@ -49,7 +49,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149);
 	}
 
-	//@Test
+	@Test
 	public void csvVersioningTest() throws IOException {
 
 		final ObjectNode requestJson = objectMapper.createObjectNode();
@@ -66,7 +66,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_01_v1.xml.gson", "versioning/selectedUpdates_01_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/3", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149);
+				"http://data.slub-dresden.de/resources/3", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 113, 95);
 	}
 
 	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,

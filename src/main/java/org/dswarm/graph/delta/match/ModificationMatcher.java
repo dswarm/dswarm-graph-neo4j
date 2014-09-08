@@ -8,13 +8,17 @@ import java.util.Map;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.dswarm.graph.delta.match.model.ModificationEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 public abstract class ModificationMatcher<ENTITY extends ModificationEntity> extends Matcher<ENTITY> implements ModificationResultSet<ENTITY> {
 
-	private Map<ENTITY, ENTITY>	modifications;
+	private static final Logger LOG = LoggerFactory.getLogger(ModificationMatcher.class);
+
+	private Map<ENTITY, ENTITY> modifications;
 
 	public ModificationMatcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg,
 			final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
@@ -74,7 +78,12 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	@Override
 	protected void markMatchedPaths() {
 
+		ModificationMatcher.LOG.debug("mark matched paths in existing resource (modifications)");
+
 		markPaths(getMatches(existingEntities), DeltaState.MODIFICATION, existingResourceDB, existingResourceURI);
+
+		ModificationMatcher.LOG.debug("mark matched paths in new resource (modifications)");
+
 		markPaths(getMatches(newEntities), DeltaState.MODIFICATION, newResourceDB, newResourceURI);
 	}
 
@@ -83,7 +92,12 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	 */
 	protected void markNonMatchedPaths() {
 
+		ModificationMatcher.LOG.debug("mark non-matched paths in existing resource (deletions)");
+
 		markPaths(getNonMatches(existingEntities), DeltaState.DELETION, existingResourceDB, existingResourceURI);
+
+		ModificationMatcher.LOG.debug("mark non-matched paths in new resource (additions)");
+
 		markPaths(getNonMatches(newEntities), DeltaState.ADDITION, newResourceDB, newResourceURI);
 	}
 

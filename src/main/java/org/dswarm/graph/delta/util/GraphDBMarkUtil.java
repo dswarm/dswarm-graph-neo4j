@@ -3,6 +3,7 @@ package org.dswarm.graph.delta.util;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -19,7 +20,7 @@ import org.dswarm.graph.delta.DeltaStatics;
  */
 public final class GraphDBMarkUtil {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GraphDBMarkUtil.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(GraphDBMarkUtil.class);
 
 	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
 			final Set<Long> pathEndNodeIds) {
@@ -68,11 +69,15 @@ public final class GraphDBMarkUtil {
 
 	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) {
 
+		final Set<Long> markedPathEndNodeIds = Sets.newHashSet();
+
 		for (final Path path : paths) {
 
 			final long pathEndNodeId = path.endNode().getId();
 
 			if (pathEndNodeIds.contains(pathEndNodeId)) {
+
+				markedPathEndNodeIds.add(pathEndNodeId);
 
 				// mark path
 				for (final Relationship rel : path.relationships()) {
@@ -80,6 +85,12 @@ public final class GraphDBMarkUtil {
 					if (!rel.hasProperty(DeltaStatics.DELTA_STATE_PROPERTY)) {
 
 						rel.setProperty(DeltaStatics.DELTA_STATE_PROPERTY, deltaState.toString());
+					}
+
+					// TODO: remove this later, it'S just for debugging purpose right now
+					if (rel.getType().name().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+
+						GraphDBMarkUtil.LOG.debug("mark rel: " + GraphDBPrintUtil.printDeltaRelationship(rel));
 					}
 
 					rel.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
@@ -111,6 +122,12 @@ public final class GraphDBMarkUtil {
 					node.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
 				}
 			}
+		}
+
+		if (pathEndNodeIds.size() != markedPathEndNodeIds.size()) {
+
+			GraphDBMarkUtil.LOG.debug("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
+					+ "' :: marked path end node ids size = '" + markedPathEndNodeIds.size() + "'");
 		}
 	}
 

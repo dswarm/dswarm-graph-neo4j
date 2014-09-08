@@ -112,6 +112,7 @@ public final class GraphDBUtil {
 	 *
 	 * @param graphDB
 	 * @param resourceURI
+	 * @param resourceURI
 	 * @return
 	 */
 	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String resourceURI) {
@@ -145,50 +146,60 @@ public final class GraphDBUtil {
 	 */
 	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Relationship> rels = GlobalGraphOperations.at(graphDB).getAllRelationships();
+		try {
 
-		boolean incomplete = false;
+			final Iterable<Relationship> rels = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
-		for(final Relationship rel : rels) {
+			boolean incomplete = false;
 
-			final Boolean relMatchedState = (Boolean) rel.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
-			final boolean finalRelMatchedState = checkMatchedState(relMatchedState, rel.getId(), DeltaStatics.RELATIONSHIP_TYPE);
+			for (final Relationship rel : rels) {
 
-			if(!finalRelMatchedState) {
+				final Boolean relMatchedState = (Boolean) rel.getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+				final boolean finalRelMatchedState = checkMatchedState(relMatchedState, rel.getId(), DeltaStatics.RELATIONSHIP_TYPE);
 
-				incomplete = true;
+				if (!finalRelMatchedState) {
 
-				break;
+					incomplete = true;
+
+					break;
+				}
+
+				final Boolean subjectMatchedState = (Boolean) rel.getStartNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+				final boolean finalSubjectMatchedState = checkMatchedState(subjectMatchedState, rel.getStartNode().getId(), DeltaStatics.NODE_TYPE);
+
+				if (!finalSubjectMatchedState) {
+
+					incomplete = true;
+
+					break;
+				}
+
+				final Boolean objectMatchedState = (Boolean) rel.getEndNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
+				final boolean finalObjectMatchedState = checkMatchedState(objectMatchedState, rel.getEndNode().getId(), DeltaStatics.NODE_TYPE);
+
+				if (!finalObjectMatchedState) {
+
+					incomplete = true;
+
+					break;
+				}
 			}
 
-			final Boolean subjectMatchedState = (Boolean) rel.getStartNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
-			final boolean finalSubjectMatchedState = checkMatchedState(subjectMatchedState, rel.getStartNode().getId(), DeltaStatics.NODE_TYPE);
+			final boolean result = !incomplete;
 
-			if(!finalSubjectMatchedState) {
+			tx.success();
 
-				incomplete = true;
-
-				break;
-			}
-
-			final Boolean objectMatchedState = (Boolean) rel.getEndNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
-			final boolean finalObjectMatchedState = checkMatchedState(objectMatchedState, rel.getEndNode().getId(), DeltaStatics.NODE_TYPE);
-
-			if(!finalObjectMatchedState) {
-
-				incomplete = true;
-
-				break;
-			}
-		}
-
-		return !incomplete;
-
+			return result;
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't complete the graph matching completeness check for graph DB '" + graphDB.toString() + "'", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return false;
@@ -463,6 +474,8 @@ public final class GraphDBUtil {
 	}
 
 	/**
+	 * note: should be executed in transaction scope
+	 *
 	 * @param graphDB
 	 * @param pathEndNodeIds
 	 * @param nodeId
@@ -476,11 +489,22 @@ public final class GraphDBUtil {
 
 			for (final Relationship typeRel : typeRels) {
 
+				// TODO: could be removed later
+				GraphDBUtil.LOG.debug("fetch entity type rel: '" + typeRel.getId() + "'");
+
 				pathEndNodeIds.add(typeRel.getEndNode().getId());
 			}
 		}
 	}
 
+	/**
+	 * note: should be executed in transaction scope
+	 *
+	 * @param deltaState
+	 * @param graphDB
+	 * @param pathEndNodeIds
+	 * @param nodeId
+	 */
 	public static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
 			final Set<Long> pathEndNodeIds, final long nodeId) {
 
@@ -637,7 +661,9 @@ public final class GraphDBUtil {
 
 		final Set<SubGraphEntity> subgraphEntities = new HashSet<>();
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			for(final CSEntity csEntity : csEntities) {
 
@@ -698,7 +724,11 @@ public final class GraphDBUtil {
 						final long relId = nonMatchedRel.getId();
 						final String value = (String) nonMatchedRel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
-						System.out.println("rel id = '" + relId + "', value = '" + value +"'");
+						final String logout = "in determineNonMatchedCSEntitySubGraphs with rel id = '" + relId + "', value = '" + value +"'";
+						System.out.println(logout);
+						final String relPrint = GraphDBPrintUtil.printDeltaRelationship(nonMatchedRel);
+						GraphDBUtil.LOG.debug(logout);
+						GraphDBUtil.LOG.debug(relPrint);
 					}
 
 					final long endNodeId = nonMatchedRel.getEndNode().getId();
@@ -709,9 +739,15 @@ public final class GraphDBUtil {
 				}
 			}
 
+			tx.success();
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't determine non-matched cs entity sub graphs", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return subgraphEntities;
@@ -734,15 +770,25 @@ public final class GraphDBUtil {
 
 	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-		final Node resourceNode = getResourceNode(graphDB, resourceURI);
+		try {
 
-			return getFlatNodeValues(resourceNode, graphDB);
+			final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
+			final Collection<ValueEntity> flatResourceNodeValues = getFlatNodeValues(resourceNode, graphDB);
+
+			tx.success();
+
+			return flatResourceNodeValues;
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't determine record uri", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return null;
@@ -1026,11 +1072,13 @@ public final class GraphDBUtil {
 		final ExecutionResult result;
 		String resultValue = null;
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			result = engine.execute(query);
 
-			if(result != null) {
+			if (result != null) {
 
 				for (final Map<String, Object> row : result) {
 
@@ -1051,9 +1099,15 @@ public final class GraphDBUtil {
 				}
 			}
 
+			tx.success();
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't execute query with single result", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return resultValue;
@@ -1067,7 +1121,9 @@ public final class GraphDBUtil {
 
 		final ExecutionResult result;
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			result = engine.execute(query);
 
@@ -1088,9 +1144,15 @@ public final class GraphDBUtil {
 				}
 			}
 
+			tx.success();
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't execute query with multiple results", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return resultSet;
@@ -1103,7 +1165,9 @@ public final class GraphDBUtil {
 
 		final ExecutionResult result;
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			result = engine.execute(query);
 
@@ -1137,9 +1201,15 @@ public final class GraphDBUtil {
 				}
 			}
 
+			tx.success();
 		} catch (final Exception e) {
 
+			tx.failure();
+
 			GraphDBUtil.LOG.error("couldn't execute query with multiple results with values", e);
+		} finally {
+
+			tx.close();
 		}
 
 		return resultSet;

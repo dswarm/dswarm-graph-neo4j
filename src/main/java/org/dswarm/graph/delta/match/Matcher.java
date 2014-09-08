@@ -11,6 +11,8 @@ import com.google.common.base.Optional;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
@@ -18,19 +20,21 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
-	protected Set<String>							matches;
-	protected boolean								matchesCalculated	= false;
+	private static final Logger LOG = LoggerFactory.getLogger(Matcher.class);
 
-	protected final Optional<Map<String, ENTITY>>	existingEntities;
-	protected final Optional<Map<String, ENTITY>>	newEntities;
+	protected Set<String> matches;
+	protected boolean matchesCalculated = false;
 
-	protected final GraphDatabaseService			existingResourceDB;
-	protected final GraphDatabaseService			newResourceDB;
+	protected final Optional<Map<String, ENTITY>> existingEntities;
+	protected final Optional<Map<String, ENTITY>> newEntities;
 
-	protected final String							existingResourceURI;
-	protected final String							newResourceURI;
+	protected final GraphDatabaseService existingResourceDB;
+	protected final GraphDatabaseService newResourceDB;
 
-	protected final Marker<ENTITY>					marker;
+	protected final String existingResourceURI;
+	protected final String newResourceURI;
+
+	protected final Marker<ENTITY> marker;
 
 	public Matcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg, final Optional<? extends Collection<ENTITY>> newEntitiesArg,
 			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
@@ -139,6 +143,8 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 				}
 			}
 
+			Matcher.LOG.debug("'" + matches.size() + "' matches");
+
 			matchesCalculated = true;
 		}
 	}
@@ -147,7 +153,12 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 		if(matches == null || matches.isEmpty()) {
 
-			return Optional.absent();
+			if(!entityMap.isPresent()) {
+
+				return Optional.absent();
+			}
+
+			return Optional.of(entityMap.get().values());
 		}
 
 		if(!entityMap.isPresent()) {
@@ -165,12 +176,17 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 			}
 		}
 
-		return Optional.fromNullable(valueEntities);
+		return Optional.of(valueEntities);
 	}
 
 	protected void markMatchedPaths() {
 
+		Matcher.LOG.debug("mark matched paths in existing resource");
+
 		markPaths(getMatches(existingEntities), DeltaState.ExactMatch, existingResourceDB, existingResourceURI);
+
+		Matcher.LOG.debug("mark matched paths in new resource");
+
 		markPaths(getMatches(newEntities), DeltaState.ExactMatch, newResourceDB, newResourceURI);
 	}
 

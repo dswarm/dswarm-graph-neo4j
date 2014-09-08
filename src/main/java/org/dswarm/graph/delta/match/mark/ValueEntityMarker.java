@@ -76,6 +76,9 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 						pathEndNodeIdsFromCSEntity = new HashSet<>();
 					}
 
+					// TODO: could be removed later
+					ValueEntityMarker.LOG.debug("fetch entity type nodes in value entity marker");
+
 					GraphDBUtil.fetchEntityTypeNodes(graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);
 					// TODO: we can't do this here, or? - I think we'll probably mark too much
 					GraphDBUtil.determineNonMatchedSubGraphPathEndNodes(deltaState, graphDB, pathEndNodeIdsFromCSEntity, csEntityNodeId);

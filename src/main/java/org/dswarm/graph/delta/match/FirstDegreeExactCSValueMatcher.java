@@ -9,11 +9,15 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
 public class FirstDegreeExactCSValueMatcher extends Matcher<ValueEntity> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(FirstDegreeExactCSValueMatcher.class);
 
 	public FirstDegreeExactCSValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
 			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
@@ -21,6 +25,9 @@ public class FirstDegreeExactCSValueMatcher extends Matcher<ValueEntity> {
 
 		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
 				new ValueEntityMarker());
+
+		// TODO: could be removed later
+		FirstDegreeExactCSValueMatcher.LOG.debug("new FirstDegreeExactCSValueMatcher");
 	}
 
 	/**

@@ -10,11 +10,15 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by tgaengler on 01/08/14.
  */
 public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(FirstDegreeExactCSEntityMatcher.class);
 
 	public FirstDegreeExactCSEntityMatcher(final Optional<? extends Collection<CSEntity>> existingCSEntitiesArg,
 			final Optional<? extends Collection<CSEntity>> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
@@ -22,6 +26,9 @@ public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 
 		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg,
 				new CSEntityMarker());
+
+		// TODO: could be removed later
+		FirstDegreeExactCSEntityMatcher.LOG.debug("new FirstDegreeExactCSEntityMatcher");
 	}
 
 	/**

@@ -64,6 +64,9 @@ public class CSEntityMarker implements Marker<CSEntity> {
 
 				final Set<Long> pathEndNodeIdsFromCSEntity = new HashSet<>();
 
+				// TODO: could be removed later
+				CSEntityMarker.LOG.debug("fetch entity type nodes in cs entity marker");
+
 				//markEntityTypeNodes(graphDB, deltaState, csEntity.getNodeId());
 				GraphDBUtil.fetchEntityTypeNodes(graphDB, pathEndNodeIdsFromCSEntity, csEntity.getNodeId());
 

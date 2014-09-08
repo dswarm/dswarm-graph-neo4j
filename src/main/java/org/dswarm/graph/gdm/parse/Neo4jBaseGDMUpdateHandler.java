@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
@@ -72,21 +71,34 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 	protected final PropertyGraphGDMReader	propertyGraphGDMReader		= new PropertyGraphGDMReader();
 
-	public Neo4jBaseGDMUpdateHandler(final GraphDatabaseService database) {
+	public Neo4jBaseGDMUpdateHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 
 		tx = database.beginTx();
 
-		LOG.debug("start write TX");
+		try {
 
-		resources = database.index().forNodes("resources");
-		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
-		resourceTypes = database.index().forNodes("resource_types");
-		values = database.index().forNodes("values");
-		bnodes = new HashMap<>();
-		statementHashes = database.index().forRelationships("statement_hashes");
-		nodeResourceMap = new HashMap<>();
+			LOG.debug("start write TX");
+
+			resources = database.index().forNodes("resources");
+			resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			resourceTypes = database.index().forNodes("resource_types");
+			values = database.index().forNodes("values");
+			bnodes = new HashMap<>();
+			statementHashes = database.index().forRelationships("statement_hashes");
+			nodeResourceMap = new HashMap<>();
+		}catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	protected void init() {
@@ -532,7 +544,16 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 		if (hits != null && hits.hasNext()) {
 
-			return hits.next();
+			final Relationship rel = hits.next();
+
+			hits.close();
+
+			return rel;
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return null;
@@ -609,7 +630,14 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 
 				node = hits.next();
 
+				hits.close();
+
 				return node;
+			}
+
+			if(hits != null) {
+
+				hits.close();
 			}
 
 			return null;
@@ -730,26 +758,6 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	}
 
 	protected abstract Relationship getRelationship(final String uuid) throws DMPGraphException;
-
-//	{
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		final String resultVariable = "rel";
-//
-//		sb.append("MATCH ()-[r{").append(GraphStatics.UUID_PROPERTY).append(": \"").append(uuid).append("\"}]->()\nRETURN r AS rel");
-//
-//		final String query = sb.toString();
-//
-//		final Relationship rel = GraphDBUtil.executeQueryWithSingleRelationshipResult(query, resultVariable, database);
-//
-//		if (rel == null) {
-//
-//			throw new DMPGraphException("could not find a statement for '" + uuid + "'");
-//		}
-//
-//		return rel;
-//	}
 
 	private void addBNode(final org.dswarm.graph.json.Node gdmNode, final Node node) {
 

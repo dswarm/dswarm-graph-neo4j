@@ -7,7 +7,7 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 
 /**
- * Created by tgaengler on 31/07/14.
+ * @author tgaengler
  */
 public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourceReader {
 
@@ -32,9 +32,15 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 		}
 		if (!hits.hasNext()) {
 
+			hits.close();
+
 			return null;
 		}
 
-		return hits.next();
+		final Node node = hits.next();
+
+		hits.close();
+
+		return node;
 	}
 }

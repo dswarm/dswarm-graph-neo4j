@@ -24,15 +24,28 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 	private final String				resourceGraphURI;
 
-	public Neo4jGDMWProvenanceUpdateHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
+	public Neo4jGDMWProvenanceUpdateHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
 
 		super(database);
 
-		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+		try {
 
-		resourceGraphURI = resourceGraphURIArg;
+			statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
 
-		init();
+			resourceGraphURI = resourceGraphURIArg;
+
+			init();
+		} catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jGDMWProvenanceUpdateHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
@@ -122,12 +135,17 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 		if (hits != null && hits.hasNext()) {
 
 			final Node dataModelNode = hits.next();
-			final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
+			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
-			if (lastestVersionFromDB != null) {
+			if (latestVersionFromDB != null) {
 
-				latestVersion = lastestVersionFromDB;
+				latestVersion = latestVersionFromDB;
 			}
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return latestVersion;
@@ -140,7 +158,16 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 		if (hits != null && hits.hasNext()) {
 
-			return hits.next();
+			final Relationship rel = hits.next();
+
+			hits.close();
+
+			return rel;
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return null;
@@ -155,6 +182,11 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 			final Node dataModelNode = hits.next();
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 	}
 }

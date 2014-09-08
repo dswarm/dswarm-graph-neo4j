@@ -311,8 +311,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 			existingResourceDBTX.success();
 		} catch (final Exception e) {
 
-			// TODO: move this to log
-			e.printStackTrace();
+			GDMChangesetParser.LOG.error("couldn't write changeset successfully to graph DB", e);
 
 			newResourceDBTX.failure();
 			existingResourceDBTX.failure();

@@ -41,40 +41,53 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jDeltaGDMHandler.class);
 
-	private int totalTriples       = 0;
-	private int addedNodes         = 0;
-	private int addedLabels        = 0;
-	private int addedRelationships = 0;
-	private int sinceLastCommit    = 0;
-	private int i                  = 0;
-	private int literals           = 0;
+	private int							totalTriples		= 0;
+	private int							addedNodes			= 0;
+	private int							addedLabels			= 0;
+	private int							addedRelationships	= 0;
+	private int							sinceLastCommit		= 0;
+	private int							i					= 0;
+	private int							literals			= 0;
 
-	private long tick = System.currentTimeMillis();
-	private final GraphDatabaseService database;
-	private final Index<Node>          resources;
-	private final Index<Node>          resourceTypes;
-	private final Index<Node>          values;
-	private final Map<String, Node>    bnodes;
-	private final Index<Relationship> statementHashes;
-	private final Index<Relationship> statementUUIDs;
-	private final Map<Long, String>    nodeResourceMap;
+	private long						tick				= System.currentTimeMillis();
+	private final GraphDatabaseService	database;
+	private final Index<Node>			resources;
+	private final Index<Node>			resourceTypes;
+	private final Index<Node>			values;
+	private final Map<String, Node>		bnodes;
+	private final Index<Relationship>	statementHashes;
+	private final Index<Relationship>	statementUUIDs;
+	private final Map<Long, String>		nodeResourceMap;
 
-	private Transaction tx;
+	private Transaction					tx;
 
-	public Neo4jDeltaGDMHandler(final GraphDatabaseService database) {
+	public Neo4jDeltaGDMHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 		tx = database.beginTx();
 
-		LOG.debug("start write TX");
+		try {
 
-		resources = database.index().forNodes("resources");
-		resourceTypes = database.index().forNodes("resource_types");
-		values = database.index().forNodes("values");
-		bnodes = new HashMap<String, Node>();
-		statementHashes = database.index().forRelationships("statement_hashes");
-		statementUUIDs = database.index().forRelationships("statement_uuids");
-		nodeResourceMap = new HashMap<Long, String>();
+			LOG.debug("start write TX");
+
+			resources = database.index().forNodes("resources");
+			resourceTypes = database.index().forNodes("resource_types");
+			values = database.index().forNodes("values");
+			bnodes = new HashMap<>();
+			statementHashes = database.index().forRelationships("statement_hashes");
+			statementUUIDs = database.index().forRelationships("statement_uuids");
+			nodeResourceMap = new HashMap<>();
+		} catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jDeltaGDMHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
@@ -141,7 +154,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				addedNodes++;
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(), object.getType());
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(),
+						object.getType());
 			} else { // must be Resource
 						// Make sure object exists
 
@@ -206,7 +220,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(), object.getType());
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(),
+						object.getType());
 			}
 
 			totalTriples++;
@@ -244,7 +259,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 	}
 
-	@Override public void setResourceUri(String resourceUri) {
+	@Override
+	public void setResourceUri(String resourceUri) {
 
 		// nothing TODO here
 	}
@@ -338,7 +354,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			final String finalStatementUUID;
 
-			if(statementUUID == null) {
+			if (statementUUID == null) {
 
 				finalStatementUUID = UUID.randomUUID().toString();
 			} else {
@@ -364,6 +380,11 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		} else {
 
 			rel = hits.next();
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return rel;
@@ -393,7 +414,14 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				node = hits.next();
 
+				hits.close();
+
 				return node;
+			}
+
+			if(hits != null) {
+
+				hits.close();
 			}
 
 			return null;

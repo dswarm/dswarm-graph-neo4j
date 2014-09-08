@@ -3,7 +3,8 @@ package org.dswarm.graph.delta.util;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
+import org.dswarm.graph.delta.DeltaState;
+import org.dswarm.graph.delta.DeltaStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -12,8 +13,7 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.delta.DeltaState;
-import org.dswarm.graph.delta.DeltaStatics;
+import com.google.common.collect.Sets;
 
 /**
  * @author tgaengler
@@ -126,7 +126,7 @@ public final class GraphDBMarkUtil {
 
 		if (pathEndNodeIds.size() != markedPathEndNodeIds.size()) {
 
-			GraphDBMarkUtil.LOG.debug("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
+			GraphDBMarkUtil.LOG.error("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
 					+ "' :: marked path end node ids size = '" + markedPathEndNodeIds.size() + "'");
 		}
 	}

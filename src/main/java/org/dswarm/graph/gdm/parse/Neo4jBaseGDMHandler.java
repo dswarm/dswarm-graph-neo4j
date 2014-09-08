@@ -66,20 +66,34 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 	protected boolean						latestVersionInitialized	= false;
 
-	public Neo4jBaseGDMHandler(final GraphDatabaseService database) {
+	public Neo4jBaseGDMHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 		tx = database.beginTx();
 
-		LOG.debug("start write TX");
+		try {
 
-		resources = database.index().forNodes("resources");
-		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
-		resourceTypes = database.index().forNodes("resource_types");
-		values = database.index().forNodes("values");
-		bnodes = new HashMap<>();
-		statementHashes = database.index().forRelationships("statement_hashes");
-		nodeResourceMap = new HashMap<>();
+			LOG.debug("start write TX");
+
+			resources = database.index().forNodes("resources");
+			resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			resourceTypes = database.index().forNodes("resource_types");
+			values = database.index().forNodes("values");
+			bnodes = new HashMap<>();
+			statementHashes = database.index().forRelationships("statement_hashes");
+			nodeResourceMap = new HashMap<>();
+
+		} catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jBaseGDMHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
@@ -473,7 +487,16 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 		if (hits != null && hits.hasNext()) {
 
-			return hits.next();
+			final Relationship rel = hits.next();
+
+			hits.close();
+
+			return rel;
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return null;
@@ -550,7 +573,14 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 				node = hits.next();
 
+				hits.close();
+
 				return node;
+			}
+
+			if(hits != null) {
+
+				hits.close();
 			}
 
 			return null;

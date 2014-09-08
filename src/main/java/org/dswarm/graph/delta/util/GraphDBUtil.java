@@ -87,10 +87,19 @@ public final class GraphDBUtil {
 
 		if (hits == null || !hits.hasNext()) {
 
+			if(hits != null) {
+
+				hits.close();
+			}
+
 			return null;
 		}
 
-		return hits.next();
+		final Node node = hits.next();
+
+		hits.close();
+
+		return node;
 	}
 
 	static String getLabels(final Node node) {
@@ -524,46 +533,58 @@ public final class GraphDBUtil {
 
 	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String resourceURI, final AttributePath commonAttributePath, final ContentSchema contentSchema) {
 
+		final Map<Long, CSEntity> csEntities = new LinkedHashMap<>();
+		
 		final Transaction tx = graphDB.beginTx();
 
-		final Node resourceNode = getResourceNode(graphDB, resourceURI);
+		try {
 
-		// determine CS entity nodes
-		final ResourceIterable<Node> csEntityNodes = graphDB.traversalDescription().breadthFirst()
-				.evaluator(Evaluators.toDepth(commonAttributePath.getAttributes().size())).evaluator(new EntityEvaluator(commonAttributePath.getAttributes()))
-				.traverse(resourceNode).nodes();
+			final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
-		if(csEntityNodes == null) {
+			// determine CS entity nodes
+			final ResourceIterable<Node> csEntityNodes = graphDB.traversalDescription().breadthFirst()
+					.evaluator(Evaluators.toDepth(commonAttributePath.getAttributes().size())).evaluator(new EntityEvaluator(commonAttributePath.getAttributes()))
+					.traverse(resourceNode).nodes();
 
-			return null;
+			if(csEntityNodes == null) {
+
+				tx.success();
+
+				return null;
+			}
+
+			for(final Node node : csEntityNodes) {
+
+				final CSEntity csEntity = new CSEntity(node.getId());
+				csEntities.put(csEntity.getNodeId(), csEntity);
+			}
+
+			final ArrayList<Node> csEntityNodesList = Lists.newArrayList(csEntityNodes);
+			final Node[] csEntityNodesArray = new Node[csEntityNodesList.size()];
+			csEntityNodesList.toArray(csEntityNodesArray);
+
+			if(contentSchema.getKeyAttributePaths() != null) {
+
+				// determine key entities
+				determineKeyEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
+			}
+
+			if(contentSchema.getValueAttributePath() != null) {
+
+				// determine value entities
+				determineValueEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
+			}
+
+			tx.success();
+		} catch (final Exception e) {
+
+			tx.failure();
+
+			GraphDBUtil.LOG.error("couldn't determine cs entities successfully", e);
+		} finally {
+
+			tx.close();
 		}
-
-		final Map<Long, CSEntity> csEntities = new LinkedHashMap<>();
-
-		for(final Node node : csEntityNodes) {
-
-			final CSEntity csEntity = new CSEntity(node.getId());
-			csEntities.put(csEntity.getNodeId(), csEntity);
-		}
-
-		final ArrayList<Node> csEntityNodesList = Lists.newArrayList(csEntityNodes);
-		final Node[] csEntityNodesArray = new Node[csEntityNodesList.size()];
-		csEntityNodesList.toArray(csEntityNodesArray);
-
-		if(contentSchema.getKeyAttributePaths() != null) {
-
-			// determine key entities
-			determineKeyEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
-		}
-
-		if(contentSchema.getValueAttributePath() != null) {
-
-			// determine value entities
-			determineValueEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
-		}
-
-		tx.success();
-		tx.close();
 
 		final Collection<CSEntity> csEntitiesCollection = csEntities.values();
 

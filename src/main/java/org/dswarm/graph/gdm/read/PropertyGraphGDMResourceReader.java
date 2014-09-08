@@ -66,7 +66,9 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 
 			if (recordNode == null) {
 
-				LOG.debug("could a find a resource node to start traversal");
+				LOG.debug("couldn't a find a resource node to start traversal");
+
+				tx.success();
 
 				return null;
 			}

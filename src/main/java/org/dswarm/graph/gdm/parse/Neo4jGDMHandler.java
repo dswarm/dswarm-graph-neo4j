@@ -1,5 +1,6 @@
 package org.dswarm.graph.gdm.parse;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -19,11 +20,24 @@ public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
 
 	protected final Index<Relationship>	statementUUIDs;
 
-	public Neo4jGDMHandler(final GraphDatabaseService database) {
+	public Neo4jGDMHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		super(database);
 
-		statementUUIDs = database.index().forRelationships("statement_uuids");
+		try {
+
+			statementUUIDs = database.index().forRelationships("statement_uuids");
+		} catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jGDMHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override

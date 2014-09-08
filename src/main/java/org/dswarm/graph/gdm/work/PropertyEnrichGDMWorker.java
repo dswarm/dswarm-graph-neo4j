@@ -1,26 +1,15 @@
 package org.dswarm.graph.gdm.work;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.util.GraphDBUtil;
-import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
-import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.utils.GraphUtils;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

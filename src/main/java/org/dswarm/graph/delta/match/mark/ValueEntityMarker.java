@@ -86,6 +86,7 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 					pathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), pathEndNodeIdsFromCSEntity);
 				}
 			}
+
 			tx.success();
 		} catch (final Exception e) {
 

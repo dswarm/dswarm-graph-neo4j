@@ -48,12 +48,12 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private Resource					currentResource;
 	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
 
-	private final int					version;
+	private Integer					version;
 
 	private Transaction					tx							= null;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final Integer versionArg,
-			final GraphDatabaseService databaseArg) {
+			final GraphDatabaseService databaseArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
 		resourceGraphUri = resourceGraphUriArg;
@@ -68,16 +68,40 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 		} else {
 
 			tx = database.beginTx();
-			version = getLatestVersion();
+
+			try {
+
+				version = getLatestVersion();
+			} catch (final Exception e) {
+
+				final String message = "couldn't retrieve latest version successfully";
+
+				PropertyGraphGDMModelReader.LOG.error(message, e);
+
+				tx.failure();
+				tx.close();
+
+				throw new DMPGraphException(message);
+			}
 		}
 	}
 
 	@Override
-	public Model read() {
+	public Model read() throws DMPGraphException {
 
 		if (tx == null) {
 
-			tx = database.beginTx();
+			try {
+
+				tx = database.beginTx();
+			} catch (final Exception e) {
+
+				final String message = "couldn't acquire tx successfully";
+
+				PropertyGraphGDMModelReader.LOG.debug(message, e);
+
+				throw new DMPGraphException(message);
+			}
 		}
 
 		PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
@@ -313,6 +337,11 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				latestVersion = latestVersionFromDB;
 			}
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return latestVersion;

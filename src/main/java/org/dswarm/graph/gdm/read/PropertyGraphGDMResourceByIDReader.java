@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by tgaengler on 31/07/14.
+ * @author tgaengler
  */
 public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResourceReader {
 
@@ -33,7 +33,7 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 
 		if (recordURI == null) {
 
-			LOG.debug("could a find a resource node to start traversal");
+			LOG.debug("couldn't a find a resource node to start traversal");
 
 			return null;
 		}

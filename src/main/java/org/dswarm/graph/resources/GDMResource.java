@@ -37,7 +37,6 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
-import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
@@ -62,8 +61,6 @@ import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
-
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -74,6 +71,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Optional;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -561,7 +559,7 @@ public class GDMResource {
 		return new Changeset(addedStatements, removedStatements, changesetModifications, preparedExistingModifiedStatements, preparedNewModifiedStatements);
 	}
 
-	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) {
+	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) throws DMPGraphException {
 
 		// TODO: find proper graph database settings to hold everything in-memory only
 		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)

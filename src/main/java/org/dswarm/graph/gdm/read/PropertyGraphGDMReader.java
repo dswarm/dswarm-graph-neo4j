@@ -172,12 +172,12 @@ public class PropertyGraphGDMReader {
 
 	private org.dswarm.graph.json.Node createResourceFromBNode(final long bnodeId) {
 
-		if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+		if (!bnodes.containsKey(bnodeId)) {
 
-			bnodes.put(Long.valueOf(bnodeId), new org.dswarm.graph.json.Node(bnodeId));
+			bnodes.put(bnodeId, new org.dswarm.graph.json.Node(bnodeId));
 		}
 
-		return bnodes.get(Long.valueOf(bnodeId));
+		return bnodes.get(bnodeId);
 	}
 
 	private ResourceNode createResourceFromURI(final long id, final String uri) {

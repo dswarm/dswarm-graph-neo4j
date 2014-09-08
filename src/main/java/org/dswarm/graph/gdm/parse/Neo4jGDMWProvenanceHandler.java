@@ -23,20 +23,34 @@ public class Neo4jGDMWProvenanceHandler extends Neo4jBaseGDMHandler {
 
 	private final String				resourceGraphURI;
 
-	public Neo4jGDMWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
+	public Neo4jGDMWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
 
 		super(database);
 
-		statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+		try {
+
+			statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+		} catch (final Exception e) {
+
+			tx.failure();
+			tx.close();
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jGDMWProvenanceHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 
 		resourceGraphURI = resourceGraphURIArg;
 	}
 
-	@Override protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
+	@Override
+	protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
 
 		final String finalProvenanceURI;
 
-		if(provenanceURI != null) {
+		if (provenanceURI != null) {
 
 			finalProvenanceURI = provenanceURI;
 		} else {

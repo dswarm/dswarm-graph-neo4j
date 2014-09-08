@@ -187,7 +187,7 @@ public class GDMResource {
 			// = new resources model, since existing, modified resources were already written to the DB
 			final Pair<Model, Long> result = calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
 
-			result.first();
+			model = result.first();
 			size += result.other();
 		}
 
@@ -292,7 +292,7 @@ public class GDMResource {
 		}
 
 		GDMResource.LOG.debug("try to read GDM statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
-				+ recordClassUri + "' from graph db");
+				+ recordClassUri + "' and version = '" + version + "' from graph db");
 
 		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, resourceGraphUri, version, database);
 		final Model model = gdmReader.read();
@@ -307,7 +307,7 @@ public class GDMResource {
 
 		GDMResource.LOG.debug("finished reading '" + model.size() + "' GDM statements ('" + gdmReader.countStatements()
 				+ "' via GDM reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+				+ "' and version = '" + version + "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

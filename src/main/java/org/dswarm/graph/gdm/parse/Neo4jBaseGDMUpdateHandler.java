@@ -16,6 +16,8 @@ import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
+
+import org.apache.commons.lang.NotImplementedException;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -273,45 +275,80 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	@Override
 	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException {
 
-		final Relationship rel = getRelationship(stmtUUID);
-		final Node subject = rel.getStartNode();
-		final Node object = rel.getEndNode();
-		final Statement stmt = propertyGraphGDMReader.readStatement(rel);
-		addBNode(stmt.getSubject(), subject);
-		addBNode(stmt.getObject(), object);
+		try {
 
-		// reset stmt uuid, so that a new stmt uuid will be assigned when relationship will be added
-		stmt.setUUID(null);
-		// set actual order of the stmt
-		stmt.setOrder(order);
-		final String predicate = stmt.getPredicate().getUri();
+			final Relationship rel = getRelationship(stmtUUID);
+			final Node subject = rel.getStartNode();
+			final Node object = rel.getEndNode();
+			final Statement stmt = propertyGraphGDMReader.readStatement(rel);
+			addBNode(stmt.getSubject(), subject);
+			addBNode(stmt.getObject(), object);
 
-		// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the index
-		// be update with the new stmt (?)
-		final String hash = generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+			// reset stmt uuid, so that a new stmt uuid will be assigned when relationship will be added
+			stmt.setUUID(null);
+			// set actual order of the stmt
+			stmt.setOrder(order);
+			final String predicate = stmt.getPredicate().getUri();
 
-		addRelationship(subject, object, resource.getUri(), resource, stmt, index, hash);
+			// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the
+			// index
+			// be update with the new stmt (?)
+			final String hash = generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+
+			addRelationship(subject, object, resource.getUri(), resource, stmt, index, hash);
+
+			totalTriples++;
+		} catch (final DMPGraphException e) {
+
+			throw e;
+		} catch (final Exception e) {
+
+			final String message = "couldn't handle statement successfully";
+
+			tx.failure();
+			tx.close();
+
+			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
 	public void deprecateStatement(long index) {
 
-		// TODO:
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
 
-		final Relationship rel = getRelationship(uuid);
+		try {
 
-		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
+			final Relationship rel = getRelationship(uuid);
 
-		final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readObject(rel.getStartNode());
-		final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(rel.getEndNode());
-		addBNode(subjectGDMNode, rel.getStartNode());
-		addBNode(objectGDMNode, rel.getEndNode());
+			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
 
-		return subjectGDMNode;
+			final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readObject(rel.getStartNode());
+			final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(rel.getEndNode());
+			addBNode(subjectGDMNode, rel.getStartNode());
+			addBNode(objectGDMNode, rel.getEndNode());
+
+			return subjectGDMNode;
+		} catch (final DMPGraphException e) {
+
+			throw e;
+		} catch (final Exception e) {
+
+			final String message = "couldn't deprecate statement successfully";
+
+			tx.failure();
+			tx.close();
+
+			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	protected abstract void addObjectToResourceWProvenanceIndex(final Node node, final String URI, final String provenanceURI);
@@ -551,7 +588,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 			return rel;
 		}
 
-		if(hits != null) {
+		if (hits != null) {
 
 			hits.close();
 		}
@@ -635,7 +672,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 				return node;
 			}
 
-			if(hits != null) {
+			if (hits != null) {
 
 				hits.close();
 			}
@@ -757,7 +794,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 		return identifier;
 	}
 
-	protected abstract Relationship getRelationship(final String uuid) throws DMPGraphException;
+	protected abstract Relationship getRelationship(final String uuid);
 
 	private void addBNode(final org.dswarm.graph.json.Node gdmNode, final Node node) {
 

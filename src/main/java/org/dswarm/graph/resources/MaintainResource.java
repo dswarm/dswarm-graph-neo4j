@@ -116,119 +116,118 @@ public class MaintainResource {
 
 			i++;
 
-			final Transaction tx = database.beginTx();
+			try(final Transaction tx = database.beginTx()) {
 
-			MaintainResource.LOG
-					.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
+				MaintainResource.LOG
+						.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
 
-			try {
+				try {
 
-				final ExecutionResult result = engine.execute(deleteQuery);
+					final ExecutionResult result = engine.execute(deleteQuery);
 
-				if(result == null) {
+					if (result == null) {
 
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
 
-					tx.success();
+						tx.success();
 
-					break;
-				}
+						break;
+					}
 
-				final ResourceIterator<Map<String, Object>> iterator = result.iterator();
+					final ResourceIterator<Map<String, Object>> iterator = result.iterator();
 
-				if(iterator == null) {
+					if (iterator == null) {
 
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is not available");
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is not available");
 
-					tx.success();
+						tx.success();
 
-					break;
-				}
+						break;
+					}
 
-				if (!iterator.hasNext()) {
+					if (!iterator.hasNext()) {
 
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
+
+					final Map<String, Object> row = iterator.next();
+
+					if (row == null || row.isEmpty()) {
+
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
+
+					final Entry<String, Object> entry = row.entrySet().iterator().next();
+
+					if (entry == null) {
+
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
+
+					final Object value = entry.getValue();
+
+					if (value == null) {
+
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
+
+					if (!entry.getKey().equals("entity_count")) {
+
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
+
+					final Long count = (Long) value;
+
+					deleted += count;
+
+					MaintainResource.LOG.debug("deleted " + count + " entities");
+
+					if (count < chunkSize) {
+
+						MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
+
+						iterator.close();
+						tx.success();
+
+						break;
+					}
 
 					iterator.close();
 					tx.success();
+				} catch (final Exception e) {
 
-					break;
+					MaintainResource.LOG.error("couldn't finish delete-all-entities TX successfully", e);
+
+					tx.failure();
 				}
-
-				final Map<String, Object> row = iterator.next();
-
-				if (row == null || row.isEmpty()) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
-
-					iterator.close();
-					tx.success();
-
-					break;
-				}
-
-				final Entry<String, Object> entry = row.entrySet().iterator().next();
-
-				if (entry == null) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
-
-					iterator.close();
-					tx.success();
-
-					break;
-				}
-
-				final Object value = entry.getValue();
-
-				if (value == null) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
-
-					iterator.close();
-					tx.success();
-
-					break;
-				}
-
-				if (!entry.getKey().equals("entity_count")) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
-
-					iterator.close();
-					tx.success();
-
-					break;
-				}
-
-				final Long count = (Long) value;
-
-				deleted += count;
-
-				MaintainResource.LOG.debug("deleted " + count + " entities");
-
-				if (count < chunkSize) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
-
-					iterator.close();
-					tx.success();
-
-					break;
-				}
-
-				iterator.close();
-				tx.success();
 			} catch (final Exception e) {
 
-				MaintainResource.LOG.error("couldn't finished delete-all-entities TX successfully", e);
-
-				tx.failure();
-			} finally {
-
-				MaintainResource.LOG.debug("finished delete-all-entities TX finally");
-
-				tx.close();
+				MaintainResource.LOG.debug("couldn't finish delete-all-entities TX finally", e);
 			}
 		}
 
@@ -238,87 +237,85 @@ public class MaintainResource {
 	private void deleteSomeLegacyIndices(final GraphDatabaseService database) {
 		MaintainResource.LOG.debug("start delete legacy indices TX");
 
-		final Transaction itx = database.beginTx();
+		try(final Transaction itx = database.beginTx()) {
 
-		try {
+			try {
 
-			final Index<Node> resources = database.index().forNodes("resources");
-			final Index<Node> values = database.index().forNodes("values");
-			final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
-			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
-			final Index<Relationship> statements = database.index().forRelationships("statements");
-			final Index<Relationship> statementHashes = database.index().forRelationships("statement_hashes");
-			final Index<Relationship> statementUUIDs = database.index().forRelationships("statement_uuids");
-			final Index<Relationship> statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+				final Index<Node> resources = database.index().forNodes("resources");
+				final Index<Node> values = database.index().forNodes("values");
+				final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+				final Index<Node> resourceTypes = database.index().forNodes("resource_types");
+				final Index<Relationship> statements = database.index().forRelationships("statements");
+				final Index<Relationship> statementHashes = database.index().forRelationships("statement_hashes");
+				final Index<Relationship> statementUUIDs = database.index().forRelationships("statement_uuids");
+				final Index<Relationship> statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
 
-			if (resources != null) {
+				if (resources != null) {
 
-				MaintainResource.LOG.debug("delete resources legacy index");
+					MaintainResource.LOG.debug("delete resources legacy index");
 
-				resources.delete();
+					resources.delete();
+				}
+
+				if (resourcesWProvenance != null) {
+
+					MaintainResource.LOG.debug("delete resources with provenance legacy index");
+
+					resourcesWProvenance.delete();
+				}
+
+				if (resourceTypes != null) {
+
+					MaintainResource.LOG.debug("delete resource types legacy index");
+
+					resourceTypes.delete();
+				}
+
+				if (statements != null) {
+
+					MaintainResource.LOG.debug("delete statements legacy index");
+
+					statements.delete();
+				}
+
+				if (statementHashes != null) {
+
+					MaintainResource.LOG.debug("delete statement hashes legacy index");
+
+					statementHashes.delete();
+				}
+
+				if (statementUUIDs != null) {
+
+					MaintainResource.LOG.debug("delete statement uuids legacy index");
+
+					statementUUIDs.delete();
+				}
+
+				if (statementUUIDsWProvenance != null) {
+
+					MaintainResource.LOG.debug("delete statement uuids with provenance legacy index");
+
+					statementUUIDsWProvenance.delete();
+				}
+
+				if (values != null) {
+
+					MaintainResource.LOG.debug("delete values legacy index");
+
+					values.delete();
+				}
+
+				itx.success();
+			} catch (final Exception e) {
+
+				MaintainResource.LOG.error("couldn't finish delete legacy indices TX successfully", e);
+
+				itx.failure();
 			}
-
-			if (resourcesWProvenance != null) {
-
-				MaintainResource.LOG.debug("delete resources with provenance legacy index");
-
-				resourcesWProvenance.delete();
-			}
-
-			if (resourceTypes != null) {
-
-				MaintainResource.LOG.debug("delete resource types legacy index");
-
-				resourceTypes.delete();
-			}
-
-			if (statements != null) {
-
-				MaintainResource.LOG.debug("delete statements legacy index");
-
-				statements.delete();
-			}
-
-			if (statementHashes != null) {
-
-				MaintainResource.LOG.debug("delete statement hashes legacy index");
-
-				statementHashes.delete();
-			}
-
-			if (statementUUIDs != null) {
-
-				MaintainResource.LOG.debug("delete statement uuids legacy index");
-
-				statementUUIDs.delete();
-			}
-
-			if (statementUUIDsWProvenance != null) {
-
-				MaintainResource.LOG.debug("delete statement uuids with provenance legacy index");
-
-				statementUUIDsWProvenance.delete();
-			}
-
-			if(values != null) {
-
-				MaintainResource.LOG.debug("delete values legacy index");
-
-				values.delete();
-			}
-
-			itx.success();
-
 		} catch (final Exception e) {
 
-			MaintainResource.LOG.error("couldn't finished delete legacy indices TX successfully", e);
-
-			itx.failure();
-		} finally {
-
-			MaintainResource.LOG.debug("finished delete legacy indices TX finally");
-
-			itx.close();
+			MaintainResource.LOG.debug("couldn't finish delete legacy indices TX finally");
 		}
 	}
 
@@ -326,52 +323,50 @@ public class MaintainResource {
 
 		MaintainResource.LOG.debug("start delete schema indices TX");
 
-		final Transaction itx = database.beginTx();
+		try(final Transaction itx = database.beginTx()) {
 
-		try {
+			try {
 
-			final Schema schema = database.schema();
+				final Schema schema = database.schema();
 
-			if (schema == null) {
+				if (schema == null) {
 
-				MaintainResource.LOG.debug("no schema available");
+					MaintainResource.LOG.debug("no schema available");
+
+					itx.success();
+
+					return;
+				}
+
+				Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
+
+				if (indexDefinitions == null) {
+
+					MaintainResource.LOG.debug("no schema indices available");
+
+					itx.success();
+
+					return;
+				}
+
+				for (final IndexDefinition indexDefinition : indexDefinitions) {
+
+					MaintainResource.LOG.debug("drop '" + indexDefinition.getLabel().name() + "' : '"
+							+ indexDefinition.getPropertyKeys().iterator().next() + "' schema index");
+
+					indexDefinition.drop();
+				}
 
 				itx.success();
+			} catch (final Exception e) {
 
-				return;
+				MaintainResource.LOG.error("couldn't finish delete schema indices TX successfully", e);
+
+				itx.failure();
 			}
-
-			Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
-
-			if (indexDefinitions == null) {
-
-				MaintainResource.LOG.debug("no schema indices available");
-
-				itx.success();
-
-				return;
-			}
-
-			for (final IndexDefinition indexDefinition : indexDefinitions) {
-
-				MaintainResource.LOG.debug("drop '" + indexDefinition.getLabel().name() + "' : '"
-						+ indexDefinition.getPropertyKeys().iterator().next() + "' schema index");
-
-				indexDefinition.drop();
-			}
-
-			itx.success();
-
 		} catch (final Exception e) {
 
-			MaintainResource.LOG.error("couldn't finished delete schema indices TX successfully", e);
-
-			itx.failure();
-		} finally {
-
-			MaintainResource.LOG.debug("finished delete schema indices TX finally");
-
-			itx.close();
+			MaintainResource.LOG.debug("couldn't finish delete schema indices TX finally");
 		}
 	}
 }

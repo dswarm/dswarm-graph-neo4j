@@ -152,7 +152,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	}
 
 	@Override
-	protected Relationship getRelationship(final String uuid) throws DMPGraphException {
+	protected Relationship getRelationship(final String uuid) {
 
 		final IndexHits<Relationship> hits = statementUUIDsWProvenance.get(GraphStatics.UUID_W_PROVENANCE, resourceGraphURI + "." + uuid);
 

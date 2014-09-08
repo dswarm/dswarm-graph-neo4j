@@ -91,6 +91,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			if (recordNodes == null) {
 
+				tx.success();
+
 				return null;
 			}
 
@@ -110,7 +112,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				currentResource = new Resource(resourceUri);
 				startNodeHandler.handleNode(recordNode);
 
-				if (currentResourceStatements != null && !currentResourceStatements.isEmpty()) {
+				if (!currentResourceStatements.isEmpty()) {
 
 					// note, this is just an integer number (i.e. NOT long)
 					final int mapSize = currentResourceStatements.size();
@@ -123,7 +125,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 						i++;
 
-						final Statement statement = currentResourceStatements.get(Long.valueOf(i));
+						final Statement statement = currentResourceStatements.get(i);
 
 						statements.add(statement);
 					}
@@ -135,17 +137,17 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				currentResourceStatements.clear();
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
 			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);
 
 			tx.failure();
-			tx.close();
 		} finally {
 
 			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX finally");
 
-			tx.success();
 			tx.close();
 		}
 
@@ -262,10 +264,10 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				if (order != null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (order != null && uuid == null) {
+				} else if (order != null) {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (order == null && uuid != null) {
+				} else if (uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
 				} else {
@@ -305,11 +307,11 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 		if (hits != null && hits.iterator().hasNext()) {
 
 			final Node dataModelNode = hits.iterator().next();
-			final Integer lastestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
+			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
-			if (lastestVersionFromDB != null) {
+			if (latestVersionFromDB != null) {
 
-				latestVersion = lastestVersionFromDB;
+				latestVersion = latestVersionFromDB;
 			}
 		}
 

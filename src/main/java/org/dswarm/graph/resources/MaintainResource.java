@@ -127,6 +127,8 @@ public class MaintainResource {
 
 				if (!result.iterator().hasNext()) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+
 					tx.success();
 
 					break;
@@ -135,6 +137,8 @@ public class MaintainResource {
 				final Map<String, Object> row = result.iterator().next();
 
 				if (row == null || row.isEmpty()) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
 
 					tx.success();
 
@@ -145,6 +149,8 @@ public class MaintainResource {
 
 				if (entry == null) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
+
 					tx.success();
 
 					break;
@@ -154,12 +160,16 @@ public class MaintainResource {
 
 				if (value == null) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
+
 					tx.success();
 
 					break;
 				}
 
 				if (!entry.getKey().equals("entity_count")) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
 
 					tx.success();
 
@@ -173,6 +183,8 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("deleted " + count + " entities");
 
 				if (count < chunkSize) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
 
 					tx.success();
 
@@ -297,6 +309,8 @@ public class MaintainResource {
 
 				MaintainResource.LOG.debug("no schema available");
 
+				itx.success();
+
 				return;
 			}
 
@@ -305,6 +319,8 @@ public class MaintainResource {
 			if (indexDefinitions == null) {
 
 				MaintainResource.LOG.debug("no schema indices available");
+
+				itx.success();
 
 				return;
 			}

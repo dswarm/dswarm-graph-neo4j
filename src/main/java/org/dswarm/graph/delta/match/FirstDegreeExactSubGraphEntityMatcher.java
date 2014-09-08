@@ -103,19 +103,29 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 		}
 	}
 
-	private void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
+	private void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId,
+			final Map<Long, Long> nodeHashes, final int hierarchyLevel) {
 
 		final Collection<String> entityHierarchyLevelNodeIds = getEntityHierarchyLevelNodes(graphDB, entityNodeId, hierarchyLevel);
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-			for(final String entityHierarchyLevelNodeId : entityHierarchyLevelNodeIds) {
+		try {
+
+			for (final String entityHierarchyLevelNodeId : entityHierarchyLevelNodeIds) {
 
 				GraphDBUtil.calculateEntityHash(graphDB, Long.valueOf(entityHierarchyLevelNodeId), nodeHashes);
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
-			FirstDegreeExactSubGraphEntityMatcher.LOG.error("couldn't calculate simple node hashes", e);
+			FirstDegreeExactSubGraphEntityMatcher.LOG.error("couldn't calculate hierarchy level node hashes", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 	}
 
@@ -124,27 +134,28 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 		final Collection<String> entityLeafNodeIds = GraphDBUtil.getEntityLeafs(graphDB, entityNodeId);
 		Integer deepestHierarchyLevel = null;
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-			for(final String entityLeafNodeId : entityLeafNodeIds) {
+		try {
+
+			for (final String entityLeafNodeId : entityLeafNodeIds) {
 
 				final Node leafNode = graphDB.getNodeById(Long.valueOf(entityLeafNodeId));
 
-
 				Long hash = GraphDBUtil.calculateNodeHash(leafNode);
 
-				if(hash == null) {
+				if (hash == null) {
 
 					continue;
 				}
 
 				final Integer hierarchyLevel = (Integer) leafNode.getProperty("__HIERARCHY_LEVEL__", null);
 
-				if(hierarchyLevel != null) {
+				if (hierarchyLevel != null) {
 
 					hash = 31 * hash + hierarchyLevel;
 
-					if(deepestHierarchyLevel != null && deepestHierarchyLevel < hierarchyLevel) {
+					if (deepestHierarchyLevel != null && deepestHierarchyLevel < hierarchyLevel) {
 
 						deepestHierarchyLevel = hierarchyLevel;
 					} else {
@@ -155,9 +166,16 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 
 				nodeHashes.put(leafNode.getId(), hash);
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
 			FirstDegreeExactSubGraphEntityMatcher.LOG.error("couldn't calculated entity leaf hashes", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 
 		return deepestHierarchyLevel;

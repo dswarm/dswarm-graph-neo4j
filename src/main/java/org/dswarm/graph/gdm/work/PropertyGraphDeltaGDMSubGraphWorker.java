@@ -81,19 +81,12 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 				PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("couldn't find record for resource '" + resourceURI + "'");
 
+				tx.success();
+
 				return null;
 			}
 
 			startNodeHandler.handleNode(recordNode);
-		} catch (final Exception e) {
-
-			PropertyGraphDeltaGDMSubGraphWorker.LOG.error("couldn't finished delta GDM TX successfully", e);
-
-			tx.failure();
-			tx.close();
-		} finally {
-
-			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("finished enrich GDM TX finally");
 
 			// GraphDBUtil.printPaths(subGraphPaths);
 
@@ -139,6 +132,15 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 			}
 
 			tx.success();
+		} catch (final Exception e) {
+
+			PropertyGraphDeltaGDMSubGraphWorker.LOG.error("couldn't finished delta GDM TX successfully", e);
+
+			tx.failure();
+		} finally {
+
+			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("finished enrich GDM TX finally");
+
 			tx.close();
 		}
 

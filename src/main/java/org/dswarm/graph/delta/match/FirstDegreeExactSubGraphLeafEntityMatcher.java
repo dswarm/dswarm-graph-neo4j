@@ -73,10 +73,14 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 
 	private Long calculateSubGraphLeafPathHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
-			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
+		try {
+
+			final Iterable<Path> entityPaths = GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+			if (entityPaths == null || !entityPaths.iterator().hasNext()) {
+
+				tx.success();
 
 				return null;
 			}
@@ -86,7 +90,9 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 
 			Long endNodeHash = GraphDBUtil.calculateNodeHash(entityPathNodes.next());
 
-			if(endNodeHash == null) {
+			if (endNodeHash == null) {
+
+				tx.success();
 
 				return null;
 			}
@@ -95,7 +101,7 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 
 			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
 
-			for(final Relationship entityPathRel : entityPathRels) {
+			for (final Relationship entityPathRel : entityPathRels) {
 
 				subGraphLeafPathHash = GraphDBUtil.calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
 
@@ -103,10 +109,19 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 				endNodeHash = GraphDBUtil.calculateNodeHash(endNode);
 			}
 
-			return subGraphLeafPathHash;
+			final Long result = subGraphLeafPathHash;
+
+			tx.success();
+
+			return result;
 		} catch (final Exception e) {
 
 			FirstDegreeExactSubGraphLeafEntityMatcher.LOG.error("couldn't calculate sub graph leaf path hashes", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 
 		return null;

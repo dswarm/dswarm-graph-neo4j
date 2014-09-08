@@ -24,7 +24,9 @@ public final class GraphDBPrintUtil {
 
 	public static void printRelationships(final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -43,32 +45,51 @@ public final class GraphDBPrintUtil {
 					System.out.println("relationship = '" + relationship.getId() + "' :: key = '" + propertyKey + "' :: value = '" + value + "'");
 				}
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
 			GraphDBPrintUtil.LOG.error("couldn't print relationships", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 	}
 
 	public static void printDeltaRelationships(final GraphDatabaseService graphDB) {
 
-		Transaction tx = graphDB.beginTx();
+		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
+		try {
 
-		for (final Relationship relationship : relationships) {
+			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
-			final String sb = printDeltaRelationship(relationship);
+			for (final Relationship relationship : relationships) {
 
-			System.out.println(sb);
+				final String sb = printDeltaRelationship(relationship);
+
+				System.out.println(sb);
+			}
+
+			tx.success();
+		} catch (final Exception e) {
+
+			GraphDBPrintUtil.LOG.error("couldn't print relationships", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
-
-		tx.success();
-		tx.close();
 	}
 
 	public static void printNodes(final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
+
+		try {
 
 			final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
 
@@ -91,9 +112,15 @@ public final class GraphDBPrintUtil {
 				}
 			}
 
+			tx.success();
 		} catch (final Exception e) {
 
 			GraphDBPrintUtil.LOG.error("couldn't print nodes", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 	}
 
@@ -204,11 +231,21 @@ public final class GraphDBPrintUtil {
 
 		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
-		printPaths(paths);
+		try {
 
-		tx.success();
-		tx.close();
+			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
+			printPaths(paths);
+
+			tx.success();
+		} catch (final Exception e) {
+
+			GraphDBPrintUtil.LOG.error("couldn't print paths", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
+		}
 	}
 
 	/**
@@ -232,10 +269,20 @@ public final class GraphDBPrintUtil {
 
 		final Transaction tx = graphDB.beginTx();
 
-		final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
-		printPaths(paths);
+		try {
 
-		tx.success();
-		tx.close();
+			final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
+			printPaths(paths);
+
+			tx.success();
+		} catch (final Exception e) {
+
+			GraphDBPrintUtil.LOG.error("couldn't print entity paths", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
+		}
 	}
 }

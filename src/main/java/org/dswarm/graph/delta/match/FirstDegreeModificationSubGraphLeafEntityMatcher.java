@@ -74,11 +74,15 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 
 	private Long calculateSubGraphLeafPathModificationHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
 
-		try (final Transaction ignored = graphDB.beginTx()) {
+		final Transaction tx = graphDB.beginTx();
 
-			final Iterable<Path> entityPaths =  GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+		try {
 
-			if(entityPaths == null || !entityPaths.iterator().hasNext()) {
+			final Iterable<Path> entityPaths = GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
+
+			if (entityPaths == null || !entityPaths.iterator().hasNext()) {
+
+				tx.success();
 
 				return null;
 			}
@@ -88,7 +92,9 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 
 			Long endNodeHash = GraphDBUtil.calculateSimpleNodeHash(entityPathNodes.next());
 
-			if(endNodeHash == null) {
+			if (endNodeHash == null) {
+
+				tx.success();
 
 				return null;
 			}
@@ -97,7 +103,7 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 
 			final Iterable<Relationship> entityPathRels = entityPath.reverseRelationships();
 
-			for(final Relationship entityPathRel : entityPathRels) {
+			for (final Relationship entityPathRel : entityPathRels) {
 
 				subGraphLeafPathHash = GraphDBUtil.calculateRelationshipHash(subGraphLeafPathHash, entityPathRel, endNodeHash);
 
@@ -105,10 +111,19 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 				endNodeHash = GraphDBUtil.calculateNodeHash(endNode);
 			}
 
-			return subGraphLeafPathHash;
+			final Long result = subGraphLeafPathHash;
+
+			tx.success();
+
+			return result;
 		} catch (final Exception e) {
 
 			FirstDegreeModificationSubGraphLeafEntityMatcher.LOG.error("couldn't calculated sub graph leaf path modification hashes", e);
+
+			tx.failure();
+		} finally {
+
+			tx.close();
 		}
 
 		return null;

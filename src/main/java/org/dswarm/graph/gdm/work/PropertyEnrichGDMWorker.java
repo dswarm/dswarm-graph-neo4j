@@ -65,21 +65,23 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '" + resourceUri + "'");
 
+				tx.success();
+
 				return;
 			}
 
 			startNodeHandler.handleNode(recordNode);
+
+			tx.success();
 		} catch (final Exception e) {
 
 			PropertyEnrichGDMWorker.LOG.error("couldn't finished enrich GDM TX successfully", e);
 
 			tx.failure();
-			tx.close();
 		} finally {
 
 			PropertyEnrichGDMWorker.LOG.debug("finished enrich GDM TX finally");
 
-			tx.success();
 			tx.close();
 		}
 	}

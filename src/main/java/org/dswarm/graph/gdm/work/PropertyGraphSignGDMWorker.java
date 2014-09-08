@@ -69,6 +69,8 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 				// no leaves (?)
 
+				tx.success();
+
 				return;
 			}
 
@@ -76,17 +78,17 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 				startNodeHandler.handleNode(leafNode);
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
 			PropertyGraphSignGDMWorker.LOG.error("couldn't finished sign GDM TX successfully", e);
 
 			tx.failure();
-			tx.close();
 		} finally {
 
 			PropertyGraphSignGDMWorker.LOG.debug("finished sign GDM TX finally");
 
-			tx.success();
 			tx.close();
 		}
 	}

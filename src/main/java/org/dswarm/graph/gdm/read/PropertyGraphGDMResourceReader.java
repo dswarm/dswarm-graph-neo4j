@@ -77,6 +77,8 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 
 				LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
 
+				tx.success();
+
 				return null;
 			}
 
@@ -103,17 +105,17 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 
 				currentResource.setStatements(statements);
 			}
+
+			tx.success();
 		} catch (final Exception e) {
 
 			PropertyGraphGDMResourceReader.LOG.error("couldn't finished read GDM TX successfully", e);
 
 			tx.failure();
-			tx.close();
 		} finally {
 
 			PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX finally");
 
-			tx.success();
 			tx.close();
 		}
 

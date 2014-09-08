@@ -46,11 +46,11 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 	private Model						model;
 	private Resource					currentResource;
-	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
+	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
 
-	private Integer					version;
+	private Integer version;
 
-	private Transaction					tx							= null;
+	private Transaction tx = null;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final Integer versionArg,
 			final GraphDatabaseService databaseArg) throws DMPGraphException {
@@ -98,7 +98,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				final String message = "couldn't acquire tx successfully";
 
-				PropertyGraphGDMModelReader.LOG.debug(message, e);
+				PropertyGraphGDMModelReader.LOG.error(message, e);
 
 				throw new DMPGraphException(message);
 			}
@@ -143,7 +143,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 					long i = 0;
 
-					final Set<Statement> statements = new LinkedHashSet<Statement>();
+					final Set<Statement> statements = new LinkedHashSet<>();
 
 					while (i < mapSize) {
 

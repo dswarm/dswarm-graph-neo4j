@@ -128,6 +128,14 @@ public final class GraphDBMarkUtil {
 
 			GraphDBMarkUtil.LOG.error("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
 					+ "' :: marked path end node ids size = '" + markedPathEndNodeIds.size() + "'");
+
+			for(final Long pathEndNodeId : pathEndNodeIds) {
+
+				if(!markedPathEndNodeIds.contains(pathEndNodeId)) {
+
+					GraphDBMarkUtil.LOG.error("couldn't mark path with end node id = '" + pathEndNodeId + "'");
+				}
+			}
 		}
 	}
 

@@ -18,11 +18,11 @@ import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,21 +125,43 @@ public class MaintainResource {
 
 				final ExecutionResult result = engine.execute(deleteQuery);
 
-				if (!result.iterator().hasNext()) {
+				if(result == null) {
 
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
 
 					tx.success();
 
 					break;
 				}
 
-				final Map<String, Object> row = result.iterator().next();
+				final ResourceIterator<Map<String, Object>> iterator = result.iterator();
+
+				if(iterator == null) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is not available");
+
+					tx.success();
+
+					break;
+				}
+
+				if (!iterator.hasNext()) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+
+					iterator.close();
+					tx.success();
+
+					break;
+				}
+
+				final Map<String, Object> row = iterator.next();
 
 				if (row == null || row.isEmpty()) {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
 
+					iterator.close();
 					tx.success();
 
 					break;
@@ -151,6 +173,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
 
+					iterator.close();
 					tx.success();
 
 					break;
@@ -162,6 +185,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
 
+					iterator.close();
 					tx.success();
 
 					break;
@@ -171,6 +195,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
 
+					iterator.close();
 					tx.success();
 
 					break;
@@ -186,11 +211,13 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
 
+					iterator.close();
 					tx.success();
 
 					break;
 				}
 
+				iterator.close();
 				tx.success();
 			} catch (final Exception e) {
 

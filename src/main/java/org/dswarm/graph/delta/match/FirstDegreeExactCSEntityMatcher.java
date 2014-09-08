@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by tgaengler on 01/08/14.
+ * @author tgaengler
  */
 public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 

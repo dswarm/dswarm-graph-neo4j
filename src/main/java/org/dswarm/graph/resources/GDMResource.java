@@ -63,6 +63,7 @@ import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,8 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
+		Long size = (long) 0;
+
 		if (multiPart.getBodyParts().size() == 3) {
 
 			final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
@@ -182,7 +185,10 @@ public class GDMResource {
 			}
 
 			// = new resources model, since existing, modified resources were already written to the DB
-			model = calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
+			final Pair<Model, Long> result = calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
+
+			result.first();
+			size += result.other();
 		}
 
 		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
@@ -190,8 +196,9 @@ public class GDMResource {
 		parser.setGDMHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jGDMWProvenanceHandler) handler).getCountedStatements()
-				+ " GDM statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+		size += ((Neo4jGDMWProvenanceHandler) handler).getCountedStatements();
+
+		LOG.debug("finished writing " + size + " GDM statements into graph db for resource graph URI '" + resourceGraphURI + "'");
 
 		return Response.ok().build();
 	}
@@ -305,12 +312,13 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
+	private Pair<Model, Long> calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
 			final GraphDatabaseService permanentDatabase) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
 		final Model newResourcesModel = new Model();
+		Long size = (long) 0;
 
 		// calculate delta resource-wise
 		for (Resource newResource : model.getResources()) {
@@ -362,12 +370,14 @@ public class GDMResource {
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
 			parser.setGDMHandler(gdmHandler);
 			parser.parse();
+
+			size += ((Neo4jGDMWProvenanceUpdateHandler) gdmHandler).getCountedStatements();
 		}
 
 		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 
 		// return only model with new, non-existing resources
-		return newResourcesModel;
+		return Pair.of(newResourcesModel, size);
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB, final Resource newResource, final GraphDatabaseService newResourceDB,

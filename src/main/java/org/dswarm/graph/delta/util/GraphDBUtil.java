@@ -27,8 +27,6 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.model.GraphStatics;
-
-import com.google.common.base.Optional;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.Direction;
@@ -41,6 +39,7 @@ import org.neo4j.graphdb.PathExpanderBuilder;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -56,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 /**
@@ -87,7 +87,7 @@ public final class GraphDBUtil {
 
 		if (hits == null || !hits.hasNext()) {
 
-			if(hits != null) {
+			if (hits != null) {
 
 				hits.close();
 			}
@@ -1256,9 +1256,14 @@ public final class GraphDBUtil {
 			return null;
 		}
 
-		final Iterator<Map<String, Object>> resultIter = result.iterator();
+		final ResourceIterator<Map<String, Object>> resultIter = result.iterator();
 
 		if (resultIter == null || !resultIter.hasNext()) {
+
+			if (resultIter != null) {
+
+				resultIter.close();
+			}
 
 			return null;
 		}
@@ -1269,6 +1274,8 @@ public final class GraphDBUtil {
 
 		if (!rowIter.hasNext()) {
 
+			resultIter.close();
+
 			return null;
 		}
 
@@ -1276,14 +1283,22 @@ public final class GraphDBUtil {
 
 		if (column.getValue() == null) {
 
+			resultIter.close();
+
 			return null;
 		}
 
 		if (!column.getKey().equals(resultVariableName) || !Relationship.class.isInstance(column.getValue())) {
 
+			resultIter.close();
+
 			return null;
 		}
 
-		return (Relationship) column.getValue();
+		final Relationship rel = (Relationship) column.getValue();
+
+		resultIter.close();
+
+		return rel;
 	}
 }

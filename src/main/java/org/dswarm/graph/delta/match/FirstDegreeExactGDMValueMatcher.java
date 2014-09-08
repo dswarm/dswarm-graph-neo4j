@@ -2,15 +2,14 @@ package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.GDMValueEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.google.common.base.Optional;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author tgaengler

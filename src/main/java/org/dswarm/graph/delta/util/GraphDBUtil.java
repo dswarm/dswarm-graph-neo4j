@@ -68,6 +68,28 @@ public final class GraphDBUtil {
 
 	private static final RelationshipType	rdfTypeRelType	= DynamicRelationshipType.withName("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
 
+	public static void addNodeId(final Set<Long> nodeIds, final Long nodeId) throws DMPGraphException {
+
+		if (nodeId == null) {
+
+			// TODO: remove this, if it bugs you ;)
+			GraphDBUtil.LOG.debug("node id was null");
+
+			return;
+		}
+
+		if(nodeId == -1) {
+
+			final String message = "node id shouldn't be '-1'";
+
+			GraphDBUtil.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		nodeIds.add(nodeId);
+	}
+
 	/**
 	 * note: should be run in transaction scope
 	 *
@@ -485,7 +507,8 @@ public final class GraphDBUtil {
 	 * @param pathEndNodeIds
 	 * @param nodeId
 	 */
-	public static void fetchEntityTypeNodes(final GraphDatabaseService graphDB, final Set<Long> pathEndNodeIds, final long nodeId) {
+	public static void fetchEntityTypeNodes(final GraphDatabaseService graphDB, final Set<Long> pathEndNodeIds, final long nodeId)
+			throws DMPGraphException {
 
 		// fetch type nodes as well
 		final Iterable<Relationship> typeRels = graphDB.getNodeById(nodeId).getRelationships(Direction.OUTGOING, rdfTypeRelType);
@@ -497,7 +520,7 @@ public final class GraphDBUtil {
 				// TODO: could be removed later
 				GraphDBUtil.LOG.debug("fetch entity type rel: '" + typeRel.getId() + "'");
 
-				pathEndNodeIds.add(typeRel.getEndNode().getId());
+				GraphDBUtil.addNodeId(pathEndNodeIds, typeRel.getEndNode().getId());
 			}
 		}
 	}
@@ -511,7 +534,7 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 */
 	public static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final Set<Long> pathEndNodeIds, final long nodeId) {
+			final Set<Long> pathEndNodeIds, final long nodeId) throws DMPGraphException {
 
 		if (deltaState.equals(DeltaState.ADDITION) || deltaState.equals(DeltaState.DELETION)) {
 
@@ -521,7 +544,7 @@ public final class GraphDBUtil {
 
 				for (final Path nonMatchtedSubGraphPath : nonMatchedSubGraphPaths) {
 
-					pathEndNodeIds.add(nonMatchtedSubGraphPath.endNode().getId());
+					GraphDBUtil.addNodeId(pathEndNodeIds, nonMatchtedSubGraphPath.endNode().getId());
 				}
 			}
 		}
@@ -877,8 +900,8 @@ public final class GraphDBUtil {
 
 			if(!valuesMap.containsKey(predicate)) {
 
-				final CSEntity csEntity = new CSEntity(-1);
-				final KeyEntity keyEntity = new KeyEntity(-1, predicate);
+				final CSEntity csEntity = new CSEntity();
+				final KeyEntity keyEntity = new KeyEntity(predicate);
 				csEntity.addKeyEntity(keyEntity);
 
 				valuesMap.put(predicate, csEntity);

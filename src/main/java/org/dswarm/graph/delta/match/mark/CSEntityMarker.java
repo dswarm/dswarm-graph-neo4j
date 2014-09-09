@@ -42,14 +42,14 @@ public class CSEntityMarker implements Marker<CSEntity> {
 
 				for (final KeyEntity keyEntity : csEntity.getKeyEntities()) {
 
-					pathEndNodeIds.add(keyEntity.getNodeId());
+					GraphDBUtil.addNodeId(pathEndNodeIds, keyEntity.getNodeId());
 				}
 
 				for (final ValueEntity valueEntity : csEntity.getValueEntities()) {
 
 					if(!deltaState.equals(DeltaState.MODIFICATION)) {
 
-						pathEndNodeIds.add(valueEntity.getNodeId());
+						GraphDBUtil.addNodeId(pathEndNodeIds, valueEntity.getNodeId());
 					} else {
 
 						if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(csEntity)) {
@@ -57,7 +57,7 @@ public class CSEntityMarker implements Marker<CSEntity> {
 							modifiedPathEndNodesIdsFromCSEntityMap.put(csEntity, new HashSet<Long>());
 						}
 
-						modifiedPathEndNodesIdsFromCSEntityMap.get(csEntity).add(valueEntity.getNodeId());
+						GraphDBUtil.addNodeId(modifiedPathEndNodesIdsFromCSEntityMap.get(csEntity), valueEntity.getNodeId());
 					}
 				}
 

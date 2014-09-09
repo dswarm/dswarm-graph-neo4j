@@ -10,6 +10,8 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.util.GraphDBMarkUtil;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -29,7 +31,7 @@ public class SubGraphLeafEntityMarker implements Marker<SubGraphLeafEntity> {
 				pathEndNodesIdsFromCSEntityMap.put(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId(), new HashSet<Long>());
 			}
 
-			pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId()).add(subGraphLeafEntity.getNodeId());
+			GraphDBUtil.addNodeId(pathEndNodesIdsFromCSEntityMap.get(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getNodeId()), subGraphLeafEntity.getNodeId());
 		}
 
 		for(final Map.Entry<Long, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {

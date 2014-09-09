@@ -19,7 +19,12 @@ public class CSEntity extends Entity {
 
 	private boolean					hasSubEntities	= false;
 
-	public CSEntity(final long nodeIdArg) {
+	public CSEntity() {
+
+		super(null);
+	}
+
+	public CSEntity(final Long nodeIdArg) {
 
 		super(nodeIdArg);
 	}

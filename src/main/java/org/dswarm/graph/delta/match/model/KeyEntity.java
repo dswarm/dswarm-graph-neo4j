@@ -8,7 +8,13 @@ public class KeyEntity extends Entity implements ModificationEntity {
 	private final String	value;
 	protected CSEntity		csEntity;
 
-	public KeyEntity(final long nodeIdArg, final String valueArg) {
+	public KeyEntity(final String valueArg) {
+
+		super(null);
+		value = valueArg;
+	}
+
+	public KeyEntity(final Long nodeIdArg, final String valueArg) {
 
 		super(nodeIdArg);
 		value = valueArg;

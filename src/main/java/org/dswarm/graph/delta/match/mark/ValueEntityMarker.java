@@ -33,7 +33,7 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
-		try( final Transaction tx = graphDB.beginTx()) {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			// calc path end nodes
 			for (final ValueEntity valueEntity : valueEntities) {
@@ -41,29 +41,28 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 				// TODO: what should I do with related key paths here?
 				for (final KeyEntity keyEntity : valueEntity.getCSEntity().getKeyEntities()) {
 
-					pathEndNodeIds.add(keyEntity.getNodeId());
+					GraphDBUtil.addNodeId(pathEndNodeIds, keyEntity.getNodeId());
 				}
 
-				final long csEntityNodeId = valueEntity.getCSEntity().getNodeId();
+				final Long csEntityNodeId = valueEntity.getCSEntity().getNodeId();
 
 				if(!deltaState.equals(DeltaState.MODIFICATION)) {
 
-					pathEndNodeIds.add(valueEntity.getNodeId());
-				} else if(csEntityNodeId >= 0) {
+					GraphDBUtil.addNodeId(pathEndNodeIds, valueEntity.getNodeId());
+				} else if(csEntityNodeId != null && csEntityNodeId >= 0) {
 
 					if(!modifiedPathEndNodesIdsFromCSEntityMap.containsKey(valueEntity.getCSEntity())) {
 
 						modifiedPathEndNodesIdsFromCSEntityMap.put(valueEntity.getCSEntity(), new HashSet<Long>());
 					}
 
-					modifiedPathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity()).add(valueEntity.getNodeId());
+					GraphDBUtil.addNodeId(modifiedPathEndNodesIdsFromCSEntityMap.get(valueEntity.getCSEntity()), valueEntity.getNodeId());
 				} else {
 
-					modifiedPathEndNodeIds.add(valueEntity.getNodeId());
+					GraphDBUtil.addNodeId(modifiedPathEndNodeIds, valueEntity.getNodeId());
 				}
 
-				if(csEntityNodeId >= 0) {
-
+				if(csEntityNodeId != null && csEntityNodeId >= 0) {
 
 					final Set<Long> pathEndNodeIdsFromCSEntity;
 

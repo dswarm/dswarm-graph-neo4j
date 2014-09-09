@@ -5,14 +5,14 @@ package org.dswarm.graph.delta.match.model;
  */
 public class Entity {
 
-	private final long	nodeId;
+	private final Long	nodeId;
 
-	public Entity(final long nodeIdArg) {
+	public Entity(final Long nodeIdArg) {
 
 		nodeId = nodeIdArg;
 	}
 
-	public long getNodeId() {
+	public Long getNodeId() {
 
 		return nodeId;
 	}
@@ -21,21 +21,24 @@ public class Entity {
 	public boolean equals(final Object o) {
 
 		if (this == o) {
+
 			return true;
 		}
+
 		if (!(o instanceof Entity)) {
+
 			return false;
 		}
 
-		final Entity that = (Entity) o;
+		final Entity entity = (Entity) o;
 
-		return nodeId == that.nodeId;
+		return !(nodeId != null ? !nodeId.equals(entity.nodeId) : entity.nodeId != null);
 
 	}
 
 	@Override
 	public int hashCode() {
 
-		return (int) (nodeId ^ (nodeId >>> 32));
+		return nodeId != null ? nodeId.hashCode() : 0;
 	}
 }

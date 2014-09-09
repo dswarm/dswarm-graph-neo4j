@@ -47,7 +47,7 @@ public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
 
 				for(final String leafNode : leafNodes) {
 
-					pathEndNodeIds.add(Long.valueOf(leafNode));
+					GraphDBUtil.addNodeId(pathEndNodeIds, Long.valueOf(leafNode));
 				}
 
 				pathEndNodesIdsFromCSEntityMap.put(subGraphEntity.getCSEntity().getNodeId(), pathEndNodeIds);

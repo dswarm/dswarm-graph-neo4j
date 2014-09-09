@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datei xmlns="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd http://files.d-nb.de/standards/formate/mabxml-1.xsd">
+   <datensatz id="ID197391087" typ="k" status="n" mabVersion="M2.0">
+      <feld nr="001" ind=" ">197391087</feld>
+      <feld nr="002" ind="a">19981218</feld>
+      <feld nr="003" ind=" ">20140227130103 MOD</feld>
+      <feld nr="028" ind=" ">5309538-8 MOD</feld>
+      <feld nr="028" ind="b">16287595-2 MOD</feld>
+      <feld nr="028" ind="b">16281322-3 ADD</feld>
+      <feld nr="028" ind="b">16286541-7 ADD</feld>
+      <feld nr="028" ind="b">5309538-8 ADD</feld>
+      <feld nr="030" ind=" ">zazucrz|||||| MOD</feld>
+      <feld nr="036" ind="c">XA-DE ADD</feld>
+      <feld nr="068" ind="a">f ADD</feld>
+      <feld nr="068" ind="e">
+         v ADD
+         <tf />
+         z ADD
+      </feld>
+      <feld nr="076" ind="z">800 Deutschland / Bundesministerium für Bildung und Forschung++5309538-8++gkd ADD</feld>
+      <feld nr="076" ind="z">800 Bundesministerium für Bildung und Forschung++16286541-7++gkd ADD</feld>
+      <feld nr="076" ind="z"><![CDATA[800 Bundesministerium für Bildung und Forschung &lt;Bonn&gt;++16281322-3++gkd ADD]]></feld>
+      <feld nr="076" ind="z">800 Deutschland / Bundesminister für Bildung und Forschung++16287595-2++gkd ADD</feld>
+      <feld nr="080" ind=" ">GKD</feld>
+      <feld nr="800" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung</feld>
+      <feld nr="805" ind=" ">XX.10.1998 - MOD</feld>
+      <feld nr="806" ind=" ">4011882-4 MOD</feld>
+      <feld nr="810" ind=" "><![CDATA[Bundesministerium für Bildung und Forschung &lt;Deutschland&gt;]]></feld>
+      <feld nr="812" ind=" ">Deutschland / Ministry of Education and Research</feld>
+      <feld nr="814" ind=" "><![CDATA[Ministry of Education and Research &lt;Deutschland&gt;]]></feld>
+      <feld nr="816" ind=" "><![CDATA[Federal Ministry of Education and Research &lt;Deutschland&gt;]]></feld>
+      <feld nr="818" ind=" ">Deutschland / Ministère de l'Education et de la Recherche MOD</feld>
+      <feld nr="820" ind=" "><![CDATA[Ministère de l'Education et de la Recherche &lt;Deutschland&gt; MOD]]></feld>
+      <feld nr="822" ind=" "><![CDATA[Ministère Fédéral de l'Education et de la Recherche &lt;Deutschland&gt; MOD]]></feld>
+      <feld nr="824" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Arbeitsgruppe Aus- und Weiterbildung MOD</feld>
+      <feld nr="826" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Öffentlichkeitsarbeit MOD</feld>
+      <feld nr="828" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Frauen in Bildung und Forschung MOD</feld>
+      <feld nr="830" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Publikationen; Internetredaktion MOD</feld>
+      <feld nr="832" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Bildungsforschung MOD</feld>
+      <feld nr="834" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat EU-Bildungsprogramme; Internationale Zusammenarbeit in der Bildung MOD</feld>
+      <feld nr="836" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Chancengleichheit in Bildung und Forschung MOD</feld>
+      <feld nr="838" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Gesundheitsforschung MOD</feld>
+      <feld nr="840" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Referat Forschungsbauten und Großgeräte an Hochschulen; Forschungsinfrastrukturen MOD</feld>
+      <feld nr="842" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Publications and Website Division MOD</feld>
+      <feld nr="844" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Division Publications et Site Web MOD</feld>
+      <feld nr="846" ind=" ">Deutschland / Bundesministerium für Bildung und Forschung / Division Sustainability Policy Issues, Environmental Law MOD</feld>
+      <feld nr="848" ind=" "><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Division &lt;621&gt; MOD]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Grundsatzfragen Kultur, Nachhaltigkeit, Umweltrecht</feld>
+      <feld nr="849" ind="b"><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Referat &lt;721&gt;]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Ernährung und Erneuerbare Rohstoffe</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Nanomaterialien, Neue Werkstoffe</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung 
+und Forschung / Referat Übergreifende Fragen der Nachwuchsförderung, Begabtenförderung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Strukturen und Entwicklung der Weiterbildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division Cultural Science, Sustainability, Environmental Law</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Zusammenarbeit Westeuropa, Mittelmeerraum, Afrika</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division for Cooperation with Western European Countries, the Mediterranean Region and Africa</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Sicherheitsforschung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Grundsatzfragen, Multilaterale Zusammenarbeit, Protokoll, Sprachendienst</feld>
+      <feld nr="849" ind="b"><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Referat &lt;111&gt;]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Innovationspolitische Querschnittsfragen, Rahmenbedingungen</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat für Grundsatzfragen der Beruflichen Bildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division for Vocational Training Policy Issues</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Wissenschaftsanalysen, Wissenschaftskommunikation, Forschungskoordinierung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Wissenschaftlicher Nachwuchs, Wissenschaftliche Weiterbildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Projektgruppe Wissenschaftsjahr Energie</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Neue Medien in der Bildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division Science Analyses, Science Communication, Research Coordination</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Grundsatzfragen des Wissenschaftssystems</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Regionale Innovationsinitiativen, Neue Länder</feld>
+      <feld nr="849" ind="b"><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Referat &lt;114&gt;]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Forschungspolitik der EU, EUREKA</feld>
+      <feld nr="849" ind="b"><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Referat &lt;213&gt;]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Übergreifende Fragen und Bildungspolitik der EU</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Photonik, Optische Technologien</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Grundsatzfragen Nachhaltigkeit, Klima, Energie</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Europäische Forschungsunion</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Geistes-, Sozial- und Kulturwissenschaften, Akademien, Forschungsmuseen</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Chancengerechtigkeit in Bildung und Forschung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division Key Technologies, Strategy and Policy Issues</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Integration durch Bildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für 
+Bildung und Forschung / Referat für Grundsatzfragen der Beruflichen Aus- und Weiterbildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Division Grundsatzfragen der Beruflichen Aus- und Weiterbildung</feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat Hochschulrecht, Hochschulforschung</feld>
+      <feld nr="849" ind="b"><![CDATA[Deutschland / Bundesministerium für Bildung und Forschung / Referat &lt;412&gt;]]></feld>
+      <feld nr="849" ind="b">Deutschland / Bundesministerium für Bildung und Forschung / Referat System Erde</feld>
+      <feld nr="849" ind="b">BMBF</feld>
+      <feld nr="849" ind="b">BMB+F</feld>
+      <feld nr="850" ind="a">Deutschland / Bundesministerium für Bildung, Wissenschaft, Forschung und Technologie</feld>
+      <feld nr="852" ind="a">2142404-4</feld>
+      <feld nr="852" ind="b">19505458X ADD</feld>
+   </datensatz>
+</datei>

@@ -115,11 +115,18 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 					final org.dswarm.graph.json.Node subject = getNode(rel.getStartNode());
 					final Predicate predicate = getPredicate(rel.getType().name());
 					final org.dswarm.graph.json.Node object = getNode(rel.getEndNode());
+					final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 					final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
 					final Statement statement;
 
-					if (uuid != null) {
+					if (order != null && uuid != null) {
+
+						statement = new Statement(uuid, subject, predicate, object, order);
+					} else if(order != null) {
+
+						statement = new Statement(subject, predicate, object, order);
+					} else if(uuid != null) {
 
 						statement = new Statement(uuid, subject, predicate, object);
 					} else {

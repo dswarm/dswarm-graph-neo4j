@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.dswarm.graph.delta.match.model.ModificationEntity;
@@ -23,13 +24,13 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	public ModificationMatcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg,
 			final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg,
-			final Marker<ENTITY> markerArg) {
+			final Marker<ENTITY> markerArg) throws DMPGraphException {
 
 		super(existingEntitiesArg, newEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg, markerArg);
 	}
 
 	@Override
-	public void match() {
+	public void match() throws DMPGraphException {
 
 		getModifications();
 		super.match();
@@ -76,7 +77,7 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	}
 
 	@Override
-	protected void markMatchedPaths() {
+	protected void markMatchedPaths() throws DMPGraphException {
 
 		ModificationMatcher.LOG.debug("mark matched paths in existing resource (modifications)");
 
@@ -90,7 +91,7 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	/**
 	 * a.k.a. additions + deletions
 	 */
-	protected void markNonMatchedPaths() {
+	protected void markNonMatchedPaths() throws DMPGraphException {
 
 		ModificationMatcher.LOG.debug("mark non-matched paths in existing resource (deletions)");
 

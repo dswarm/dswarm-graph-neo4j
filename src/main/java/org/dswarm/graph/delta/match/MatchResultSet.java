@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import com.google.common.base.Optional;
 
+import org.dswarm.graph.DMPGraphException;
+
 /**
  * @author tgaengler
  *
@@ -11,7 +13,7 @@ import com.google.common.base.Optional;
  */
 public interface MatchResultSet<ENTITY> {
 
-	void match();
+	void match() throws DMPGraphException;
 
 	Optional<? extends Collection<ENTITY>> getExistingEntitiesNonMatches();
 

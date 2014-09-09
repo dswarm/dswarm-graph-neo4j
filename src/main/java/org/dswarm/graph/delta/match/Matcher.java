@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
+
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -38,7 +40,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 	public Matcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg, final Optional<? extends Collection<ENTITY>> newEntitiesArg,
 			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
-			final String newResourceURIArg, final Marker<ENTITY> markerArg) {
+			final String newResourceURIArg, final Marker<ENTITY> markerArg) throws DMPGraphException {
 
 		existingResourceDB = existingResourceDBArg;
 		newResourceDB = newResourceDBArg;
@@ -65,10 +67,11 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 		}
 	}
 
-	protected abstract Map<String, ENTITY> generateHashes(final Collection<ENTITY> entities, final GraphDatabaseService resourceDB);
+	protected abstract Map<String, ENTITY> generateHashes(final Collection<ENTITY> entities, final GraphDatabaseService resourceDB)
+			throws DMPGraphException;
 
 	@Override
-	public void match() {
+	public void match() throws DMPGraphException {
 
 		getMatches();
 		markMatchedPaths();
@@ -179,7 +182,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 		return Optional.of(valueEntities);
 	}
 
-	protected void markMatchedPaths() {
+	protected void markMatchedPaths() throws DMPGraphException {
 
 		Matcher.LOG.debug("mark matched paths in existing resource");
 
@@ -191,7 +194,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 	}
 
 	protected void markPaths(final Optional<? extends Collection<ENTITY>> entities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String resourceURI) {
+			final String resourceURI) throws DMPGraphException {
 
 		if (entities.isPresent()) {
 

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.NodeType;
 import org.neo4j.graphdb.DynamicLabel;
@@ -19,6 +20,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.IndexCreator;
@@ -66,7 +68,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 	private final String				resourceGraphURI;
 
-	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
+	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
 
 		this.database = database;
 		resourceGraphURI = resourceGraphURIArg;
@@ -86,7 +88,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		// resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		// resourceTypes = database.index().forNodes("resource_types");
 		// values = database.index().forNodes("values");
-		bnodes = new HashMap<String, Node>();
+		bnodes = new HashMap<>();
 
 		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing
 
@@ -94,6 +96,13 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			statements = database.index().forRelationships("statements");
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't initialize statements index successfully";
+
+			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
 		}
 
 		// nodeResourceMap = new HashMap<Long, String>();
@@ -104,7 +113,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 	}
 
 	@Override
-	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) {
+	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) throws DMPGraphException {
 
 		i++;
 
@@ -254,19 +263,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -332,7 +336,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
 		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-		statements.add(rel, GraphStatics.ID, Long.valueOf(rel.getId()));
+		statements.add(rel, GraphStatics.ID, rel.getId());
 
 		addedRelationships++;
 
@@ -359,26 +363,52 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_W_PROVENANCE_PROPERTY,
 				resource.toString() + " " + resourceGraphURI);
 
-		if (hits != null && hits.iterator().hasNext()) {
+		if (hits != null) {
 
-			// node exists
+			final ResourceIterator<Node> iterator = hits.iterator();
 
-			node = hits.iterator().next();
+			if (iterator != null && iterator.hasNext()) {
 
-			return node;
+				// node exists
+
+				node = iterator.next();
+
+				iterator.close();
+
+				return node;
+			}
+
+			if (iterator != null) {
+
+				iterator.close();
+			}
 		}
 
 		// 2. get by resource uri
 
 		ResourceIterable<Node> hits2 = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_PROPERTY, resource.toString());
 
-		if (hits2 != null && hits2.iterator().hasNext()) {
+		if (hits2 == null) {
+
+			return null;
+		}
+
+		final ResourceIterator<Node> iterator2 = hits2.iterator();
+
+		if (iterator2 != null && iterator2.hasNext()) {
 
 			// node exists
 
-			node = hits2.iterator().next();
+			node = iterator2.next();
+
+			iterator2.close();
 
 			return node;
+		}
+
+		if (iterator2 != null) {
+
+			iterator2.close();
 		}
 
 		return null;
@@ -436,7 +466,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 	// return resourceUri;
 	// }
 
-	private IndexDefinition getOrCreateIndex(final Label label, final String[] properties) {
+	private IndexDefinition getOrCreateIndex(final Label label, final String[] properties) throws DMPGraphException {
 
 		IndexDefinition indexDefinition = null;
 
@@ -451,7 +481,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		LOG.debug("try to find index for label = '" + label.name() + "' and properties = '" + propertiesString + "'");
 
-		try (Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			Iterable<IndexDefinition> indices = database.schema().getIndexes(label);
 
@@ -495,6 +525,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			}
 
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't get schema index successfully";
+
+			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		if (indexDefinition != null) {
@@ -507,13 +545,13 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		return createIndex(label, properties, propertiesString);
 	}
 
-	private IndexDefinition createIndex(final Label label, final String[] properties, final String propertiesString) {
+	private IndexDefinition createIndex(final Label label, final String[] properties, final String propertiesString) throws DMPGraphException {
 
 		IndexDefinition indexDefinition = null;
 
 		LOG.debug("try to create index for label = '" + label.name() + "' and properties = '" + propertiesString + "'");
 
-		try (Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			IndexCreator indexCreator = database.schema().indexFor(label);
 
@@ -525,17 +563,33 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			indexDefinition = indexCreator.create();
 
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't create schema index successfully";
+
+			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		LOG.debug("created index for label = '" + label.name() + "' and property = '" + propertiesString + "'");
 
 		LOG.debug("try to bring index online for label = '" + label.name() + "' and properties = '" + propertiesString + "'");
 
-		try (Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			database.schema().awaitIndexOnline(indexDefinition, 5, TimeUnit.SECONDS);
 
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't bring schema index successfully online";
+
+			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		LOG.debug("brought index online for label = '" + label.name() + "' and properties = '" + propertiesString + "'");

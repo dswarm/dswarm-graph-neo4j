@@ -51,11 +51,9 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 	}
 
 	@Override
-	public Dataset export() {
+	public Dataset export() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
-
-		try {
+		try(final Transaction tx = database.beginTx()) {
 
 			/*
 			 * // all nodes would also return endnodes without further outgoing relations final Iterable<Node> recordNodes;
@@ -73,6 +71,8 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			if (relations == null) {
 
+				tx.success();
+
 				return null;
 			}
 
@@ -82,18 +82,15 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 				relationshipHandler.handleRelationship(recordNode);
 			}
-		} catch (final Exception e) {
-
-			PropertyGraphRDFExporter.LOG.error("couldn't finish read RDF TX successfully", e);
-
-			tx.failure();
-			tx.close();
-		} finally {
-
-			PropertyGraphRDFExporter.LOG.debug("finished read RDF TX finally");
 
 			tx.success();
-			tx.close();
+		} catch (final Exception e) {
+
+			final String mesage = "couldn't finish read RDF TX successfully";
+
+			PropertyGraphRDFExporter.LOG.error(mesage, e);
+
+			throw new DMPGraphException(mesage);
 		}
 
 		return dataset;
@@ -196,7 +193,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 			// predicate
 
 			final String predicate = rel.getType().name();
-					//.getProperty(GraphStatics.URI_PROPERTY, null);
+			// .getProperty(GraphStatics.URI_PROPERTY, null);
 			final Property predicateProperty = model.createProperty(predicate);
 
 			// object
@@ -292,12 +289,12 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 		private Resource createResourceFromBNode(final long bnodeId, final Model model) {
 
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+			if (!bnodes.containsKey(bnodeId)) {
 
-				bnodes.put(Long.valueOf(bnodeId), model.createResource());
+				bnodes.put(bnodeId, model.createResource());
 			}
 
-			return bnodes.get(Long.valueOf(bnodeId));
+			return bnodes.get(bnodeId);
 		}
 
 		private Resource createResourceFromURI(final String uri, final Model model) {

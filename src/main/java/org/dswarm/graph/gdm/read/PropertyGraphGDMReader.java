@@ -83,8 +83,7 @@ public class PropertyGraphGDMReader {
 				break;
 			case Literal:
 
-				final Node endNode = objectNode;
-				final String object = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+				final String object = (String) objectNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
 
 				if (object == null) {
 

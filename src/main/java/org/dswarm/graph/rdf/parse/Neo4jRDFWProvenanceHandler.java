@@ -62,26 +62,38 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 	private final String resourceGraphURI;
 
-	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) {
+	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
 
 		this.database = database;
 		tx = database.beginTx();
 
-		LOG.debug("start write TX");
+		try {
 
-		resources = database.index().forNodes("resources");
-		resourcesWProvenance = database.index().forNodes("resources_w_provenance");
-		resourceTypes = database.index().forNodes("resource_types");
-		values = database.index().forNodes("values");
-		bnodes = new HashMap<String, Node>();
-		statementHashes = database.index().forRelationships("statement_hashes");
-		nodeResourceMap = new HashMap<Long, String>();
+			LOG.debug("start write TX");
 
-		resourceGraphURI = resourceGraphURIArg;
+			resources = database.index().forNodes("resources");
+			resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			resourceTypes = database.index().forNodes("resource_types");
+			values = database.index().forNodes("values");
+			bnodes = new HashMap<>();
+			statementHashes = database.index().forRelationships("statement_hashes");
+			nodeResourceMap = new HashMap<>();
+
+			resourceGraphURI = resourceGraphURIArg;
+
+		} catch (final Exception e) {
+
+			final String message = "couldn't initialize indices successfully";
+
+			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
-	public void handleStatement(final Statement st) {
+	public void handleStatement(final Statement st) throws DMPGraphException {
 
 		i++;
 
@@ -242,19 +254,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -362,6 +369,11 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			rel = hits.next();
 		}
 
+		if(hits != null) {
+
+			hits.close();
+		}
+
 		return rel;
 	}
 
@@ -392,7 +404,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			node = hits.next();
 
+			hits.close();
+
 			return node;
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return null;

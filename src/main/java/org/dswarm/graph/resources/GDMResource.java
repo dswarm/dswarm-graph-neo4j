@@ -585,7 +585,7 @@ public class GDMResource {
 		return impermanentDB;
 	}
 
-	private void enrichModel(final GraphDatabaseService graphDB, final String resourceUri) {
+	private void enrichModel(final GraphDatabaseService graphDB, final String resourceUri) throws DMPGraphException {
 
 		final GDMWorker worker = new PropertyEnrichGDMWorker(resourceUri, graphDB);
 		worker.work();

@@ -72,7 +72,7 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -103,7 +103,7 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) {
+	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -127,7 +127,7 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) {
+	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -151,7 +151,7 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes("multipart/mixed")
-	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -260,7 +260,7 @@ public class RDFResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private String exportAllRDFInternal(final GraphDatabaseService database) {
+	private String exportAllRDFInternal(final GraphDatabaseService database) throws DMPGraphException {
 
 		LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 

@@ -39,14 +39,11 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 	}
 
 	@Override
-	public void work() {
+	public void work() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try(final Transaction tx = database.beginTx()) {
 
-		PropertyEnrichGDMWorker.LOG.debug("start enrich GDM TX");
-
-		try {
-
+			PropertyEnrichGDMWorker.LOG.debug("start enrich GDM TX");
 
 			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceUri);
 
@@ -56,22 +53,23 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 				tx.success();
 
+				PropertyEnrichGDMWorker.LOG.debug("finished enrich GDM TX successfully");
+
 				return;
 			}
 
 			startNodeHandler.handleNode(recordNode);
 
 			tx.success();
+
+			PropertyEnrichGDMWorker.LOG.debug("finished enrich GDM TX successfully");
 		} catch (final Exception e) {
 
-			PropertyEnrichGDMWorker.LOG.error("couldn't finished enrich GDM TX successfully", e);
+			final String message = "couldn't finished enrich GDM TX successfully";
 
-			tx.failure();
-		} finally {
+			PropertyEnrichGDMWorker.LOG.error(message, e);
 
-			PropertyEnrichGDMWorker.LOG.debug("finished enrich GDM TX finally");
-
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 

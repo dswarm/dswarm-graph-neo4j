@@ -1,5 +1,6 @@
 package org.dswarm.graph.gdm.parse;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.slf4j.Logger;
@@ -27,11 +28,13 @@ public class GDMResourceParser implements GDMParser {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws DMPGraphException {
 
 		if (resource == null || resource.getStatements() == null || resource.getStatements().isEmpty()) {
 
 			LOG.debug("there are no statements in the GDM resource");
+
+			gdmHandler.closeTransaction();
 
 			return;
 		}

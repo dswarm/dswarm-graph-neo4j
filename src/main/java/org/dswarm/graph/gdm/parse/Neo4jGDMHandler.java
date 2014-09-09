@@ -35,6 +35,7 @@ public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
 			final String message = "couldn't load indices successfully";
 
 			Neo4jGDMHandler.LOG.error(message, e);
+			Neo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}

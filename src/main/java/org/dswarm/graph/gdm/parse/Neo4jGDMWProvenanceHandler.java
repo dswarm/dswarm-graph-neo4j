@@ -38,6 +38,7 @@ public class Neo4jGDMWProvenanceHandler extends Neo4jBaseGDMHandler {
 			final String message = "couldn't load indices successfully";
 
 			Neo4jGDMWProvenanceHandler.LOG.error(message, e);
+			Neo4jGDMWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}

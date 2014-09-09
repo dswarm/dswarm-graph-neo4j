@@ -1,6 +1,6 @@
 package org.dswarm.graph.gdm.parse;
 
-
+import org.dswarm.graph.DMPGraphException;
 
 /**
  *
@@ -14,5 +14,5 @@ public interface GDMUpdateParser {
 	 */
 	public void setGDMHandler(GDMUpdateHandler handler);
 
-	public void parse();
+	public void parse() throws DMPGraphException;
 }

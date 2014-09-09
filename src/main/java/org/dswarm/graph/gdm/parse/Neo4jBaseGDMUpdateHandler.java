@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
@@ -16,8 +17,6 @@ import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
-
-import org.apache.commons.lang.NotImplementedException;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -98,6 +97,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 			final String message = "couldn't load indices successfully";
 
 			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+			Neo4jBaseGDMUpdateHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -116,7 +116,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final Resource r, final long index) {
+	public void handleStatement(final Statement st, final Resource r, final long index) throws DMPGraphException {
 		// utilise r for the resource property
 
 		i++;
@@ -256,19 +256,14 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -309,6 +304,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 			tx.close();
 
 			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+			Neo4jBaseGDMUpdateHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -346,6 +342,7 @@ public abstract class Neo4jBaseGDMUpdateHandler implements GDMUpdateHandler {
 			tx.close();
 
 			Neo4jBaseGDMUpdateHandler.LOG.error(message, e);
+			Neo4jBaseGDMUpdateHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
@@ -153,11 +154,9 @@ public final class GraphDBUtil {
 	 * @param graphDB
 	 * @return
 	 */
-	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB) {
+	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> rels = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -203,15 +202,12 @@ public final class GraphDBUtil {
 			return result;
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't complete the graph matching completeness check for graph DB '" + graphDB.toString() + "'";
 
-			GraphDBUtil.LOG.error("couldn't complete the graph matching completeness check for graph DB '" + graphDB.toString() + "'", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
-
-		return false;
 	}
 
 	private static boolean checkMatchedState(final Boolean matchedState, final long id, final String type) {
@@ -463,7 +459,7 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 * @return
 	 */
-	public static Collection<String> getEntityLeafs(final GraphDatabaseService graphDB, final long nodeId) {
+	public static Collection<String> getEntityLeafs(final GraphDatabaseService graphDB, final long nodeId) throws DMPGraphException {
 
 		final String entityLeafsQuery = buildGetEntityLeafsQuery(nodeId);
 
@@ -475,7 +471,7 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 * @return
 	 */
-	private static Map<String, String> getEntityLeafsWithValue(final GraphDatabaseService graphDB, final long nodeId) {
+	private static Map<String, String> getEntityLeafsWithValue(final GraphDatabaseService graphDB, final long nodeId) throws DMPGraphException {
 
 		final String entityLeafsQuery = buildGetEntityLeafsWithValueQuery(nodeId);
 
@@ -531,13 +527,12 @@ public final class GraphDBUtil {
 		}
 	}
 
-	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String resourceURI, final AttributePath commonAttributePath, final ContentSchema contentSchema) {
+	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String resourceURI, final AttributePath commonAttributePath, final ContentSchema contentSchema)
+			throws DMPGraphException {
 
 		final Map<Long, CSEntity> csEntities = new LinkedHashMap<>();
 		
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
@@ -578,12 +573,11 @@ public final class GraphDBUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't determine cs entities successfully";
 
-			GraphDBUtil.LOG.error("couldn't determine cs entities successfully", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		final Collection<CSEntity> csEntitiesCollection = csEntities.values();
@@ -594,7 +588,8 @@ public final class GraphDBUtil {
 		return csEntitiesCollection;
 	}
 
-	public static Optional<? extends Collection<SubGraphLeafEntity>> getSubGraphLeafEntities(final Optional<? extends Collection<SubGraphEntity>> subGraphEntities, final GraphDatabaseService graphDB) {
+	public static Optional<? extends Collection<SubGraphLeafEntity>> getSubGraphLeafEntities(final Optional<? extends Collection<SubGraphEntity>> subGraphEntities, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
 		if(!subGraphEntities.isPresent()) {
 
@@ -678,13 +673,12 @@ public final class GraphDBUtil {
 		return paths;
 	}
 
-	public static Collection<SubGraphEntity> determineNonMatchedCSEntitySubGraphs(final Collection<CSEntity> csEntities, final GraphDatabaseService graphDB) {
+	public static Collection<SubGraphEntity> determineNonMatchedCSEntitySubGraphs(final Collection<CSEntity> csEntities, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
 		final Set<SubGraphEntity> subgraphEntities = new HashSet<>();
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			for(final CSEntity csEntity : csEntities) {
 
@@ -763,18 +757,18 @@ public final class GraphDBUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't determine non-matched cs entity sub graphs";
 
-			GraphDBUtil.LOG.error("couldn't determine non-matched cs entity sub graphs", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return subgraphEntities;
 	}
 
-	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI) {
+	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI)
+			throws DMPGraphException {
 
 		final String query = buildGetRecordIdentifierQuery(recordIdentifierAP, recordURI);
 
@@ -782,18 +776,17 @@ public final class GraphDBUtil {
 	}
 
 	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String resourceGraphUri,
-			final GraphDatabaseService graphDB) {
+			final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, resourceGraphUri);
 
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
-	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB) {
+	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Node resourceNode = getResourceNode(graphDB, resourceURI);
 
@@ -804,15 +797,12 @@ public final class GraphDBUtil {
 			return flatResourceNodeValues;
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't determine record uri";
 
-			GraphDBUtil.LOG.error("couldn't determine record uri", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
-
-		return null;
 	}
 
 	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) {
@@ -1086,16 +1076,15 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String executeQueryWithSingleResult(final String query, final String resultVariableName, final GraphDatabaseService graphDB) {
+	private static String executeQueryWithSingleResult(final String query, final String resultVariableName, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
 		final ExecutionEngine engine = new ExecutionEngine(graphDB);
 
 		final ExecutionResult result;
 		String resultValue = null;
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			result = engine.execute(query);
 
@@ -1123,28 +1112,25 @@ public final class GraphDBUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't execute query with single result";
 
-			GraphDBUtil.LOG.error("couldn't execute query with single result", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return resultValue;
 	}
 
 	public static Collection<String> executeQueryWithMultipleResults(final String query, final String resultVariableName,
-			final GraphDatabaseService graphDB) {
+			final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final Set<String> resultSet = new HashSet<>();
 		final ExecutionEngine engine = new ExecutionEngine(graphDB);
 
 		final ExecutionResult result;
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			result = engine.execute(query);
 
@@ -1168,27 +1154,25 @@ public final class GraphDBUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't execute query with multiple results";
 
-			GraphDBUtil.LOG.error("couldn't execute query with multiple results", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return resultSet;
 	}
 
-	private static Map<String, String> executeQueryWithMultipleResultsWithValues(final String query, final String resultVariableName, final String uriVariableName, final String valueVariableName, final GraphDatabaseService graphDB) {
+	private static Map<String, String> executeQueryWithMultipleResultsWithValues(final String query, final String resultVariableName, final String uriVariableName, final String valueVariableName, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
 		final Map<String, String> resultSet = new HashMap<>();
 		final ExecutionEngine engine = new ExecutionEngine(graphDB);
 
 		final ExecutionResult result;
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			result = engine.execute(query);
 
@@ -1225,12 +1209,11 @@ public final class GraphDBUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't execute query with multiple results with values";
 
-			GraphDBUtil.LOG.error("couldn't execute query with multiple results with values", e);
-		} finally {
+			GraphDBUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return resultSet;

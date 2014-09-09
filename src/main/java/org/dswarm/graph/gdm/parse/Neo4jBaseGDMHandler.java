@@ -91,6 +91,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			final String message = "couldn't load indices successfully";
 
 			Neo4jBaseGDMHandler.LOG.error(message, e);
+			Neo4jBaseGDMHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -103,7 +104,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final Resource r, final long index) {
+	public void handleStatement(final Statement st, final Resource r, final long index) throws DMPGraphException {
 
 		// utilise r for the resource property
 
@@ -244,19 +245,14 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 

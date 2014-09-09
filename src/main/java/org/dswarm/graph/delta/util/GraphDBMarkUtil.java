@@ -3,6 +3,7 @@ package org.dswarm.graph.delta.util;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -23,11 +24,9 @@ public final class GraphDBMarkUtil {
 	private static final Logger	LOG	= LoggerFactory.getLogger(GraphDBMarkUtil.class);
 
 	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
-			final Set<Long> pathEndNodeIds) {
+			final Set<Long> pathEndNodeIds) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
 
@@ -36,20 +35,18 @@ public final class GraphDBMarkUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't mark paths successfully";
 
-			GraphDBMarkUtil.LOG.error("couldn't mark paths successfully", e);
-		} finally {
+			GraphDBMarkUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
-	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds) {
+	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final long nodeId, final Set<Long> pathEndNodeIds)
+			throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
 
@@ -58,12 +55,11 @@ public final class GraphDBMarkUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't mark paths successfully";
 
-			GraphDBMarkUtil.LOG.error("couldn't mark paths successfully", e);
-		} finally {
+			GraphDBMarkUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -129,9 +125,9 @@ public final class GraphDBMarkUtil {
 			GraphDBMarkUtil.LOG.error("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
 					+ "' :: marked path end node ids size = '" + markedPathEndNodeIds.size() + "'");
 
-			for(final Long pathEndNodeId : pathEndNodeIds) {
+			for (final Long pathEndNodeId : pathEndNodeIds) {
 
-				if(!markedPathEndNodeIds.contains(pathEndNodeId)) {
+				if (!markedPathEndNodeIds.contains(pathEndNodeId)) {
 
 					GraphDBMarkUtil.LOG.error("couldn't mark path with end node id = '" + pathEndNodeId + "'");
 				}
@@ -145,7 +141,8 @@ public final class GraphDBMarkUtil {
 	 * @param graphDB
 	 * @param nodeId
 	 */
-	private static void markEntityTypeNodes(final GraphDatabaseService graphDB, final DeltaState deltaState, final long nodeId) {
+	private static void markEntityTypeNodes(final GraphDatabaseService graphDB, final DeltaState deltaState, final long nodeId)
+			throws DMPGraphException {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 

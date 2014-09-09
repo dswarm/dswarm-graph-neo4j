@@ -43,6 +43,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 			final String message = "couldn't load indices successfully";
 
 			Neo4jGDMWProvenanceUpdateHandler.LOG.error(message, e);
+			Neo4jGDMWProvenanceUpdateHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -143,7 +144,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 			}
 		}
 
-		if(hits != null) {
+		if (hits != null) {
 
 			hits.close();
 		}
@@ -165,7 +166,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 			return rel;
 		}
 
-		if(hits != null) {
+		if (hits != null) {
 
 			hits.close();
 		}
@@ -174,19 +175,33 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	}
 
 	@Override
-	public void updateLatestVersion() {
+	public void updateLatestVersion() throws DMPGraphException {
 
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphURI);
+		try {
 
-		if (hits != null && hits.hasNext()) {
+			final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphURI);
 
-			final Node dataModelNode = hits.next();
-			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
-		}
+			if (hits != null && hits.hasNext()) {
 
-		if(hits != null) {
+				final Node dataModelNode = hits.next();
+				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+			}
 
-			hits.close();
+			if (hits != null) {
+
+				hits.close();
+			}
+		} catch (final Exception e) {
+
+			final String message = "couldn't update latest version";
+
+			Neo4jGDMWProvenanceUpdateHandler.LOG.error(message, e);
+			Neo4jGDMWProvenanceUpdateHandler.LOG.debug("couldn't finish write TX successfully");
+
+			tx.failure();
+			tx.close();
+
+			throw new DMPGraphException(message);
 		}
 	}
 }

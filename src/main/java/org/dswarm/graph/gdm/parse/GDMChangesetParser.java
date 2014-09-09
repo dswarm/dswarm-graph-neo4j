@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
@@ -57,11 +58,13 @@ public class GDMChangesetParser implements GDMUpdateParser {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws DMPGraphException {
 
 		if (changeset == null || existingResourceDB == null || newResourceDB == null) {
 
 			LOG.debug("there is no change set or resource working sets");
+
+			gdmHandler.closeTransaction();
 
 			return;
 		}

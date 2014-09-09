@@ -69,11 +69,9 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 	@Override
 	public Map<String, Statement> work() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try(final Transaction tx = database.beginTx()) {
 
-		PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("start delta GDM TX");
-
-		try {
+			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("start delta GDM TX");
 
 			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceURI);
 
@@ -82,6 +80,8 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 				PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("couldn't find record for resource '" + resourceURI + "'");
 
 				tx.success();
+
+				PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("finished delta GDM TX successfully");
 
 				return null;
 			}
@@ -132,16 +132,15 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 			}
 
 			tx.success();
+
+			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("finished delta GDM TX successfully");
 		} catch (final Exception e) {
 
-			PropertyGraphDeltaGDMSubGraphWorker.LOG.error("couldn't finished delta GDM TX successfully", e);
+			final String message = "couldn't finished delta GDM TX successfully";
 
-			tx.failure();
-		} finally {
+			PropertyGraphDeltaGDMSubGraphWorker.LOG.error(message, e);
 
-			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("finished enrich GDM TX finally");
-
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return currentSubGraphs;

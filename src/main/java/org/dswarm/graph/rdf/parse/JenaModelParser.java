@@ -3,6 +3,8 @@ package org.dswarm.graph.rdf.parse;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import org.dswarm.graph.DMPGraphException;
+
 /**
  * @author tgaengler
  */
@@ -23,7 +25,7 @@ public class JenaModelParser implements RDFParser {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws DMPGraphException {
 
 		final StmtIterator iter = model.listStatements();
 
@@ -31,6 +33,8 @@ public class JenaModelParser implements RDFParser {
 
 			rdfHandler.handleStatement(iter.next());
 		}
+
+		iter.close();
 
 		rdfHandler.closeTransaction();
 	}

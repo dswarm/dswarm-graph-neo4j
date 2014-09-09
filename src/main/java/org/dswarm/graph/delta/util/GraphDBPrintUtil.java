@@ -1,5 +1,6 @@
 package org.dswarm.graph.delta.util;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.model.GraphStatics;
@@ -22,11 +23,9 @@ public final class GraphDBPrintUtil {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(GraphDBPrintUtil.class);
 
-	public static void printRelationships(final GraphDatabaseService graphDB) {
+	public static void printRelationships(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -49,20 +48,17 @@ public final class GraphDBPrintUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			GraphDBPrintUtil.LOG.error("couldn't print relationships", e);
+			final String message = "couldn't print relationships";
 
-			tx.failure();
-		} finally {
+			GraphDBPrintUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
-	public static void printDeltaRelationships(final GraphDatabaseService graphDB) {
+	public static void printDeltaRelationships(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -76,20 +72,17 @@ public final class GraphDBPrintUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			GraphDBPrintUtil.LOG.error("couldn't print relationships", e);
+			final String message = "couldn't print relationships";
 
-			tx.failure();
-		} finally {
+			GraphDBPrintUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
-	public static void printNodes(final GraphDatabaseService graphDB) {
+	public static void printNodes(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
 
@@ -115,12 +108,11 @@ public final class GraphDBPrintUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			GraphDBPrintUtil.LOG.error("couldn't print nodes", e);
+			final String message = "couldn't print nodes";
 
-			tx.failure();
-		} finally {
+			GraphDBPrintUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -227,11 +219,9 @@ public final class GraphDBPrintUtil {
 		return sb.toString();
 	}
 
-	public static void printPaths(final GraphDatabaseService graphDB, final String resourceURI) {
+	public static void printPaths(final GraphDatabaseService graphDB, final String resourceURI) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
 			printPaths(paths);
@@ -239,12 +229,11 @@ public final class GraphDBPrintUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			GraphDBPrintUtil.LOG.error("couldn't print paths", e);
+			final String message = "couldn't print paths";
 
-			tx.failure();
-		} finally {
+			GraphDBPrintUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -265,11 +254,9 @@ public final class GraphDBPrintUtil {
 		}
 	}
 
-	public static void printEntityPaths(final GraphDatabaseService graphDB, final long nodeId) {
+	public static void printEntityPaths(final GraphDatabaseService graphDB, final long nodeId) throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
 			printPaths(paths);
@@ -277,12 +264,11 @@ public final class GraphDBPrintUtil {
 			tx.success();
 		} catch (final Exception e) {
 
-			GraphDBPrintUtil.LOG.error("couldn't print entity paths", e);
+			final String message = "couldn't print entity paths";
 
-			tx.failure();
-		} finally {
+			GraphDBPrintUtil.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 }

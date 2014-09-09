@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.NodeType;
 import org.neo4j.graphdb.DynamicLabel;
@@ -16,6 +17,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.schema.IndexCreator;
 import org.neo4j.graphdb.schema.IndexDefinition;
@@ -60,7 +62,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private Label						typeResourceNodeLabel	= DynamicLabel.label(NodeType.TypeResource.toString());
 	private Label						literalNodeLabel		= DynamicLabel.label(NodeType.Literal.toString());
 
-	public Neo4jRDFHandler(final GraphDatabaseService database) {
+	public Neo4jRDFHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 
@@ -72,7 +74,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		// resourcesWProvenance = database.index().forNodes("resources_w_provenance");
 		// resourceTypes = database.index().forNodes("resource_types");
 		// values = database.index().forNodes("values");
-		bnodes = new HashMap<String, Node>();
+		bnodes = new HashMap<>();
 
 		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing => via uuid property ;)
 
@@ -90,7 +92,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 	}
 
 	@Override
-	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) {
+	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) throws DMPGraphException {
 
 		i++;
 
@@ -233,19 +235,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -335,13 +332,27 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_PROPERTY, resource.toString());
 
-		if (hits != null && hits.iterator().hasNext()) {
+		if(hits == null) {
+
+			return null;
+		}
+
+		final ResourceIterator<Node> iterator = hits.iterator();
+
+		if (iterator != null && iterator.hasNext()) {
 
 			// node exists
 
-			node = hits.iterator().next();
+			node = iterator.next();
+
+			iterator.close();
 
 			return node;
+		}
+
+		if(iterator != null) {
+
+			iterator.close();
 		}
 
 		return null;
@@ -399,13 +410,13 @@ public class Neo4jRDFHandler implements RDFHandler {
 	// return resourceUri;
 	// }
 
-	private IndexDefinition getOrCreateIndex(final Label label, final String property) {
+	private IndexDefinition getOrCreateIndex(final Label label, final String property) throws DMPGraphException {
 
 		IndexDefinition indexDefinition = null;
 
 		LOG.debug("try to find index for label = '" + label.name() + "' and property = '" + property + "'");
 
-		try (Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			Iterable<IndexDefinition> indices = database.schema().getIndexes(label);
 
@@ -415,6 +426,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 			}
 
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't find schema index successfully";
+
+			Neo4jRDFHandler.LOG.error(message, e);
+			Neo4jRDFHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		if (indexDefinition != null) {
@@ -427,7 +446,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		return createIndex(label, property);
 	}
 
-	private IndexDefinition createIndex(final Label label, final String property) {
+	private IndexDefinition createIndex(final Label label, final String property) throws DMPGraphException {
 
 		IndexDefinition indexDefinition = null;
 
@@ -438,6 +457,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 			final IndexCreator indexCreator = database.schema().indexFor(label).on(property);
 			indexDefinition = indexCreator.create();
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't create schema index successfully";
+
+			Neo4jRDFHandler.LOG.error(message, e);
+			Neo4jRDFHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		LOG.debug("created index for label = '" + label.name() + "' and property = '" + property + "'");
@@ -448,6 +475,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 			database.schema().awaitIndexOnline(indexDefinition, 5, TimeUnit.SECONDS);
 			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't bring schema index successfully online";
+
+			Neo4jRDFHandler.LOG.error(message, e);
+			Neo4jRDFHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
 		}
 
 		LOG.debug("brought index online for label = '" + label.name() + "' and property = '" + property + "'");

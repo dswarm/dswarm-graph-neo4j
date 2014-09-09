@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.KeyEntity;
@@ -25,16 +26,14 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 	private static final Logger	LOG	= LoggerFactory.getLogger(ValueEntityMarker.class);
 
 	public void markPaths(final Collection<ValueEntity> valueEntities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String resourceURI) {
+			final String resourceURI) throws DMPGraphException {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Set<Long> modifiedPathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 		final Map<CSEntity, Set<Long>> modifiedPathEndNodesIdsFromCSEntityMap = new HashMap<>();
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try( final Transaction tx = graphDB.beginTx()) {
 
 			// calc path end nodes
 			for (final ValueEntity valueEntity : valueEntities) {
@@ -90,12 +89,11 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 			tx.success();
 		} catch (final Exception e) {
 
-			tx.failure();
+			final String message = "couldn't identify paths for marking successfully";
 
-			ValueEntityMarker.LOG.error("couldn't identify paths for marking successfully", e);
-		} finally {
+			ValueEntityMarker.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		final DeltaState finalDeltaState;

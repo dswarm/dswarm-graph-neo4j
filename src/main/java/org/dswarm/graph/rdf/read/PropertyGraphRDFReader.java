@@ -53,13 +53,11 @@ public class PropertyGraphRDFReader implements RDFReader {
 	}
 
 	@Override
-	public Model read() {
+	public Model read() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try(final Transaction tx = database.beginTx()) {
 
-		LOG.debug("start read RDF TX");
-
-		try {
+			LOG.debug("start read RDF TX");
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
@@ -67,6 +65,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 					resourceGraphUri);
 
 			if (recordNodes == null) {
+
+				tx.success();
 
 				return null;
 			}
@@ -77,18 +77,15 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 				startNodeHandler.handleNode(recordNode);
 			}
-		} catch (final Exception e) {
-
-			LOG.error("couldn't finished read RDF TX successfully", e);
-
-			tx.failure();
-			tx.close();
-		} finally {
-
-			LOG.debug("finished read RDF TX finally");
 
 			tx.success();
-			tx.close();
+		} catch (final Exception e) {
+
+			final String message = "couldn't finish read RDF TX successfully";
+
+			LOG.error(message, e);
+
+			throw new DMPGraphException(message);
 		}
 
 		return model;
@@ -217,12 +214,12 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		private Resource createResourceFromBNode(final long bnodeId) {
 
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+			if (!bnodes.containsKey(bnodeId)) {
 
-				bnodes.put(Long.valueOf(bnodeId), model.createResource());
+				bnodes.put(bnodeId, model.createResource());
 			}
 
-			return bnodes.get(Long.valueOf(bnodeId));
+			return bnodes.get(bnodeId);
 		}
 
 		private Resource createResourceFromURI(final String uri) {

@@ -51,13 +51,11 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 	}
 
 	@Override
-	public void work() {
+	public void work() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try(final Transaction tx = database.beginTx()) {
 
-		PropertyGraphSignGDMWorker.LOG.debug("start sign GDM TX");
-
-		try {
+			PropertyGraphSignGDMWorker.LOG.debug("start sign GDM TX");
 
 			final Label recordClassLabel = DynamicLabel.label("__LEAF__");
 
@@ -69,6 +67,8 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 				tx.success();
 
+				PropertyGraphSignGDMWorker.LOG.debug("finished sign GDM TX successfully");
+
 				return;
 			}
 
@@ -78,16 +78,15 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 			}
 
 			tx.success();
+
+			PropertyGraphSignGDMWorker.LOG.debug("finished sign GDM TX successfully");
 		} catch (final Exception e) {
 
-			PropertyGraphSignGDMWorker.LOG.error("couldn't finished sign GDM TX successfully", e);
+			final String message = "couldn't finished sign GDM TX successfully";
 
-			tx.failure();
-		} finally {
+			PropertyGraphSignGDMWorker.LOG.error(message, e);
 
-			PropertyGraphSignGDMWorker.LOG.debug("finished sign GDM TX finally");
-
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -224,12 +223,12 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 		private org.dswarm.graph.json.Node createResourceFromBNode(final long bnodeId) {
 
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+			if (!bnodes.containsKey(bnodeId)) {
 
-				bnodes.put(Long.valueOf(bnodeId), new org.dswarm.graph.json.Node(bnodeId));
+				bnodes.put(bnodeId, new org.dswarm.graph.json.Node(bnodeId));
 			}
 
-			return bnodes.get(Long.valueOf(bnodeId));
+			return bnodes.get(bnodeId);
 		}
 
 		private ResourceNode createResourceFromURI(final long id, final String uri) {

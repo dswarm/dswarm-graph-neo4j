@@ -69,6 +69,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			tx = database.beginTx();
 
+			PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
+
 			try {
 
 				version = getLatestVersion();
@@ -77,6 +79,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				final String message = "couldn't retrieve latest version successfully";
 
 				PropertyGraphGDMModelReader.LOG.error(message, e);
+				PropertyGraphGDMModelReader.LOG.debug("couldn't finish read GDM TX successfully");
 
 				tx.failure();
 				tx.close();
@@ -93,18 +96,19 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			try {
 
+				PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
+
 				tx = database.beginTx();
 			} catch (final Exception e) {
 
 				final String message = "couldn't acquire tx successfully";
 
 				PropertyGraphGDMModelReader.LOG.error(message, e);
+				PropertyGraphGDMModelReader.LOG.debug("couldn't finish read GDM TX successfully");
 
 				throw new DMPGraphException(message);
 			}
 		}
-
-		PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
 
 		try {
 
@@ -116,6 +120,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 			if (recordNodes == null) {
 
 				tx.success();
+
+				PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX successfully");
 
 				return null;
 			}
@@ -163,6 +169,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 			}
 
 			tx.success();
+
+			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX successfully");
 		} catch (final Exception e) {
 
 			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);

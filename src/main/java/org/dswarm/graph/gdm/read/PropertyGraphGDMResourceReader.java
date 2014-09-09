@@ -54,13 +54,11 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 	}
 
 	@Override
-	public Resource read() {
+	public Resource read() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try(final Transaction tx = database.beginTx()) {
 
 		PropertyGraphGDMResourceReader.LOG.debug("start read GDM TX");
-
-		try {
 
 			final Node recordNode = getResourceNode();
 
@@ -69,6 +67,8 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 				LOG.debug("couldn't find a resource node to start traversal");
 
 				tx.success();
+
+				PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
 
 				return null;
 			}
@@ -80,6 +80,8 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 				LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
 
 				tx.success();
+
+				PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
 
 				return null;
 			}
@@ -109,16 +111,15 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 			}
 
 			tx.success();
+
+			PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
 		} catch (final Exception e) {
 
-			PropertyGraphGDMResourceReader.LOG.error("couldn't finished read GDM TX successfully", e);
+			final String message = "couldn't finished read GDM TX successfully";
 
-			tx.failure();
-		} finally {
+			PropertyGraphGDMResourceReader.LOG.error(message, e);
 
-			PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX finally");
-
-			tx.close();
+			throw new DMPGraphException(message);
 		}
 
 		return currentResource;
@@ -306,10 +307,10 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 				if (order != null && uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (order != null && uuid == null) {
+				} else if (order != null) {
 
 					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (order == null && uuid != null) {
+				} else if (uuid != null) {
 
 					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
 				} else {

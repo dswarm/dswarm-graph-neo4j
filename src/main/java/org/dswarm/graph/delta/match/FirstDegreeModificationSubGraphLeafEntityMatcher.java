@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
@@ -27,7 +28,8 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 
 	public FirstDegreeModificationSubGraphLeafEntityMatcher(final Optional<? extends Collection<SubGraphLeafEntity>> existingSubGraphLeafEntitiesArg,
 			final Optional<? extends Collection<SubGraphLeafEntity>> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) {
+			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) throws
+			DMPGraphException {
 
 		super(existingSubGraphLeafEntitiesArg, newSubGraphLeafEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,
 				newResourceURIArg, new SubGraphLeafEntityMarker());
@@ -40,7 +42,7 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 	 * @return
 	 */
 	@Override
-	protected Map<String, SubGraphLeafEntity> generateHashes(Collection<SubGraphLeafEntity> subGraphLeafEntities, final GraphDatabaseService graphDB) {
+	protected Map<String, SubGraphLeafEntity> generateHashes(Collection<SubGraphLeafEntity> subGraphLeafEntities, final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final Map<String, SubGraphLeafEntity> hashedSubGraphLeafEntities = new HashMap<>();
 
@@ -72,11 +74,10 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 		return hashedSubGraphLeafEntities;
 	}
 
-	private Long calculateSubGraphLeafPathModificationHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB) {
+	private Long calculateSubGraphLeafPathModificationHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB)
+			throws DMPGraphException {
 
-		final Transaction tx = graphDB.beginTx();
-
-		try {
+		try(final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> entityPaths = GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
 
@@ -118,14 +119,11 @@ public class FirstDegreeModificationSubGraphLeafEntityMatcher extends Modificati
 			return result;
 		} catch (final Exception e) {
 
-			FirstDegreeModificationSubGraphLeafEntityMatcher.LOG.error("couldn't calculated sub graph leaf path modification hashes", e);
+			final String message = "couldn't calculated sub graph leaf path modification hashes";
 
-			tx.failure();
-		} finally {
+			FirstDegreeModificationSubGraphLeafEntityMatcher.LOG.error(message, e);
 
-			tx.close();
+			throw new DMPGraphException(message);
 		}
-
-		return null;
 	}
 }

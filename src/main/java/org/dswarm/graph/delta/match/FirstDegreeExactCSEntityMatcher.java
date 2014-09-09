@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.match.mark.CSEntityMarker;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
@@ -22,7 +23,7 @@ public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 
 	public FirstDegreeExactCSEntityMatcher(final Optional<? extends Collection<CSEntity>> existingCSEntitiesArg,
 			final Optional<? extends Collection<CSEntity>> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourcURIArg, final String newResourceURIArg) {
+			final GraphDatabaseService newResourceDBArg, final String existingResourcURIArg, final String newResourceURIArg) throws DMPGraphException {
 
 		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg,
 				new CSEntityMarker());
@@ -38,7 +39,8 @@ public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 	 * @return
 	 */
 	@Override
-	protected Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities, final GraphDatabaseService resourceD) {
+	protected Map<String, CSEntity> generateHashes(final Collection<CSEntity> csEntities, final GraphDatabaseService resourceD) throws
+			DMPGraphException {
 
 		final Map<String, CSEntity> hashedCSEntities = new HashMap<>();
 

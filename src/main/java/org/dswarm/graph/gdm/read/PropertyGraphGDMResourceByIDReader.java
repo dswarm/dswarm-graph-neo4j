@@ -1,5 +1,6 @@
 package org.dswarm.graph.gdm.read;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.AttributePath;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -19,7 +20,7 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 	private final AttributePath	recordIdentifierAP;
 
 	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String resourceGraphUri,
-			final GraphDatabaseService database) {
+			final GraphDatabaseService database) throws DMPGraphException {
 
 		super(resourceGraphUri, database);
 
@@ -43,7 +44,7 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 		return uriReader.getResourceNode();
 	}
 
-	private void determineRecordUri() {
+	private void determineRecordUri() throws DMPGraphException {
 
 		recordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, resourceGraphUri, database);
 	}

@@ -96,6 +96,15 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://data.slub-dresden.de/resources/6", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 423, 310);
 	}
 
+	@Test
+	public void selectedMabxmlVersioningTest() throws IOException {
+
+		final ObjectNode requestJson = getMABXMLContentSchema();
+
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_v1.xml.gson", "versioning/selectedUpdates_v2.xml.gson",
+				"http://data.slub-dresden.de/resources/7", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 834, 640);
+	}
+
 	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,
 			final String resourcePathV2, final String resourceGraphURI, final String recordClassURI, final long statementCountCurrentVersion,
 			final long statementCountV1) throws IOException {

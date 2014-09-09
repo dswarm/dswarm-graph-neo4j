@@ -184,11 +184,11 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 	protected void markMatchedPaths() throws DMPGraphException {
 
-		Matcher.LOG.debug("mark matched paths in existing resource");
+		Matcher.LOG.debug("mark matched paths in existing resource (exact matches)");
 
 		markPaths(getMatches(existingEntities), DeltaState.ExactMatch, existingResourceDB, existingResourceURI);
 
-		Matcher.LOG.debug("mark matched paths in new resource");
+		Matcher.LOG.debug("mark matched paths in new resource (exact matches)");
 
 		markPaths(getMatches(newEntities), DeltaState.ExactMatch, newResourceDB, newResourceURI);
 	}

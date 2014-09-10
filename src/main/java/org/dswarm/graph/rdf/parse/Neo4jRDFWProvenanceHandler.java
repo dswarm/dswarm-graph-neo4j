@@ -51,7 +51,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 	private long						tick				= System.currentTimeMillis();
 	private final GraphDatabaseService	database;
 	private final Index<Node>			resources;
-	private final Index<Node>			resourcesWProvenance;
+	private final Index<Node>			resourcesWDataModel;
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
@@ -72,7 +72,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			LOG.debug("start write TX");
 
 			resources = database.index().forNodes("resources");
-			resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			resourcesWDataModel = database.index().forNodes("resources_w_data_model");
 			resourceTypes = database.index().forNodes("resource_types");
 			values = database.index().forNodes("values");
 			bnodes = new HashMap<>();
@@ -129,7 +129,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
-					resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() + resourceGraphURI);
+					resourcesWDataModel.add(subjectNode, GraphStatics.URI_W_DATA_MODEL, subject.toString() + resourceGraphURI);
 
 					subjectNodeType = NodeType.Resource;
 				}
@@ -222,7 +222,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
-						resourcesWProvenance.add(objectNode, GraphStatics.URI_W_PROVENANCE, object.toString() + resourceGraphURI);
+						resourcesWDataModel.add(objectNode, GraphStatics.URI_W_DATA_MODEL, object.toString() + resourceGraphURI);
 					}
 
 					addedNodes++;
@@ -392,7 +392,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		if (!isType) {
 
-			hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.toString() + resourceGraphURI);
+			hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resource.toString() + resourceGraphURI);
 		} else {
 
 			hits = resourceTypes.get(GraphStatics.URI, resource.toString());

@@ -20,7 +20,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMWProvenanceUpdateHandler.class);
 
-	private final Index<Relationship>	statementUUIDsWProvenance;
+	private final Index<Relationship>	statementUUIDsWDataModel;
 
 	private final String				resourceGraphURI;
 
@@ -30,7 +30,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 		try {
 
-			statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+			statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
 
 			resourceGraphURI = resourceGraphURIArg;
 
@@ -70,10 +70,10 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 
 		if (provenanceURI == null) {
 
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + resourceGraphURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + resourceGraphURI);
 		} else {
 
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + provenanceURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
 		}
 	}
 
@@ -95,18 +95,18 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 		if (provenanceURI == null) {
 
 			node.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + resourceGraphURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + resourceGraphURI);
 		} else {
 
 			node.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + provenanceURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
 		}
 	}
 
 	@Override
 	protected void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
-		statementUUIDsWProvenance.add(rel, GraphStatics.UUID_W_PROVENANCE, resourceGraphURI + "." + statementUUID);
+		statementUUIDsWDataModel.add(rel, GraphStatics.UUID_W_DATA_MODEL, resourceGraphURI + "." + statementUUID);
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	@Override
 	protected IndexHits<Node> getResourceNodeHits(final ResourceNode resource) {
 
-		return resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, resource.getUri() + resourceGraphURI);
+		return resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resource.getUri() + resourceGraphURI);
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class Neo4jGDMWProvenanceUpdateHandler extends Neo4jBaseGDMUpdateHandler 
 	@Override
 	protected Relationship getRelationship(final String uuid) {
 
-		final IndexHits<Relationship> hits = statementUUIDsWProvenance.get(GraphStatics.UUID_W_PROVENANCE, resourceGraphURI + "." + uuid);
+		final IndexHits<Relationship> hits = statementUUIDsWDataModel.get(GraphStatics.UUID_W_DATA_MODEL, resourceGraphURI + "." + uuid);
 
 		if (hits != null && hits.hasNext()) {
 

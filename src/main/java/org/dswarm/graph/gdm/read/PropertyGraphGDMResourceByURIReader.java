@@ -23,8 +23,8 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	@Override
 	protected Node getResourceNode() {
 
-		final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
-		final IndexHits<Node> hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE, recordUri + resourceGraphUri);
+		final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
+		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + resourceGraphUri);
 
 		if (hits == null) {
 

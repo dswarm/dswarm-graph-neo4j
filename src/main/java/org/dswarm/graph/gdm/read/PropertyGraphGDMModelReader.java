@@ -290,21 +290,24 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+				final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
 
-				final Statement statement;
+				final Statement statement = new Statement(subjectGDMNode, predicateProperty, objectGDMNode);
+				statement.setId(statementId);
 
-				if (order != null && uuid != null) {
+				if(order != null) {
 
-					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (order != null) {
+					statement.setOrder(order);
+				}
 
-					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode, order);
-				} else if (uuid != null) {
+				if(uuid != null) {
 
-					statement = new Statement(statementId, uuid, subjectGDMNode, predicateProperty, objectGDMNode);
-				} else {
+					statement.setUUID(uuid);
+				}
 
-					statement = new Statement(statementId, subjectGDMNode, predicateProperty, objectGDMNode);
+				if(confidence != null) {
+
+					statement.setConfidence(confidence);
 				}
 
 				// index should never be null (when resource was written as GDM JSON)

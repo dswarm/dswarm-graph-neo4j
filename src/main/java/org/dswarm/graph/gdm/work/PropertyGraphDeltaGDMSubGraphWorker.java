@@ -118,20 +118,16 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 					final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 					final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
-					final Statement statement;
+					final Statement statement = new Statement(subject, predicate, object);
 
-					if (order != null && uuid != null) {
+					if(order != null) {
 
-						statement = new Statement(uuid, subject, predicate, object, order);
-					} else if(order != null) {
+						statement.setOrder(order);
+					}
 
-						statement = new Statement(subject, predicate, object, order);
-					} else if(uuid != null) {
+					if(uuid != null) {
 
-						statement = new Statement(uuid, subject, predicate, object);
-					} else {
-
-						statement = new Statement(subject, predicate, object);
+						statement.setUUID(uuid);
 					}
 
 					currentSubGraphs.put(stmtIdentifier, statement);

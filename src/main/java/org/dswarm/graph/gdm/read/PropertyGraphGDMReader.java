@@ -117,14 +117,12 @@ public class PropertyGraphGDMReader {
 		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
-		final Statement statement;
+		final Statement statement = new Statement(subject, predicate, object);
+		statement.setOrder(order);
 
-		if (uuid != null) {
+		if(uuid != null) {
 
-			statement = new Statement(uuid, subject, predicate, object, order);
-		} else {
-
-			statement = new Statement(subject, predicate, object, order);
+			statement.setUUID(uuid);
 		}
 
 		return statement;

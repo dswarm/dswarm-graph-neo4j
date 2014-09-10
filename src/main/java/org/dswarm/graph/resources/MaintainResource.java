@@ -240,12 +240,12 @@ public class MaintainResource {
 
 			final Index<Node> resources = database.index().forNodes("resources");
 			final Index<Node> values = database.index().forNodes("values");
-			final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
 			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
 			final Index<Relationship> statements = database.index().forRelationships("statements");
 			final Index<Relationship> statementHashes = database.index().forRelationships("statement_hashes");
 			final Index<Relationship> statementUUIDs = database.index().forRelationships("statement_uuids");
-			final Index<Relationship> statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+			final Index<Relationship> statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
 
 			if (resources != null) {
 
@@ -254,11 +254,11 @@ public class MaintainResource {
 				resources.delete();
 			}
 
-			if (resourcesWProvenance != null) {
+			if (resourcesWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete resources with provenance legacy index");
+				MaintainResource.LOG.debug("delete resources with data model legacy index");
 
-				resourcesWProvenance.delete();
+				resourcesWDataModel.delete();
 			}
 
 			if (resourceTypes != null) {
@@ -289,11 +289,11 @@ public class MaintainResource {
 				statementUUIDs.delete();
 			}
 
-			if (statementUUIDsWProvenance != null) {
+			if (statementUUIDsWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete statement uuids with provenance legacy index");
+				MaintainResource.LOG.debug("delete statement uuids with data model legacy index");
 
-				statementUUIDsWProvenance.delete();
+				statementUUIDsWDataModel.delete();
 			}
 
 			if (values != null) {

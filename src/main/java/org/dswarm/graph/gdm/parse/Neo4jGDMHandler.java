@@ -46,7 +46,7 @@ public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
 
 		if (provenanceURI != null) {
 
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + provenanceURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
 		if (provenanceURI != null) {
 
 			node.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
-			resourcesWProvenance.add(node, GraphStatics.URI_W_PROVENANCE, URI + provenanceURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
 		}
 	}
 

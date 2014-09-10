@@ -77,7 +77,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		// shall we utilise a separate property for this or a combination of two existing properties? - but then, how to
 		// effectively utilise this index (instead of the default resources index?
-		getOrCreateIndex(DynamicLabel.label(NodeType.Resource.toString()), new String[] { GraphStatics.URI_W_PROVENANCE });
+		getOrCreateIndex(DynamicLabel.label(NodeType.Resource.toString()), new String[] { GraphStatics.URI_W_DATA_MODEL });
 
 		getOrCreateIndex(DynamicLabel.label(NodeType.TypeResource.toString()), new String[] { GraphStatics.URI_PROPERTY });
 
@@ -149,7 +149,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 					// resources.add(subjectNode, GraphStatics.URI, subject.toString());
 					// resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() +
 					// resourceGraphURI);
-					subjectNode.setProperty(GraphStatics.URI_W_PROVENANCE_PROPERTY, subject.toString() + " " + resourceGraphURI);
+					subjectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, subject.toString() + " " + resourceGraphURI);
 				}
 
 				addedNodes++;
@@ -220,7 +220,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
 							// note: this might be not correct ... i.e., this makes this resource also data model dependent
-							objectNode.setProperty(GraphStatics.URI_W_PROVENANCE_PROPERTY, object.toString() + " " + resourceGraphURI);
+							objectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, object.toString() + " " + resourceGraphURI);
 						} else {
 
 							objectNode = database.createNode(resourceNodeLabel, typeResourceNodeLabel);
@@ -360,7 +360,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		// 1. get by resource uri + provenance uri
 
-		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_W_PROVENANCE_PROPERTY,
+		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_W_DATA_MODEL_PROPERTY,
 				resource.toString() + " " + resourceGraphURI);
 
 		if (hits != null) {

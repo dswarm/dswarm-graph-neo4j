@@ -24,7 +24,7 @@
 		<jackson.version>1.9.7</jackson.version>
 		<jena.version>2.11.0</jena.version>
 		<jersey.version>1.9</jersey.version>
-		<junit.version>4.9</junit.version>
+		<junit.version>4.11</junit.version>
 	</properties>
 
 	<build>
@@ -207,12 +207,12 @@
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-json</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.yars</groupId>

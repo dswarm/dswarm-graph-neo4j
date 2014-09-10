@@ -51,7 +51,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 	protected long							tick						= System.currentTimeMillis();
 	protected final GraphDatabaseService	database;
 	protected final Index<Node>				resources;
-	protected final Index<Node>				resourcesWProvenance;
+	protected final Index<Node>				resourcesWDataModel;
 	protected final Index<Node>				resourceTypes;
 	protected final Index<Node>				values;
 	protected final Map<String, Node>		bnodes;
@@ -76,7 +76,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			LOG.debug("start write TX");
 
 			resources = database.index().forNodes("resources");
-			resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			resourcesWDataModel = database.index().forNodes("resources_w_data_model");
 			resourceTypes = database.index().forNodes("resource_types");
 			values = database.index().forNodes("values");
 			bnodes = new HashMap<>();
@@ -447,6 +447,11 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
 		}
 
+		if(statement.getConfidence() != null) {
+
+			rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
+		}
+
 		return rel;
 	}
 
@@ -555,7 +560,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 					hits = getResourceNodeHits((ResourceNode) resource);
 				} else {
 
-					hits = resourcesWProvenance.get(GraphStatics.URI_W_PROVENANCE,
+					hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL,
 							((ResourceNode) resource).getUri() + ((ResourceNode) resource).getProvenance());
 				}
 			} else {

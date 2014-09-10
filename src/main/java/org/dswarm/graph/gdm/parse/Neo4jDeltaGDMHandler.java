@@ -33,7 +33,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
- * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
+ * TODO: re-factor usage of CommonHandler
  *
  * @author tgaengler
  */

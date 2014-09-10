@@ -7,11 +7,6 @@ import org.dswarm.graph.json.Statement;
 /**
  * @author tgaengler
  */
-public interface GDMHandler {
+public interface GDMHandler extends CommonHandler {
 
-	public void handleStatement(Statement st, Resource resource, long index) throws DMPGraphException;
-
-	public void setResourceUri(String resourceUri);
-
-	public void closeTransaction();
 }

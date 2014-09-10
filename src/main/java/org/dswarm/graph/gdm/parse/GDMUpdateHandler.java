@@ -8,21 +8,11 @@ import org.dswarm.graph.json.Statement;
 /**
  * @author tgaengler
  */
-public interface GDMUpdateHandler {
+public interface GDMUpdateHandler extends CommonHandler {
 
-	public void handleStatement(Statement st, Resource resource, long index) throws DMPGraphException;
+	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException;
 
-	public void handleStatement(String stmtUUID, Resource resource, long index, long order) throws DMPGraphException;
+	public void deprecateStatement(final long index);
 
-	public void deprecateStatement(long index);
-
-	public Node deprecateStatement(String uuid) throws DMPGraphException;
-
-	public int getLatestVersion();
-
-	public void updateLatestVersion() throws DMPGraphException;
-
-	public void setResourceUri(String resourceUri);
-
-	public void closeTransaction();
+	public Node deprecateStatement(final String uuid) throws DMPGraphException;
 }

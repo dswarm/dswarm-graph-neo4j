@@ -47,22 +47,6 @@ public class Neo4jGDMWDataModelHandler extends Neo4jBaseGDMHandler {
 	}
 
 	@Override
-	protected void setLatestVersion(final String dataModelURI) throws DMPGraphException {
-
-		final String finalDataModelURI;
-
-		if (dataModelURI != null) {
-
-			finalDataModelURI = dataModelURI;
-		} else {
-
-			finalDataModelURI = this.dataModelURI;
-		}
-
-		super.setLatestVersion(finalDataModelURI);
-	}
-
-	@Override
 	protected void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
 
 		if (dataModelURI == null) {

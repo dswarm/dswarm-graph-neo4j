@@ -40,7 +40,6 @@ public class GDMChangesetParser implements GDMUpdateParser {
 	private final Resource					existingResource;
 	private final GraphDatabaseService		existingResourceDB;
 	private final GraphDatabaseService		newResourceDB;
-	private final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
 
 	public GDMChangesetParser(final Changeset changesetArg, final Resource existingResourceArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg) {
@@ -70,7 +69,6 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		}
 
 		// 0. fetch latest version from data model node (+ increase this value + update resource node (maybe at the end))
-		final int latestVersion = gdmHandler.getLatestVersion();
 
 		// 1. compare existing resource DB statements with new resource DB statements, i.e. write/follow statements ordered by
 		// index property (it might be good to also have the relationship in the permanent DB that is related to this index
@@ -99,6 +97,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 				final Long indexFromDB;
 
 				if(existingRelationship != null) {
+
 					indexFromDB = (Long) existingRelationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
 				} else if (newRelationship != null) {
 
@@ -110,14 +109,14 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 				if (indexFromDB == null) {
 
-					// TODO: we should probably should throw an exception instead
+					// TODO: we should probably throw an exception instead
 
 					break;
 				}
 
 				if (!newRelationshipsIter.hasNext()) {
 
-					// TODO: we should probably should throw an exception instead
+					// TODO: we should probably throw an exception instead
 
 					break;
 				}
@@ -327,9 +326,6 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		// 1.1 if a statement was added or deleted or the printed version doesn't equal, rewrite all following statements
 		// afterwards and deprecated the existing ones (i.e. update their valid to value)
 		// for added + modified statements utilise the current version for valid from
-
-		gdmHandler.updateLatestVersion();
-		gdmHandler.closeTransaction();
 
 		GDMChangesetParser.LOG.debug("start shutting down working graph data model DBs for resources");
 

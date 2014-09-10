@@ -8,6 +8,7 @@ import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -18,21 +19,21 @@ import org.slf4j.LoggerFactory;
  */
 public class Neo4jGDMWDataModelUpdateHandler extends Neo4jBaseGDMUpdateHandler {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMWDataModelUpdateHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jGDMWDataModelUpdateHandler.class);
 
-	private final Index<Relationship>	statementUUIDsWDataModel;
+	private Index<Relationship>	statementUUIDsWDataModel;
 
-	private final String				dataModelURI;
+	private final String		dataModelURI;
 
 	public Neo4jGDMWDataModelUpdateHandler(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
 		super(database);
 
+		dataModelURI = dataModelURIArg;
+
 		try {
 
 			statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
-
-			dataModelURI = dataModelURIArg;
 
 			init();
 		} catch (final Exception e) {
@@ -47,22 +48,6 @@ public class Neo4jGDMWDataModelUpdateHandler extends Neo4jBaseGDMUpdateHandler {
 
 			throw new DMPGraphException(message);
 		}
-	}
-
-	@Override
-	protected void setLatestVersion(final String dataModelURI) throws DMPGraphException {
-
-		final String finalDataModelURI;
-
-		if (dataModelURI != null) {
-
-			finalDataModelURI = dataModelURI;
-		} else {
-
-			finalDataModelURI = this.dataModelURI;
-		}
-
-		super.setLatestVersion(finalDataModelURI);
 	}
 
 	@Override
@@ -127,32 +112,6 @@ public class Neo4jGDMWDataModelUpdateHandler extends Neo4jBaseGDMUpdateHandler {
 	}
 
 	@Override
-	protected int retrieveLatestVersion() {
-
-		int latestVersion = 1;
-
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelURI);
-
-		if (hits != null && hits.hasNext()) {
-
-			final Node dataModelNode = hits.next();
-			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
-
-			if (latestVersionFromDB != null) {
-
-				latestVersion = latestVersionFromDB;
-			}
-		}
-
-		if (hits != null) {
-
-			hits.close();
-		}
-
-		return latestVersion;
-	}
-
-	@Override
 	protected Relationship getRelationship(final String uuid) {
 
 		final IndexHits<Relationship> hits = statementUUIDsWDataModel.get(GraphStatics.UUID_W_DATA_MODEL, dataModelURI + "." + uuid);
@@ -172,36 +131,5 @@ public class Neo4jGDMWDataModelUpdateHandler extends Neo4jBaseGDMUpdateHandler {
 		}
 
 		return null;
-	}
-
-	@Override
-	public void updateLatestVersion() throws DMPGraphException {
-
-		try {
-
-			final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelURI);
-
-			if (hits != null && hits.hasNext()) {
-
-				final Node dataModelNode = hits.next();
-				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
-			}
-
-			if (hits != null) {
-
-				hits.close();
-			}
-		} catch (final Exception e) {
-
-			final String message = "couldn't update latest version";
-
-			Neo4jGDMWDataModelUpdateHandler.LOG.error(message, e);
-			Neo4jGDMWDataModelUpdateHandler.LOG.debug("couldn't finish write TX successfully");
-
-			tx.failure();
-			tx.close();
-
-			throw new DMPGraphException(message);
-		}
 	}
 }

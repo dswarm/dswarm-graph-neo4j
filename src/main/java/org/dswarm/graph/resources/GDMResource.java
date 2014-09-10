@@ -318,7 +318,7 @@ public class GDMResource {
 		GDMResource.LOG.debug("start calculating delta for model");
 
 		final Model newResourcesModel = new Model();
-		Long size = (long) 0;
+		GDMUpdateHandler gdmHandler = null;
 
 		// calculate delta resource-wise
 		for (Resource newResource : model.getResources()) {
@@ -366,12 +366,31 @@ public class GDMResource {
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
 			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
-			final GDMUpdateHandler gdmHandler = new Neo4jGDMWDataModelUpdateHandler(permanentDatabase, dataModelURI);
+			if(gdmHandler == null) {
+
+				gdmHandler = new Neo4jGDMWDataModelUpdateHandler(permanentDatabase, dataModelURI);
+			} else {
+
+				gdmHandler.reset();
+			}
+
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
 			parser.setGDMHandler(gdmHandler);
 			parser.parse();
+		}
 
-			size += ((Neo4jGDMWDataModelUpdateHandler) gdmHandler).getCountedStatements();
+		final Long size;
+
+		if(gdmHandler != null) {
+
+			// TODO: note ideally we should increase the data model version at the nearly end, i.e., when all records are written to the permanent graph DB, i.e., not here
+			gdmHandler.updateLatestVersion();
+			gdmHandler.closeTransaction();
+
+			size = ((Neo4jGDMWDataModelUpdateHandler) gdmHandler).getCountedStatements();
+		} else {
+
+			size = (long) 0;
 		}
 
 		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");

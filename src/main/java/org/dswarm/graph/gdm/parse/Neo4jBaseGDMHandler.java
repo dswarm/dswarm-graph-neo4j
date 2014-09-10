@@ -138,14 +138,14 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
-					final String provenanceURI = ((ResourceNode) subject).getProvenance();
+					final String dataModelURI = ((ResourceNode) subject).getDataModel();
 
 					if (resourceUri != null && resourceUri.equals(subjectURI)) {
 
-						setLatestVersion(provenanceURI);
+						setLatestVersion(dataModelURI);
 					}
 
-					handleSubjectProvenance(subjectNode, subjectURI, provenanceURI);
+					handleSubjectDataModel(subjectNode, subjectURI, dataModelURI);
 
 					resources.add(subjectNode, GraphStatics.URI, subjectURI);
 				} else {
@@ -189,7 +189,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 						// object is a resource node
 
 						final String objectURI = ((ResourceNode) object).getUri();
-						final String provenanceURI = ((ResourceNode) object).getProvenance();
+						final String dataModelURI = ((ResourceNode) object).getDataModel();
 
 						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
 
@@ -197,7 +197,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
-							handleObjectProvenance(objectNode, provenanceURI);
+							handleObjectDataModel(objectNode, dataModelURI);
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
@@ -208,7 +208,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 						resources.add(objectNode, GraphStatics.URI, objectURI);
 
-						addObjectToResourceWProvenanceIndex(objectNode, objectURI, provenanceURI);
+						addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
 					} else {
 
 						resourceUri = handleBNode(r, subject, object, subjectNode, isType, objectNode);
@@ -256,11 +256,11 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		}
 	}
 
-	protected abstract void addObjectToResourceWProvenanceIndex(final Node node, final String URI, final String provenanceURI);
+	protected abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI);
 
-	protected abstract void handleObjectProvenance(Node node, String provenanceURI);
+	protected abstract void handleObjectDataModel(Node node, String dataModelURI);
 
-	protected abstract void handleSubjectProvenance(final Node node, String URI, final String provenanceURI);
+	protected abstract void handleSubjectDataModel(final Node node, String URI, final String dataModelURI);
 
 	@Override
 	public void closeTransaction() {
@@ -291,16 +291,16 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 		return literals;
 	}
 
-	protected void setLatestVersion(final String provenanceURI) throws DMPGraphException {
+	protected void setLatestVersion(final String dataModelURI) throws DMPGraphException {
 
 		if (!latestVersionInitialized) {
 
-			if (provenanceURI == null) {
+			if (dataModelURI == null) {
 
 				return;
 			}
 
-			Node dataModelNode = determineNode(new ResourceNode(provenanceURI), false);
+			Node dataModelNode = determineNode(new ResourceNode(dataModelURI), false);
 
 			if (dataModelNode != null) {
 
@@ -311,12 +311,13 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 			dataModelNode = database.createNode();
 			addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
-			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, provenanceURI);
-			dataModelNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			resources.add(dataModelNode, GraphStatics.URI, provenanceURI);
+			resources.add(dataModelNode, GraphStatics.URI, dataModelURI);
+			resourcesWDataModel.add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, dataModelURI + VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
 			Node dataModelTypeNode = determineNode(new ResourceNode(VersioningStatics.DATA_MODEL_TYPE), true);
 
@@ -341,7 +342,7 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
 				rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
-				rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
+				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
 				final String uuid = UUID.randomUUID().toString();
 
@@ -555,13 +556,13 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 
 			if (!isType) {
 
-				if (((ResourceNode) resource).getProvenance() == null) {
+				if (((ResourceNode) resource).getDataModel() == null) {
 
 					hits = getResourceNodeHits((ResourceNode) resource);
 				} else {
 
 					hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL,
-							((ResourceNode) resource).getUri() + ((ResourceNode) resource).getProvenance());
+							((ResourceNode) resource).getUri() + ((ResourceNode) resource).getDataModel());
 				}
 			} else {
 
@@ -670,14 +671,14 @@ public abstract class Neo4jBaseGDMHandler implements GDMHandler {
 			case Resource:
 
 				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
-				final String provenance = (String) node.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+				final String dataModel = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
-				if (provenance == null) {
+				if (dataModel == null) {
 
 					identifier = uri;
 				} else {
 
-					identifier = uri + provenance;
+					identifier = uri + dataModel;
 				}
 
 				break;

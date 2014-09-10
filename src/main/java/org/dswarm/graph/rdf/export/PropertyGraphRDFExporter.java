@@ -114,13 +114,13 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			processedStatements++;
 
-			// provenance
+			// data model
 
-			final String provenanceURI = (String) rel.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+			final String dataModelURI = (String) rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
-			if (provenanceURI == null) {
+			if (dataModelURI == null) {
 
-				final String message = "provenance URI can't be null (relationship id = '" + rel.getId() + "'";
+				final String message = "data model URI can't be null (relationship id = '" + rel.getId() + "'";
 
 				PropertyGraphRDFExporter.LOG.error(message);
 
@@ -129,19 +129,19 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			final Model model;
 
-			if (dataset.containsNamedModel(provenanceURI)) {
+			if (dataset.containsNamedModel(dataModelURI)) {
 
-				model = dataset.getNamedModel(provenanceURI);
+				model = dataset.getNamedModel(dataModelURI);
 			} else {
 
 				model = ModelFactory.createDefaultModel();
 
-				dataset.addNamedModel(provenanceURI, model);
+				dataset.addNamedModel(dataModelURI, model);
 			}
 
 			if (model == null) {
 
-				final String message = "RDF model for graph '" + provenanceURI + "' can't be null (relationship id = '" + rel.getId() + "'";
+				final String message = "RDF model for graph '" + dataModelURI + "' can't be null (relationship id = '" + rel.getId() + "'";
 
 				PropertyGraphRDFExporter.LOG.error(message);
 
@@ -274,7 +274,7 @@ public class PropertyGraphRDFExporter implements RDFExporter {
 
 			if (subjectResource == null || predicateProperty == null || objectRDFNode == null) {
 
-				final String message = "couldn't determine the complete statement (subject-predicate-object + provenance) for relationship '"
+				final String message = "couldn't determine the complete statement (subject-predicate-object + data model) for relationship '"
 						+ rel.getId() + "'";
 
 				PropertyGraphRDFExporter.LOG.error(message);

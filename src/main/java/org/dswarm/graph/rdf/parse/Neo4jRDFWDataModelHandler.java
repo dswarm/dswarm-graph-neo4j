@@ -36,33 +36,33 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  *
  * @author tgaengler
  */
-public class Neo4jRDFWProvenanceHandler implements RDFHandler {
+public class Neo4jRDFWDataModelHandler implements RDFHandler {
 
-	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jRDFWProvenanceHandler.class);
+	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jRDFWDataModelHandler.class);
 
-	private int							totalTriples		= 0;
-	private int							addedNodes			= 0;
-	private int							addedLabels			= 0;
-	private int							addedRelationships	= 0;
-	private int							sinceLastCommit		= 0;
-	private int							i					= 0;
-	private int							literals			= 0;
+	private int totalTriples       = 0;
+	private int addedNodes         = 0;
+	private int addedLabels        = 0;
+	private int addedRelationships = 0;
+	private int sinceLastCommit    = 0;
+	private int i                  = 0;
+	private int literals           = 0;
 
-	private long						tick				= System.currentTimeMillis();
-	private final GraphDatabaseService	database;
-	private final Index<Node>			resources;
-	private final Index<Node>			resourcesWDataModel;
-	private final Index<Node>			resourceTypes;
-	private final Index<Node>			values;
-	private final Map<String, Node>		bnodes;
-	private final Index<Relationship> statementHashes;
-	private final Map<Long, String>   nodeResourceMap;
+	private long tick = System.currentTimeMillis();
+	private final GraphDatabaseService database;
+	private final Index<Node>          resources;
+	private final Index<Node>          resourcesWDataModel;
+	private final Index<Node>          resourceTypes;
+	private final Index<Node>          values;
+	private final Map<String, Node>    bnodes;
+	private final Index<Relationship>  statementHashes;
+	private final Map<Long, String>    nodeResourceMap;
 
 	private Transaction tx;
 
-	private final String resourceGraphURI;
+	private final String dataModelURI;
 
-	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
+	public Neo4jRDFWDataModelHandler(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
 		this.database = database;
 		tx = database.beginTx();
@@ -79,14 +79,14 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 			statementHashes = database.index().forRelationships("statement_hashes");
 			nodeResourceMap = new HashMap<>();
 
-			resourceGraphURI = resourceGraphURIArg;
+			dataModelURI = dataModelURIArg;
 
 		} catch (final Exception e) {
 
 			final String message = "couldn't initialize indices successfully";
 
-			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
-			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+			Neo4jRDFWDataModelHandler.LOG.error(message, e);
+			Neo4jRDFWDataModelHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -126,10 +126,10 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 				} else {
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
-					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+					subjectNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					resources.add(subjectNode, GraphStatics.URI, subject.toString());
-					resourcesWDataModel.add(subjectNode, GraphStatics.URI_W_DATA_MODEL, subject.toString() + resourceGraphURI);
+					resourcesWDataModel.add(subjectNode, GraphStatics.URI_W_DATA_MODEL, subject.toString() + dataModelURI);
 
 					subjectNodeType = NodeType.Resource;
 				}
@@ -222,7 +222,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 						}
 
 						resources.add(objectNode, GraphStatics.URI, object.toString());
-						resourcesWDataModel.add(objectNode, GraphStatics.URI_W_DATA_MODEL, object.toString() + resourceGraphURI);
+						resourcesWDataModel.add(objectNode, GraphStatics.URI_W_DATA_MODEL, object.toString() + dataModelURI);
 					}
 
 					addedNodes++;
@@ -332,7 +332,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		final NodeType finalObjectNodeType = remapNodeType(objectNodeType);
 
 		sb.append(finalSubjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ")
-				.append(finalObjectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(resourceGraphURI);
+				.append(finalObjectNodeType.toString()).append(":").append(objectIdentifier).append(" ").append(dataModelURI);
 		MessageDigest messageDigest = null;
 
 		try {
@@ -357,7 +357,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			// note: this property is not really necessary, since the uri is also the relationship type
 			// rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
-			rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+			rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 
 			statementHashes.add(rel, GraphStatics.HASH, hash);
 
@@ -392,7 +392,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 		if (!isType) {
 
-			hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resource.toString() + resourceGraphURI);
+			hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resource.toString() + dataModelURI);
 		} else {
 
 			hits = resourceTypes.get(GraphStatics.URI, resource.toString());

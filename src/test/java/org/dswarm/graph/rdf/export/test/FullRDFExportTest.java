@@ -30,9 +30,9 @@ public abstract class FullRDFExportTest extends BasicResourceTest {
 		super(neo4jDBWrapper, "/rdf", dbTypeArg);
 	}
 
-	protected void writeRDFToDBInternal(String resource_graph_uri) throws IOException {
+	protected void writeRDFToDBInternal(String dataModelUri) throws IOException {
 
-		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + dataModelUri + ")");
 
 		final URL fileURL = Resources.getResource(TEST_RDF_FILE);
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -40,7 +40,7 @@ public abstract class FullRDFExportTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resource_graph_uri, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelUri, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -49,7 +49,7 @@ public abstract class FullRDFExportTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + dataModelUri + ")");
 	}
 
 }

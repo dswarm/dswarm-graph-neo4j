@@ -42,9 +42,9 @@ public abstract class FullRDFExportSingleGraphTest extends FullRDFExportTest {
 
 		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
 
-		final String provenanceURI = "http://data.slub-dresden.de/resources/2";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
 
-		writeRDFToDBInternal(provenanceURI);
+		writeRDFToDBInternal(dataModelURI);
 
 		// GET the request
 		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
@@ -80,12 +80,12 @@ public abstract class FullRDFExportSingleGraphTest extends FullRDFExportTest {
 
 		Assert.assertEquals("the number of statements should be " + statementsInOriginalRDFFile, statementsInOriginalRDFFile,
 				statementsInExportedRDFModel);
-		Assert.assertTrue("the received dataset should contain a graph with the provenance uri '" + provenanceURI + "'",
-				dataset.containsNamedModel(provenanceURI));
+		Assert.assertTrue("the received dataset should contain a graph with the data model uri '" + dataModelURI + "'",
+				dataset.containsNamedModel(dataModelURI));
 
-		final Model model = dataset.getNamedModel(provenanceURI);
+		final Model model = dataset.getNamedModel(dataModelURI);
 
-		Assert.assertNotNull("the graph (model) for provenance uri '" + provenanceURI + "' shouldn't be null", model);
+		Assert.assertNotNull("the graph (model) for data model uri '" + dataModelURI + "' shouldn't be null", model);
 
 		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",

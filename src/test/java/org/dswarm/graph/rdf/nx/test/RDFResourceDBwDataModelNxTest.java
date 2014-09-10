@@ -28,11 +28,11 @@ import org.dswarm.graph.test.BasicResourceTest;
 /**
  * @author tgaengler
  */
-public abstract class RDFResourceDBwPROVNxTest extends BasicResourceTest {
+public abstract class RDFResourceDBwDataModelNxTest extends BasicResourceTest {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResourceDBwPROVNxTest.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResourceDBwDataModelNxTest.class);
 
-	public RDFResourceDBwPROVNxTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
+	public RDFResourceDBwDataModelNxTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/rdf", dbTypeArg);
 	}
@@ -58,7 +58,7 @@ public abstract class RDFResourceDBwPROVNxTest extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", "http://www.openarchives.org/OAI/2.0/recordType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 

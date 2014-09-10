@@ -42,30 +42,30 @@ public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
 	}
 
 	@Override
-	protected void addObjectToResourceWProvenanceIndex(final Node node, final String URI, final String provenanceURI) {
+	protected void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
 
-		if (provenanceURI != null) {
+		if (dataModelURI != null) {
 
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
 		}
 	}
 
 	@Override
-	protected void handleObjectProvenance(final Node node, final String provenanceURI) {
+	protected void handleObjectDataModel(final Node node, final String dataModelURI) {
 
-		if (provenanceURI != null) {
+		if (dataModelURI != null) {
 
-			node.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 		}
 	}
 
 	@Override
-	protected void handleSubjectProvenance(final Node node, String URI, final String provenanceURI) {
+	protected void handleSubjectDataModel(final Node node, String URI, final String dataModelURI) {
 
-		if (provenanceURI != null) {
+		if (dataModelURI != null) {
 
-			node.setProperty(GraphStatics.PROVENANCE_PROPERTY, provenanceURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + provenanceURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
 		}
 	}
 

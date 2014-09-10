@@ -19,7 +19,7 @@ import org.dswarm.graph.rdf.export.PropertyGraphRDFExporter;
 import org.dswarm.graph.rdf.export.RDFExporter;
 import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.Neo4jRDFHandler;
-import org.dswarm.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
+import org.dswarm.graph.rdf.parse.Neo4jRDFWDataModelHandler;
 import org.dswarm.graph.rdf.parse.RDFHandler;
 import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.nx.NxModelParser;
@@ -79,7 +79,7 @@ public class RDFResource {
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
 
-		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(rdfInputStream, null, "N3");
@@ -88,14 +88,14 @@ public class RDFResource {
 
 		LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFWProvenanceHandler(database, resourceGraphURI);
+		final RDFHandler handler = new Neo4jRDFWDataModelHandler(database, dataModelURI);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements ('"
-				+ ((Neo4jRDFWProvenanceHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for resource graph URI '"
-				+ resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jRDFWDataModelHandler) handler).getCountedStatements() + " RDF statements ('"
+				+ ((Neo4jRDFWDataModelHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for data model URI '"
+				+ dataModelURI + "'");
 
 		return Response.ok().build();
 	}
@@ -158,7 +158,7 @@ public class RDFResource {
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
 
-		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
 		final NxParser nxParser = new NxParser(rdfInputStream);
 
@@ -166,14 +166,14 @@ public class RDFResource {
 
 		LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler(database,
-				resourceGraphURI);
+		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler(database,
+				dataModelURI);
 		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
-				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
 
 		return Response.ok().build();
 	}
@@ -201,12 +201,12 @@ public class RDFResource {
 		}
 
 		final String recordClassUri = json.get("record_class_uri").asText();
-		final String resourceGraphUri = json.get("resource_graph_uri").asText();
+		final String dataModelUri = json.get("data_model_uri").asText();
 
-		LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+		LOG.debug("try to read RDF statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
-		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
+		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, dataModelUri, database);
 		final Model model = rdfReader.read();
 
 		// model.write(System.out, "N-TRIPLE");
@@ -216,7 +216,7 @@ public class RDFResource {
 		final String result = writer.toString();
 
 		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
-				+ "' via RDF reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
 		return Response.ok().entity(result).build();

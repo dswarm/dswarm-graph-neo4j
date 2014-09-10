@@ -36,16 +36,16 @@ public class PropertyGraphRDFReader implements RDFReader {
 	private final RelationshipHandler	relationshipHandler;
 
 	private final String				recordClassUri;
-	private final String				resourceGraphUri;
+	private final String dataModelUri;
 
-	private final GraphDatabaseService	database;
+	private final GraphDatabaseService database;
 
-	private Model						model;
+	private Model model;
 
-	public PropertyGraphRDFReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
-		resourceGraphUri = resourceGraphUriArg;
+		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -55,14 +55,14 @@ public class PropertyGraphRDFReader implements RDFReader {
 	@Override
 	public Model read() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			LOG.debug("start read RDF TX");
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
-					resourceGraphUri);
+			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+					dataModelUri);
 
 			if (recordNodes == null) {
 
@@ -144,7 +144,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
 
 				// TODO: utilise __NODETYPE__ property for switch
 

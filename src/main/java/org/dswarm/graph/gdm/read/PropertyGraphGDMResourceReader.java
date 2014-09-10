@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * retrieves the CBD for the given resource URI + provenance graph URI
+ * retrieves the CBD for the given resource URI + data model URI
  *
  * @author tgaengler
  */
@@ -37,16 +37,16 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 	private final NodeHandler			startNodeHandler;
 	private final RelationshipHandler	relationshipHandler;
 
-	protected final String				resourceGraphUri;
+	protected final String dataModelUri;
 
-	protected final GraphDatabaseService	database;
+	protected final GraphDatabaseService database;
 
-	private Resource					currentResource;
-	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
+	private Resource currentResource;
+	private final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
-	public PropertyGraphGDMResourceReader(final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphGDMResourceReader(final String dataModelUriArg, final GraphDatabaseService databaseArg) {
 
-		resourceGraphUri = resourceGraphUriArg;
+		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -56,9 +56,9 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 	@Override
 	public Resource read() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
-		PropertyGraphGDMResourceReader.LOG.debug("start read GDM TX");
+			PropertyGraphGDMResourceReader.LOG.debug("start read GDM TX");
 
 			final Node recordNode = getResourceNode();
 
@@ -188,7 +188,7 @@ public abstract class PropertyGraphGDMResourceReader implements GDMResourceReade
 
 			// note: we can also optionally check for the "resource property at the relationship (this property will only be
 			// written right now for model that came as GDM JSON)
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
 
 				final long statementId = rel.getId();
 

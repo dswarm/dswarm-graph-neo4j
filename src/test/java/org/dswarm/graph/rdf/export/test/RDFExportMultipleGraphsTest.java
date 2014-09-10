@@ -43,11 +43,11 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 
 		RDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB");
 
-		final String provenanceURI1 = "http://data.slub-dresden.de/resources/2";
-		final String provenanceURI2 = "http://data.slub-dresden.de/resources/3";
+		final String dataMpdelURI1 = "http://data.slub-dresden.de/resources/2";
+		final String dataModelURI2 = "http://data.slub-dresden.de/resources/3";
 
-		writeRDFToDBInternal(provenanceURI1);
-		writeRDFToDBInternal(provenanceURI2);
+		writeRDFToDBInternal(dataMpdelURI1);
+		writeRDFToDBInternal(dataModelURI2);
 
 		final ClientResponse response = service().path("/rdf/getall").accept("application/n-quads").get(ClientResponse.class);
 
@@ -84,8 +84,8 @@ public abstract class RDFExportMultipleGraphsTest extends FullRDFExportTest {
 		final long statementsInOriginalRDFFileAfter2ndRead = modelFromOriginalRDFile.size() + modelFromOriginalRDFile2.size();
 
 		final Dataset datasetFromSources = DatasetFactory.createMem();
-		datasetFromSources.addNamedModel(provenanceURI1, modelFromOriginalRDFile);
-		datasetFromSources.addNamedModel(provenanceURI2, modelFromOriginalRDFile2);
+		datasetFromSources.addNamedModel(dataMpdelURI1, modelFromOriginalRDFile);
+		datasetFromSources.addNamedModel(dataModelURI2, modelFromOriginalRDFile2);
 
 		final Iterator<String> graphURIs = datasetFromSources.listNames();
 

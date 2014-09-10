@@ -19,10 +19,10 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 	private String recordURI;
 	private final AttributePath	recordIdentifierAP;
 
-	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String resourceGraphUri,
+	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri,
 			final GraphDatabaseService database) throws DMPGraphException {
 
-		super(resourceGraphUri, database);
+		super(dataModelUri, database);
 
 		recordId = recordIdArg;
 		recordIdentifierAP = recordIdentifierAPArg;
@@ -39,13 +39,13 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 			return null;
 		}
 
-		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, resourceGraphUri, database);
+		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, dataModelUri, database);
 
 		return uriReader.getResourceNode();
 	}
 
 	private void determineRecordUri() throws DMPGraphException {
 
-		recordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, resourceGraphUri, database);
+		recordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, dataModelUri, database);
 	}
 }

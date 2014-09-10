@@ -453,11 +453,11 @@ public final class GraphDBUtil {
 
 				String tempValue = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
 
-				final String provenance = (String) node.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+				final String dataModel = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
-				if (provenance != null) {
+				if (dataModel != null) {
 
-					tempValue += provenance;
+					tempValue += dataModel;
 				}
 
 				value = tempValue;
@@ -798,10 +798,10 @@ public final class GraphDBUtil {
 		return executeQueryWithSingleResult(query, "record_identifier", graphDB);
 	}
 
-	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String resourceGraphUri,
+	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String dataModelUri,
 			final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, resourceGraphUri);
+		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, dataModelUri);
 
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
@@ -864,11 +864,11 @@ public final class GraphDBUtil {
 
 					String tempValue = (String) path.endNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
-					final String provenance = (String) path.endNode().getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+					final String dataModel = (String) path.endNode().getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
-					if(provenance != null) {
+					if(dataModel != null) {
 
-						tempValue += provenance;
+						tempValue += dataModel;
 					}
 
 					value = tempValue;
@@ -1045,7 +1045,7 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUriQuery(final String recordId, final AttributePath recordIdentifierAP, final String resourceGraphUri) {
+	private static String buildGetRecordUriQuery(final String recordId, final AttributePath recordIdentifierAP, final String dataModelUri) {
 
 		// START n=node:values(__VALUE__="a1280f78-5f96-4fe6-b916-5e38e5d620d3")
 		// MATCH (n)-[r:`http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id`]->(o)
@@ -1069,7 +1069,7 @@ public final class GraphDBUtil {
 		}
 
 		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")
-				.append(GraphStatics.PROVENANCE_PROPERTY).append(" = \"").append(resourceGraphUri).append("\" AND\no.")
+				.append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(dataModelUri).append("\" AND\no.")
 				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN n.")
 				.append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
 

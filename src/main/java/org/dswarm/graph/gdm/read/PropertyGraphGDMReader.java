@@ -116,6 +116,8 @@ public class PropertyGraphGDMReader {
 		final org.dswarm.graph.json.Node object = readObject(rel.getEndNode());
 		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+		final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
+		final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
 
 		final Statement statement = new Statement(subject, predicate, object);
 		statement.setOrder(order);
@@ -123,6 +125,16 @@ public class PropertyGraphGDMReader {
 		if(uuid != null) {
 
 			statement.setUUID(uuid);
+		}
+
+		if(confidence != null) {
+
+			statement.setConfidence(confidence);
+		}
+
+		if(evidence != null) {
+
+			statement.setEvidence(evidence);
 		}
 
 		return statement;
@@ -152,16 +164,16 @@ public class PropertyGraphGDMReader {
 			throw new DMPGraphException(message);
 		}
 
-		final String provenanceURI = (String) node.getProperty(GraphStatics.PROVENANCE_PROPERTY, null);
+		final String dataModelURI = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
 		final ResourceNode resourceNode;
 
-		if (provenanceURI == null) {
+		if (dataModelURI == null) {
 
 			resourceNode = createResourceFromURI(node.getId(), resourceURI);
 		} else {
 
-			resourceNode = createResourceFromURIAndProvenance(node.getId(), resourceURI, provenanceURI);
+			resourceNode = createResourceFromURIAndDataModel(node.getId(), resourceURI, dataModelURI);
 		}
 
 		return resourceNode;
@@ -187,14 +199,14 @@ public class PropertyGraphGDMReader {
 		return resourceNodes.get(uri);
 	}
 
-	private ResourceNode createResourceFromURIAndProvenance(final long id, final String uri, final String provenance) {
+	private ResourceNode createResourceFromURIAndDataModel(final long id, final String uri, final String dataModel) {
 
-		if (!resourceNodes.containsKey(uri + provenance)) {
+		if (!resourceNodes.containsKey(uri + dataModel)) {
 
-			resourceNodes.put(uri + provenance, new ResourceNode(id, uri, provenance));
+			resourceNodes.put(uri + dataModel, new ResourceNode(id, uri, dataModel));
 		}
 
-		return resourceNodes.get(uri + provenance);
+		return resourceNodes.get(uri + dataModel);
 	}
 
 

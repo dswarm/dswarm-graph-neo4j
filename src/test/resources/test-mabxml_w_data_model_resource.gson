@@ -13,10 +13,10 @@
          "s" : {
            "uri" : "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497"
          },
-         "p" : "http://example.com/mypropertywprovenanceresourceobject",
+         "p" : "http://example.com/mypropertywdatamodelresourceobject",
          "o" : {
            "uri" : "http://example.com/mydataresource",
-           "provenance" : "http://example.com/"
+           "data_model" : "http://example.com/"
          }
        },{
     "order" : 1,

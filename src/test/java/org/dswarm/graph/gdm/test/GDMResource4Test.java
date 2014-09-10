@@ -2,7 +2,6 @@ package org.dswarm.graph.gdm.test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -15,11 +14,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -49,7 +46,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -70,17 +67,17 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal(final String resourceGraphURI) throws IOException {
+	private void writeGDMToDBInternal(final String dataModelURI) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
-		final URL fileURL = Resources.getResource("test-mabxml_w_provenance_resource.gson");
+		final URL fileURL = Resources.getResource("test-mabxml_w_data_model_resource.gson");
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

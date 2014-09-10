@@ -106,20 +106,20 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	}
 
 	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,
-			final String resourcePathV2, final String resourceGraphURI, final String recordClassURI, final long statementCountCurrentVersion,
+			final String resourcePathV2, final String dataModelURI, final String recordClassURI, final long statementCountCurrentVersion,
 			final long statementCountV1) throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal(resourcePathV1, resourceGraphURI);
-		writeGDMToDBInternalWithContentSchema(resourcePathV2, resourceGraphURI, contentSchemaRequestJSON);
+		writeGDMToDBInternal(resourcePathV1, dataModelURI);
+		writeGDMToDBInternalWithContentSchema(resourcePathV2, dataModelURI, contentSchemaRequestJSON);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", recordClassURI);
-		requestJson.put("resource_graph_uri", resourceGraphURI);
+		requestJson.put("data_model_uri", dataModelURI);
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -141,7 +141,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson2 = objectMapper.createObjectNode();
 
 		requestJson2.put("record_class_uri", recordClassURI);
-		requestJson2.put("resource_graph_uri", resourceGraphURI);
+		requestJson2.put("data_model_uri", dataModelURI);
 		requestJson2.put("version", 1);
 
 		final String requestJsonString2 = objectMapper.writeValueAsString(requestJson2);
@@ -163,7 +163,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String resourceGraphURI,
+	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String dataModelURI,
 			final ObjectNode contentSchemaRequestJSON) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
@@ -176,7 +176,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE))
-				.bodyPart(new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE))
+				.bodyPart(new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE))
 				.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
@@ -189,7 +189,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal(final String dataResourceFileName, final String resourceGraphURI) throws IOException {
+	private void writeGDMToDBInternal(final String dataResourceFileName, final String dataModelURI) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
@@ -199,7 +199,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

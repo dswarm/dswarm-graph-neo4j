@@ -37,7 +37,6 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
-import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
@@ -48,8 +47,8 @@ import org.dswarm.graph.gdm.parse.GDMUpdateHandler;
 import org.dswarm.graph.gdm.parse.GDMUpdateParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMWProvenanceUpdateHandler;
+import org.dswarm.graph.gdm.parse.Neo4jGDMWDataModelHandler;
+import org.dswarm.graph.gdm.parse.Neo4jGDMWDataModelUpdateHandler;
 import org.dswarm.graph.gdm.read.GDMModelReader;
 import org.dswarm.graph.gdm.read.GDMResourceReader;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
@@ -127,7 +126,7 @@ public class GDMResource {
 			throw new DMPGraphException(message);
 		}
 
-		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
 		final ObjectMapper mapper = Util.getJSONObjectMapper();
 
@@ -186,20 +185,20 @@ public class GDMResource {
 			}
 
 			// = new resources model, since existing, modified resources were already written to the DB
-			final Pair<Model, Long> result = calculateDeltaForDataModel(model, contentSchema, resourceGraphURI, database);
+			final Pair<Model, Long> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database);
 
 			model = result.first();
 			size += result.other();
 		}
 
-		final GDMHandler handler = new Neo4jGDMWProvenanceHandler(database, resourceGraphURI);
+		final GDMHandler handler = new Neo4jGDMWDataModelHandler(database, dataModelURI);
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();
 
-		size += ((Neo4jGDMWProvenanceHandler) handler).getCountedStatements();
+		size += ((Neo4jGDMWDataModelHandler) handler).getCountedStatements();
 
-		LOG.debug("finished writing " + size + " GDM statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+		LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
 		return Response.ok().build();
 	}
@@ -280,7 +279,7 @@ public class GDMResource {
 		}
 
 		final String recordClassUri = json.get("record_class_uri").asText();
-		final String resourceGraphUri = json.get("resource_graph_uri").asText();
+		final String dataModelUri = json.get("data_model_uri").asText();
 		final JsonNode versionNode = json.get("version");
 		final Integer version;
 
@@ -292,10 +291,10 @@ public class GDMResource {
 			version = null;
 		}
 
-		GDMResource.LOG.debug("try to read GDM statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
+		GDMResource.LOG.debug("try to read GDM statements for data model uri = '" + dataModelUri + "' and record class uri = '"
 				+ recordClassUri + "' and version = '" + version + "' from graph db");
 
-		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, resourceGraphUri, version, database);
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, version, database);
 		final Model model = gdmReader.read();
 
 		String result = null;
@@ -307,13 +306,13 @@ public class GDMResource {
 		}
 
 		GDMResource.LOG.debug("finished reading '" + model.size() + "' GDM statements ('" + gdmReader.countStatements()
-				+ "' via GDM reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+				+ "' via GDM reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' and version = '" + version + "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}
 
-	private Pair<Model, Long> calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String resourceGraphURI,
+	private Pair<Model, Long> calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String dataModelURI,
 			final GraphDatabaseService permanentDatabase) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
@@ -339,18 +338,18 @@ public class GDMResource {
 
 				// try to retrieve existing model via legacy record identifier
 				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, contentSchema.getRecordIdentifierAttributePath(),
-						resourceGraphURI, permanentDatabase);
+						dataModelURI, permanentDatabase);
 			} else {
 
 				// try to retrieve existing model via resource uri
-				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, resourceGraphURI, permanentDatabase);
+				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, permanentDatabase);
 			}
 
 			existingResource = gdmReader.read();
 
 			if (existingResource == null) {
 
-				// take new resource model, since there was no match in the provenance graph for this resource identifier
+				// take new resource model, since there was no match in the data model graph for this resource identifier
 				newResourcesModel.addResource(newResource);
 
 				newResourceDB.shutdown();
@@ -367,12 +366,12 @@ public class GDMResource {
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
 			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
-			final GDMUpdateHandler gdmHandler = new Neo4jGDMWProvenanceUpdateHandler(permanentDatabase, resourceGraphURI);
+			final GDMUpdateHandler gdmHandler = new Neo4jGDMWDataModelUpdateHandler(permanentDatabase, dataModelURI);
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
 			parser.setGDMHandler(gdmHandler);
 			parser.parse();
 
-			size += ((Neo4jGDMWProvenanceUpdateHandler) gdmHandler).getCountedStatements();
+			size += ((Neo4jGDMWDataModelUpdateHandler) gdmHandler).getCountedStatements();
 		}
 
 		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");

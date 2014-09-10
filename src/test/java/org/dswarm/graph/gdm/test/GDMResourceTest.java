@@ -107,7 +107,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", "http://www.openarchives.org/OAI/2.0/recordType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -140,7 +140,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -161,7 +161,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeRDFToDBInternal(final String resourceGraphURI) throws IOException {
+	private void writeRDFToDBInternal(final String dataModelURI) throws IOException {
 
 		LOG.debug("start writing RDF statements for GDM resource at " + dbType + " DB");
 
@@ -171,7 +171,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = service().path("/rdf/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -183,7 +183,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished writing RDF statements for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal(final String resourceGraphURI) throws IOException {
+	private void writeGDMToDBInternal(final String dataModelURI) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
@@ -193,7 +193,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resourceGraphURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

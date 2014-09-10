@@ -13,9 +13,9 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 
 	private final String	recordUri;
 
-	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String resourceGraphUri, final GraphDatabaseService database) {
+	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final GraphDatabaseService database) {
 
-		super(resourceGraphUri, database);
+		super(dataModelUri, database);
 
 		recordUri = recordUriArg;
 	}
@@ -24,7 +24,7 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	protected Node getResourceNode() {
 
 		final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
-		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + resourceGraphUri);
+		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + dataModelUri);
 
 		if (hits == null) {
 

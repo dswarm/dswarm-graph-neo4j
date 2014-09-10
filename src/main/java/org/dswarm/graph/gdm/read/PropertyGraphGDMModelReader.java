@@ -40,23 +40,23 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private final RelationshipHandler	relationshipHandler;
 
 	private final String				recordClassUri;
-	private final String				resourceGraphUri;
+	private final String dataModelUri;
 
-	private final GraphDatabaseService	database;
+	private final GraphDatabaseService database;
 
-	private Model						model;
-	private Resource					currentResource;
-	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
+	private Model    model;
+	private Resource currentResource;
+	private final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
 	private Integer version;
 
 	private Transaction tx = null;
 
-	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String resourceGraphUriArg, final Integer versionArg,
+	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
 			final GraphDatabaseService databaseArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
-		resourceGraphUri = resourceGraphUriArg;
+		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -114,8 +114,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
-					resourceGraphUri);
+			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+					dataModelUri);
 
 			if (recordNodes == null) {
 
@@ -267,7 +267,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			// note: we can also optionally check for the "resource property at the relationship (this property will only be
 			// written right now for model that came as GDM JSON)
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
 
 				final long statementId = rel.getId();
 
@@ -291,6 +291,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 				final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
+				final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
 
 				final Statement statement = new Statement(subjectGDMNode, predicateProperty, objectGDMNode);
 				statement.setId(statementId);
@@ -308,6 +309,11 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				if(confidence != null) {
 
 					statement.setConfidence(confidence);
+				}
+
+				if(evidence != null) {
+
+					statement.setEvidence(evidence);
 				}
 
 				// index should never be null (when resource was written as GDM JSON)
@@ -337,7 +343,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 		int latestVersion = 1;
 
 		final Index<Node> resources = database.index().forNodes("resources");
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceGraphUri);
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelUri);
 
 		if (hits != null && hits.iterator().hasNext()) {
 

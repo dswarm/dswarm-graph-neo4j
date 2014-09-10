@@ -5,9 +5,9 @@ import org.dswarm.graph.test.Neo4jEmbeddedDBWrapper;
 /**
  * @author tgaengler
  */
-public class RDFResourceOnEmbeddedDBwPROVNxTest extends RDFResourceDBwPROVNxTest {
+public class RDFResourceOnEmbeddedDBwDataModelNxTest extends RDFResourceDBwDataModelNxTest {
 
-	public RDFResourceOnEmbeddedDBwPROVNxTest() {
+	public RDFResourceOnEmbeddedDBwDataModelNxTest() {
 
 		super(new Neo4jEmbeddedDBWrapper("/ext"), "embedded");
 	}

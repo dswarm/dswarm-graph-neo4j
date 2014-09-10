@@ -38,40 +38,40 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgaengler
  */
-public class Neo4jRDFWProvenanceHandler implements RDFHandler {
+public class Neo4jRDFWDataModelHandler implements RDFHandler {
 
-	private static final Logger			LOG						= LoggerFactory.getLogger(Neo4jRDFWProvenanceHandler.class);
+	private static final Logger			LOG						= LoggerFactory.getLogger(Neo4jRDFWDataModelHandler.class);
 
-	private int							totalTriples			= 0;
-	private int							addedNodes				= 0;
-	private int							addedLabels				= 0;
-	private int							addedRelationships		= 0;
-	private int							sinceLastCommit			= 0;
-	private int							i						= 0;
-	private int							literals				= 0;
+	private int totalTriples       = 0;
+	private int addedNodes         = 0;
+	private int addedLabels        = 0;
+	private int addedRelationships = 0;
+	private int sinceLastCommit    = 0;
+	private int i                  = 0;
+	private int literals           = 0;
 
-	private long						tick					= System.currentTimeMillis();
-	private final GraphDatabaseService	database;
+	private long tick = System.currentTimeMillis();
+	private final GraphDatabaseService database;
 	// private final Index<Node> resources;
 	// private final Index<Node> resourcesWProvenance;
 	// private final Index<Node> resourceTypes;
 	// private final Index<Node> values;
-	private final Map<String, Node>		bnodes;
-	private final Index<Relationship>	statements;
+	private final Map<String, Node>    bnodes;
+	private final Index<Relationship>  statements;
 	// private final Map<Long, String> nodeResourceMap;
 
-	private Transaction					tx;
+	private Transaction tx;
 
-	private Label						resourceNodeLabel		= DynamicLabel.label(NodeType.Resource.toString());
-	private Label						typeResourceNodeLabel	= DynamicLabel.label(NodeType.TypeResource.toString());
-	private Label						literalNodeLabel		= DynamicLabel.label(NodeType.Literal.toString());
+	private Label resourceNodeLabel     = DynamicLabel.label(NodeType.Resource.toString());
+	private Label typeResourceNodeLabel = DynamicLabel.label(NodeType.TypeResource.toString());
+	private Label literalNodeLabel      = DynamicLabel.label(NodeType.Literal.toString());
 
-	private final String				resourceGraphURI;
+	private final String dataModelURI;
 
-	public Neo4jRDFWProvenanceHandler(final GraphDatabaseService database, final String resourceGraphURIArg) throws DMPGraphException {
+	public Neo4jRDFWDataModelHandler(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
 		this.database = database;
-		resourceGraphURI = resourceGraphURIArg;
+		dataModelURI = dataModelURIArg;
 
 		getOrCreateIndex(DynamicLabel.label(NodeType.Resource.toString()), new String[] { GraphStatics.URI_PROPERTY });
 
@@ -100,7 +100,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			final String message = "couldn't initialize statements index successfully";
 
-			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
+			Neo4jRDFWDataModelHandler.LOG.error(message, e);
 
 			throw new DMPGraphException(message);
 		}
@@ -144,12 +144,12 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 					subjectNode = database.createNode(resourceNodeLabel);
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subject.toString());
-					subjectNode.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+					subjectNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 					// resources.add(subjectNode, GraphStatics.URI, subject.toString());
 					// resourcesWProvenance.add(subjectNode, GraphStatics.URI_W_PROVENANCE, subject.toString() +
 					// resourceGraphURI);
-					subjectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, subject.toString() + " " + resourceGraphURI);
+					subjectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, subject.toString() + " " + dataModelURI);
 				}
 
 				addedNodes++;
@@ -220,7 +220,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
 							// note: this might be not correct ... i.e., this makes this resource also data model dependent
-							objectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, object.toString() + " " + resourceGraphURI);
+							objectNode.setProperty(GraphStatics.URI_W_DATA_MODEL_PROPERTY, object.toString() + " " + dataModelURI);
 						} else {
 
 							objectNode = database.createNode(resourceNodeLabel, typeResourceNodeLabel);
@@ -335,7 +335,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 		rel.setProperty(GraphStatics.URI_PROPERTY, predicateName);
-		rel.setProperty(GraphStatics.PROVENANCE_PROPERTY, resourceGraphURI);
+		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 		statements.add(rel, GraphStatics.ID, rel.getId());
 
 		addedRelationships++;
@@ -361,7 +361,7 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 		// 1. get by resource uri + provenance uri
 
 		ResourceIterable<Node> hits = database.findNodesByLabelAndProperty(resourceNodeLabel, GraphStatics.URI_W_DATA_MODEL_PROPERTY,
-				resource.toString() + " " + resourceGraphURI);
+				resource.toString() + dataModelURI);
 
 		if (hits != null) {
 
@@ -529,8 +529,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			final String message = "couldn't get schema index successfully";
 
-			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
-			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+			Neo4jRDFWDataModelHandler.LOG.error(message, e);
+			Neo4jRDFWDataModelHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -567,8 +567,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			final String message = "couldn't create schema index successfully";
 
-			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
-			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+			Neo4jRDFWDataModelHandler.LOG.error(message, e);
+			Neo4jRDFWDataModelHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -586,8 +586,8 @@ public class Neo4jRDFWProvenanceHandler implements RDFHandler {
 
 			final String message = "couldn't bring schema index successfully online";
 
-			Neo4jRDFWProvenanceHandler.LOG.error(message, e);
-			Neo4jRDFWProvenanceHandler.LOG.debug("couldn't finish write TX successfully");
+			Neo4jRDFWDataModelHandler.LOG.error(message, e);
+			Neo4jRDFWDataModelHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}

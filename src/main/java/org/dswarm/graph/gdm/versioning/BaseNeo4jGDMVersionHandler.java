@@ -1,11 +1,10 @@
-package org.dswarm.graph.versioning;
+package org.dswarm.graph.gdm.versioning;
 
 import java.util.UUID;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -14,16 +13,19 @@ import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.gdm.CommonNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersionHandler;
+import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
  * @author tgaengler
  */
-public abstract class Neo4jGDMBaseVersionHandler implements VersionHandler {
+public abstract class BaseNeo4jGDMVersionHandler implements VersionHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Neo4jGDMBaseVersionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseNeo4jGDMVersionHandler.class);
 
 	protected boolean latestVersionInitialized = false;
 
@@ -31,9 +33,9 @@ public abstract class Neo4jGDMBaseVersionHandler implements VersionHandler {
 
 	private Range range;
 
-	protected final CommonNeo4jGDMProcessor processor;
+	protected final BaseNeo4jGDMProcessor processor;
 
-	public Neo4jGDMBaseVersionHandler(final CommonNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	public BaseNeo4jGDMVersionHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 	}
@@ -42,6 +44,11 @@ public abstract class Neo4jGDMBaseVersionHandler implements VersionHandler {
 	public int getLatestVersion() {
 
 		return latestVersion;
+	}
+
+	@Override public Range getRange() {
+
+		return range;
 	}
 
 	protected void init() {
@@ -88,6 +95,9 @@ public abstract class Neo4jGDMBaseVersionHandler implements VersionHandler {
 				processor.addLabel(dataModelTypeNode, RDFS.Class.getURI());
 				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
 				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
+
+				processor.getResourcesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
+				processor.getResourceTypesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
 			}
 
 			final String hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, org.dswarm.graph.json.NodeType.Resource,

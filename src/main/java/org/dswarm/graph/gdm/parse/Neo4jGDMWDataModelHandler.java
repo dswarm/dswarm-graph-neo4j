@@ -1,13 +1,13 @@
 package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
+import org.dswarm.graph.gdm.versioning.Neo4jGDMWDataModelVersionHandler;
 import org.dswarm.graph.model.GraphStatics;
+
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,95 +15,40 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tgaengler
  */
-public class Neo4jGDMWDataModelHandler extends Neo4jBaseGDMHandler {
+public class Neo4jGDMWDataModelHandler extends BaseNeo4jGDMHandler {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMWDataModelHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jGDMWDataModelHandler.class);
 
-	private final Index<Relationship> statementUUIDsWDataModel;
+	public Neo4jGDMWDataModelHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
 
-	private final String dataModelURI;
+		super(processorArg);
+	}
 
-	public Neo4jGDMWDataModelHandler(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
+	@Override protected void init() throws DMPGraphException {
 
-		super(database);
+		versionHandler = new Neo4jGDMWDataModelVersionHandler(processor);
+	}
 
-		try {
+	@Override
+	protected Relationship getRelationship(final String uuid) {
 
-			statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
-		} catch (final Exception e) {
+		final IndexHits<Relationship> hits = ((Neo4jGDMWDataModelProcessor) processor).getStatementWDataModelIndex().get(
+				GraphStatics.UUID_W_DATA_MODEL, ((Neo4jGDMWDataModelProcessor) processor).getDataModelURI() + "." + uuid);
 
-			tx.failure();
-			tx.close();
+		if (hits != null && hits.hasNext()) {
 
-			final String message = "couldn't load indices successfully";
+			final Relationship rel = hits.next();
 
-			Neo4jGDMWDataModelHandler.LOG.error(message, e);
-			Neo4jGDMWDataModelHandler.LOG.debug("couldn't finish write TX successfully");
+			hits.close();
 
-			throw new DMPGraphException(message);
+			return rel;
 		}
 
-		dataModelURI = dataModelURIArg;
-	}
+		if (hits != null) {
 
-	@Override
-	protected void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
-
-		if (dataModelURI == null) {
-
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
-		} else {
-
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			hits.close();
 		}
-	}
 
-	@Override
-	protected void handleObjectDataModel(final Node node, final String dataModelURI) {
-
-		if (dataModelURI == null) {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-		} else {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-		}
-	}
-
-	@Override
-	protected void handleSubjectDataModel(final Node node, String URI, final String dataModelURI) {
-
-		if (dataModelURI == null) {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
-		} else {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
-		}
-	}
-
-	@Override
-	protected void addStatementToIndex(final Relationship rel, final String statementUUID) {
-
-		statementUUIDsWDataModel.add(rel, GraphStatics.UUID_W_DATA_MODEL, dataModelURI + "." + statementUUID);
-	}
-
-	@Override
-	protected Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
-			final long index) {
-
-		final Relationship rel = super.prepareRelationship(subjectNode, objectNode, statementUUID, statement, index);
-
-		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-
-		return rel;
-	}
-
-	@Override
-	protected IndexHits<Node> getResourceNodeHits(final ResourceNode resource) {
-
-		return resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resource.getUri() + dataModelURI);
+		return null;
 	}
 }

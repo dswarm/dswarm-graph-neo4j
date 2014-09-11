@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -20,16 +22,19 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.VersionHandler;
+import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
  * @author tgaengler
  */
-public abstract class CommonNeo4jGDMProcessor {
+public abstract class BaseNeo4jGDMProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CommonNeo4jGDMProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseNeo4jGDMProcessor.class);
 
-	protected int addedLabels        = 0;
+	protected int addedLabels = 0;
 
 	protected final GraphDatabaseService database;
 	protected final Index<Node>          resources;
@@ -42,10 +47,12 @@ public abstract class CommonNeo4jGDMProcessor {
 
 	protected Transaction tx;
 
-	public CommonNeo4jGDMProcessor(final GraphDatabaseService database) throws DMPGraphException {
+	boolean txIsClosed = false;
+
+	public BaseNeo4jGDMProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
-		tx = database.beginTx();
+		beginTx();
 
 		try {
 
@@ -63,11 +70,12 @@ public abstract class CommonNeo4jGDMProcessor {
 
 			tx.failure();
 			tx.close();
+			txIsClosed = true;
 
 			final String message = "couldn't load indices successfully";
 
-			CommonNeo4jGDMProcessor.LOG.error(message, e);
-			CommonNeo4jGDMProcessor.LOG.debug("couldn't finish write TX successfully");
+			BaseNeo4jGDMProcessor.LOG.error(message, e);
+			BaseNeo4jGDMProcessor.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -108,23 +116,45 @@ public abstract class CommonNeo4jGDMProcessor {
 		return statementHashes;
 	}
 
+	public void beginTx() {
+
+		tx = database.beginTx();
+	}
+
 	public void renewTx() {
 
 		tx.success();
 		tx.close();
+		txIsClosed = true;
 		tx = database.beginTx();
+		txIsClosed = false;
 	}
 
 	public void failTx() {
 
 		tx.failure();
 		tx.close();
+		txIsClosed = true;
 	}
 
 	public void succeedTx() {
 
 		tx.success();
 		tx.close();
+		txIsClosed = true;
+	}
+
+	public void ensureRunningTx() {
+
+		if(txIsClosed()) {
+
+			beginTx();
+		}
+	}
+
+	public boolean txIsClosed() {
+
+		return txIsClosed;
 	}
 
 	public Node determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
@@ -270,7 +300,43 @@ public abstract class CommonNeo4jGDMProcessor {
 		return null;
 	}
 
+	public Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
+			final long index, final VersionHandler versionHandler) {
+
+		final RelationshipType relType = DynamicRelationshipType.withName(statement.getPredicate().getUri());
+		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
+
+		rel.setProperty(GraphStatics.UUID_PROPERTY, statementUUID);
+
+		if (statement.getOrder() != null) {
+
+			rel.setProperty(GraphStatics.ORDER_PROPERTY, statement.getOrder());
+		}
+
+		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
+
+		// TODO: versioning handling only implemented for data models right now
+
+		if (statement.getEvidence() != null) {
+
+			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
+		}
+
+		if(statement.getConfidence() != null) {
+
+			rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
+		}
+
+		return rel;
+	}
+
 	protected abstract IndexHits<Node> getResourceNodeHits(final ResourceNode resource);
+
+	public abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI);
+
+	public abstract void handleObjectDataModel(Node node, String dataModelURI);
+
+	public abstract void handleSubjectDataModel(final Node node, String URI, final String dataModelURI);
 
 	public abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
 

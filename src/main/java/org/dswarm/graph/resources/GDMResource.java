@@ -38,6 +38,10 @@ import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
+import org.dswarm.graph.gdm.parse.BaseNeo4jGDMHandler;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
@@ -48,7 +52,6 @@ import org.dswarm.graph.gdm.parse.GDMUpdateParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
 import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
 import org.dswarm.graph.gdm.parse.Neo4jGDMWDataModelHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMWDataModelUpdateHandler;
 import org.dswarm.graph.gdm.read.GDMModelReader;
 import org.dswarm.graph.gdm.read.GDMResourceReader;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
@@ -131,7 +134,9 @@ public class GDMResource {
 		final ObjectMapper mapper = Util.getJSONObjectMapper();
 
 		Model model = null;
+
 		try {
+
 			model = mapper.readValue(gdmInputStream, Model.class);
 		} catch (IOException e) {
 
@@ -152,10 +157,10 @@ public class GDMResource {
 		}
 
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
-
 		LOG.debug("try to write GDM statements into graph db");
 
-		Long size = (long) 0;
+		final BaseNeo4jGDMProcessor processor = new Neo4jGDMWDataModelProcessor(database, dataModelURI);
+		final BaseNeo4jGDMHandler handler = new Neo4jGDMWDataModelHandler(processor);
 
 		if (multiPart.getBodyParts().size() == 3) {
 
@@ -185,18 +190,17 @@ public class GDMResource {
 			}
 
 			// = new resources model, since existing, modified resources were already written to the DB
-			final Pair<Model, Long> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database);
-
-			model = result.first();
-			size += result.other();
+			model = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database, handler);
 		}
 
-		final GDMHandler handler = new Neo4jGDMWDataModelHandler(database, dataModelURI);
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();
 
-		size += ((Neo4jGDMWDataModelHandler) handler).getCountedStatements();
+		handler.getVersionHandler().updateLatestVersion();
+		handler.closeTransaction();
+
+		final Long size = handler.getCountedStatements();
 
 		LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
@@ -246,10 +250,12 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		final GDMHandler handler = new Neo4jGDMHandler(database);
+		final BaseNeo4jGDMProcessor processor = new Neo4jGDMProcessor(database);
+		final GDMHandler handler = new Neo4jGDMHandler(processor);
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();
+		handler.closeTransaction();
 
 		LOG.debug("finished writing " + ((Neo4jGDMHandler) handler).getCountedStatements() + " GDM statements into graph db");
 
@@ -312,13 +318,12 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Pair<Model, Long> calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String dataModelURI,
-			final GraphDatabaseService permanentDatabase) throws DMPGraphException {
+	private Model calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String dataModelURI,
+			final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
 		final Model newResourcesModel = new Model();
-		GDMUpdateHandler gdmHandler = null;
 
 		// calculate delta resource-wise
 		for (Resource newResource : model.getResources()) {
@@ -365,38 +370,16 @@ public class GDMResource {
 
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
-			// TODO: we maybe should write modified resources resource-wise - instead of the whole model at once.
-			if(gdmHandler == null) {
-
-				gdmHandler = new Neo4jGDMWDataModelUpdateHandler(permanentDatabase, dataModelURI);
-			} else {
-
-				gdmHandler.reset();
-			}
-
+			// write modified resources resource-wise - instead of the whole model at once.
 			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
-			parser.setGDMHandler(gdmHandler);
+			parser.setGDMHandler(handler);
 			parser.parse();
-		}
-
-		final Long size;
-
-		if(gdmHandler != null) {
-
-			// TODO: note ideally we should increase the data model version at the nearly end, i.e., when all records are written to the permanent graph DB, i.e., not here
-			gdmHandler.updateLatestVersion();
-			gdmHandler.closeTransaction();
-
-			size = ((Neo4jGDMWDataModelUpdateHandler) gdmHandler).getCountedStatements();
-		} else {
-
-			size = (long) 0;
 		}
 
 		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 
 		// return only model with new, non-existing resources
-		return Pair.of(newResourcesModel, size);
+		return newResourcesModel;
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB, final Resource newResource, final GraphDatabaseService newResourceDB,

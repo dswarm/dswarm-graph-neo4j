@@ -1,9 +1,11 @@
-package org.dswarm.graph.versioning;
+package org.dswarm.graph.gdm.versioning;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +13,30 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tgaengler
  */
-public class Neo4jGDMWDataModelVersionHandler extends Neo4jGDMBaseVersionHandler {
+public class Neo4jGDMWDataModelVersionHandler extends BaseNeo4jGDMVersionHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Neo4jGDMWDataModelVersionHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jGDMWDataModelVersionHandler.class);
 
-	private final String dataModelURI;
+	public Neo4jGDMWDataModelVersionHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
 
-	public Neo4jGDMWDataModelVersionHandler(final String dataModelURIArg) {
+		super(processorArg);
 
-		super();
+		processor.ensureRunningTx();
 
-		dataModelURI = dataModelURIArg;
+		try {
+
+			init();
+		} catch (final Exception e) {
+
+			processor.failTx();
+
+			final String message = "couldn't init version handler successfully";
+
+			Neo4jGDMWDataModelVersionHandler.LOG.error(message, e);
+			Neo4jGDMWDataModelVersionHandler.LOG.debug("couldn't finish TX successfully");
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
@@ -34,7 +49,7 @@ public class Neo4jGDMWDataModelVersionHandler extends Neo4jGDMBaseVersionHandler
 			finalDataModelURI = dataModelURI;
 		} else {
 
-			finalDataModelURI = this.dataModelURI;
+			finalDataModelURI = ((Neo4jGDMWDataModelProcessor) processor).getDataModelURI();
 		}
 
 		super.setLatestVersion(finalDataModelURI);
@@ -43,9 +58,9 @@ public class Neo4jGDMWDataModelVersionHandler extends Neo4jGDMBaseVersionHandler
 	@Override
 	protected int retrieveLatestVersion() {
 
-		int latestVersion = 1;
+		int latestVersion = 0;
 
-		final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI, dataModelURI);
+		final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI, ((Neo4jGDMWDataModelProcessor) processor).getDataModelURI());
 
 		if (hits != null && hits.hasNext()) {
 
@@ -69,9 +84,12 @@ public class Neo4jGDMWDataModelVersionHandler extends Neo4jGDMBaseVersionHandler
 	@Override
 	public void updateLatestVersion() throws DMPGraphException {
 
-		try (final Transaction tx = processor.getDatabase().beginTx()) {
+		processor.ensureRunningTx();
 
-			final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI, dataModelURI);
+		try {
+
+			final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI,
+					((Neo4jGDMWDataModelProcessor) processor).getDataModelURI());
 
 			if (hits != null && hits.hasNext()) {
 
@@ -83,9 +101,9 @@ public class Neo4jGDMWDataModelVersionHandler extends Neo4jGDMBaseVersionHandler
 
 				hits.close();
 			}
-
-			tx.success();
 		} catch (final Exception e) {
+
+			processor.failTx();
 
 			final String message = "couldn't update latest version";
 

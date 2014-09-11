@@ -1,29 +1,19 @@
 package org.dswarm.graph.gdm.parse;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
+import org.apache.commons.lang.NotImplementedException;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.gdm.CommonNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
@@ -35,40 +25,44 @@ import org.dswarm.graph.versioning.VersioningStatics;
 /**
  * @author tgaengler
  */
-public abstract class CommonNeo4jGDMHandler implements CommonHandler {
+public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CommonNeo4jGDMHandler.class);
+	private static final Logger				LOG						= LoggerFactory.getLogger(BaseNeo4jGDMHandler.class);
 
-	protected int totalTriples       = 0;
-	protected int addedNodes         = 0;
-	protected int addedRelationships = 0;
-	protected int sinceLastCommit    = 0;
-	protected int i                  = 0;
-	protected int literals           = 0;
+	protected int							totalTriples			= 0;
+	protected int							addedNodes				= 0;
+	protected int							addedRelationships		= 0;
+	protected int							sinceLastCommit			= 0;
+	protected int							i						= 0;
+	protected int							literals				= 0;
 
-	protected long tick = System.currentTimeMillis();
+	protected long							tick					= System.currentTimeMillis();
 
-	protected String resourceUri;
+	protected String						resourceUri;
 
 	// TODO: init
-	protected VersionHandler versionHandler = null;
+	protected VersionHandler				versionHandler			= null;
 
-	protected final CommonNeo4jGDMProcessor processor;
+	protected final BaseNeo4jGDMProcessor	processor;
 
-	public CommonNeo4jGDMHandler(final CommonNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	protected final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
+
+	public BaseNeo4jGDMHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
-	}
 
-	protected void init() {
-
-		// TODO: init version handler
+		init();
 	}
 
 	@Override
 	public void setResourceUri(final String resourceUriArg) {
 
 		resourceUri = resourceUriArg;
+	}
+
+	@Override public VersionHandler getVersionHandler() {
+
+		return versionHandler;
 	}
 
 	@Override
@@ -79,6 +73,8 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		i++;
 
 		// System.out.println("handle statement " + i + ": " + st.toString());
+
+		processor.ensureRunningTx();
 
 		try {
 
@@ -113,7 +109,7 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 						versionHandler.setLatestVersion(dataModelURI);
 					}
 
-					handleSubjectDataModel(subjectNode, subjectURI, dataModelURI);
+					processor.handleSubjectDataModel(subjectNode, subjectURI, dataModelURI);
 
 					processor.getResourcesIndex().add(subjectNode, GraphStatics.URI, subjectURI);
 				} else {
@@ -165,7 +161,7 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
-							handleObjectDataModel(objectNode, dataModelURI);
+							processor.handleObjectDataModel(objectNode, dataModelURI);
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
@@ -176,7 +172,7 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 
 						processor.getResourcesIndex().add(objectNode, GraphStatics.URI, objectURI);
 
-						addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
+						processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
 					} else {
 
 						resourceUri = handleBNode(r, subject, object, subjectNode, isType, objectNode);
@@ -221,11 +217,88 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		}
 	}
 
-	protected abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI);
+	@Override
+	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException {
 
-	protected abstract void handleObjectDataModel(Node node, String dataModelURI);
+		processor.ensureRunningTx();
 
-	protected abstract void handleSubjectDataModel(final Node node, String URI, final String dataModelURI);
+		try {
+
+			final Relationship rel = getRelationship(stmtUUID);
+			final Node subject = rel.getStartNode();
+			final Node object = rel.getEndNode();
+			final Statement stmt = propertyGraphGDMReader.readStatement(rel);
+			addBNode(stmt.getSubject(), subject);
+			addBNode(stmt.getObject(), object);
+
+			// reset stmt uuid, so that a new stmt uuid will be assigned when relationship will be added
+			stmt.setUUID(null);
+			// set actual order of the stmt
+			stmt.setOrder(order);
+			final String predicate = stmt.getPredicate().getUri();
+
+			// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the
+			// index
+			// be update with the new stmt (?)
+			final String hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+
+			addRelationship(subject, object, resource.getUri(), resource, stmt, index, hash);
+
+			totalTriples++;
+		} catch (final DMPGraphException e) {
+
+			throw e;
+		} catch (final Exception e) {
+
+			final String message = "couldn't handle statement successfully";
+
+			processor.failTx();
+
+			BaseNeo4jGDMHandler.LOG.error(message, e);
+			BaseNeo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
+		}
+	}
+
+	@Override
+	public void deprecateStatement(long index) {
+
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
+
+		processor.ensureRunningTx();
+
+		try {
+
+			final Relationship rel = getRelationship(uuid);
+
+			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getLatestVersion());
+
+			final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readObject(rel.getStartNode());
+			final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(rel.getEndNode());
+			addBNode(subjectGDMNode, rel.getStartNode());
+			addBNode(objectGDMNode, rel.getEndNode());
+
+			return subjectGDMNode;
+		} catch (final DMPGraphException e) {
+
+			throw e;
+		} catch (final Exception e) {
+
+			final String message = "couldn't deprecate statement successfully";
+
+			processor.failTx();
+
+			BaseNeo4jGDMHandler.LOG.error(message, e);
+			BaseNeo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
+		}
+	}
 
 	@Override
 	public void closeTransaction() {
@@ -255,6 +328,10 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		return literals;
 	}
 
+	protected abstract void init() throws DMPGraphException;
+
+	protected abstract Relationship getRelationship(final String uuid);
+
 	protected String handleBNode(final Resource r, final org.dswarm.graph.json.Node subject, final org.dswarm.graph.json.Node object,
 			final Node subjectNode, final boolean isType, final Node objectNode) {
 
@@ -281,8 +358,8 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		final LiteralNode literal = (LiteralNode) statement.getObject();
 		final String value = literal.getValue();
 
-		final String hash = processor.generateStatementHash(subjectNode, statement.getPredicate().getUri(), value, statement.getSubject().getType(), statement
-				.getObject().getType());
+		final String hash = processor.generateStatementHash(subjectNode, statement.getPredicate().getUri(), value, statement.getSubject().getType(),
+				statement.getObject().getType());
 
 		final Relationship rel = processor.getStatement(hash);
 
@@ -303,36 +380,6 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		}
 	}
 
-	protected Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
-			final long index) {
-
-		final RelationshipType relType = DynamicRelationshipType.withName(statement.getPredicate().getUri());
-		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
-
-		rel.setProperty(GraphStatics.UUID_PROPERTY, statementUUID);
-
-		if (statement.getOrder() != null) {
-
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, statement.getOrder());
-		}
-
-		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
-		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, versionHandler.getRange().from());
-		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getRange().to());
-
-		if (statement.getEvidence() != null) {
-
-			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
-		}
-
-		if(statement.getConfidence() != null) {
-
-			rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
-		}
-
-		return rel;
-	}
-
 	protected Relationship addRelationship(final Node subjectNode, final Node objectNode, final String resourceUri, final Resource resource,
 			final Statement statement, final long index, final String hash) throws DMPGraphException {
 
@@ -346,7 +393,7 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 			finalStatementUUID = statement.getUUID();
 		}
 
-		final Relationship rel = prepareRelationship(subjectNode, objectNode, finalStatementUUID, statement, index);
+		final Relationship rel = processor.prepareRelationship(subjectNode, objectNode, finalStatementUUID, statement, index, versionHandler);
 
 		processor.getStatementIndex().add(rel, GraphStatics.HASH, hash);
 		processor.addStatementToIndex(rel, finalStatementUUID);
@@ -389,5 +436,17 @@ public abstract class CommonNeo4jGDMHandler implements CommonHandler {
 		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
 
 		return finalResourceUri;
+	}
+
+	private void addBNode(final org.dswarm.graph.json.Node gdmNode, final Node node) {
+
+		switch (gdmNode.getType()) {
+
+			case BNode:
+
+				processor.getBNodesIndex().put("" + gdmNode.getId(), node);
+
+				break;
+		}
 	}
 }

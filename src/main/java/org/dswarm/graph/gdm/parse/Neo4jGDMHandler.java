@@ -1,83 +1,57 @@
 package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMProcessor;
+import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
+import org.dswarm.graph.gdm.versioning.Neo4jGDMVersionHandler;
 import org.dswarm.graph.model.GraphStatics;
+
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
+ *
  * @author tgaengler
  */
-public class Neo4jGDMHandler extends Neo4jBaseGDMHandler {
+public class Neo4jGDMHandler extends BaseNeo4jGDMHandler {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jGDMHandler.class);
 
-	protected final Index<Relationship>	statementUUIDs;
+	public Neo4jGDMHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
 
-	public Neo4jGDMHandler(final GraphDatabaseService database) throws DMPGraphException {
+		super(processorArg);
+	}
 
-		super(database);
+	@Override
+	protected void init() throws DMPGraphException {
 
-		try {
+		versionHandler = new Neo4jGDMVersionHandler(processor);
+	}
 
-			statementUUIDs = database.index().forRelationships("statement_uuids");
-		} catch (final Exception e) {
+	@Override
+	protected Relationship getRelationship(final String uuid) {
 
-			tx.failure();
-			tx.close();
+		final IndexHits<Relationship> hits = processor.getStatementIndex().get(GraphStatics.UUID, uuid);
 
-			final String message = "couldn't load indices successfully";
+		if (hits != null && hits.hasNext()) {
 
-			Neo4jGDMHandler.LOG.error(message, e);
-			Neo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
+			final Relationship rel = hits.next();
 
-			throw new DMPGraphException(message);
+			hits.close();
+
+			return rel;
 		}
-	}
 
-	@Override
-	protected void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
+		if (hits != null) {
 
-		if (dataModelURI != null) {
-
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			hits.close();
 		}
-	}
 
-	@Override
-	protected void handleObjectDataModel(final Node node, final String dataModelURI) {
-
-		if (dataModelURI != null) {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-		}
-	}
-
-	@Override
-	protected void handleSubjectDataModel(final Node node, String URI, final String dataModelURI) {
-
-		if (dataModelURI != null) {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
-		}
-	}
-
-	@Override
-	protected void addStatementToIndex(final Relationship rel, final String statementUUID) {
-
-		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
-	}
-
-	@Override
-	protected IndexHits<Node> getResourceNodeHits(final ResourceNode resource) {
-
-		return resources.get(GraphStatics.URI, resource.getUri());
+		return null;
 	}
 }

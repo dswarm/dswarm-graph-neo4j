@@ -41,8 +41,6 @@ public class GDMModelParser implements GDMParser {
 
 			LOG.debug("there are no resources in the GDM model");
 
-			gdmHandler.closeTransaction();
-
 			return;
 		}
 
@@ -70,7 +68,5 @@ public class GDMModelParser implements GDMParser {
 				gdmHandler.handleStatement(statement, resource, i);
 			}
 		}
-
-		gdmHandler.closeTransaction();
 	}
 }

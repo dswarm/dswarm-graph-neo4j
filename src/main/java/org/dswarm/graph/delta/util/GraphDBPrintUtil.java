@@ -1,9 +1,15 @@
 package org.dswarm.graph.delta.util;
 
+import java.io.File;
+import java.net.URL;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.model.GraphStatics;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -73,6 +79,35 @@ public final class GraphDBPrintUtil {
 		} catch (final Exception e) {
 
 			final String message = "couldn't print relationships";
+
+			GraphDBPrintUtil.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
+	}
+
+	public static void writeDeltaRelationships(final GraphDatabaseService graphDB, final URL fileURL) throws DMPGraphException {
+
+		try(final Transaction tx = graphDB.beginTx()) {
+
+			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
+
+			final StringBuilder sb = new StringBuilder();
+
+			for (final Relationship relationship : relationships) {
+
+				final String printedRel = printDeltaRelationship(relationship);
+
+				sb.append(printedRel).append("\n");
+			}
+
+			final File file = FileUtils.toFile(fileURL);
+			FileUtils.writeStringToFile(file, sb.toString());
+
+			tx.success();
+		} catch (final Exception e) {
+
+			final String message = "couldn't write relationships";
 
 			GraphDBPrintUtil.LOG.error(message, e);
 

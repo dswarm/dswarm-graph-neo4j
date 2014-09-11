@@ -78,7 +78,7 @@ public final class GraphDBUtil {
 			return;
 		}
 
-		if(nodeId == -1) {
+		if (nodeId == -1) {
 
 			final String message = "node id shouldn't be '-1'";
 
@@ -125,6 +125,41 @@ public final class GraphDBUtil {
 		return node;
 	}
 
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param resourceURI
+	 * @return
+	 */
+	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
+
+		final Index<Node> resources = graphDB.index().forNodes("resources_w_data_model");
+
+		if (resources == null) {
+
+			return null;
+		}
+
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceURI + dataModelURI);
+
+		if (hits == null || !hits.hasNext()) {
+
+			if (hits != null) {
+
+				hits.close();
+			}
+
+			return null;
+		}
+
+		final Node node = hits.next();
+
+		hits.close();
+
+		return node;
+	}
+
 	static String getLabels(final Node node) {
 
 		final StringBuilder sb2 = new StringBuilder();
@@ -143,7 +178,6 @@ public final class GraphDBUtil {
 	 * note: should be run in transaction scope
 	 *
 	 * @param graphDB
-	 * @param resourceURI
 	 * @param resourceURI
 	 * @return
 	 */
@@ -165,6 +199,52 @@ public final class GraphDBUtil {
 
 							return Evaluation.INCLUDE_AND_CONTINUE;
 						}
+						return Evaluation.EXCLUDE_AND_CONTINUE;
+					}
+				}).traverse(resourceNode);
+
+		return paths;
+	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param resourceURI
+	 * @param dataModelURI
+	 * @return
+	 */
+	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
+
+		final Node resourceNode = getResourceNode(graphDB, resourceURI, dataModelURI);
+
+		return getResourcePaths(graphDB, resourceNode);
+	}
+
+	/**
+	 * note: should be run in transaction scope
+	 *
+	 * @param graphDB
+	 * @param resourceNode
+	 * @return
+	 */
+	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final Node resourceNode) {
+
+		// TODO: maybe replace with gethEntityPaths(GraphdataBaseService, Node)
+		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
+				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
+				.evaluator(new Evaluator() {
+
+					@Override
+					public Evaluation evaluate(final Path path) {
+
+						final boolean reachedEndOfResourcePath = path.length() >= 1 && (path.endNode().hasProperty(GraphStatics.URI_PROPERTY) || path.endNode().hasProperty(GraphStatics.VALUE_PROPERTY));
+
+						if (reachedEndOfResourcePath) {
+
+							return Evaluation.INCLUDE_AND_CONTINUE;
+						}
+
 						return Evaluation.EXCLUDE_AND_CONTINUE;
 					}
 				}).traverse(resourceNode);

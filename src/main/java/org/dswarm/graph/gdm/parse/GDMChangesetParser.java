@@ -68,6 +68,8 @@ public class GDMChangesetParser implements GDMUpdateParser {
 			return;
 		}
 
+		LOG.debug("start processing changeset");
+
 		// 0. fetch latest version from data model node (+ increase this value + update resource node (maybe at the end))
 
 		// 1. compare existing resource DB statements with new resource DB statements, i.e. write/follow statements ordered by
@@ -327,22 +329,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		// afterwards and deprecated the existing ones (i.e. update their valid to value)
 		// for added + modified statements utilise the current version for valid from
 
-		GDMChangesetParser.LOG.debug("start shutting down working graph data model DBs for resources");
-
-		// should probably be delegated to a background worker thread, since it looks like that shutting down the working graph DBs take some (for whatever reason)
-		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
-		service.submit(new Callable<Void>() {
-
-			public Void call() {
-
-				newResourceDB.shutdown();
-				existingResourceDB.shutdown();
-
-				return null;
-			}
-		});
-
-		GDMChangesetParser.LOG.debug("finished shutting down working graph data model DBs for resources");
+		LOG.debug("finished processing changeset");
 	}
 
 	private DeltaState getDeltaState(final Relationship relationship) {

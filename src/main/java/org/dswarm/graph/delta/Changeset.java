@@ -13,19 +13,27 @@ public class Changeset {
 
 	private final Map<String, Statement>	additions;
 	private final Map<String, Statement>	deletions;
-	private final Map<Long, Long>					modifications;
-	private final Map<Long, Statement>	existingModifiedStatements;
-	private final Map<Long, Statement>	newModifiedStatements;
+	private final Map<Long, Long>			modifications;
+	private final Map<Long, Statement>		existingModifiedStatements;
+	private final Map<Long, Statement>		newModifiedStatements;
+	private final boolean					hasChanges;
 
-	public Changeset(final Map<String, Statement> additions, final Map<String, Statement> deletions,
-			final Map<Long, Long> modifications, final Map<Long, Statement> existingModifiedStatements,
-			final Map<Long, Statement> newModifiedStatements) {
+	public Changeset(final Map<String, Statement> additions, final Map<String, Statement> deletions, final Map<Long, Long> modifications,
+			final Map<Long, Statement> existingModifiedStatements, final Map<Long, Statement> newModifiedStatements) {
 
 		this.additions = additions;
 		this.deletions = deletions;
 		this.modifications = modifications;
 		this.existingModifiedStatements = existingModifiedStatements;
 		this.newModifiedStatements = newModifiedStatements;
+
+		hasChanges = (additions != null && !additions.isEmpty()) || (deletions != null && !deletions.isEmpty())
+				|| (modifications != null && !modifications.isEmpty());
+	}
+
+	public boolean hasChanges() {
+
+		return hasChanges;
 	}
 
 	public Map<String, Statement> getAdditions() {

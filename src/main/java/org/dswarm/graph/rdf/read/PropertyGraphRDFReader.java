@@ -3,10 +3,7 @@ package org.dswarm.graph.rdf.read;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -18,8 +15,12 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
 
@@ -35,16 +36,16 @@ public class PropertyGraphRDFReader implements RDFReader {
 	private final RelationshipHandler	relationshipHandler;
 
 	private final String				recordClassUri;
-	private final String				resourceGraphUri;
+	private final String dataModelUri;
 
-	private final GraphDatabaseService	database;
+	private final GraphDatabaseService database;
 
-	private Model						model;
+	private Model model;
 
-	public PropertyGraphRDFReader(final String recordClassUriArg, final String resourceGraphUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg) {
 
 		recordClassUri = recordClassUriArg;
-		resourceGraphUri = resourceGraphUriArg;
+		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -52,20 +53,20 @@ public class PropertyGraphRDFReader implements RDFReader {
 	}
 
 	@Override
-	public Model read() {
+	public Model read() throws DMPGraphException {
 
-		final Transaction tx = database.beginTx();
+		try (final Transaction tx = database.beginTx()) {
 
-		PropertyGraphRDFReader.LOG.debug("start read RDF TX");
-
-		try {
+			LOG.debug("start read RDF TX");
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.PROVENANCE_PROPERTY,
-					resourceGraphUri);
+			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+					dataModelUri);
 
 			if (recordNodes == null) {
+
+				tx.success();
 
 				return null;
 			}
@@ -76,18 +77,15 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 				startNodeHandler.handleNode(recordNode);
 			}
-		} catch (final Exception e) {
-
-			PropertyGraphRDFReader.LOG.error("couldn't finish read RDF TX successfully", e);
-
-			tx.failure();
-			tx.close();
-		} finally {
-
-			PropertyGraphRDFReader.LOG.debug("finished read RDF TX finally");
 
 			tx.success();
-			tx.close();
+		} catch (final Exception e) {
+
+			final String message = "couldn't finish read RDF TX successfully";
+
+			LOG.error(message, e);
+
+			throw new DMPGraphException(message);
 		}
 
 		return model;
@@ -146,7 +144,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
-			if (rel.getProperty(GraphStatics.PROVENANCE_PROPERTY).equals(resourceGraphUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
 
 				// TODO: utilise __NODETYPE__ property for switch
 
@@ -166,7 +164,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 				}
 
 				final String predicate = rel.getType().name();
-				// .getProperty(GraphStatics.URI_PROPERTY, null);
+						//.getProperty(GraphStatics.URI_PROPERTY, null);
 				final Property predicateProperty = model.createProperty(predicate);
 
 				final String object;
@@ -216,12 +214,12 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		private Resource createResourceFromBNode(final long bnodeId) {
 
-			if (!bnodes.containsKey(Long.valueOf(bnodeId))) {
+			if (!bnodes.containsKey(bnodeId)) {
 
-				bnodes.put(Long.valueOf(bnodeId), model.createResource());
+				bnodes.put(bnodeId, model.createResource());
 			}
 
-			return bnodes.get(Long.valueOf(bnodeId));
+			return bnodes.get(bnodeId);
 		}
 
 		private Resource createResourceFromURI(final String uri) {

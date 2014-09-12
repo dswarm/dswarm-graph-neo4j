@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datei xmlns="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd http://files.d-nb.de/standards/formate/mabxml-1.xsd">
+   <datensatz id="ID190346825" typ="k" status="n" mabVersion="M2.0">
+      <feld nr="001" ind=" ">190346825</feld>
+      <feld nr="002" ind="a">19850416</feld>
+      <feld nr="003" ind=" ">20120425230000 MOD</feld>
+      <feld nr="028" ind=" ">36500-2 ADD</feld>
+      <feld nr="028" ind="b">36500-2</feld>
+      <feld nr="030" ind=" ">zazucrz|||||| MOD</feld>
+      <feld nr="036" ind="c">XP ADD</feld>
+      <feld nr="068" ind="a">f ADD</feld>
+      <feld nr="068" ind="e">
+         z ADD
+         <tf />
+         v ADD
+      </feld>
+      <feld nr="076" ind="z">800 League of Nations++36500-2++gkd ADD</feld>
+      <feld nr="080" ind=" ">GKD</feld>
+      <feld nr="800" ind=" ">League of Nations</feld>
+      <feld nr="805" ind=" ">10.1.1920 - 18.4.1946</feld>
+      <feld nr="810" ind=" ">Société des Nations</feld>
+      <feld nr="812" ind=" ">SDN MOD</feld>
+      <feld nr="814" ind=" "><![CDATA[Völkerbund &lt;League of Nations&gt; MOD]]></feld>
+      <feld nr="816" ind=" ">Sociedad de las Naciones MOD</feld>
+      <feld nr="818" ind=" ">Società delle Nazioni MOD</feld>
+      <feld nr="820" ind=" ">Nationernas Förbund MOD</feld>
+      <feld nr="822" ind=" ">Milletler Cemiyeti MOD</feld>
+      <feld nr="824" ind=" ">Tautu̜ Sa̜junga ADD</feld>
+   </datensatz>
+</datei>

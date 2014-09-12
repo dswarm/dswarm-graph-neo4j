@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.google.common.io.ByteSource;
 import org.apache.http.HttpStatus;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
@@ -102,13 +103,13 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	/**
 	 * @param requestedExportLanguage the serialization format neo4j should export the data to. (this value is used as accept
 	 *            header arg to query neo4j)
-	 * @param expectedHTTPResponseCode the expected HTTP status code of the response, e.g. {@link HttpStatus.SC_OK} or
-	 *            {@link HttpStatus.SC_NOT_ACCEPTABLE}
+	 * @param expectedHTTPResponseCode the expected HTTP status code of the response, e.g. {@link HttpStatus#SC_OK} or
+	 *            {@link HttpStatus#SC_NOT_ACCEPTABLE}
 	 * @param expectedExportLanguage the language the exported data is expected to be serialized in. hint: language may differ
 	 *            from {@code requestedExportLanguage} to test for default values. (ignored if expectedHTTPResponseCode !=
-	 *            {@link HttpStatus.SC_OK})
+	 *            {@link HttpStatus#SC_OK})
 	 * @param expectedFileEnding the expected file ending to be received from neo4j (ignored if expectedHTTPResponseCode !=
-	 *            {@link HttpStatus.SC_OK})
+	 *            {@link HttpStatus#SC_OK})
 	 * @throws IOException
 	 */
 	private void readAllRDFFromDBinternal(final String requestedExportLanguage, final int expectedHTTPResponseCode, final Lang expectedExportLanguage,
@@ -116,10 +117,10 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
 
-		final String provenanceURI = "http://data.slub-dresden.de/resources/2";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
 
 		// prepare: write data to graph
-		writeRDFToDBInternal(provenanceURI, FullRDFExportSingleGraphTest.RDF_N3_FILE);
+		writeRDFToDBInternal(dataModelURI, FullRDFExportSingleGraphTest.RDF_N3_FILE);
 
 		// request export from end point
 		final ClientResponse response = service().path("/rdf/getall").accept(requestedExportLanguage).get(ClientResponse.class);
@@ -156,21 +157,23 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		FullRDFExportSingleGraphTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
 		final URL fileURL = Resources.getResource(FullRDFExportSingleGraphTest.RDF_N3_FILE);
-		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream inputStream = byteSource.openStream();
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile.read(inputSupplier.getInput(), null, "TURTLE");
+		modelFromOriginalRDFile.read(inputStream, null, "TURTLE");
+		inputStream.close();
 
 		final long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();
 
 		Assert.assertEquals("the number of statements should be " + statementsInOriginalRDFFile, statementsInOriginalRDFFile,
 				statementsInExportedRDFModel);
-		Assert.assertTrue("the received dataset should contain a graph with the provenance uri '" + provenanceURI + "'",
-				dataset.containsNamedModel(provenanceURI));
+		Assert.assertTrue("the received dataset should contain a graph with the data model uri '" + dataModelURI + "'",
+				dataset.containsNamedModel(dataModelURI));
 
-		final Model actualModel = dataset.getNamedModel(provenanceURI);
+		final Model actualModel = dataset.getNamedModel(dataModelURI);
 
-		Assert.assertNotNull("the graph (model) for provenance uri '" + provenanceURI + "' shouldn't be null", actualModel);
+		Assert.assertNotNull("the graph (model) for data model uri '" + dataModelURI + "' shouldn't be null", actualModel);
 
 		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",

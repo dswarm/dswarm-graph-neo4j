@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
+import com.google.common.io.ByteSource;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -43,11 +44,11 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
 		FullRDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB");
 
-		final String provenanceURI1 = "http://data.slub-dresden.de/resources/2";
-		final String provenanceURI2 = "http://data.slub-dresden.de/resources/3";
+		final String dataModelURI1 = "http://data.slub-dresden.de/resources/2";
+		final String dataModelURI2 = "http://data.slub-dresden.de/resources/3";
 
-		writeRDFToDBInternal(provenanceURI1, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
-		writeRDFToDBInternal(provenanceURI2, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
+		writeRDFToDBInternal(dataModelURI1, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
+		writeRDFToDBInternal(dataModelURI2, FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
 
 		final ClientResponse response = service().path("/rdf/getall").accept(MediaTypeUtil.N_QUADS).get(ClientResponse.class);
 
@@ -77,19 +78,23 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 		FullRDFExportMultipleGraphsTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
 
 		final URL fileURL = Resources.getResource(FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
-		final InputSupplier<InputStream> inputSupplier = Resources.newInputStreamSupplier(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream inputStream = byteSource.openStream();
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile.read(inputSupplier.getInput(), null, "TURTLE");
+		modelFromOriginalRDFile.read(inputStream, null, "TURTLE");
+		inputStream.close();
 
+		final InputStream inputStream2 = byteSource.openStream();
 		final Model modelFromOriginalRDFile2 = ModelFactory.createDefaultModel();
-		modelFromOriginalRDFile2.read(inputSupplier.getInput(), null, "TURTLE");
+		modelFromOriginalRDFile2.read(inputStream2, null, "TURTLE");
+		inputStream2.close();
 
 		final long statementsInOriginalRDFFileAfter2ndRead = modelFromOriginalRDFile.size() + modelFromOriginalRDFile2.size();
 
 		final Dataset datasetFromSources = DatasetFactory.createMem();
-		datasetFromSources.addNamedModel(provenanceURI1, modelFromOriginalRDFile);
-		datasetFromSources.addNamedModel(provenanceURI2, modelFromOriginalRDFile2);
+		datasetFromSources.addNamedModel(dataModelURI1, modelFromOriginalRDFile);
+		datasetFromSources.addNamedModel(dataModelURI2, modelFromOriginalRDFile2);
 
 		final Iterator<String> graphURIs = datasetFromSources.listNames();
 

@@ -28,11 +28,11 @@ public abstract class MaintainResourceDeleteTest extends RDFExportTest {
 
 		MaintainResourceDeleteTest.LOG.debug("start delete test for maintain resource at " + dbType + " DB");
 
-		final String provenanceURI1 = "http://data.slub-dresden.de/resources/2";
-		final String provenanceURI2 = "http://data.slub-dresden.de/resources/3";
+		final String dataModelURI1 = "http://data.slub-dresden.de/resources/2";
+		final String dataModelURI2 = "http://data.slub-dresden.de/resources/3";
 
-		writeRDFToDBInternal(provenanceURI1, MaintainResourceDeleteTest.RDF_N3_FILE);
-		writeRDFToDBInternal(provenanceURI2, MaintainResourceDeleteTest.RDF_N3_FILE);
+		writeRDFToDBInternal(dataModelURI1, MaintainResourceDeleteTest.RDF_N3_FILE);
+		writeRDFToDBInternal(dataModelURI2, MaintainResourceDeleteTest.RDF_N3_FILE);
 
 		final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
 

@@ -18,6 +18,7 @@ import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.IndexDefinition;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import org.dswarm.graph.DMPGraphException;
 
 /**
  * @author tgaengler
@@ -63,7 +66,7 @@ public class MaintainResource {
 	@DELETE
 	@Path("/delete")
 	@Produces("application/json")
-	public Response cleanGraph(@Context final GraphDatabaseService database) throws IOException {
+	public Response cleanGraph(@Context final GraphDatabaseService database) throws IOException, DMPGraphException {
 
 		MaintainResource.LOG.debug("start cleaning up the db");
 
@@ -100,7 +103,8 @@ public class MaintainResource {
 		return Response.ok(out.toString(), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
-	private long deleteSomeStatements(final GraphDatabaseService database) {
+	private long deleteSomeStatements(final GraphDatabaseService database) throws DMPGraphException {
+
 
 		final ExecutionEngine engine = new ExecutionEngine(database);
 
@@ -114,26 +118,50 @@ public class MaintainResource {
 
 			i++;
 
-			final Transaction tx = database.beginTx();
+			try(final Transaction tx = database.beginTx()) {
 
-			MaintainResource.LOG
+				MaintainResource.LOG
 					.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
-
-			try {
 
 				final ExecutionResult result = engine.execute(deleteQuery);
 
-				if (!result.iterator().hasNext()) {
+				if (result == null) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
 
 					tx.success();
 
 					break;
 				}
 
-				final Map<String, Object> row = result.iterator().next();
+				final ResourceIterator<Map<String, Object>> iterator = result.iterator();
+
+				if (iterator == null) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is not available");
+
+					tx.success();
+
+					break;
+				}
+
+				if (!iterator.hasNext()) {
+
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
+
+					iterator.close();
+					tx.success();
+
+					break;
+				}
+
+				final Map<String, Object> row = iterator.next();
 
 				if (row == null || row.isEmpty()) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
+
+					iterator.close();
 					tx.success();
 
 					break;
@@ -143,6 +171,9 @@ public class MaintainResource {
 
 				if (entry == null) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
+
+					iterator.close();
 					tx.success();
 
 					break;
@@ -152,6 +183,9 @@ public class MaintainResource {
 
 				if (value == null) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
+
+					iterator.close();
 					tx.success();
 
 					break;
@@ -159,6 +193,9 @@ public class MaintainResource {
 
 				if (!entry.getKey().equals("entity_count")) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
+
+					iterator.close();
 					tx.success();
 
 					break;
@@ -172,42 +209,43 @@ public class MaintainResource {
 
 				if (count < chunkSize) {
 
+					MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
+
+					iterator.close();
 					tx.success();
 
 					break;
 				}
 
+				iterator.close();
 				tx.success();
 			} catch (final Exception e) {
 
-				MaintainResource.LOG.error("couldn't finished delete-all-entities TX successfully", e);
+				final String message = "couldn't finish delete-all-entities TX successfully";
 
-				tx.failure();
-			} finally {
+				MaintainResource.LOG.error(message, e);
 
-				MaintainResource.LOG.debug("finished delete-all-entities TX finally");
-
-				tx.close();
+				throw new DMPGraphException(message);
 			}
 		}
 
 		return deleted;
 	}
 
-	private void deleteSomeLegacyIndices(final GraphDatabaseService database) {
+	private void deleteSomeLegacyIndices(final GraphDatabaseService database) throws DMPGraphException {
+
 		MaintainResource.LOG.debug("start delete legacy indices TX");
 
-		final Transaction itx = database.beginTx();
-
-		try {
+		try(final Transaction itx = database.beginTx()) {
 
 			final Index<Node> resources = database.index().forNodes("resources");
 			final Index<Node> values = database.index().forNodes("values");
-			final Index<Node> resourcesWProvenance = database.index().forNodes("resources_w_provenance");
+			final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
 			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
+			final Index<Relationship> statements = database.index().forRelationships("statements");
 			final Index<Relationship> statementHashes = database.index().forRelationships("statement_hashes");
 			final Index<Relationship> statementUUIDs = database.index().forRelationships("statement_uuids");
-			final Index<Relationship> statementUUIDsWProvenance = database.index().forRelationships("statement_uuids_w_provenance");
+			final Index<Relationship> statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
 
 			if (resources != null) {
 
@@ -216,11 +254,11 @@ public class MaintainResource {
 				resources.delete();
 			}
 
-			if (resourcesWProvenance != null) {
+			if (resourcesWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete resources with provenance legacy index");
+				MaintainResource.LOG.debug("delete resources with data model legacy index");
 
-				resourcesWProvenance.delete();
+				resourcesWDataModel.delete();
 			}
 
 			if (resourceTypes != null) {
@@ -228,6 +266,13 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("delete resource types legacy index");
 
 				resourceTypes.delete();
+			}
+
+			if (statements != null) {
+
+				MaintainResource.LOG.debug("delete statements legacy index");
+
+				statements.delete();
 			}
 
 			if (statementHashes != null) {
@@ -244,14 +289,14 @@ public class MaintainResource {
 				statementUUIDs.delete();
 			}
 
-			if (statementUUIDsWProvenance != null) {
+			if (statementUUIDsWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete statement uuids with provenance legacy index");
+				MaintainResource.LOG.debug("delete statement uuids with data model legacy index");
 
-				statementUUIDsWProvenance.delete();
+				statementUUIDsWDataModel.delete();
 			}
 
-			if(values != null) {
+			if (values != null) {
 
 				MaintainResource.LOG.debug("delete values legacy index");
 
@@ -259,33 +304,31 @@ public class MaintainResource {
 			}
 
 			itx.success();
-
 		} catch (final Exception e) {
 
-			MaintainResource.LOG.error("couldn't finished delete legacy indices TX successfully", e);
+			final String message = "couldn't finish delete legacy indices TX successfully";
 
-			itx.failure();
-		} finally {
+			MaintainResource.LOG.error(message, e);
 
-			MaintainResource.LOG.debug("finished delete legacy indices TX finally");
-
-			itx.close();
+			throw new DMPGraphException(message);
 		}
+
+		MaintainResource.LOG.debug("finished delete legacy indices TX");
 	}
 
-	private void deleteSomeSchemaIndices(final GraphDatabaseService database) {
+	private void deleteSomeSchemaIndices(final GraphDatabaseService database) throws DMPGraphException {
 
 		MaintainResource.LOG.debug("start delete schema indices TX");
 
-		final Transaction itx = database.beginTx();
-
-		try {
+		try(final Transaction itx = database.beginTx()) {
 
 			final Schema schema = database.schema();
 
 			if (schema == null) {
 
 				MaintainResource.LOG.debug("no schema available");
+
+				itx.success();
 
 				return;
 			}
@@ -295,6 +338,8 @@ public class MaintainResource {
 			if (indexDefinitions == null) {
 
 				MaintainResource.LOG.debug("no schema indices available");
+
+				itx.success();
 
 				return;
 			}
@@ -308,17 +353,15 @@ public class MaintainResource {
 			}
 
 			itx.success();
-
 		} catch (final Exception e) {
 
-			MaintainResource.LOG.error("couldn't finished delete schema indices TX successfully", e);
+			final String message = "couldn't finish delete schema indices TX successfully";
 
-			itx.failure();
-		} finally {
+			MaintainResource.LOG.error(message, e);
 
-			MaintainResource.LOG.debug("finished delete schema indices TX finally");
-
-			itx.close();
+			throw new DMPGraphException(message);
 		}
+
+		MaintainResource.LOG.debug("finished delete schema indices TX");
 	}
 }

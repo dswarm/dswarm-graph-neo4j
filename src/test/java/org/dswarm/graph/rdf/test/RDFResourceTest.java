@@ -58,7 +58,7 @@ public abstract class RDFResourceTest extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
 		requestJson.put("record_class_uri", "http://www.openarchives.org/OAI/2.0/recordType");
-		requestJson.put("resource_graph_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 

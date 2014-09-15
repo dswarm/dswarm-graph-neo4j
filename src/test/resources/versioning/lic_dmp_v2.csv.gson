@@ -1,0 +1,6206 @@
+[ {
+  "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Molecular Modeling"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Springer"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "0948-5023"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1610-2940"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1284729-x"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1284729&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.springerlink.com/openurl.asp?genre=journal&issn=1610-2940"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_springer"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1995"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2002"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "8"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/cdcb25ae-10f2-468f-874c-eb43d0e79c17"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Analyst, The"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-5528"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-2654"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1472713-4"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1472713&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=AN"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1876"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/0c70adf7-e5b7-4439-964d-f93dc11cd468"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "5"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Analytical Atomic Spectrometry (JAAS)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-5544"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0267-9477"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1484654-8"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1484654&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=JA"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1986"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/fad09ef0-061d-45f1-b1ed-392b2f27d565"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Chemical Communications : ChemComm"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-548X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0009-241X;0022-4936;1359-7345"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1472881-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1472881&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=CC"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1996"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/5edfcc98-22b2-4bfb-986f-d8a957f16a21"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "7"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Chemical Research (Synopses) (-1999)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-5560"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0308-2342"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1472927-1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1472927&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "frei zug&auml;nglich"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=JC"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1997"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1999"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/223ac029-3492-4848-a84f-ed5eaee6ec32"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "8"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Dalton Transactions (formerly: Journal of the Chemical Society - Dalton Transactions)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-5447;1477-9234"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0300-9246;1470-479X;1472-7773;1477-9226"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1472887-4"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1472887&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=DT"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1972"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3c215fc3-bc18-4361-bc80-47ab3608da01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "9"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of the Chemical Society, Faraday Transactions"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Physik;Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "0956-5000"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0956-5000"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1476283-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1476283&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=FT"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1990"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "86"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1998"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "94"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/3bdc9ca1-a175-4884-aaf9-e57f21327c97"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "10"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Faraday Discussions"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Physik;Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "0301-7249;1364-5498"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1359-6640"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1472891-6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1472891&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=FD"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1991"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "92"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6f36650f-7a37-4ab1-ab67-453be5c31bac"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "11"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Materials Chemistry"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Royal Society of Chemistry (RSC)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Maschinenwesen, Werkstoffwissenschaften, Fertigungstechnik, Bergbau u. Hüttenwesen, Verkehrstechnik, Feinwerktechnik;Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1364-5501"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0959-9428"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1491403-7"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1491403&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://xlink.rsc.org/jumptojournal.cfm?journal_code=JM"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_rsc_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1991"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2012"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "22"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f4d50828-1c77-499c-9f81-cb2deee43a74"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "25"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Science"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Association for the Advancement of Science (AAAS) ; HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Informatik;Biologie;Medizin;Physik;Naturwissenschaft allgemein"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1095-9203"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0036-8075"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2066996-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2066996&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.sciencemag.org/magazine"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_science"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1880"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1996"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "274"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/f7846357-40ae-48c3-9097-7096c0317a23"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "26"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "BMJ: British Medical Journal (1840-)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "BMJ Publishing Group, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "0959-535X;0959-8138;0959-8146;1468-5833;1756-1833"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0007-1447;0267-0623;0959-8154"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1479799-9"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1479799&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.bmj.com/archive"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "bmj_complete"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1840"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/12c89acd-8bf7-484f-a72e-c7437b19d14b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "DFG-geförderte Allianz-Lizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "43"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Biological Chemistry, The (JBC online)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Society for Biochemistry and Molecular Biology ; HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Biologie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1083-351X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0021-9258"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1474604-9"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1474604&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.jbc.org/"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/b984a1f8-2966-45ff-9334-cf6cce88ad48"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "49"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Journal of Computer-Aided Molecular Design"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Springer Science+Business Media B.V. (formerly Kluwer Academic Publishers)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1573-4951"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0920-654X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2008643-X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2008643&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.springerlink.com/openurl.asp?genre=journal&issn=0920-654X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_springer"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1987"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2002"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "16"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/d8bc3219-566d-412b-b855-1807339a8a46"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "55"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Chemistry and Biology"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Elsevier"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Biologie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1879-1301"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1074-5521"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2019089-X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2019089&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.sciencedirect.com/science/journal/10745521"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_elsevier"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1994"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1994"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : "4"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/532f9225-476f-4c98-bf55-cadb2ea71a01"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "208"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Modern Judaism"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Oxford University Press ; Project MUSE"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Politologie;Geschichte"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1086-3273"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0276-1114"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2021132-6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2021132&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://mj.oxfordjournals.org/"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_oup_archive"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1981"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : "-1Y"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9d7beb35-116c-445b-b27e-718784250455"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "211"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "New Literary History (1995-): NLH"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Johns Hopkins University Press im Project MUSE"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Allgemeine und vergleichende Sprach- und Literaturwissenschaft. Indogermanistik. Außereuropäische Sprachen und Literaturen"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1080-661X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0028-6087"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1481175-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1481175&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://muse.jhu.edu/journals/nlh/"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/97ef595e-ec1f-4c92-b38c-0946e8e0dba5"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "288"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Dermatology (formerly: Archives of Dermatology)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-3652;2168-6084"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-987X;0096-5359;0096-5979;0096-6029;2168-6068"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2701763-1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2701763&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archderm.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "149"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/44656fd9-46ad-4229-ab64-dcf05bbfc62a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "290"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Ophthalmology (formerly: Archives of Ophthalmology ; AMA Archives of Ophthalmology)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-3601;2168-6173"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-9950;0093-0326;2168-6165"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2701800-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2701800&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archopht.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "131"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/82a169b2-911e-4a7a-b082-c6abac799bf1"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "291"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Neurology (formerly: Archives of Neurology ; AMA Archives of Neurology)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-3687;2168-6157"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-9942;0375-8540;2168-6149"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2701924-X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2701924&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archneur.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "70"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/daad7dc9-aee4-4d3f-bb0c-ec6f74d25059"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "293"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Psychiatry (formerly: Archives of General Psychiatry ; AMA Archives of General Psychiatry)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-3636;2168-6238"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-990X;0375-8532;2168-622X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2698864-1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2698864&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archpsyc.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "70"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9a1b99c7-c6d5-465d-826a-ecf0571515cf"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "295"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Otolaryngology - Head & Neck Surgery (formerly: Archives of Otolaryngology - Head & Neck Surgery ; AMA Archives of Otolaryngology)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-361X;2168-619X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0003-9977;0096-6894;0276-0673;0886-4470;2168-6181"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2701831-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2701831&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archotol.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "139"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/408f5e66-9957-4e24-b139-10c90fb4821a"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "297"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "JAMA Pediatrics (formerly: Archives of Pediatrics & Adolescent Medicine)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "American Medical Association, HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1538-3628;2168-6211"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1072-4710;2168-6203"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2701232-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2701232&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://archpedi.jamanetwork.com/issues.aspx"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "167"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6a13e42a-5672-482c-a031-38f086275465"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "300"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "American Journal of Pathology, The"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "6"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Elsevier"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Medizin"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1525-2191"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0002-9440"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1480207-7"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1480207&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.sciencedirect.com/science/journal/00029440"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "2013"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "182"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/43d5086f-738e-4425-92a9-4a3fff9cb061"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "301"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Classical and Quantum Gravity"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Institute of Physics Publishing (IOP)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Physik"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1361-6382"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0264-9381"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1473117-4"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1473117&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://iopscience.iop.org/0264-9381/"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_iop_archive"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1984"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2012"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "29"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/e4a408e6-c66a-49ec-9293-17b2e2627dfc"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "328"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Nature"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Nature Publishing Group"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Naturwissenschaft allgemein;Medizin;Biologie;Chemie und Pharmazie;Physik"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1476-4687"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0028-0836"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "1413423-8"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?1413423&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.nature.com/nature"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_nature"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1869"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2009"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "462"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : "7276"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/9fe34eb0-588d-4c75-8ca7-130e1cb2e85b"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "585"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Acta Crystallographica Section A : Foundations of Crystallography (Formerly: Crystal Physics, Diffraction, Theoretical and General Crystallography)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "International Union of Crystallography (IUCr) ; Wiley-Blackwell - STM"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Physik;Geowissenschaften"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1600-5724;1600-8596"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0108-7673;0567-7394"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2020844-3"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2020844&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://journals.iucr.org/a/contents/backissues.html"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_iucr"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1968"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "24"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2001"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "57"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/99bf73a4-94ce-4952-a5a4-cdaef0f0dba0"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "586"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Acta Crystallographica Section B : Structural Science (Formerly: Structural Crystallography and Crystal Chemistry)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "International Union of Crystallography (IUCr) ; Wiley-Blackwell - STM"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Physik;Geowissenschaften"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1600-5740;1600-8650"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0108-7681;0567-7408"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2020841-8"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2020841&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://journals.iucr.org/b/contents/backissues.html"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_iucr"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1968"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "24"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2001"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "57"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/1c1e6267-0e06-4ea1-b19c-2677a8dedcd6"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "587"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Acta Crystallographica Section C : Crystal Structure Communications"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "International Union of Crystallography (IUCr) ; Wiley-Blackwell - STM"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Physik;Geowissenschaften"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1600-5759"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0108-2701"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2025703-X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2025703&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://journals.iucr.org/c/contents/backissues.html"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_iucr"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1983"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "39"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2001"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "57"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6548af52-5147-4b17-b502-6c2fa0738fee"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "589"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Acta Crystallographica Section D : Biological Crystallography"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "International Union of Crystallography (IUCr) ; Wiley- Blackwell - STM"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Chemie und Pharmazie;Physik;Geowissenschaften"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1399-0047"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0907-4449"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2020492-9"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2020492&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://journals.iucr.org/d/contents/backissues.html"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_iucr"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1993"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "49"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "2001"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "57"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/a045a5b4-e994-420c-8104-67e6188bd864"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "594"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Adaptive Behavior"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Sage Publications ; HighWire Press"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Psychologie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "1741-2633"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1059-7123"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2070012-X"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2070012&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://adb.sagepub.com/"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_sage_archive"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1992"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : "-2Y"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/682c642a-ab6f-43c5-9da9-509298bdb40d"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "195191"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "Benchmarking for Quality Management & Technology"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Emerald"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Wirtschaftswissenschaften"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "1463-5771"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2704677-1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2704677&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenlos mit Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.emeraldinsight.com/journals.htm?issn=1351-3036"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "natli_emerald"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1994"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1998"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "5"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/6bfac26b-1b6f-4ed7-85d7-1d2fd8788405"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : "Nationallizenz"
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "195195"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "IEEE Design & Test (D&T)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "Institute of Electrical and Electronics Engineers (IEEE)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Informatik"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "2168-2356"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "Volltext, Online und Druckausgabe"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=6221038"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "ieee"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/68f6d9fe-7753-4a76-8c50-9e4e9cadae43"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+}, {
+  "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd" :
+      [
+          {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://data.slub-dresden.de/resources/1/schema#RecordType"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#EZB-Id",
+    "o" : {
+      "v" : "195226"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Titel",
+    "o" : {
+      "v" : "New Geographical Literature and Maps (via JSTOR)"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Ampelfarbe",
+    "o" : {
+      "v" : "2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Verlag",
+    "o" : {
+      "v" : "The Royal Geographical Society ; JSTOR"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Fach",
+    "o" : {
+      "v" : "Geographie"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#E-ISSN",
+    "o" : {
+      "v" : "2051-1906"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#P-ISSN",
+    "o" : {
+      "v" : "0028-5110"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#ZDB-Nummer",
+    "o" : {
+      "v" : "2704890-1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#FrontdoorURL",
+    "o" : {
+      "v" : "http://ezb.uni-regensburg.de/?2704890&bibid=SLUB"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Typ",
+    "o" : {
+      "v" : "retrodigitalisiert"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Preistyp",
+    "o" : {
+      "v" : "kostenpflichtig"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Zugangsbedingung",
+    "o" : {
+      "v" : "Subscription"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#Link+zur+Zeitschrift",
+    "o" : {
+      "v" : "http://www.jstor.org/action/showPublication?journalCode=newgeoglitemaps"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#anchor",
+    "o" : {
+      "v" : "jstor_arts2"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+Jahr",
+    "o" : {
+      "v" : "1951"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+volume",
+    "o" : {
+      "v" : "1"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#erstes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+Jahr",
+    "o" : {
+      "v" : "1980"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+volume",
+    "o" : {
+      "v" : "9"
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#letztes+issue",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#moving+wall",
+    "o" : {
+      "v" : ""
+    }
+  }, {
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/4/records/07a26bc6-9fa0-4ee6-9514-3b70a7ed12cd"
+    },
+    "p" : "http://data.slub-dresden.de/resources/1/schema#verfuegbar",
+    "o" : {
+      "v" : ""
+    }
+  } ]
+} ]
+

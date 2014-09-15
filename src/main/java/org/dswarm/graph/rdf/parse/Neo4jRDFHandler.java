@@ -55,28 +55,39 @@ public class Neo4jRDFHandler implements RDFHandler {
 	private final Index<Node>			resourceTypes;
 	private final Index<Node>			values;
 	private final Map<String, Node>		bnodes;
-	private final Index<Relationship> statementHashes;
-	private final Map<Long, String>   nodeResourceMap;
+	private final Index<Relationship>	statementHashes;
+	private final Map<Long, String>		nodeResourceMap;
 
-	private Transaction tx;
+	private Transaction					tx;
 
-	public Neo4jRDFHandler(final GraphDatabaseService database) {
+	public Neo4jRDFHandler(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 		tx = database.beginTx();
 
-		LOG.debug("start write TX");
+		try {
 
-		resources = database.index().forNodes("resources");
-		resourceTypes = database.index().forNodes("resource_types");
-		values = database.index().forNodes("values");
-		bnodes = new HashMap<String, Node>();
-		statementHashes = database.index().forRelationships("statement_hashes");
-		nodeResourceMap = new HashMap<Long, String>();
+			LOG.debug("start write TX");
+
+			resources = database.index().forNodes("resources");
+			resourceTypes = database.index().forNodes("resource_types");
+			values = database.index().forNodes("values");
+			bnodes = new HashMap<>();
+			statementHashes = database.index().forRelationships("statement_hashes");
+			nodeResourceMap = new HashMap<>();
+		} catch (final Exception e) {
+
+			final String message = "couldn't initialize indices";
+
+			Neo4jRDFHandler.LOG.error(message, e);
+			Neo4jRDFHandler.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
+		}
 	}
 
 	@Override
-	public void handleStatement(final Statement st) {
+	public void handleStatement(final Statement st) throws DMPGraphException {
 
 		i++;
 
@@ -234,19 +245,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("couldn't finished write TX successfully", e);
+			final String message = "couldn't finish write TX successfully";
+
+			LOG.error(message, e);
 
 			tx.failure();
 			tx.close();
-			LOG.debug("close a write TX");
 
-			tx = database.beginTx();
-
-			LOG.debug("start another write TX");
-
-		} finally {
-
-			// ???
+			throw new DMPGraphException(message);
 		}
 	}
 
@@ -284,7 +290,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 		final Label label = DynamicLabel.label(labelString);
 		boolean hit = false;
 		final Iterable<Label> labels = node.getLabels();
-		final List<Label> labelList = new LinkedList<Label>();
+		final List<Label> labelList = new LinkedList<>();
 
 		for (final Label lbl : labels) {
 
@@ -350,6 +356,11 @@ public class Neo4jRDFHandler implements RDFHandler {
 			rel = hits.next();
 		}
 
+		if (hits != null) {
+
+			hits.close();
+		}
+
 		return rel;
 	}
 
@@ -380,7 +391,14 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 			node = hits.next();
 
+			hits.close();
+
 			return node;
+		}
+
+		if(hits != null) {
+
+			hits.close();
 		}
 
 		return null;
@@ -419,7 +437,7 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 	private String determineResourceUri(final Node subjectNode, final Resource subject) {
 
-		final Long nodeId = Long.valueOf(subjectNode.getId());
+		final Long nodeId = subjectNode.getId();
 
 		final String resourceUri;
 

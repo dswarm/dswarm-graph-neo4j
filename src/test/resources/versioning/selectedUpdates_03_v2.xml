@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datei xmlns="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd http://files.d-nb.de/standards/formate/mabxml-1.xsd">
+   <datensatz id="ID195287584" typ="k" status="n" mabVersion="M2.0">
+      <feld nr="001" ind=" ">195287584</feld>
+      <feld nr="002" ind="a">19950711</feld>
+      <feld nr="003" ind=" ">20130629232632 MOD</feld>
+      <feld nr="028" ind=" ">5131180-X ADD</feld>
+      <feld nr="028" ind="b">16282584-5 MOD</feld>
+      <feld nr="028" ind="b">5131180-X ADD</feld>
+      <feld nr="030" ind=" ">zazucrz|||||| MOD</feld>
+      <feld nr="036" ind="c">XA-DE ADD</feld>
+      <feld nr="068" ind="a">f ADD</feld>
+      <feld nr="068" ind="e">
+         v ADD
+         <tf />
+         z ADD
+      </feld>
+      <feld nr="076" ind="z">800 Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt++5131180-X++gkd ADD</feld>
+      <feld nr="076" ind="z">800 Thüringer Ministerium für Landwirtschaft, Naturschutz und Umwelt (TMLNU), Referat 124 [Europa, Öffentlichkeitsarbeit]++16282584-5++gkd ADD</feld>
+      <feld nr="080" ind=" ">GKD</feld>
+      <feld nr="800" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt</feld>
+      <feld nr="805" ind=" ">Herbst 1994 -</feld>
+      <feld nr="806" ind=" ">4059979-6 MOD</feld>
+      <feld nr="810" ind=" "><![CDATA[Ministerium für Landwirtschaft, Naturschutz und Umwelt &lt;Thüringen&gt;]]></feld>
+      <feld nr="812" ind=" ">Thüringer Ministerium für Landwirtschaft, Naturschutz und Umwelt</feld>
+      <feld nr="814" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Flurneuordnungsverwaltung</feld>
+      <feld nr="816" ind=" "><![CDATA[Thüringen / Flurneuordnungsverwaltung &lt;Ministerium für Landwirtschaft, Naturschutz und Umwelt&gt;]]></feld>
+      <feld nr="818" ind=" "><![CDATA[Flurneuordnungsverwaltung &lt;Thüringen, Ministerium für Landwirtschaft, Naturschutz und Umwelt&gt;]]></feld>
+      <feld nr="820" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Landesforstverwaltung</feld>
+      <feld nr="822" ind=" "><![CDATA[Landesforstverwaltung &lt;Thüringen, Ministerium für Landwirtschaft, Naturschutz und Umwelt&gt;]]></feld>
+      <feld nr="824" ind=" "><![CDATA[Thüringen / Landesforstverwaltung &lt;Ministerium für Landwirtschaft, Naturschutz und Umwelt&gt;]]></feld>
+      <feld nr="826" ind=" ">Thüringer Landesforstverwaltung</feld>
+      <feld nr="828" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat Öffentlichkeitsarbeit</feld>
+      <feld nr="830" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat Immissionsschutz, Klima, Lärm</feld>
+      <feld nr="832" ind=" "><![CDATA[Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat &lt;41&gt;]]></feld>
+      <feld nr="834" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat Europa, Öffentlichkeitsarbeit</feld>
+      <feld nr="836" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Europa, Öffentlichkeitsarbeit</feld>
+      <feld nr="838" ind=" "><![CDATA[Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat &lt;16&gt;]]></feld>
+      <feld nr="840" ind=" ">Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat Landwirtschaftlicher Markt</feld>
+      <feld nr="842" ind=" "><![CDATA[Thüringen / Ministerium für Landwirtschaft, Naturschutz und Umwelt / Referat &lt;33&gt;]]></feld>
+      <feld nr="844" ind=" ">TMLNU ADD</feld>
+      <feld nr="850" ind="a">Thüringen / Ministerium für Landwirtschaft und Forsten</feld>
+      <feld nr="852" ind="a">2126098-9</feld>
+      <feld nr="852" ind="b">194275841 ADD</feld>
+      <feld nr="853" ind="a">Thüringen / Ministerium für Umwelt und Landesplanung</feld>
+      <feld nr="855" ind="a">5083987-1</feld>
+      <feld nr="855" ind="b">194480283 ADD</feld>
+      <feld nr="856" ind="c">Thüringen / Ministerium für Landwirtschaft, Forsten, Umwelt und Naturschutz</feld>
+      <feld nr="858" ind="a">16052879-3</feld>
+      <feld nr="858" ind="b">316267333 ADD</feld>
+   </datensatz>
+</datei>

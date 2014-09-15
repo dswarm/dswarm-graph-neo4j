@@ -23,7 +23,7 @@ This is an unmanaged extension.
 
         http://localhost:7474/dmp/rdf/put
 
-   You can POST to this service a multipart/mixed object with the bytes of the RDF (Turtle or N3) and the second part should be a resource graph URI (as string)
+   You can POST to this service a multipart/mixed object with the bytes of the RDF (Turtle or N3) and the second part should be a data model URI (as string)
 
 7. You can check this resource via
 
@@ -33,7 +33,7 @@ This is an unmanaged extension.
 
         http://localhost:7474/dmp/rdf/get
  
-   You can POST to this service a JSON object with key-value pairs for "record_class_uri" and "resource_graph_uri"
+   You can POST to this service a JSON object with key-value pairs for "record_class_uri" and "data_model_uri"
 
 To compile the package for the neo4j stand-alone, you need to run maven with the RELEASE profile, e.g.,
 

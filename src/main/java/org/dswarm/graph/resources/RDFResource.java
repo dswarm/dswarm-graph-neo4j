@@ -33,12 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.rdf.export.DataModelRDFExporter;
+import org.dswarm.graph.rdf.export.GraphRDFExporter;
 import org.dswarm.graph.rdf.export.RDFExporter;
-import org.dswarm.graph.rdf.export.RDFExporterAllData;
-import org.dswarm.graph.rdf.export.RDFExporterByProvenance;
 import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.Neo4jRDFHandler;
-import org.dswarm.graph.rdf.parse.Neo4jRDFWProvenanceHandler;
+import org.dswarm.graph.rdf.parse.Neo4jRDFWDataModelHandler;
 import org.dswarm.graph.rdf.parse.RDFHandler;
 import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.nx.NxModelParser;
@@ -75,14 +75,14 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
 
-		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(rdfInputStream, null, "N3");
@@ -91,14 +91,14 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFWProvenanceHandler(database, resourceGraphURI);
+		final RDFHandler handler = new Neo4jRDFWDataModelHandler(database, dataModelURI);
 		final RDFParser parser = new JenaModelParser(model);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		RDFResource.LOG.debug("finished writing " + ((Neo4jRDFWProvenanceHandler) handler).getCountedStatements() + " RDF statements ('"
-				+ ((Neo4jRDFWProvenanceHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for resource graph URI '"
-				+ resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((Neo4jRDFWDataModelHandler) handler).getCountedStatements() + " RDF statements ('"
+				+ ((Neo4jRDFWDataModelHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for data model URI '"
+				+ dataModelURI + "'");
 
 		return Response.ok().build();
 	}
@@ -106,7 +106,7 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) {
+	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -130,7 +130,7 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) {
+	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -154,14 +154,14 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes("multipart/mixed")
-	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) {
+	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
 		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
 		final InputStream rdfInputStream = bpe.getInputStream();
 
-		final String resourceGraphURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
 		final NxParser nxParser = new NxParser(rdfInputStream);
 
@@ -169,14 +169,14 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler(database,
-				resourceGraphURI);
+		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler(database,
+				dataModelURI);
 		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
 		parser.setRDFHandler(handler);
 		parser.parse();
 
-		RDFResource.LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWProvenanceHandler) handler).getCountedStatements()
-				+ " RDF statements into graph db for resource graph URI '" + resourceGraphURI + "'");
+		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler) handler).getCountedStatements()
+				+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
 
 		return Response.ok().build();
 	}
@@ -204,12 +204,12 @@ public class RDFResource {
 		}
 
 		final String recordClassUri = json.get("record_class_uri").asText();
-		final String resourceGraphUri = json.get("resource_graph_uri").asText();
+		final String dataModelUri = json.get("data_model_uri").asText();
 
-		RDFResource.LOG.debug("try to read RDF statements for resource graph uri = '" + resourceGraphUri + "' and record class uri = '"
-				+ recordClassUri + "' from graph db");
+		LOG.debug("try to read RDF statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
+				+ "' from graph db");
 
-		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, resourceGraphUri, database);
+		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, dataModelUri, database);
 		final Model model = rdfReader.read();
 
 		// model.write(System.out, "N-TRIPLE");
@@ -218,8 +218,8 @@ public class RDFResource {
 		model.write(writer, "N-TRIPLE");
 		final String result = writer.toString();
 
-		RDFResource.LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
-				+ "' via RDF reader) for resource graph uri = '" + resourceGraphUri + "' and record class uri = '" + recordClassUri
+		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
+				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
 		return Response.ok().entity(result).build();
@@ -274,7 +274,7 @@ public class RDFResource {
 	 * @param database the graph database
 	 * @param exportFormat serialization format ({@link MediaType}) the data model should be serialized in, injected from accept
 	 *            header field
-	 * @param provenanceURI the data model to be exported
+	 * @param dataModelURI the data model to be exported
 	 * @return a single data model, serialized in exportLanguage
 	 * @throws DMPGraphException in case exportFormat can not be converted to {@link MediaType}
 	 */
@@ -283,9 +283,9 @@ public class RDFResource {
 	@Produces({ MediaTypeUtil.N_QUADS, MediaTypeUtil.RDF_XML, MediaTypeUtil.TRIG, MediaTypeUtil.TURTLE, MediaTypeUtil.N3 })
 	public Response exportSingleRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
-			@QueryParam("provenanceuri") final String provenanceURI) throws DMPGraphException {
+			@QueryParam("data_model_uri") final String dataModelURI) throws DMPGraphException {
 
-		RDFResource.LOG.debug("Start processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \"" + exportFormat
+		RDFResource.LOG.debug("Start processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
 				+ "\"");
 
 		// determine export language and file extension
@@ -303,9 +303,9 @@ public class RDFResource {
 		RDFResource.LOG.debug("Interpreting requested format \"" + exportFormat + "\" as \"" + formatType.toString() + "\"");
 
 		// export and serialize data
-		final String result = exportSingleRDFInternal(database, exportLanguage, provenanceURI);
+		final String result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
 
-		RDFResource.LOG.debug("End processing request to export rdf data for provenanceuri \"" + provenanceURI + "\" to format \"" + exportFormat
+		RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
 				+ "\"");
 
 		return Response.ok(result).type(formatType.toString())
@@ -315,18 +315,19 @@ public class RDFResource {
 	/**
 	 * @param database the db to export the data from
 	 * @param exportLanguage the language the data should be serialized in
-	 * @param provenanceURI db internal identifier of the data model
+	 * @param dataModelURI db internal identifier of the data model
 	 * @return a single data model, serialized in exportLanguage
 	 */
-	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String provenanceURI) {
+	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
+			throws DMPGraphException {
 
-		RDFResource.LOG.debug("try to export all RDF statements for provenanceURI \"" + provenanceURI + "\" from graph db to format \""
+		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"" + dataModelURI + "\" from graph db to format \""
 				+ exportLanguage.getLabel() + "\"");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new RDFExporterByProvenance(database, provenanceURI);
+		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI);
 		final Dataset dataset = rdfExporter.export();
-		final Model exportedModel = dataset.getNamedModel(provenanceURI);
+		final Model exportedModel = dataset.getNamedModel(dataModelURI);
 
 		// serialize (export) model to exportLanguage
 		final StringWriter writer = new StringWriter();
@@ -347,12 +348,12 @@ public class RDFResource {
 	 * @param exportLanguage the language all data should be serialized in
 	 * @return all data models serialized in exportLanguage
 	 */
-	private String exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) {
+	private String exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new RDFExporterAllData(database);
+		final RDFExporter rdfExporter = new GraphRDFExporter(database);
 		final Dataset dataset = rdfExporter.export();
 
 		// serialize (export) model to exportLanguage

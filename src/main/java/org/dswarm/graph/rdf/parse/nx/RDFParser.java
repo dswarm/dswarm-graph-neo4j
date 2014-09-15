@@ -1,6 +1,6 @@
 package org.dswarm.graph.rdf.parse.nx;
 
-
+import org.dswarm.graph.DMPGraphException;
 
 /**
  *
@@ -14,5 +14,5 @@ public interface RDFParser {
 	 */
 	public void setRDFHandler(RDFHandler handler);
 
-	public void parse();
+	public void parse() throws DMPGraphException;
 }

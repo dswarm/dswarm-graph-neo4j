@@ -6,6 +6,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
@@ -32,7 +33,7 @@ public class GDMModelParser implements GDMParser {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws DMPGraphException {
 
 		final Collection<Resource> resources = model.getResources();
 
@@ -56,6 +57,8 @@ public class GDMModelParser implements GDMParser {
 
 			long i = 0;
 
+			gdmHandler.setResourceUri(resource.getUri());
+
 			for (final Statement statement : statements) {
 
 				i++;
@@ -65,7 +68,5 @@ public class GDMModelParser implements GDMParser {
 				gdmHandler.handleStatement(statement, resource, i);
 			}
 		}
-
-		gdmHandler.closeTransaction();
 	}
 }

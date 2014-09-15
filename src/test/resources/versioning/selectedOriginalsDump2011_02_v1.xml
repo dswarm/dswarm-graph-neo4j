@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datei xmlns="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ddb.de/professionell/mabxml/mabxml-1.xsd http://files.d-nb.de/standards/formate/mabxml-1.xsd">
+   <datensatz id="ID195102088" typ="k" status="n" mabVersion="M2.0">
+      <feld nr="001" ind=" ">195102088</feld>
+      <feld nr="002" ind="a">19950208</feld>
+      <feld nr="003" ind=" ">MOD 20100501082215</feld>
+      <feld nr="028" ind="b">5121349-7</feld>
+      <feld nr="030" ind=" ">MOD aazuc|m||||||</feld>
+      <feld nr="036" ind="a">XA-LT DEL</feld>
+      <feld nr="066" ind=" ">f| DEL</feld>
+      <feld nr="080" ind=" ">GKD</feld>
+      <feld nr="800" ind=" "><![CDATA[Lietuvos Bankas &lt;Vilnius&gt;]]></feld>
+      <feld nr="810" ind=" "><![CDATA[Bank of Lithuania &lt;Vilnius&gt;]]></feld>
+   </datensatz>
+</datei>

@@ -5,11 +5,12 @@
 
 	<groupId>org.dswarm</groupId>
 	<artifactId>graph</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<properties>
-		<neo4j.version>2.0.1</neo4j.version>
-		<google.guava.version>14.0.1</google.guava.version>
+		<neo4j.version>2.0.3</neo4j.version>
+		<google.guava.version>18.0</google.guava.version>
+		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.7</java.source.version>
 		<java.target.version>1.7</java.target.version>
@@ -21,9 +22,9 @@
 		<maven-clean-plugin.version>2.5</maven-clean-plugin.version>
 		<maven-release-plugin.version>2.4.2</maven-release-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>2.11.0</jena.version>
+		<jena.version>2.11.1</jena.version>
 		<jersey.version>1.9</jersey.version>
-		<junit.version>4.9</junit.version>
+		<junit.version>4.11</junit.version>
 	</properties>
 
 	<build>
@@ -157,6 +158,11 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>googlecode.lambdaj</id>
+			<name>Internal Release Repository</name>
+			<url>https://lambdaj.googlecode.com/svn/repo/releases</url>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
@@ -201,12 +207,12 @@
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-json</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.yars</groupId>
@@ -218,6 +224,34 @@
 			<artifactId>common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${google.guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.lambdaj</groupId>
+			<artifactId>lambdaj</artifactId>
+			<version>${google.lambdaj.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+			<type>test-jar</type>
+			<version>${neo4j.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -228,22 +262,6 @@
 			</properties>
 			<dependencies>
 				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j</artifactId>
-					<version>${neo4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j-kernel</artifactId>
-					<type>test-jar</type>
-					<version>${neo4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>server-api</artifactId>
-					<version>${neo4j.version}</version>
-				</dependency>
-				<dependency>
 					<groupId>org.neo4j.app</groupId>
 					<artifactId>neo4j-server</artifactId>
 					<version>${neo4j.version}</version>
@@ -253,24 +271,6 @@
 					<artifactId>neo4j-server</artifactId>
 					<version>${neo4j.version}</version>
 					<type>test-jar</type>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-client</artifactId>
-					<version>${jersey.version}</version>
-					<scope>test</scope>
-				</dependency>
-				<dependency>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-					<version>${junit.version}</version>
-					<scope>test</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-					<version>${google.guava.version}</version>
-					<scope>test</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.codehaus.jackson</groupId>
@@ -286,25 +286,6 @@
 			</properties>
 			<dependencies>
 				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j</artifactId>
-					<version>${neo4j.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j-kernel</artifactId>
-					<type>test-jar</type>
-					<version>${neo4j.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.neo4j</groupId>
-					<artifactId>server-api</artifactId>
-					<version>${neo4j.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
 					<groupId>org.neo4j.app</groupId>
 					<artifactId>neo4j-server</artifactId>
 					<version>${neo4j.version}</version>
@@ -316,24 +297,6 @@
 					<version>${neo4j.version}</version>
 					<type>test-jar</type>
 					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-client</artifactId>
-					<version>${jersey.version}</version>
-					<scope>test</scope>
-				</dependency>
-				<dependency>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-					<version>${junit.version}</version>
-					<scope>test</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-					<version>${google.guava.version}</version>
-					<scope>test</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.codehaus.jackson</groupId>

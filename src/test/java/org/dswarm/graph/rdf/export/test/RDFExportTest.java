@@ -19,6 +19,7 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
 
 public abstract class RDFExportTest extends BasicResourceTest {
 
+	protected static final String	TEST_RDF_FILE	= "dmpf_bsp1.n3";
 	// protected static final String TEST_RDF_FILE = "turtle_untyped.ttl";
 	// protected static final String TEST_RDF_FILE = "turtle_untyped_with_blanks.ttl";
 
@@ -32,13 +33,13 @@ public abstract class RDFExportTest extends BasicResourceTest {
 	/**
 	 * used as a prepare step to put some data in the graph 
 	 * 
-	 * @param resource_graph_uri the URI used as {@link GraphStatics#PROVENANCE_PROPERTY}.
+	 * @param dataModelUri the URI used as {@link GraphStatics#DATA_MODEL_PROPERTY}.
 	 * @param rdfN3File the data to be stored in the graph
 	 * @throws IOException
 	 */
-	protected void writeRDFToDBInternal(final String resource_graph_uri, final String rdfN3File) throws IOException {
+	protected void writeRDFToDBInternal(final String dataModelUri, final String rdfN3File) throws IOException {
 
-		RDFExportTest.LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB (to graph " + dataModelUri + ")");
 
 		final URL fileURL = Resources.getResource(rdfN3File);
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -46,7 +47,7 @@ public abstract class RDFExportTest extends BasicResourceTest {
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(resource_graph_uri, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(dataModelUri, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -55,7 +56,7 @@ public abstract class RDFExportTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		RDFExportTest.LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + resource_graph_uri + ")");
+		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB (to graph " + dataModelUri + ")");
 	}
 
 }

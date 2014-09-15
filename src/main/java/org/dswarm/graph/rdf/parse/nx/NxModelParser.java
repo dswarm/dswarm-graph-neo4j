@@ -2,6 +2,8 @@ package org.dswarm.graph.rdf.parse.nx;
 
 import org.semanticweb.yars.nx.parser.NxParser;
 
+import org.dswarm.graph.DMPGraphException;
+
 /**
  * @author tgaengler
  */
@@ -22,7 +24,7 @@ public class NxModelParser implements RDFParser {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws DMPGraphException {
 
 		while (model.hasNext()) {
 

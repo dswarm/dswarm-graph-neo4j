@@ -119,6 +119,7 @@ public abstract class BaseNeo4jGDMProcessor {
 	public void beginTx() {
 
 		tx = database.beginTx();
+		txIsClosed = false;
 	}
 
 	public void renewTx() {

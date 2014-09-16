@@ -120,18 +120,19 @@ public abstract class BaseNeo4jGDMProcessor {
 
 		tx = database.beginTx();
 		txIsClosed = false;
+
+		BaseNeo4jGDMProcessor.LOG.debug("begin new tx");
 	}
 
 	public void renewTx() {
 
-		tx.success();
-		tx.close();
-		txIsClosed = true;
-		tx = database.beginTx();
-		txIsClosed = false;
+		succeedTx();
+		beginTx();
 	}
 
 	public void failTx() {
+
+		BaseNeo4jGDMProcessor.LOG.error("tx failed; close tx");
 
 		tx.failure();
 		tx.close();
@@ -139,6 +140,8 @@ public abstract class BaseNeo4jGDMProcessor {
 	}
 
 	public void succeedTx() {
+
+		BaseNeo4jGDMProcessor.LOG.debug("tx succeeded; close tx");
 
 		tx.success();
 		tx.close();

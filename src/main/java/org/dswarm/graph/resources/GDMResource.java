@@ -179,102 +179,113 @@ public class GDMResource {
 		LOG.debug("try to write GDM statements into graph db");
 
 		final BaseNeo4jGDMProcessor processor = new Neo4jGDMWDataModelProcessor(database, dataModelURI);
-		final BaseNeo4jGDMHandler handler = new Neo4jGDMWDataModelHandler(processor);
 
-		if (multiPart.getBodyParts().size() >= 3) {
+		try {
 
-			final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
-			final ContentSchema contentSchema;
+			final BaseNeo4jGDMHandler handler = new Neo4jGDMWDataModelHandler(processor);
 
-			if (contentSchemaBP != null) {
+			if (multiPart.getBodyParts().size() >= 3) {
 
-				final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
+				final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
+				final ContentSchema contentSchema;
 
-				try {
+				if (contentSchemaBP != null) {
 
-					contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
-				} catch (final IOException e) {
+					final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
 
-					final String message = "could not deserialise content schema JSON for write from graph DB request";
+					try {
 
-					GDMResource.LOG.debug(message);
+						contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
+					} catch (final IOException e) {
 
-					throw new DMPGraphException(message);
-				}
-			} else {
+						final String message = "could not deserialise content schema JSON for write from graph DB request";
 
-				// no content schema available for data model
+						GDMResource.LOG.debug(message);
 
-				contentSchema = null;
-			}
-
-			final BodyPart deprecateMissingRecordsBP = multiPart.getBodyParts().get(3);
-			final Boolean deprecateMissingRecords;
-
-			if (deprecateMissingRecordsBP != null) {
-
-				deprecateMissingRecords = Boolean.valueOf(deprecateMissingRecordsBP.getEntityAs(String.class));
-			} else {
-
-				deprecateMissingRecords = Boolean.FALSE;
-			}
-
-			// = new resources model, since existing, modified resources were already written to the DB
-			final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database, handler);
-
-			model = result.first();
-
-			if (deprecateMissingRecords != null && deprecateMissingRecords) {
-
-				final BodyPart recordClassUriBP = multiPart.getBodyParts().get(4);
-				final String recordClassUri;
-
-				if (recordClassUriBP != null) {
-
-					recordClassUri = recordClassUriBP.getEntityAs(String.class);
+						throw new DMPGraphException(message);
+					}
 				} else {
 
-					recordClassUri = null;
+					// no content schema available for data model
+
+					contentSchema = null;
 				}
 
-				if(recordClassUri == null) {
+				final BodyPart deprecateMissingRecordsBP = multiPart.getBodyParts().get(3);
+				final Boolean deprecateMissingRecords;
 
-					throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+				if (deprecateMissingRecordsBP != null) {
+
+					deprecateMissingRecords = Boolean.valueOf(deprecateMissingRecordsBP.getEntityAs(String.class));
+				} else {
+
+					deprecateMissingRecords = Boolean.FALSE;
 				}
 
-				// deprecate missing records in DB
+				// = new resources model, since existing, modified resources were already written to the DB
+				final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database, handler);
 
-				final Set<String> processedResources = result.other();
+				model = result.first();
 
-				deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, handler.getVersionHandler().getLatestVersion(), processor);
+				if (deprecateMissingRecords != null && deprecateMissingRecords) {
+
+					final BodyPart recordClassUriBP = multiPart.getBodyParts().get(4);
+					final String recordClassUri;
+
+					if (recordClassUriBP != null) {
+
+						recordClassUri = recordClassUriBP.getEntityAs(String.class);
+					} else {
+
+						recordClassUri = null;
+					}
+
+					if (recordClassUri == null) {
+
+						throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+					}
+
+					// deprecate missing records in DB
+
+					final Set<String> processedResources = result.other();
+
+					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, handler.getVersionHandler().getLatestVersion(),
+							processor);
+				}
 			}
+
+			if (model.size() > 0) {
+
+				// parse model only, when model contains some resources
+
+				final GDMParser parser = new GDMModelParser(model);
+				parser.setGDMHandler(handler);
+				parser.parse();
+			} else {
+
+				GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+			}
+
+			final Long size = handler.getCountedStatements();
+
+			if (size > 0) {
+
+				// update data model version only when some statements are written to the DB
+				handler.getVersionHandler().updateLatestVersion();
+			}
+
+			handler.closeTransaction();
+
+			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
+
+			return Response.ok().build();
+
+		} catch (final DMPGraphException e) {
+
+			processor.failTx();
+
+			throw e;
 		}
-
-		if (model.size() > 0) {
-
-			// parse model only, when model contains some resources
-
-			final GDMParser parser = new GDMModelParser(model);
-			parser.setGDMHandler(handler);
-			parser.parse();
-		} else {
-
-			GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
-		}
-
-		final Long size = handler.getCountedStatements();
-
-		if (size > 0) {
-
-			// update data model version only when some statements are written to the DB
-			handler.getVersionHandler().updateLatestVersion();
-		}
-
-		handler.closeTransaction();
-
-		LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
-
-		return Response.ok().build();
 	}
 
 	@POST

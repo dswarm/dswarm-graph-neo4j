@@ -316,14 +316,14 @@ public final class GraphDBUtil {
 
 		if (matchedState == null) {
 
-			GraphDBUtil.LOG.debug(type + " '" + id + "' couldn't be matched, i.e., there was no match state available");
+			GraphDBUtil.LOG.error(type + " '" + id + "' couldn't be matched, i.e., there was no match state available");
 
 			return false;
 		}
 
 		if (!matchedState) {
 
-			GraphDBUtil.LOG.debug(type + " '" + id + "' couldn't be matched, i.e., there was no match state was 'false'");
+			GraphDBUtil.LOG.error(type + " '" + id + "' couldn't be matched, i.e., there was no match state was 'false'");
 
 			return false;
 		}

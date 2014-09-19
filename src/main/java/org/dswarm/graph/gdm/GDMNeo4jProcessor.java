@@ -1,32 +1,32 @@
 package org.dswarm.graph.gdm;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.json.LiteralNode;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.gdm.utils.NodeTypeUtils;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 /**
  * @author tgaengler
  */
 public abstract class GDMNeo4jProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GDMNeo4jProcessor.class);
+	private static final Logger		LOG	= LoggerFactory.getLogger(GDMNeo4jProcessor.class);
 
-	protected final Neo4jProcessor processor;
+	protected final Neo4jProcessor	processor;
 
 	public GDMNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
 
@@ -37,199 +37,121 @@ public abstract class GDMNeo4jProcessor {
 
 		return processor;
 	}
-	
-	public Node determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
 
-		final Node node;
+	public Optional<Node> determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
 
-		if (resource instanceof ResourceNode) {
+		final Optional<org.dswarm.graph.json.Node> optionalResource = Optional.fromNullable(resource);
+		final Optional<NodeType> optionalResourceNodeType = NodeTypeUtils.getNodeType(optionalResource, Optional.of(isType));
 
-			// resource node
+		final Optional<String> optionalResourceId;
+		final Optional<String> optionalResourceUri;
+		final Optional<String> optionalDataModelUri;
 
-			final IndexHits<Node> hits;
+		if (optionalResource.isPresent()) {
 
-			if (!isType) {
+			if (resource.getId() != null) {
 
-				if (((ResourceNode) resource).getDataModel() == null) {
-
-					hits = getResourceNodeHits((ResourceNode) resource);
-				} else {
-
-					hits = processor.getResourcesWDataModelIndex().get(GraphStatics.URI_W_DATA_MODEL,
-							((ResourceNode) resource).getUri() + ((ResourceNode) resource).getDataModel());
-				}
+				optionalResourceId = Optional.of("" + resource.getId());
 			} else {
 
-				hits = processor.getResourceTypesIndex().get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				optionalResourceId = Optional.absent();
 			}
 
-			if (hits != null && hits.hasNext()) {
+			if (optionalResourceNodeType.isPresent()
+					&& (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get()))) {
 
-				// node exists
+				final ResourceNode resourceResourceNode = (ResourceNode) resource;
 
-				node = hits.next();
+				optionalResourceUri = Optional.fromNullable(resourceResourceNode.getUri());
+				optionalDataModelUri = Optional.fromNullable(resourceResourceNode.getDataModel());
+			} else {
 
-				hits.close();
-
-				return node;
+				optionalResourceUri = Optional.absent();
+				optionalDataModelUri = Optional.absent();
 			}
-
-			if(hits != null) {
-
-				hits.close();
-			}
-
-			return null;
-		}
-
-		if (resource instanceof LiteralNode) {
-
-			// literal node - should never be the case
-
-			return null;
-		}
-
-		// resource must be a blank node
-
-		node = processor.getBNodesIndex().get("" + resource.getId());
-
-		return node;
-	}
-
-	public String determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Resource resource) {
-
-		final Long nodeId = subjectNode.getId();
-
-		final String resourceUri;
-
-		if (processor.getNodeResourceMap().containsKey(nodeId)) {
-
-			resourceUri = processor.getNodeResourceMap().get(nodeId);
 		} else {
 
-			if (subject instanceof ResourceNode) {
-
-				resourceUri = ((ResourceNode) subject).getUri();
-			} else {
-
-				resourceUri = resource.getUri();
-			}
-
-			processor.getNodeResourceMap().put(nodeId, resourceUri);
+			optionalResourceId = Optional.absent();
+			optionalResourceUri = Optional.absent();
+			optionalDataModelUri = Optional.absent();
 		}
 
-		return resourceUri;
+		return processor.determineNode(optionalResourceNodeType, optionalResourceId, optionalResourceUri, optionalDataModelUri);
+	}
+
+	public Optional<String> determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Resource resource) {
+
+		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(subject));
+
+		final Optional<String> optionalSubjectURI;
+
+		if (optionalSubjectNodeType.isPresent() && NodeType.Resource.equals(optionalSubjectNodeType.get())) {
+
+			optionalSubjectURI = Optional.fromNullable(((ResourceNode) subject).getUri());
+		} else {
+
+			optionalSubjectURI = Optional.absent();
+		}
+
+		final Optional<String> optionalResourceURI;
+
+		if (resource != null) {
+
+			optionalResourceURI = Optional.fromNullable(resource.getUri());
+		} else {
+
+			optionalResourceURI = Optional.absent();
+		}
+
+		return processor.determineResourceUri(subjectNode, optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 	}
 
 	public String generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
-		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
-		final String objectIdentifier = getIdentifier(objectNode, objectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeTypeByGDMNodeType(Optional.fromNullable(subjectNodeType));
+		final Optional<NodeType> optionalObjectNodeType = NodeTypeUtils.getNodeTypeByGDMNodeType(Optional.fromNullable(objectNodeType));
+		final Optional<String> optionalSubjectIdentifier = processor.getIdentifier(subjectNode, optionalSubjectNodeType);
+		final Optional<String> optionalObjectIdentifier = processor.getIdentifier(objectNode, optionalObjectNodeType);
 
-		return generateStatementHash(predicateName, subjectNodeType, objectNodeType, subjectIdentifier, objectIdentifier);
+		return processor.generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType, optionalSubjectIdentifier,
+				optionalObjectIdentifier);
 	}
 
 	public String generateStatementHash(final Node subjectNode, final String predicateName, final String objectValue,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
-		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeTypeByGDMNodeType(Optional.fromNullable(subjectNodeType));
+		final Optional<NodeType> optionalObjectNodeType = NodeTypeUtils.getNodeTypeByGDMNodeType(Optional.fromNullable(objectNodeType));
+		final Optional<String> optionalSubjectIdentifier = processor.getIdentifier(subjectNode, optionalSubjectNodeType);
+		final Optional<String> optionalObjectIdentifier = Optional.fromNullable(objectValue);
 
-		return generateStatementHash(predicateName, subjectNodeType, objectNodeType, subjectIdentifier, objectValue);
+		return processor.generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType, optionalSubjectIdentifier,
+				optionalObjectIdentifier);
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
 			final long index, final VersionHandler versionHandler) {
 
-		final RelationshipType relType = DynamicRelationshipType.withName(statement.getPredicate().getUri());
-		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
+		final String predicateURI = statement.getPredicate().getUri();
 
-		rel.setProperty(GraphStatics.UUID_PROPERTY, statementUUID);
+		final Map<String, Object> qualifiedAttributes = Maps.newHashMap();
 
 		if (statement.getOrder() != null) {
 
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, statement.getOrder());
+			qualifiedAttributes.put(GraphStatics.ORDER_PROPERTY, statement.getOrder());
 		}
-
-		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
-
-		// TODO: versioning handling only implemented for data models right now
 
 		if (statement.getEvidence() != null) {
 
-			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
+			qualifiedAttributes.put(GraphStatics.EVIDENCE_PROPERTY, statement.getEvidence());
 		}
 
-		if(statement.getConfidence() != null) {
+		if (statement.getConfidence() != null) {
 
-			rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
+			qualifiedAttributes.put(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
 		}
 
-		return rel;
-	}
-
-	protected abstract IndexHits<Node> getResourceNodeHits(final ResourceNode resource);
-
-	private String generateStatementHash(final String predicateName, final org.dswarm.graph.json.NodeType subjectNodeType,
-			final org.dswarm.graph.json.NodeType objectNodeType, final String subjectIdentifier, final String objectIdentifier)
-			throws DMPGraphException {
-
-		final StringBuffer sb = new StringBuffer();
-
-		sb.append(subjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ")
-				.append(objectNodeType.toString()).append(":").append(objectIdentifier).append(" ");
-
-		MessageDigest messageDigest = null;
-
-		try {
-
-			messageDigest = MessageDigest.getInstance("SHA-256");
-		} catch (final NoSuchAlgorithmException e) {
-
-			throw new DMPGraphException("couldn't instantiate hash algo");
-		}
-		messageDigest.update(sb.toString().getBytes());
-
-		return new String(messageDigest.digest());
-	}
-
-	private String getIdentifier(final Node node, final org.dswarm.graph.json.NodeType nodeType) {
-
-		final String identifier;
-
-		switch (nodeType) {
-
-			case Resource:
-
-				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
-				final String dataModel = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
-
-				if (dataModel == null) {
-
-					identifier = uri;
-				} else {
-
-					identifier = uri + dataModel;
-				}
-
-				break;
-			case BNode:
-
-				identifier = "" + node.getId();
-
-				break;
-			case Literal:
-
-				identifier = (String) node.getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-				break;
-			default:
-
-				identifier = null;
-
-				break;
-		}
-
-		return identifier;
+		return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, index, versionHandler);
 	}
 }

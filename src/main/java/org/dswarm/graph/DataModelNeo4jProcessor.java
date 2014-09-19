@@ -1,10 +1,15 @@
 package org.dswarm.graph;
 
+import java.util.Map;
+
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.VersionHandler;
+import org.dswarm.graph.versioning.VersioningStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +20,9 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
-	private final Index<Relationship> statementUUIDsWDataModel;
+	private final Index<Relationship>	statementUUIDsWDataModel;
 
-	private final String dataModelURI;
+	private final String				dataModelURI;
 
 	public DataModelNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
@@ -93,5 +98,25 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
 		statementUUIDsWDataModel.add(rel, GraphStatics.UUID_W_DATA_MODEL, dataModelURI + "." + statementUUID);
+	}
+
+	@Override
+	public IndexHits<Node> getResourceNodeHits(final String resourceURI) {
+
+		return resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resourceURI + dataModelURI);
+	}
+
+	@Override
+	public Relationship prepareRelationship(Node subjectNode, String predicateURI, Node objectNode, String statementUUID,
+			Map<String, Object> qualifiedAttributes, long index, VersionHandler versionHandler) {
+
+		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, index, versionHandler);
+
+		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+
+		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, versionHandler.getRange().from());
+		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getRange().to());
+
+		return rel;
 	}
 }

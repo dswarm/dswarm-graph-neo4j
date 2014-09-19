@@ -3,7 +3,7 @@ package org.dswarm.graph.gdm.parse;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
-import org.dswarm.graph.gdm.versioning.DataModelGDMNeo4jVersionHandler;
+import org.dswarm.graph.versioning.DataModelNeo4jVersionHandler;
 import org.dswarm.graph.model.GraphStatics;
 
 import org.neo4j.graphdb.Relationship;
@@ -25,7 +25,7 @@ public class DataModelGDMNeo4jHandler extends GDMNeo4jHandler {
 
 	@Override protected void init() throws DMPGraphException {
 
-		versionHandler = new DataModelGDMNeo4jVersionHandler(processor);
+		versionHandler = new DataModelNeo4jVersionHandler(processor.getProcessor());
 	}
 
 	@Override

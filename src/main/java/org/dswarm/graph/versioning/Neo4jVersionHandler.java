@@ -1,0 +1,130 @@
+package org.dswarm.graph.versioning;
+
+import java.util.UUID;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.model.GraphStatics;
+
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+
+/**
+ * @author tgaengler
+ */
+public abstract class Neo4jVersionHandler implements VersionHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Neo4jVersionHandler.class);
+
+	protected boolean latestVersionInitialized = false;
+
+	protected int latestVersion;
+
+	private Range range;
+
+	protected final Neo4jProcessor processor;
+
+	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+
+		processor = processorArg;
+	}
+
+	@Override
+	public int getLatestVersion() {
+
+		return latestVersion;
+	}
+
+	@Override public Range getRange() {
+
+		return range;
+	}
+
+	protected void init() {
+
+		latestVersion = retrieveLatestVersion() + 1;
+		range = Range.range(latestVersion);
+	}
+
+	protected abstract int retrieveLatestVersion();
+
+	public void setLatestVersion(final String dataModelURI) throws DMPGraphException {
+
+		if (!latestVersionInitialized) {
+
+			if (dataModelURI == null) {
+
+				return;
+			}
+
+			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(), Optional.fromNullable(dataModelURI), Optional.<String>absent());
+
+			if (optionalDataModelNode.isPresent()) {
+
+				latestVersionInitialized = true;
+
+				return;
+			}
+
+			final Node dataModelNode = processor.getDatabase().createNode();
+			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
+
+			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, dataModelURI);
+			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, dataModelURI + VersioningStatics.VERSIONING_DATA_MODEL_URI);
+
+			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.fromNullable(VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
+
+			final Node dataModelTypeNode;
+
+			if (optionaDataModelTypeNode.isPresent()) {
+
+				dataModelTypeNode = optionaDataModelTypeNode.get();
+			} else {
+
+				dataModelTypeNode = processor.getDatabase().createNode();
+				processor.addLabel(dataModelTypeNode, RDFS.Class.getURI());
+				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
+				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
+
+				processor.getResourcesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
+				processor.getResourceTypesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
+			}
+
+			final String hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);
+
+			Relationship rel = processor.getStatement(hash);
+
+			if (rel == null) {
+
+				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
+				rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
+				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
+				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
+
+				final String uuid = UUID.randomUUID().toString();
+
+				rel.setProperty(GraphStatics.UUID_PROPERTY, uuid);
+
+				processor.getStatementIndex().add(rel, GraphStatics.HASH, hash);
+				processor.addStatementToIndex(rel, uuid);
+			}
+
+			latestVersionInitialized = true;
+		}
+	}
+
+}

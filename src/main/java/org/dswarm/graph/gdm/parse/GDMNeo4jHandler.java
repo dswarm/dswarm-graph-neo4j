@@ -19,6 +19,7 @@ import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -88,9 +89,13 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 			// Check index for subject
 			// TODO: what should we do, if the subject is a resource type?
-			Node subjectNode = processor.determineNode(subject, false);
+			final Optional<Node> optionalSubjectNode = processor.determineNode(subject, false);
+			final Node subjectNode;
 
-			if (subjectNode == null) {
+			if (optionalSubjectNode.isPresent()) {
+
+				subjectNode = optionalSubjectNode.get();
+			} else {
 
 				subjectNode = processor.getProcessor().getDatabase().createNode();
 
@@ -142,10 +147,15 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 				}
 
 				// Check index for object
-				Node objectNode = processor.determineNode(object, isType);
-				String resourceUri = null;
+				final Optional<Node> optionalObjectNode = processor.determineNode(object, isType);
+				final Node objectNode;
+				final Optional<String> optionalResourceUri;
 
-				if (objectNode == null) {
+				if (optionalObjectNode.isPresent()) {
+
+					objectNode = optionalObjectNode.get();
+					optionalResourceUri = Optional.absent();
+				} else {
 
 					objectNode = processor.getProcessor().getDatabase().createNode();
 
@@ -174,9 +184,10 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 						processor.getProcessor().getResourcesIndex().add(objectNode, GraphStatics.URI, objectURI);
 
 						processor.getProcessor().addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
+						optionalResourceUri = Optional.absent();
 					} else {
 
-						resourceUri = handleBNode(r, subject, object, subjectNode, isType, objectNode);
+						optionalResourceUri = handleBNode(r, subject, object, subjectNode, isType, objectNode);
 					}
 
 					addedNodes++;
@@ -187,7 +198,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 				final Relationship rel = processor.getProcessor().getStatement(hash);
 				if (rel == null) {
 
-					addRelationship(subjectNode, objectNode, resourceUri, r, st, index, hash);
+					addRelationship(subjectNode, objectNode, optionalResourceUri, r, st, index, hash);
 				}
 			}
 
@@ -243,7 +254,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			// be update with the new stmt (?)
 			final String hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
 
-			addRelationship(subject, object, resource.getUri(), resource, stmt, index, hash);
+			addRelationship(subject, object, Optional.fromNullable(resource.getUri()), resource, stmt, index, hash);
 
 			totalTriples++;
 		} catch (final DMPGraphException e) {
@@ -333,10 +344,10 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 	protected abstract Relationship getRelationship(final String uuid);
 
-	protected String handleBNode(final Resource r, final org.dswarm.graph.json.Node subject, final org.dswarm.graph.json.Node object,
+	protected Optional<String> handleBNode(final Resource r, final org.dswarm.graph.json.Node subject, final org.dswarm.graph.json.Node object,
 			final Node subjectNode, final boolean isType, final Node objectNode) {
 
-		String resourceUri = null;
+		final Optional<String> optionalResourceUri;
 
 		// object is a blank node
 
@@ -345,13 +356,15 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		if (!isType) {
 
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-			resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
+			optionalResourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
 		} else {
 
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
 			processor.getProcessor().addLabel(objectNode, RDFS.Class.getURI());
+			optionalResourceUri = Optional.absent();
 		}
-		return resourceUri;
+
+		return optionalResourceUri;
 	}
 
 	protected void handleLiteral(final Resource r, final long index, final Statement statement, final Node subjectNode) throws DMPGraphException {
@@ -373,16 +386,16 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
 			processor.getProcessor().getValueIndex().add(objectNode, GraphStatics.VALUE, value);
 
-			final String resourceUri = addResourceProperty(subjectNode, statement.getSubject(), objectNode, r);
+			final Optional<String> optionalResourceUri = addResourceProperty(subjectNode, statement.getSubject(), objectNode, r);
 
 			addedNodes++;
 
-			addRelationship(subjectNode, objectNode, resourceUri, r, statement, index, hash);
+			addRelationship(subjectNode, objectNode, optionalResourceUri, r, statement, index, hash);
 		}
 	}
 
-	protected Relationship addRelationship(final Node subjectNode, final Node objectNode, final String resourceUri, final Resource resource,
-			final Statement statement, final long index, final String hash) throws DMPGraphException {
+	protected Relationship addRelationship(final Node subjectNode, final Node objectNode, final Optional<String> optionalResourceUri,
+			final Resource resource, final Statement statement, final long index, final String hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
@@ -401,42 +414,42 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 		addedRelationships++;
 
-		addResourceProperty(subjectNode, statement.getSubject(), rel, resourceUri, resource);
+		addResourceProperty(subjectNode, statement.getSubject(), rel, optionalResourceUri, resource);
 
 		return rel;
 	}
 
-	protected String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Node objectNode,
+	protected Optional<String> addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Node objectNode,
 			final Resource resource) {
 
-		final String resourceUri = processor.determineResourceUri(subjectNode, subject, resource);
+		final Optional<String> optionalResourceUri = processor.determineResourceUri(subjectNode, subject, resource);
 
-		if (resourceUri == null) {
+		if (!optionalResourceUri.isPresent()) {
 
-			return null;
+			return Optional.absent();
 		}
 
-		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
+		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, optionalResourceUri.get());
 
-		return resourceUri;
+		return optionalResourceUri;
 	}
 
-	protected String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Relationship rel,
-			final String resourceUri, final Resource resource) {
+	protected Optional<String> addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Relationship rel,
+			final Optional<String> optionalResourceUri, final Resource resource) {
 
-		final String finalResourceUri;
+		final Optional<String> finalOptionalResourceUri;
 
-		if (resourceUri != null) {
+		if (optionalResourceUri.isPresent()) {
 
-			finalResourceUri = resourceUri;
+			finalOptionalResourceUri = optionalResourceUri;
 		} else {
 
-			finalResourceUri = processor.determineResourceUri(subjectNode, subject, resource);
+			finalOptionalResourceUri = processor.determineResourceUri(subjectNode, subject, resource);
 		}
 
-		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceUri.get());
 
-		return finalResourceUri;
+		return finalOptionalResourceUri;
 	}
 
 	private void addBNode(final org.dswarm.graph.json.Node gdmNode, final Node node) {

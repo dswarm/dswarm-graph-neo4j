@@ -1,10 +1,12 @@
 package org.dswarm.graph;
 
+import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,5 +73,11 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
 		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
+	}
+
+	@Override
+	public IndexHits<Node> getResourceNodeHits(final String resourceURI) {
+
+		return getResourcesIndex().get(GraphStatics.URI, resourceURI);
 	}
 }

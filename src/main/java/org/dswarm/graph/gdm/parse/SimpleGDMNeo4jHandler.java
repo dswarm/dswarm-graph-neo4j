@@ -2,8 +2,9 @@ package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
-import org.dswarm.graph.gdm.versioning.SimpleGDMNeo4jVersionHandler;
+import org.dswarm.graph.versioning.SimpleNeo4jVersionHandler;
 import org.dswarm.graph.model.GraphStatics;
+
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class SimpleGDMNeo4jHandler extends GDMNeo4jHandler {
 	@Override
 	protected void init() throws DMPGraphException {
 
-		versionHandler = new SimpleGDMNeo4jVersionHandler(processor);
+		versionHandler = new SimpleNeo4jVersionHandler(processor.getProcessor());
 	}
 
 	@Override

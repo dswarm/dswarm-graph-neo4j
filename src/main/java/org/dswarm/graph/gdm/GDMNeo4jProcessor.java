@@ -2,165 +2,42 @@ package org.dswarm.graph.gdm;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
-import org.dswarm.graph.versioning.VersioningStatics;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.index.IndexHits;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
-public abstract class BaseNeo4jGDMProcessor {
+public abstract class GDMNeo4jProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(BaseNeo4jGDMProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMNeo4jProcessor.class);
 
-	protected int addedLabels = 0;
+	protected final Neo4jProcessor processor;
 
-	protected final GraphDatabaseService database;
-	protected final Index<Node>          resources;
-	protected final Index<Node>          resourcesWDataModel;
-	protected final Index<Node>          resourceTypes;
-	protected final Index<Node>          values;
-	protected final Map<String, Node>    bnodes;
-	protected final Index<Relationship>  statementHashes;
-	protected final Map<Long, String>    nodeResourceMap;
+	public GDMNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
 
-	protected Transaction tx;
-
-	boolean txIsClosed = false;
-
-	public BaseNeo4jGDMProcessor(final GraphDatabaseService database) throws DMPGraphException {
-
-		this.database = database;
-		beginTx();
-
-		try {
-
-			LOG.debug("start write TX");
-
-			resources = database.index().forNodes("resources");
-			resourcesWDataModel = database.index().forNodes("resources_w_data_model");
-			resourceTypes = database.index().forNodes("resource_types");
-			values = database.index().forNodes("values");
-			bnodes = new HashMap<>();
-			statementHashes = database.index().forRelationships("statement_hashes");
-			nodeResourceMap = new HashMap<>();
-
-		} catch (final Exception e) {
-
-			tx.failure();
-			tx.close();
-			txIsClosed = true;
-
-			final String message = "couldn't load indices successfully";
-
-			BaseNeo4jGDMProcessor.LOG.error(message, e);
-			BaseNeo4jGDMProcessor.LOG.debug("couldn't finish write TX successfully");
-
-			throw new DMPGraphException(message);
-		}
+		processor = processorArg;
 	}
 
-	public GraphDatabaseService getDatabase() {
+	public Neo4jProcessor getProcessor() {
 
-		return database;
+		return processor;
 	}
-
-	public Index<Node> getResourcesIndex() {
-
-		return resources;
-	}
-
-	public Index<Node> getResourcesWDataModelIndex() {
-
-		return resourcesWDataModel;
-	}
-
-	public Map<String, Node> getBNodesIndex() {
-
-		return bnodes;
-	}
-
-	public Index<Node> getResourceTypesIndex() {
-
-		return resourceTypes;
-	}
-
-	public Index<Node> getValueIndex() {
-
-		return values;
-	}
-
-	public Index<Relationship> getStatementIndex() {
-
-		return statementHashes;
-	}
-
-	public void beginTx() {
-
-		tx = database.beginTx();
-		txIsClosed = false;
-
-		BaseNeo4jGDMProcessor.LOG.debug("begin new tx");
-	}
-
-	public void renewTx() {
-
-		succeedTx();
-		beginTx();
-	}
-
-	public void failTx() {
-
-		BaseNeo4jGDMProcessor.LOG.error("tx failed; close tx");
-
-		tx.failure();
-		tx.close();
-		txIsClosed = true;
-	}
-
-	public void succeedTx() {
-
-		BaseNeo4jGDMProcessor.LOG.debug("tx succeeded; close tx");
-
-		tx.success();
-		tx.close();
-		txIsClosed = true;
-	}
-
-	public void ensureRunningTx() {
-
-		if(txIsClosed()) {
-
-			beginTx();
-		}
-	}
-
-	public boolean txIsClosed() {
-
-		return txIsClosed;
-	}
-
+	
 	public Node determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
 
 		final Node node;
@@ -178,12 +55,12 @@ public abstract class BaseNeo4jGDMProcessor {
 					hits = getResourceNodeHits((ResourceNode) resource);
 				} else {
 
-					hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL,
+					hits = processor.getResourcesWDataModelIndex().get(GraphStatics.URI_W_DATA_MODEL,
 							((ResourceNode) resource).getUri() + ((ResourceNode) resource).getDataModel());
 				}
 			} else {
 
-				hits = resourceTypes.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				hits = processor.getResourceTypesIndex().get(GraphStatics.URI, ((ResourceNode) resource).getUri());
 			}
 
 			if (hits != null && hits.hasNext()) {
@@ -214,7 +91,7 @@ public abstract class BaseNeo4jGDMProcessor {
 
 		// resource must be a blank node
 
-		node = bnodes.get("" + resource.getId());
+		node = processor.getBNodesIndex().get("" + resource.getId());
 
 		return node;
 	}
@@ -225,9 +102,9 @@ public abstract class BaseNeo4jGDMProcessor {
 
 		final String resourceUri;
 
-		if (nodeResourceMap.containsKey(nodeId)) {
+		if (processor.getNodeResourceMap().containsKey(nodeId)) {
 
-			resourceUri = nodeResourceMap.get(nodeId);
+			resourceUri = processor.getNodeResourceMap().get(nodeId);
 		} else {
 
 			if (subject instanceof ResourceNode) {
@@ -238,32 +115,10 @@ public abstract class BaseNeo4jGDMProcessor {
 				resourceUri = resource.getUri();
 			}
 
-			nodeResourceMap.put(nodeId, resourceUri);
+			processor.getNodeResourceMap().put(nodeId, resourceUri);
 		}
 
 		return resourceUri;
-	}
-
-	public void addLabel(final Node node, final String labelString) {
-
-		final Label label = DynamicLabel.label(labelString);
-		boolean hit = false;
-		final Iterable<Label> labels = node.getLabels();
-
-		for (final Label lbl : labels) {
-
-			if (label.equals(lbl)) {
-
-				hit = true;
-				break;
-			}
-		}
-
-		if (!hit) {
-
-			node.addLabel(label);
-			addedLabels++;
-		}
 	}
 
 	public String generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode,
@@ -281,27 +136,6 @@ public abstract class BaseNeo4jGDMProcessor {
 		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
 
 		return generateStatementHash(predicateName, subjectNodeType, objectNodeType, subjectIdentifier, objectValue);
-	}
-
-	public Relationship getStatement(final String hash) throws DMPGraphException {
-
-		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
-
-		if (hits != null && hits.hasNext()) {
-
-			final Relationship rel = hits.next();
-
-			hits.close();
-
-			return rel;
-		}
-
-		if(hits != null) {
-
-			hits.close();
-		}
-
-		return null;
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
@@ -335,14 +169,6 @@ public abstract class BaseNeo4jGDMProcessor {
 	}
 
 	protected abstract IndexHits<Node> getResourceNodeHits(final ResourceNode resource);
-
-	public abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI);
-
-	public abstract void handleObjectDataModel(Node node, String dataModelURI);
-
-	public abstract void handleSubjectDataModel(final Node node, String URI, final String dataModelURI);
-
-	public abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
 
 	private String generateStatementHash(final String predicateName, final org.dswarm.graph.json.NodeType subjectNodeType,
 			final org.dswarm.graph.json.NodeType objectNodeType, final String subjectIdentifier, final String objectIdentifier)

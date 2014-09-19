@@ -1,14 +1,14 @@
 package org.dswarm.graph.gdm.versioning;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 
 /**
  * @author tgaengler
  */
-public class Neo4jGDMVersionHandler extends BaseNeo4jGDMVersionHandler {
+public class SimpleGDMNeo4jVersionHandler extends GDMNeo4jVersionHandler {
 
-	public Neo4jGDMVersionHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	public SimpleGDMNeo4jVersionHandler(final GDMNeo4jProcessor processorArg) throws DMPGraphException {
 
 		super(processorArg);
 	}

@@ -1,26 +1,23 @@
-package org.dswarm.graph.gdm;
+package org.dswarm.graph;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
  */
-public class Neo4jGDMProcessor extends BaseNeo4jGDMProcessor {
+public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(Neo4jGDMProcessor.class);
+	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
-	protected final Index<Relationship>	statementUUIDs;
+	protected final Index<Relationship> statementUUIDs;
 
-	public Neo4jGDMProcessor(final GraphDatabaseService database) throws DMPGraphException {
+	public SimpleNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
 		super(database);
 
@@ -31,13 +28,12 @@ public class Neo4jGDMProcessor extends BaseNeo4jGDMProcessor {
 			statementUUIDs = database.index().forRelationships("statement_uuids");
 		} catch (final Exception e) {
 
-			tx.failure();
-			tx.close();
+			failTx();
 
 			final String message = "couldn't load indices successfully";
 
-			Neo4jGDMProcessor.LOG.error(message, e);
-			Neo4jGDMProcessor.LOG.debug("couldn't finish write TX successfully");
+			SimpleNeo4jProcessor.LOG.error(message, e);
+			SimpleNeo4jProcessor.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -75,11 +71,5 @@ public class Neo4jGDMProcessor extends BaseNeo4jGDMProcessor {
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
 		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
-	}
-
-	@Override
-	protected IndexHits<Node> getResourceNodeHits(final ResourceNode resource) {
-
-		return resources.get(GraphStatics.URI, resource.getUri());
 	}
 }

@@ -2,17 +2,10 @@ package org.dswarm.graph.gdm.parse;
 
 import java.util.UUID;
 
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.lang.NotImplementedException;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
+import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
@@ -21,13 +14,20 @@ import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * @author tgaengler
  */
-public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandler {
+public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
-	private static final Logger				LOG						= LoggerFactory.getLogger(BaseNeo4jGDMHandler.class);
+	private static final Logger				LOG						= LoggerFactory.getLogger(GDMNeo4jHandler.class);
 
 	protected int							totalTriples			= 0;
 	protected int							addedNodes				= 0;
@@ -43,11 +43,11 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 	// TODO: init
 	protected VersionHandler				versionHandler			= null;
 
-	protected final BaseNeo4jGDMProcessor	processor;
+	protected final GDMNeo4jProcessor		processor;
 
 	protected final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
 
-	public BaseNeo4jGDMHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	public GDMNeo4jHandler(final GDMNeo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 
@@ -60,7 +60,8 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 		resourceUri = resourceUriArg;
 	}
 
-	@Override public VersionHandler getVersionHandler() {
+	@Override
+	public VersionHandler getVersionHandler() {
 
 		return versionHandler;
 	}
@@ -74,7 +75,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 		// System.out.println("handle statement " + i + ": " + st.toString());
 
-		processor.ensureRunningTx();
+		processor.getProcessor().ensureRunningTx();
 
 		try {
 
@@ -91,7 +92,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			if (subjectNode == null) {
 
-				subjectNode = processor.getDatabase().createNode();
+				subjectNode = processor.getProcessor().getDatabase().createNode();
 
 				if (subject instanceof ResourceNode) {
 
@@ -109,15 +110,15 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 						versionHandler.setLatestVersion(dataModelURI);
 					}
 
-					processor.handleSubjectDataModel(subjectNode, subjectURI, dataModelURI);
+					processor.getProcessor().handleSubjectDataModel(subjectNode, subjectURI, dataModelURI);
 
-					processor.getResourcesIndex().add(subjectNode, GraphStatics.URI, subjectURI);
+					processor.getProcessor().getResourcesIndex().add(subjectNode, GraphStatics.URI, subjectURI);
 				} else {
 
 					// subject is a blank node
 
 					// note: can I expect an id here?
-					processor.getBNodesIndex().put("" + subject.getId(), subjectNode);
+					processor.getProcessor().getBNodesIndex().put("" + subject.getId(), subjectNode);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
@@ -135,7 +136,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 				// add Label if this is a type entry
 				if (predicateName.equals(RDF.type.getURI())) {
 
-					processor.addLabel(subjectNode, ((ResourceNode) object).getUri());
+					processor.getProcessor().addLabel(subjectNode, ((ResourceNode) object).getUri());
 
 					isType = true;
 				}
@@ -146,7 +147,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 				if (objectNode == null) {
 
-					objectNode = processor.getDatabase().createNode();
+					objectNode = processor.getProcessor().getDatabase().createNode();
 
 					if (object instanceof ResourceNode) {
 
@@ -161,18 +162,18 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
-							processor.handleObjectDataModel(objectNode, dataModelURI);
+							processor.getProcessor().handleObjectDataModel(objectNode, dataModelURI);
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-							processor.addLabel(objectNode, RDFS.Class.getURI());
+							processor.getProcessor().addLabel(objectNode, RDFS.Class.getURI());
 
-							processor.getResourceTypesIndex().add(objectNode, GraphStatics.URI, objectURI);
+							processor.getProcessor().getResourceTypesIndex().add(objectNode, GraphStatics.URI, objectURI);
 						}
 
-						processor.getResourcesIndex().add(objectNode, GraphStatics.URI, objectURI);
+						processor.getProcessor().getResourcesIndex().add(objectNode, GraphStatics.URI, objectURI);
 
-						processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
+						processor.getProcessor().addObjectToResourceWDataModelIndex(objectNode, objectURI, dataModelURI);
 					} else {
 
 						resourceUri = handleBNode(r, subject, object, subjectNode, isType, objectNode);
@@ -183,7 +184,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 				final String hash = processor.generateStatementHash(subjectNode, predicateName, objectNode, subject.getType(), object.getType());
 
-				final Relationship rel = processor.getStatement(hash);
+				final Relationship rel = processor.getProcessor().getStatement(hash);
 				if (rel == null) {
 
 					addRelationship(subjectNode, objectNode, resourceUri, r, st, index, hash);
@@ -197,7 +198,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			if (nodeDelta >= 50000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
 
-				processor.renewTx();
+				processor.getProcessor().renewTx();
 
 				sinceLastCommit = totalTriples;
 
@@ -211,7 +212,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			LOG.error(message, e);
 
-			processor.failTx();
+			processor.getProcessor().failTx();
 
 			throw new DMPGraphException(message);
 		}
@@ -220,7 +221,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 	@Override
 	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException {
 
-		processor.ensureRunningTx();
+		processor.getProcessor().ensureRunningTx();
 
 		try {
 
@@ -252,10 +253,10 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			final String message = "couldn't handle statement successfully";
 
-			processor.failTx();
+			processor.getProcessor().failTx();
 
-			BaseNeo4jGDMHandler.LOG.error(message, e);
-			BaseNeo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
+			GDMNeo4jHandler.LOG.error(message, e);
+			GDMNeo4jHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -270,7 +271,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 	@Override
 	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
 
-		processor.ensureRunningTx();
+		processor.getProcessor().ensureRunningTx();
 
 		try {
 
@@ -291,10 +292,10 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			final String message = "couldn't deprecate statement successfully";
 
-			processor.failTx();
+			processor.getProcessor().failTx();
 
-			BaseNeo4jGDMHandler.LOG.error(message, e);
-			BaseNeo4jGDMHandler.LOG.debug("couldn't finish write TX successfully");
+			GDMNeo4jHandler.LOG.error(message, e);
+			GDMNeo4jHandler.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -305,7 +306,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 		LOG.debug("close write TX finally");
 
-		processor.succeedTx();
+		processor.getProcessor().succeedTx();
 	}
 
 	public long getCountedStatements() {
@@ -339,7 +340,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 		// object is a blank node
 
-		processor.getBNodesIndex().put("" + object.getId(), objectNode);
+		processor.getProcessor().getBNodesIndex().put("" + object.getId(), objectNode);
 
 		if (!isType) {
 
@@ -348,7 +349,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 		} else {
 
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
-			processor.addLabel(objectNode, RDFS.Class.getURI());
+			processor.getProcessor().addLabel(objectNode, RDFS.Class.getURI());
 		}
 		return resourceUri;
 	}
@@ -361,16 +362,16 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 		final String hash = processor.generateStatementHash(subjectNode, statement.getPredicate().getUri(), value, statement.getSubject().getType(),
 				statement.getObject().getType());
 
-		final Relationship rel = processor.getStatement(hash);
+		final Relationship rel = processor.getProcessor().getStatement(hash);
 
 		if (rel == null) {
 
 			literals++;
 
-			final Node objectNode = processor.getDatabase().createNode();
+			final Node objectNode = processor.getProcessor().getDatabase().createNode();
 			objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
-			processor.getValueIndex().add(objectNode, GraphStatics.VALUE, value);
+			processor.getProcessor().getValueIndex().add(objectNode, GraphStatics.VALUE, value);
 
 			final String resourceUri = addResourceProperty(subjectNode, statement.getSubject(), objectNode, r);
 
@@ -395,8 +396,8 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 		final Relationship rel = processor.prepareRelationship(subjectNode, objectNode, finalStatementUUID, statement, index, versionHandler);
 
-		processor.getStatementIndex().add(rel, GraphStatics.HASH, hash);
-		processor.addStatementToIndex(rel, finalStatementUUID);
+		processor.getProcessor().getStatementIndex().add(rel, GraphStatics.HASH, hash);
+		processor.getProcessor().addStatementToIndex(rel, finalStatementUUID);
 
 		addedRelationships++;
 
@@ -444,7 +445,7 @@ public abstract class BaseNeo4jGDMHandler implements GDMHandler, GDMUpdateHandle
 
 			case BNode:
 
-				processor.getBNodesIndex().put("" + gdmNode.getId(), node);
+				processor.getProcessor().getBNodesIndex().put("" + gdmNode.getId(), node);
 
 				break;
 		}

@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
 
 import com.google.common.base.Optional;
@@ -58,16 +57,16 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected abstract int retrieveLatestVersion();
 
-	public void setLatestVersion(final String dataModelURI) throws DMPGraphException {
+	public void setLatestVersion(final Optional<String> optionalDataModelURI) throws DMPGraphException {
 
 		if (!latestVersionInitialized) {
 
-			if (dataModelURI == null) {
+			if (!optionalDataModelURI.isPresent()) {
 
 				return;
 			}
 
-			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(), Optional.fromNullable(dataModelURI), Optional.<String>absent());
+			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(), optionalDataModelURI, Optional.<String>absent());
 
 			if (optionalDataModelNode.isPresent()) {
 
@@ -78,13 +77,13 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 			final Node dataModelNode = processor.getDatabase().createNode();
 			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
-			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, dataModelURI);
-			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, dataModelURI + VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, optionalDataModelURI.get());
+			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, optionalDataModelURI.get() + VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
 			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.fromNullable(VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
 

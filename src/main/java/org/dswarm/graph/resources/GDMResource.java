@@ -69,6 +69,7 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -244,7 +245,7 @@ public class GDMResource {
 
 					final Set<String> processedResources = result.other();
 
-					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, handler.getVersionHandler().getLatestVersion(),
+					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, ((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(),
 							processor);
 				}
 			}
@@ -261,15 +262,15 @@ public class GDMResource {
 				GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
 			}
 
-			final Long size = handler.getCountedStatements();
+			final Long size = handler.getHandler().getCountedStatements();
 
 			if (size > 0) {
 
 				// update data model version only when some statements are written to the DB
-				handler.getVersionHandler().updateLatestVersion();
+				((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().updateLatestVersion();
 			}
 
-			handler.closeTransaction();
+			handler.getHandler().closeTransaction();
 
 			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
@@ -331,9 +332,9 @@ public class GDMResource {
 		final GDMParser parser = new GDMModelParser(model);
 		parser.setGDMHandler(handler);
 		parser.parse();
-		handler.closeTransaction();
+		handler.getHandler().closeTransaction();
 
-		LOG.debug("finished writing " + ((SimpleGDMNeo4jHandler) handler).getCountedStatements() + " GDM statements into graph db");
+		LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
 
 		return Response.ok().build();
 	}

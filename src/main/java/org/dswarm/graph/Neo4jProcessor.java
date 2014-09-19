@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dswarm.graph.gdm.utils.NodeTypeUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.neo4j.graphdb.DynamicLabel;
@@ -228,31 +227,44 @@ public abstract class Neo4jProcessor {
 
 		final Long nodeId = subjectNode.getId();
 
-		final String resourceUri;
+		final Optional<String> optionalResourceUri;
 
 		if (nodeResourceMap.containsKey(nodeId)) {
 
-			resourceUri = nodeResourceMap.get(nodeId);
+			optionalResourceUri = Optional.fromNullable(nodeResourceMap.get(nodeId));
 		} else {
 
-			if (optionalSubjectNodeType.isPresent()
-					&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
+			optionalResourceUri = determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 
-				resourceUri = optionalSubjectURI.get();
-			} else if (optionalResourceURI.isPresent()) {
+			if (optionalResourceUri.isPresent()) {
 
-				resourceUri = optionalResourceURI.get();
-			} else {
-
-				// shouldn't never be the case
-
-				resourceUri = null;
+				nodeResourceMap.put(nodeId, optionalResourceUri.get());
 			}
-
-			nodeResourceMap.put(nodeId, resourceUri);
 		}
 
-		return Optional.fromNullable(resourceUri);
+		return optionalResourceUri;
+	}
+
+	public Optional<String> determineResourceUri(final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
+			final Optional<String> optionalResourceURI) {
+
+		final Optional<String> optionalResourceUri;
+
+		if (optionalSubjectNodeType.isPresent()
+				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
+
+			optionalResourceUri = optionalSubjectURI;
+		} else if (optionalResourceURI.isPresent()) {
+
+			optionalResourceUri = optionalResourceURI;
+		} else {
+
+			// shouldn't never be the case
+
+			return Optional.absent();
+		}
+
+		return optionalResourceUri;
 	}
 
 	public void addLabel(final Node node, final String labelString) {
@@ -299,30 +311,38 @@ public abstract class Neo4jProcessor {
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
-			final Map<String, Object> qualifiedAttributes, final long index, final VersionHandler versionHandler) {
+			final Optional<Map<String, Object>> optionalQualifiedAttributes, final VersionHandler versionHandler) {
 
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
 
 		rel.setProperty(GraphStatics.UUID_PROPERTY, statementUUID);
 
-		if (qualifiedAttributes.containsKey(GraphStatics.ORDER_PROPERTY)) {
+		if (optionalQualifiedAttributes.isPresent()) {
 
-			rel.setProperty(GraphStatics.ORDER_PROPERTY, qualifiedAttributes.get(GraphStatics.ORDER_PROPERTY));
-		}
+			final Map<String, Object> qualifiedAttributes = optionalQualifiedAttributes.get();
 
-		rel.setProperty(GraphStatics.INDEX_PROPERTY, index);
+			if (qualifiedAttributes.containsKey(GraphStatics.ORDER_PROPERTY)) {
 
-		// TODO: versioning handling only implemented for data models right now
+				rel.setProperty(GraphStatics.ORDER_PROPERTY, qualifiedAttributes.get(GraphStatics.ORDER_PROPERTY));
+			}
 
-		if (qualifiedAttributes.containsKey(GraphStatics.EVIDENCE_PROPERTY)) {
+			if(qualifiedAttributes.containsKey(GraphStatics.INDEX_PROPERTY)) {
 
-			rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, qualifiedAttributes.get(GraphStatics.EVIDENCE_PROPERTY));
-		}
+				rel.setProperty(GraphStatics.INDEX_PROPERTY, qualifiedAttributes.get(GraphStatics.INDEX_PROPERTY));
+			}
 
-		if (qualifiedAttributes.containsKey(GraphStatics.CONFIDENCE_PROPERTY)) {
+			// TODO: versioning handling only implemented for data models right now
 
-			rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, qualifiedAttributes.get(GraphStatics.CONFIDENCE_PROPERTY));
+			if (qualifiedAttributes.containsKey(GraphStatics.EVIDENCE_PROPERTY)) {
+
+				rel.setProperty(GraphStatics.EVIDENCE_PROPERTY, qualifiedAttributes.get(GraphStatics.EVIDENCE_PROPERTY));
+			}
+
+			if (qualifiedAttributes.containsKey(GraphStatics.CONFIDENCE_PROPERTY)) {
+
+				rel.setProperty(GraphStatics.CONFIDENCE_PROPERTY, qualifiedAttributes.get(GraphStatics.CONFIDENCE_PROPERTY));
+			}
 		}
 
 		return rel;
@@ -432,11 +452,11 @@ public abstract class Neo4jProcessor {
 		return Optional.fromNullable(identifier);
 	}
 
-	public abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI);
+	public abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI);
 
-	public abstract void handleObjectDataModel(Node node, String dataModelURI);
+	public abstract void handleObjectDataModel(Node node, Optional<String> optionalDataModelURI);
 
-	public abstract void handleSubjectDataModel(final Node node, String URI, final String dataModelURI);
+	public abstract void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI);
 
 	public abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
 

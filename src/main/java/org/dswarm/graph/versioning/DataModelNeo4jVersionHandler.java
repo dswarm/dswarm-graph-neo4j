@@ -4,6 +4,8 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.model.GraphStatics;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -39,19 +41,19 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 	}
 
 	@Override
-	public void setLatestVersion(final String dataModelURI) throws DMPGraphException {
+	public void setLatestVersion(final Optional<String> optionalDataModelURI) throws DMPGraphException {
 
 		final String finalDataModelURI;
 
-		if (dataModelURI != null) {
+		if (optionalDataModelURI.isPresent()) {
 
-			finalDataModelURI = dataModelURI;
+			finalDataModelURI = optionalDataModelURI.get();
 		} else {
 
 			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
 		}
 
-		super.setLatestVersion(finalDataModelURI);
+		super.setLatestVersion(Optional.fromNullable(finalDataModelURI));
 	}
 
 	@Override

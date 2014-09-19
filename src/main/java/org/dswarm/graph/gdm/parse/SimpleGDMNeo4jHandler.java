@@ -2,11 +2,7 @@ package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
-import org.dswarm.graph.versioning.SimpleNeo4jVersionHandler;
-import org.dswarm.graph.model.GraphStatics;
-
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.IndexHits;
+import org.dswarm.graph.parse.SimpleNeo4jHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,34 +17,6 @@ public class SimpleGDMNeo4jHandler extends GDMNeo4jHandler {
 
 	public SimpleGDMNeo4jHandler(final GDMNeo4jProcessor processorArg) throws DMPGraphException {
 
-		super(processorArg);
-	}
-
-	@Override
-	protected void init() throws DMPGraphException {
-
-		versionHandler = new SimpleNeo4jVersionHandler(processor.getProcessor());
-	}
-
-	@Override
-	protected Relationship getRelationship(final String uuid) {
-
-		final IndexHits<Relationship> hits = processor.getProcessor().getStatementIndex().get(GraphStatics.UUID, uuid);
-
-		if (hits != null && hits.hasNext()) {
-
-			final Relationship rel = hits.next();
-
-			hits.close();
-
-			return rel;
-		}
-
-		if (hits != null) {
-
-			hits.close();
-		}
-
-		return null;
+		super(new SimpleNeo4jHandler(processorArg.getProcessor()), processorArg);
 	}
 }

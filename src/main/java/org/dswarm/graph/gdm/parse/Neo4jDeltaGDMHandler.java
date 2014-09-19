@@ -16,6 +16,8 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.parse.Neo4jHandler;
+
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -255,13 +257,13 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 	}
 
-	@Override
-	public void setResourceUri(String resourceUri) {
+	@Override public Neo4jHandler getHandler() {
 
-		// nothing TODO here
+		// nothing TODO here ...
+
+		return null;
 	}
 
-	@Override
 	public void closeTransaction() {
 
 		LOG.debug("close write TX finally");

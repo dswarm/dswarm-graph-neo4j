@@ -13,6 +13,8 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
+
 /**
  * @author tgaengler
  */
@@ -57,40 +59,40 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
+	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI == null) {
+		if (!optionalDataModelURI.isPresent()) {
 
 			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
 		} else {
 
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
 		}
 	}
 
 	@Override
-	public void handleObjectDataModel(final Node node, final String dataModelURI) {
+	public void handleObjectDataModel(final Node node, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI == null) {
+		if (!optionalDataModelURI.isPresent()) {
 
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
 		} else {
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
 		}
 	}
 
 	@Override
-	public void handleSubjectDataModel(final Node node, String URI, final String dataModelURI) {
+	public void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI == null) {
+		if (!optionalDataModelURI.isPresent()) {
 
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
 			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
 		} else {
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
 		}
 	}
 
@@ -108,9 +110,9 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 	@Override
 	public Relationship prepareRelationship(Node subjectNode, String predicateURI, Node objectNode, String statementUUID,
-			Map<String, Object> qualifiedAttributes, long index, VersionHandler versionHandler) {
+			Optional<Map<String, Object>> qualifiedAttributes, VersionHandler versionHandler) {
 
-		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, index, versionHandler);
+		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, versionHandler);
 
 		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 

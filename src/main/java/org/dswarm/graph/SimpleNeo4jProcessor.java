@@ -2,6 +2,8 @@ package org.dswarm.graph;
 
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.model.GraphStatics;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,30 +44,30 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final String dataModelURI) {
+	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI != null) {
+		if (optionalDataModelURI.isPresent()) {
 
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
 		}
 	}
 
 	@Override
-	public void handleObjectDataModel(final Node node, final String dataModelURI) {
+	public void handleObjectDataModel(final Node node, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI != null) {
+		if (optionalDataModelURI.isPresent()) {
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
 		}
 	}
 
 	@Override
-	public void handleSubjectDataModel(final Node node, String URI, final String dataModelURI) {
+	public void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI) {
 
-		if (dataModelURI != null) {
+		if (optionalDataModelURI.isPresent()) {
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + dataModelURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
+			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
 		}
 	}
 

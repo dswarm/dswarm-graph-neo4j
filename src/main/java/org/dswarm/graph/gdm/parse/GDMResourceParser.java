@@ -34,7 +34,7 @@ public class GDMResourceParser implements GDMParser {
 
 			LOG.debug("there are no statements in the GDM resource");
 
-			gdmHandler.closeTransaction();
+			gdmHandler.getHandler().closeTransaction();
 
 			return;
 		}
@@ -50,6 +50,6 @@ public class GDMResourceParser implements GDMParser {
 			gdmHandler.handleStatement(statement, resource, i);
 		}
 
-		gdmHandler.closeTransaction();
+		gdmHandler.getHandler().closeTransaction();
 	}
 }

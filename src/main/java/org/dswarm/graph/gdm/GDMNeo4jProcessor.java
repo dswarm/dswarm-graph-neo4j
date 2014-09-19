@@ -10,9 +10,9 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.VersionHandler;
+import org.dswarm.graph.model.StatementBuilder;
+
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +38,10 @@ public abstract class GDMNeo4jProcessor {
 		return processor;
 	}
 
-	public Optional<Node> determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
+	public StatementBuilder determineNode(final org.dswarm.graph.json.Node resource, final StatementBuilder statementBuilder, final boolean forSubject) {
 
 		final Optional<org.dswarm.graph.json.Node> optionalResource = Optional.fromNullable(resource);
-		final Optional<NodeType> optionalResourceNodeType = NodeTypeUtils.getNodeType(optionalResource, Optional.of(isType));
+		final Optional<NodeType> optionalResourceNodeType = NodeTypeUtils.getNodeType(optionalResource);
 
 		final Optional<String> optionalResourceId;
 		final Optional<String> optionalResourceUri;
@@ -76,10 +76,22 @@ public abstract class GDMNeo4jProcessor {
 			optionalDataModelUri = Optional.absent();
 		}
 
-		return processor.determineNode(optionalResourceNodeType, optionalResourceId, optionalResourceUri, optionalDataModelUri);
+		if (forSubject) {
+
+			statementBuilder.setOptionalSubjectId(optionalResourceId);
+			statementBuilder.setOptionalSubjectURI(optionalResourceUri);
+			statementBuilder.setOptionalSubjectDataModelURI(optionalDataModelUri);
+		} else {
+
+			statementBuilder.setOptionalObjectId(optionalResourceId);
+			statementBuilder.setOptionalObjectURI(optionalResourceUri);
+			statementBuilder.setOptionalObjectDataModelURI(optionalDataModelUri);
+		}
+
+		return statementBuilder;
 	}
 
-	public Optional<String> determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Resource resource) {
+	public Optional<String> determineResourceUri(final org.dswarm.graph.json.Node subject, final Resource resource) {
 
 		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(subject));
 
@@ -103,7 +115,7 @@ public abstract class GDMNeo4jProcessor {
 			optionalResourceURI = Optional.absent();
 		}
 
-		return processor.determineResourceUri(subjectNode, optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
+		return processor.determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 	}
 
 	public String generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode,
@@ -130,10 +142,7 @@ public abstract class GDMNeo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public Relationship prepareRelationship(final Node subjectNode, final Node objectNode, final String statementUUID, final Statement statement,
-			final long index, final VersionHandler versionHandler) {
-
-		final String predicateURI = statement.getPredicate().getUri();
+	public Map<String, Object> getQualifiedAttributes(final Statement statement) {
 
 		final Map<String, Object> qualifiedAttributes = Maps.newHashMap();
 
@@ -152,6 +161,8 @@ public abstract class GDMNeo4jProcessor {
 			qualifiedAttributes.put(GraphStatics.CONFIDENCE_PROPERTY, statement.getConfidence());
 		}
 
-		return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, index, versionHandler);
+		return qualifiedAttributes;
+
+		// return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, Optional.of(qualifiedAttributes), versionHandler);
 	}
 }

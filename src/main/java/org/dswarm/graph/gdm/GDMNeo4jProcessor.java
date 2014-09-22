@@ -61,14 +61,14 @@ public abstract class GDMNeo4jProcessor {
 
 			if (optionalResourceNodeType.isPresent()) {
 
-				if(NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
+				if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 					final ResourceNode resourceResourceNode = (ResourceNode) resource;
 
 					optionalResourceUri = Optional.fromNullable(resourceResourceNode.getUri());
 					optionalDataModelUri = Optional.fromNullable(resourceResourceNode.getDataModel());
 					optionalResourceValue = Optional.absent();
-				} else if(NodeType.Literal.equals(optionalResourceNodeType.get())) {
+				} else if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
 
 					optionalResourceValue = Optional.fromNullable(((LiteralNode) resource).getValue());
 					optionalResourceUri = Optional.absent();
@@ -115,7 +115,8 @@ public abstract class GDMNeo4jProcessor {
 
 		final Optional<String> optionalSubjectURI;
 
-		if (optionalSubjectNodeType.isPresent() && NodeType.Resource.equals(optionalSubjectNodeType.get())) {
+		if (optionalSubjectNodeType.isPresent()
+				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
 
 			optionalSubjectURI = Optional.fromNullable(((ResourceNode) subject).getUri());
 		} else {
@@ -181,6 +182,7 @@ public abstract class GDMNeo4jProcessor {
 
 		return qualifiedAttributes;
 
-		// return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, Optional.of(qualifiedAttributes), versionHandler);
+		// return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID,
+		// Optional.of(qualifiedAttributes), versionHandler);
 	}
 }

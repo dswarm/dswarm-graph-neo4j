@@ -245,8 +245,8 @@ public class GDMResource {
 
 					final Set<String> processedResources = result.other();
 
-					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, ((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(),
-							processor);
+					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, ((Neo4jUpdateHandler) handler.getHandler())
+							.getVersionHandler().getLatestVersion(), processor);
 				}
 			}
 
@@ -276,7 +276,7 @@ public class GDMResource {
 
 			return Response.ok().build();
 
-		} catch (final DMPGraphException e) {
+		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
@@ -328,13 +328,22 @@ public class GDMResource {
 		LOG.debug("try to write GDM statements into graph db");
 
 		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database);
-		final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
-		final GDMParser parser = new GDMModelParser(model);
-		parser.setGDMHandler(handler);
-		parser.parse();
-		handler.getHandler().closeTransaction();
 
-		LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
+		try {
+
+			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
+			final GDMParser parser = new GDMModelParser(model);
+			parser.setGDMHandler(handler);
+			parser.parse();
+			handler.getHandler().closeTransaction();
+
+			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			throw e;
+		}
 
 		return Response.ok().build();
 	}

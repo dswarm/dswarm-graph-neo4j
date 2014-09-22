@@ -327,7 +327,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		return addedNodes;
 	}
 
-	public int getRelationShipsAdded() {
+	@Override
+	public int getRelationshipsAdded() {
 
 		return addedRelationships;
 	}
@@ -469,7 +470,10 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			finalOptionalResourceUri = processor.determineResourceUri(subjectNode, optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 		}
 
-		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceUri.get());
+		if(finalOptionalResourceUri.isPresent()) {
+
+			rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceUri.get());
+		}
 
 		return finalOptionalResourceUri;
 	}

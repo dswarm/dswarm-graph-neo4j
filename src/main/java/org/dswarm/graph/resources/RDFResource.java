@@ -16,34 +16,37 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.dswarm.common.MediaTypeUtil;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.rdf.DataModelRDFNeo4jProcessor;
+import org.dswarm.graph.rdf.RDFNeo4jProcessor;
+import org.dswarm.graph.rdf.SimpleRDFNeo4jProcessor;
+import org.dswarm.graph.rdf.export.DataModelRDFExporter;
+import org.dswarm.graph.rdf.export.GraphRDFExporter;
+import org.dswarm.graph.rdf.export.RDFExporter;
+import org.dswarm.graph.rdf.parse.DataModelRDFNeo4jHandler;
+import org.dswarm.graph.rdf.parse.JenaModelParser;
+import org.dswarm.graph.rdf.parse.RDFHandler;
+import org.dswarm.graph.rdf.parse.RDFParser;
+import org.dswarm.graph.rdf.parse.SimpleRDFNeo4jHandler;
+import org.dswarm.graph.rdf.parse.nx.NxModelParser;
+import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
+import org.dswarm.graph.rdf.read.RDFReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.common.MediaTypeUtil;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.rdf.export.DataModelRDFExporter;
-import org.dswarm.graph.rdf.export.GraphRDFExporter;
-import org.dswarm.graph.rdf.export.RDFExporter;
-import org.dswarm.graph.rdf.parse.JenaModelParser;
-import org.dswarm.graph.rdf.parse.Neo4jRDFHandler;
-import org.dswarm.graph.rdf.parse.Neo4jRDFWDataModelHandler;
-import org.dswarm.graph.rdf.parse.RDFHandler;
-import org.dswarm.graph.rdf.parse.RDFParser;
-import org.dswarm.graph.rdf.parse.nx.NxModelParser;
-import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
-import org.dswarm.graph.rdf.read.RDFReader;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.MultiPart;
 
 /**
  * @author tgaengler
@@ -91,14 +94,25 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFWDataModelHandler(database, dataModelURI);
-		final RDFParser parser = new JenaModelParser(model);
-		parser.setRDFHandler(handler);
-		parser.parse();
+		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, dataModelURI);
 
-		LOG.debug("finished writing " + ((Neo4jRDFWDataModelHandler) handler).getCountedStatements() + " RDF statements ('"
-				+ ((Neo4jRDFWDataModelHandler) handler).getRelationShipsAdded() + "' added relationships) into graph db for data model URI '"
-				+ dataModelURI + "'");
+		try {
+
+			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+			final RDFParser parser = new JenaModelParser(model);
+			parser.setRDFHandler(handler);
+			parser.parse();
+
+			handler.getHandler().closeTransaction();
+
+			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
+					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI + "'");
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			throw e;
+		}
 
 		return Response.ok().build();
 	}
@@ -117,12 +131,26 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFHandler handler = new Neo4jRDFHandler(database);
-		final RDFParser parser = new JenaModelParser(model);
-		parser.setRDFHandler(handler);
-		parser.parse();
+		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database);
 
-		RDFResource.LOG.debug("finished writing " + ((Neo4jRDFHandler) handler).getCountedStatements() + " RDF statements into graph db");
+		try {
+
+			final RDFHandler handler = new SimpleRDFNeo4jHandler(processor);
+			final RDFParser parser = new JenaModelParser(model);
+			parser.setRDFHandler(handler);
+			parser.parse();
+
+			handler.getHandler().closeTransaction();
+
+			RDFResource.LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements into graph db");
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			throw e;
+		}
+
+
 
 		return Response.ok().build();
 	}
@@ -169,8 +197,7 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler(database,
-				dataModelURI);
+		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler(database, dataModelURI);
 		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
 		parser.setRDFHandler(handler);
 		parser.parse();
@@ -219,8 +246,7 @@ public class RDFResource {
 		final String result = writer.toString();
 
 		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
-				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' from graph db");
 
 		return Response.ok().entity(result).build();
 	}

@@ -231,7 +231,7 @@ public abstract class Neo4jProcessor {
 
 		if (nodeResourceMap.containsKey(nodeId)) {
 
-			optionalResourceUri = Optional.fromNullable(nodeResourceMap.get(nodeId));
+			optionalResourceUri = Optional.of(nodeResourceMap.get(nodeId));
 		} else {
 
 			optionalResourceUri = determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);

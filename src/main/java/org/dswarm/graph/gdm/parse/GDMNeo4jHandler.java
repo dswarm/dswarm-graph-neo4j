@@ -63,7 +63,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		final org.dswarm.graph.json.Node object = st.getObject();
 		final Optional<NodeType> optionalObjectNodeType = NodeTypeUtils.getNodeType(Optional.of(object));
 		sb.setOptionalObjectNodeType(optionalObjectNodeType);
-		processor.determineNode(object, sb, true);
+		processor.determineNode(object, sb, false);
 
 		final Optional<String> optionalStatementUUID = Optional.fromNullable(st.getUUID());
 		sb.setOptionalStatementUUID(optionalStatementUUID);

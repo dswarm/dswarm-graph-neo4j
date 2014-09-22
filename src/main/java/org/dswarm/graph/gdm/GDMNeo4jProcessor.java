@@ -6,6 +6,7 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
+import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
@@ -46,6 +47,7 @@ public abstract class GDMNeo4jProcessor {
 		final Optional<String> optionalResourceId;
 		final Optional<String> optionalResourceUri;
 		final Optional<String> optionalDataModelUri;
+		final Optional<String> optionalResourceValue;
 
 		if (optionalResource.isPresent()) {
 
@@ -57,23 +59,38 @@ public abstract class GDMNeo4jProcessor {
 				optionalResourceId = Optional.absent();
 			}
 
-			if (optionalResourceNodeType.isPresent()
-					&& (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get()))) {
+			if (optionalResourceNodeType.isPresent()) {
 
-				final ResourceNode resourceResourceNode = (ResourceNode) resource;
+				if(NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
-				optionalResourceUri = Optional.fromNullable(resourceResourceNode.getUri());
-				optionalDataModelUri = Optional.fromNullable(resourceResourceNode.getDataModel());
+					final ResourceNode resourceResourceNode = (ResourceNode) resource;
+
+					optionalResourceUri = Optional.fromNullable(resourceResourceNode.getUri());
+					optionalDataModelUri = Optional.fromNullable(resourceResourceNode.getDataModel());
+					optionalResourceValue = Optional.absent();
+				} else if(NodeType.Literal.equals(optionalResourceNodeType.get())) {
+
+					optionalResourceValue = Optional.fromNullable(((LiteralNode) resource).getValue());
+					optionalResourceUri = Optional.absent();
+					optionalDataModelUri = Optional.absent();
+				} else {
+
+					optionalResourceUri = Optional.absent();
+					optionalDataModelUri = Optional.absent();
+					optionalResourceValue = Optional.absent();
+				}
 			} else {
 
 				optionalResourceUri = Optional.absent();
 				optionalDataModelUri = Optional.absent();
+				optionalResourceValue = Optional.absent();
 			}
 		} else {
 
 			optionalResourceId = Optional.absent();
 			optionalResourceUri = Optional.absent();
 			optionalDataModelUri = Optional.absent();
+			optionalResourceValue = Optional.absent();
 		}
 
 		if (forSubject) {
@@ -86,6 +103,7 @@ public abstract class GDMNeo4jProcessor {
 			statementBuilder.setOptionalObjectId(optionalResourceId);
 			statementBuilder.setOptionalObjectURI(optionalResourceUri);
 			statementBuilder.setOptionalObjectDataModelURI(optionalDataModelUri);
+			statementBuilder.setOptionalObjectValue(optionalResourceValue);
 		}
 
 		return statementBuilder;

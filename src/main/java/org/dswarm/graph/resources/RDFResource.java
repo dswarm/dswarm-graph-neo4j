@@ -111,6 +111,8 @@ public class RDFResource {
 
 			processor.getProcessor().failTx();
 
+			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+
 			throw e;
 		}
 
@@ -146,6 +148,8 @@ public class RDFResource {
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
 
 			throw e;
 		}

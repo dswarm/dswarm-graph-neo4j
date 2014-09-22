@@ -280,6 +280,8 @@ public class GDMResource {
 
 			processor.getProcessor().failTx();
 
+			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
+
 			throw e;
 		}
 	}
@@ -341,6 +343,8 @@ public class GDMResource {
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
 
 			throw e;
 		}

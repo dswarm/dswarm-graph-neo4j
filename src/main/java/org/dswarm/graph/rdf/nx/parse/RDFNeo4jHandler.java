@@ -47,7 +47,7 @@ public abstract class RDFNeo4jHandler implements RDFHandler {
 		processor.determineNode(subject, sb, true);
 
 		final Node predicate = st[1];
-		final String predicateName = predicate.toString();
+		final String predicateName = predicate.getLabel();
 		sb.setOptionalPredicateURI(Optional.fromNullable(predicateName));
 
 		final Node object = st[2];

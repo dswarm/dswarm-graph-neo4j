@@ -52,7 +52,7 @@ public abstract class RDFNeo4jProcessor {
 
 					// only bnodes have ids in Jena
 
-					optionalResourceId = Optional.fromNullable(resource.toString());
+					optionalResourceId = Optional.fromNullable(resource.getLabel());
 				} else {
 
 					optionalResourceId = Optional.absent();
@@ -60,13 +60,13 @@ public abstract class RDFNeo4jProcessor {
 
 				if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
-					optionalResourceUri = Optional.fromNullable(resource.toString());
+					optionalResourceUri = Optional.fromNullable(resource.getLabel());
 					optionalDataModelUri = Optional.absent();
 					optionalResourceValue = Optional.absent();
 				} else if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
 
 					// TODO: we could extract and set the datatype of the literal as well
-					optionalResourceValue = Optional.fromNullable(((Literal) resource).getData());
+					optionalResourceValue = Optional.fromNullable(resource.getLabel());
 					optionalResourceUri = Optional.absent();
 					optionalDataModelUri = Optional.absent();
 				} else {

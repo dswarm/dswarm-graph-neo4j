@@ -166,7 +166,8 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
-		final NxParser nxParser = new NxParser(inputStream);
+		final NxParser nxParser = new NxParser();
+		nxParser.parse(inputStream);
 
 		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 
@@ -209,7 +210,8 @@ public class RDFResource {
 
 		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
 
-		final NxParser nxParser = new NxParser(rdfInputStream);
+		final NxParser nxParser = new NxParser();
+		nxParser.parse(rdfInputStream);
 
 		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
 

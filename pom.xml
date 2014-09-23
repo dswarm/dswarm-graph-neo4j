@@ -18,13 +18,15 @@
 		<maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
 		<maven-resources-plugin.version>2.6</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.1</maven-install-plugin.version>
-		<maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
 		<maven-clean-plugin.version>2.5</maven-clean-plugin.version>
-		<maven-release-plugin.version>2.4.2</maven-release-plugin.version>
+		<maven-release-plugin.version>2.5</maven-release-plugin.version>
+		<maven-version-plugin.version>2.1</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>2.11.1</jena.version>
+		<jena.version>2.12.0</jena.version>
 		<jersey.version>1.9</jersey.version>
 		<junit.version>4.11</junit.version>
+		<nxparser.version>2.0-SNAPSHOT</nxparser.version>
 	</properties>
 
 	<build>
@@ -96,6 +98,11 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${maven-version-plugin.version}</version>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>
@@ -110,6 +117,16 @@
 			</testResource>
 		</testResources>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${maven-version-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
 
 	<repositories>
 		<repository>
@@ -217,7 +234,7 @@
 		<dependency>
 			<groupId>org.semanticweb.yars</groupId>
 			<artifactId>nxparser</artifactId>
-			<version>1.2.5</version>
+			<version>${nxparser.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>

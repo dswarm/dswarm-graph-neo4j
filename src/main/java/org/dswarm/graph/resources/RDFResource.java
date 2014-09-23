@@ -29,12 +29,12 @@ import org.dswarm.graph.rdf.SimpleRDFNeo4jProcessor;
 import org.dswarm.graph.rdf.export.DataModelRDFExporter;
 import org.dswarm.graph.rdf.export.GraphRDFExporter;
 import org.dswarm.graph.rdf.export.RDFExporter;
+import org.dswarm.graph.rdf.nx.parse.NxModelParser;
 import org.dswarm.graph.rdf.parse.DataModelRDFNeo4jHandler;
 import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.RDFHandler;
 import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.SimpleRDFNeo4jHandler;
-import org.dswarm.graph.rdf.parse.nx.NxModelParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -172,13 +172,27 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFHandler(database);
-		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
-		parser.setRDFHandler(handler);
-		parser.parse();
+		final org.dswarm.graph.rdf.nx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.nx.SimpleRDFNeo4jProcessor(database);
 
-		RDFResource.LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFHandler) handler).getCountedStatements()
-				+ " RDF statements into graph db");
+		try {
+
+			final org.dswarm.graph.rdf.nx.parse.RDFHandler handler = new org.dswarm.graph.rdf.nx.parse.SimpleRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.nx.parse.RDFParser parser = new NxModelParser(nxParser);
+			parser.setRDFHandler(handler);
+			parser.parse();
+
+			handler.getHandler().closeTransaction();
+
+			RDFResource.LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
+					+ " RDF statements into graph db");
+		} catch(final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+
+			throw e;
+		}
 
 		return Response.ok().build();
 	}
@@ -186,7 +200,7 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes("multipart/mixed")
-	public Response writeRDFwPROVwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeRDFwDataModelwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -201,13 +215,27 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.parse.nx.RDFHandler handler = new org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler(database, dataModelURI);
-		final org.dswarm.graph.rdf.parse.nx.RDFParser parser = new NxModelParser(nxParser);
-		parser.setRDFHandler(handler);
-		parser.parse();
+		final org.dswarm.graph.rdf.nx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.nx.DataModelRDFNeo4jProcessor(database, dataModelURI);
 
-		LOG.debug("finished writing " + ((org.dswarm.graph.rdf.parse.nx.Neo4jRDFWDataModelHandler) handler).getCountedStatements()
-				+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
+		try {
+
+			final org.dswarm.graph.rdf.nx.parse.RDFHandler handler = new org.dswarm.graph.rdf.nx.parse.DataModelRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.nx.parse.RDFParser parser = new NxModelParser(nxParser);
+			parser.setRDFHandler(handler);
+			parser.parse();
+
+			handler.getHandler().closeTransaction();
+
+			LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
+					+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
+		} catch(final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+
+			throw e;
+		}
 
 		return Response.ok().build();
 	}

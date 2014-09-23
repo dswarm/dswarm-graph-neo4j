@@ -1,16 +1,15 @@
-package org.dswarm.graph.rdf.parse.nx;
-
-import org.semanticweb.yars.nx.parser.NxParser;
+package org.dswarm.graph.rdf.nx.parse;
 
 import org.dswarm.graph.DMPGraphException;
+import org.semanticweb.yars.nx.parser.NxParser;
 
 /**
  * @author tgaengler
  */
 public class NxModelParser implements RDFParser {
 
-	private RDFHandler		rdfHandler;
-	private final NxParser	model;
+	private       RDFHandler rdfHandler;
+	private final NxParser   model;
 
 	public NxModelParser(final NxParser modelArg) {
 
@@ -30,7 +29,5 @@ public class NxModelParser implements RDFParser {
 
 			rdfHandler.handleStatement(model.next());
 		}
-
-		rdfHandler.closeTransaction();
 	}
 }

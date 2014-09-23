@@ -1,4 +1,4 @@
-package org.dswarm.graph.rdf.parse.nx;
+package org.dswarm.graph.rdf.nx.parse;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -34,33 +34,33 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgaengler
  */
-public class Neo4jRDFHandler implements RDFHandler {
+public class Neo4jRDFHandler {
 
 	private static final Logger			LOG						= LoggerFactory.getLogger(Neo4jRDFHandler.class);
 
-	private int							totalTriples			= 0;
-	private int							addedNodes				= 0;
-	private int							addedLabels				= 0;
-	private int							addedRelationships		= 0;
-	private int							sinceLastCommit			= 0;
-	private int							i						= 0;
-	private int							literals				= 0;
+	private int totalTriples       = 0;
+	private int addedNodes         = 0;
+	private int addedLabels        = 0;
+	private int addedRelationships = 0;
+	private int sinceLastCommit    = 0;
+	private int i                  = 0;
+	private int literals           = 0;
 
-	private long						tick					= System.currentTimeMillis();
-	private final GraphDatabaseService	database;
+	private long tick = System.currentTimeMillis();
+	private final GraphDatabaseService database;
 	// private final Index<Node> resources;
 	// private final Index<Node> resourcesWProvenance;
 	// private final Index<Node> resourceTypes;
 	// private final Index<Node> values;
-	private final Map<String, Node>		bnodes;
+	private final Map<String, Node>    bnodes;
 	// private final Index<Relationship>	statements;
 	// private final Map<Long, String> nodeResourceMap;
 
-	private Transaction					tx;
+	private Transaction tx;
 
-	private Label						resourceNodeLabel		= DynamicLabel.label(NodeType.Resource.toString());
-	private Label						typeResourceNodeLabel	= DynamicLabel.label(NodeType.TypeResource.toString());
-	private Label						literalNodeLabel		= DynamicLabel.label(NodeType.Literal.toString());
+	private Label resourceNodeLabel     = DynamicLabel.label(NodeType.Resource.toString());
+	private Label typeResourceNodeLabel = DynamicLabel.label(NodeType.TypeResource.toString());
+	private Label literalNodeLabel      = DynamicLabel.label(NodeType.Literal.toString());
 
 	public Neo4jRDFHandler(final GraphDatabaseService database) throws DMPGraphException {
 
@@ -78,11 +78,11 @@ public class Neo4jRDFHandler implements RDFHandler {
 
 		// TODO: switch to auto-index for nodes and relationships, i.e., remove separate statements index + enable auto-indexing => via uuid property ;)
 
-//		try (Transaction tx = database.beginTx()) {
-//
-//			statements = database.index().forRelationships("statements");
-//			tx.success();
-//		}
+		//		try (Transaction tx = database.beginTx()) {
+		//
+		//			statements = database.index().forRelationships("statements");
+		//			tx.success();
+		//		}
 
 		// nodeResourceMap = new HashMap<Long, String>();
 
@@ -91,7 +91,6 @@ public class Neo4jRDFHandler implements RDFHandler {
 		LOG.debug("start write TX");
 	}
 
-	@Override
 	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) throws DMPGraphException {
 
 		i++;
@@ -246,7 +245,6 @@ public class Neo4jRDFHandler implements RDFHandler {
 		}
 	}
 
-	@Override
 	public void closeTransaction() {
 
 		LOG.debug("close write TX finally");

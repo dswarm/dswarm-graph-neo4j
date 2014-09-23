@@ -1,4 +1,4 @@
-package org.dswarm.graph.rdf.parse.nx;
+package org.dswarm.graph.rdf.nx.parse;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgaengler
  */
-public class Neo4jRDFWDataModelHandler implements RDFHandler {
+public class Neo4jRDFWDataModelHandler {
 
 	private static final Logger			LOG						= LoggerFactory.getLogger(Neo4jRDFWDataModelHandler.class);
 
@@ -112,7 +112,6 @@ public class Neo4jRDFWDataModelHandler implements RDFHandler {
 		LOG.debug("start write TX");
 	}
 
-	@Override
 	public void handleStatement(final org.semanticweb.yars.nx.Node[] st) throws DMPGraphException {
 
 		i++;
@@ -274,7 +273,6 @@ public class Neo4jRDFWDataModelHandler implements RDFHandler {
 		}
 	}
 
-	@Override
 	public void closeTransaction() {
 
 		LOG.debug("close write TX finally");

@@ -114,8 +114,8 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public Relationship prepareRelationship(Node subjectNode, String predicateURI, Node objectNode, String statementUUID,
-			Optional<Map<String, Object>> qualifiedAttributes, VersionHandler versionHandler) {
+	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
+			final Optional<Map<String, Object>> qualifiedAttributes, final VersionHandler versionHandler) {
 
 		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, versionHandler);
 

@@ -314,6 +314,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		LOG.debug("close write TX finally");
 
 		processor.succeedTx();
+		processor.clearMaps();
 	}
 
 	@Override

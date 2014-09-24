@@ -27,6 +27,7 @@
 		<jersey.version>1.9</jersey.version>
 		<junit.version>4.11</junit.version>
 		<nxparser.version>2.0-SNAPSHOT</nxparser.version>
+		<hppc.version>0.6.0</hppc.version>
 	</properties>
 
 	<build>
@@ -268,6 +269,11 @@
 			<artifactId>neo4j-kernel</artifactId>
 			<type>test-jar</type>
 			<version>${neo4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>hppc</artifactId>
+			<version>${hppc.version}</version>
 		</dependency>
 	</dependencies>
 

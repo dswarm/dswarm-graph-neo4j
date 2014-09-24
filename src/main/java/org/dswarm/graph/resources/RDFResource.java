@@ -78,7 +78,7 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeRDF(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -104,12 +104,18 @@ public class RDFResource {
 			parser.parse();
 
 			handler.getHandler().closeTransaction();
+			rdfInputStream.close();
 
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
 					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI + "'");
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			if(rdfInputStream != null) {
+
+				rdfInputStream.close();
+			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
 
@@ -122,7 +128,7 @@ public class RDFResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeRDF(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -143,11 +149,17 @@ public class RDFResource {
 			parser.parse();
 
 			handler.getHandler().closeTransaction();
+			inputStream.close();
 
 			RDFResource.LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements into graph db");
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			if(inputStream != null) {
+
+				inputStream.close();
+			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
 
@@ -162,7 +174,7 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeRDFwNx(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -183,12 +195,18 @@ public class RDFResource {
 			parser.parse();
 
 			handler.getHandler().closeTransaction();
+			inputStream.close();
 
 			RDFResource.LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
 					+ " RDF statements into graph db");
 		} catch(final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			if(inputStream != null) {
+
+				inputStream.close();
+			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
 
@@ -201,7 +219,8 @@ public class RDFResource {
 	@POST
 	@Path("/putnx")
 	@Consumes("multipart/mixed")
-	public Response writeRDFwDataModelwNx(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeRDFwDataModelwNx(final MultiPart multiPart, @Context final GraphDatabaseService database)
+			throws DMPGraphException, IOException {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
@@ -227,12 +246,18 @@ public class RDFResource {
 			parser.parse();
 
 			handler.getHandler().closeTransaction();
+			rdfInputStream.close();
 
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
 					+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
 		} catch(final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			if(rdfInputStream != null) {
+
+				rdfInputStream.close();
+			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
 

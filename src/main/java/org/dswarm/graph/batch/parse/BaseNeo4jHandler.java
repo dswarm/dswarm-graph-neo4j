@@ -209,14 +209,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 					addedNodes++;
 				}
 
-//				final String hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId,
-//						subjectNodeType, finalObjectNodeType);
-//
-//				final Optional<Long> optionalRelId = processor.getStatement(hash);
-//
-//				if (!optionalRelId.isPresent()) {
+				final String hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId,
+						subjectNodeType, finalObjectNodeType);
 
-				final String hash = null;
+				final Optional<Long> optionalRelId = processor.getStatement(hash);
+
+				if (!optionalRelId.isPresent()) {
+
+				// final String hash = null;
 
 					final Optional<String> finalOptionalResourceUri;
 
@@ -232,14 +232,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 							statement.getOptionalSubjectURI(), statement.getOptionalStatementUUID(), finalOptionalResourceUri,
 							statement.getOptionalQualifiedAttributes(), hash);
 				}
-//			}
+			}
 
 			totalTriples++;
 
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 50000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
+			if (nodeDelta >= 200000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
 
 				sinceLastCommit = totalTriples;
 
@@ -248,12 +248,12 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				tick = System.currentTimeMillis();
 			}
 
-			if(nodeDelta >= 1000000 || timeDelta >= 30) {
-
-				LOG.debug("flush indices");
-
-				processor.flushIndices();
-			}
+//			if(nodeDelta >= 1000000 || timeDelta >= 30) {
+//
+//				LOG.debug("flush indices");
+//
+//				processor.flushIndices();
+//			}
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish write TX successfully";
@@ -385,8 +385,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		final Long relId = processor.prepareRelationship(subjectNodeId, predicateURI, objectNodeId, finalStatementUUID,
 				optionalQualifiedAttributes);
 
-//		processor.addToStatementIndex(hash, relId);
-//		processor.addStatementToIndex(relId, finalStatementUUID);
+		processor.addToStatementIndex(hash, relId);
+		processor.addStatementToIndex(relId, finalStatementUUID);
 
 		addedRelationships++;
 

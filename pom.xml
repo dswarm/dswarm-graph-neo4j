@@ -275,6 +275,11 @@
 			<artifactId>hppc</artifactId>
 			<version>${hppc.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>de.knutwalker</groupId>
+			<artifactId>dbpedia-parser_2.10</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

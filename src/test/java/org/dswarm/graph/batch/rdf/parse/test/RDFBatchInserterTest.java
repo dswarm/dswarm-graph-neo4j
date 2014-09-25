@@ -31,42 +31,60 @@ public class RDFBatchInserterTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RDFBatchInserterTest.class);
 
+	private static final String BASE_PATH = "/media/tgaengler/data/dnb_dump/nt/dnb_dump_0000";
+	private static final String PATH_POSTFIX = "01.nt";
+
 	@Test
 	public void testRDFBatchInsertTest() throws Exception {
 
-		LOG.debug("start batch import");
+		for (int i = 1; i < 33; i++) {
 
-		final String dataModelURI = "dnb";
+			LOG.debug("start batch import pt. " + i);
 
-		final Path path = Paths.get("/var/lib/neo4j/conf/neo4j.properties");
-		final InputStream input = Files.newInputStream(path);
-		final Map<String, String> config = MapUtil.load(input);
-		input.close();
-		final BatchInserter inserter = BatchInserters.inserter("target/batchinserter-example-config", config);
+			final String dataModelURI = "dnb";
 
-		LOG.debug("finish initializing batch inserter");
+			final Path path = Paths.get("/var/lib/neo4j/conf/neo4j.properties");
+			final InputStream input = Files.newInputStream(path);
+			final Map<String, String> config = MapUtil.load(input);
+			input.close();
+			final BatchInserter inserter = BatchInserters.inserter("/media/tgaengler/data/projects/ekz/neo4j/dnb_data", config);
 
-		final Path modelPath = Paths.get("/media/tgaengler/data/dnb_dump/nt/dnb_dump_000001.nt");
-		//final Path modelPath = Paths.get("/home/tgaengler/git/dmp-graph/dmp-graph/src/test/resources/dmpf_bsp1.nt");
-		final BufferedReader modelInput = Files.newBufferedReader(modelPath, Charsets.UTF_8);
-		final Model model = ModelFactory.createDefaultModel();
-		model.read(modelInput, null, "N3");
+			LOG.debug("finished initializing batch inserter");
 
-		LOG.debug("finished loading RDF model");
+			final StringBuilder sb = new StringBuilder();
 
-		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(inserter, dataModelURI);
-		final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
-		final RDFParser parser = new JenaModelParser(model);
-		parser.setRDFHandler(handler);
-		parser.parse();
+			sb.append(BASE_PATH);
 
-		// flush indices etc.
-		handler.getHandler().closeTransaction();
+			if(i < 10) {
 
-		LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
-				+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI + "'");
+				sb.append("0");
+			}
 
-		inserter.shutdown();
-		modelInput.close();
+			sb.append(i).append(PATH_POSTFIX);
+
+			final Path modelPath = Paths.get(sb.toString());
+					//final Path modelPath = Paths.get("/home/tgaengler/git/dmp-graph/dmp-graph/src/test/resources/dmpf_bsp1.nt");
+			final BufferedReader modelInput = Files.newBufferedReader(modelPath, Charsets.UTF_8);
+			final Model model = ModelFactory.createDefaultModel();
+			model.read(modelInput, null, "N3");
+
+			LOG.debug("finished loading RDF model");
+
+			final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(inserter, dataModelURI);
+			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+			final RDFParser parser = new JenaModelParser(model);
+			parser.setRDFHandler(handler);
+			parser.parse();
+
+			// flush indices etc.
+			handler.getHandler().closeTransaction();
+
+			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
+					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
+					+ "'");
+
+			inserter.shutdown();
+			modelInput.close();
+		}
 	}
 }

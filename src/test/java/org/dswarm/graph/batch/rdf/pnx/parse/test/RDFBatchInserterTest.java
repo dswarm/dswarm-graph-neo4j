@@ -1,18 +1,21 @@
-package org.dswarm.graph.batch.rdf.parse.test;
+package org.dswarm.graph.batch.rdf.pnx.parse.test;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.dswarm.graph.batch.rdf.DataModelRDFNeo4jProcessor;
-import org.dswarm.graph.batch.rdf.RDFNeo4jProcessor;
-import org.dswarm.graph.batch.rdf.parse.DataModelRDFNeo4jHandler;
-import org.dswarm.graph.rdf.parse.JenaModelParser;
-import org.dswarm.graph.rdf.parse.RDFHandler;
-import org.dswarm.graph.rdf.parse.RDFParser;
+import org.dswarm.graph.batch.rdf.pnx.DataModelRDFNeo4jProcessor;
+import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
+import org.dswarm.graph.batch.rdf.pnx.parse.DataModelRDFNeo4jHandler;
+import org.dswarm.graph.batch.rdf.pnx.parse.PNXParser;
+import org.dswarm.graph.batch.rdf.pnx.parse.RDFHandler;
+import org.dswarm.graph.batch.rdf.pnx.parse.RDFParser;
+
+import de.knutwalker.dbpedia.Statement;
+import de.knutwalker.dbpedia.loader.Loader$;
 import org.junit.Test;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -20,9 +23,7 @@ import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import de.knutwalker.dbpedia.parser.NtParser$;
 
 /**
  * @author tgaengler
@@ -31,7 +32,7 @@ public class RDFBatchInserterTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RDFBatchInserterTest.class);
 
-	private static final String BASE_PATH = "/media/tgaengler/data/dnb_dump/nt/dnb_dump_0000";
+	private static final String BASE_PATH    = "/media/tgaengler/data/dnb_dump/nt/dnb_dump_0000";
 	private static final String PATH_POSTFIX = ".nt";
 
 	@Test
@@ -49,6 +50,7 @@ public class RDFBatchInserterTest {
 
 		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(inserter, dataModelURI);
 		final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+		final RDFParser parser = new PNXParser(handler);
 
 		LOG.debug("finished initializing batch inserter");
 
@@ -60,24 +62,19 @@ public class RDFBatchInserterTest {
 
 			sb.append(BASE_PATH);
 
-			if(i < 10) {
+			if (i < 10) {
 
 				sb.append("0");
 			}
 
 			sb.append(i).append(PATH_POSTFIX);
 
-			final Path modelPath = Paths.get(sb.toString());
-					//final Path modelPath = Paths.get("/home/tgaengler/git/dmp-graph/dmp-graph/src/test/resources/dmpf_bsp1.nt");
-			final BufferedReader modelInput = Files.newBufferedReader(modelPath, Charsets.UTF_8);
-			final Model model = ModelFactory.createDefaultModel();
-			model.read(modelInput, null, "N3");
+			//final Path modelPath = Paths.get("/home/tgaengler/git/dmp-graph/dmp-graph/src/test/resources/dmpf_bsp1.nt");
+			final Iterator<Statement> model = NtParser$.MODULE$.parse(sb.toString());
 
 			LOG.debug("finished loading RDF model");
 
-			final RDFParser parser = new JenaModelParser(model);
-			parser.setRDFHandler(handler);
-			parser.parse();
+			parser.parse(model);
 
 			// flush indices etc.
 			handler.getHandler().closeTransaction();
@@ -85,8 +82,7 @@ public class RDFBatchInserterTest {
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
 					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
 					+ "'");
-			modelInput.close();
-			model.close();
+			Loader$.MODULE$.shutdown();
 		}
 
 		inserter.shutdown();

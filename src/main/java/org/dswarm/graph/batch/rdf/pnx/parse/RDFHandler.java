@@ -1,9 +1,9 @@
-package org.dswarm.graph.rdf.parse;
+package org.dswarm.graph.batch.rdf.pnx.parse;
+
+import de.knutwalker.dbpedia.Statement;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.parse.Handler;
-
-import com.hp.hpl.jena.rdf.model.Statement;
 
 /**
  * @author tgaengler

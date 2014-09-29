@@ -86,7 +86,7 @@ public abstract class Neo4jProcessor {
 
 		initIndices();
 
-		mapdb = DBMaker.newFileDB(new File("testmapdb")).cacheSoftRefEnable().mmapFileEnable().transactionDisable().closeOnJvmShutdown().make();
+		mapdb = DBMaker.newFileDB(new File("testmapdb")).cacheSoftRefEnable().mmapFileEnable().transactionDisable().asyncWriteEnable().compressionEnable().closeOnJvmShutdown().make();
 		mapdbResourcesIndex = getOrCreateMapDBIndex("resources");
 		mapdbResourcesWDataModelIndex = getOrCreateMapDBIndex("resources_w_data_model");
 		mapdbResourcesTypesIndex = getOrCreateMapDBIndex("resource_types");

@@ -7,7 +7,7 @@ import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.knutwalker.dbpedia.Node;
+import de.knutwalker.ntparser.Node;
 
 import com.google.common.base.Optional;
 

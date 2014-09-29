@@ -8,9 +8,9 @@ import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.parse.Neo4jHandler;
 
-import de.knutwalker.dbpedia.Node;
-import de.knutwalker.dbpedia.Resource;
-import de.knutwalker.dbpedia.Statement;
+import de.knutwalker.ntparser.Node;
+import de.knutwalker.ntparser.Resource;
+import de.knutwalker.ntparser.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

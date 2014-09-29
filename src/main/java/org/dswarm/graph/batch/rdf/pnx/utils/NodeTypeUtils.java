@@ -3,10 +3,10 @@ package org.dswarm.graph.batch.rdf.pnx.utils;
 import org.dswarm.graph.NodeType;
 
 import com.google.common.base.Optional;
-import de.knutwalker.dbpedia.BNode;
-import de.knutwalker.dbpedia.Literal;
-import de.knutwalker.dbpedia.Node;
-import de.knutwalker.dbpedia.Resource;
+import de.knutwalker.ntparser.BNode;
+import de.knutwalker.ntparser.Literal;
+import de.knutwalker.ntparser.Node;
+import de.knutwalker.ntparser.Resource;
 
 /**
  * @author tgaengler

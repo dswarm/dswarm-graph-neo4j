@@ -13,9 +13,6 @@ import org.dswarm.graph.batch.rdf.pnx.parse.DataModelRDFNeo4jHandler;
 import org.dswarm.graph.batch.rdf.pnx.parse.PNXParser;
 import org.dswarm.graph.batch.rdf.pnx.parse.RDFHandler;
 import org.dswarm.graph.batch.rdf.pnx.parse.RDFParser;
-
-import de.knutwalker.dbpedia.Statement;
-import de.knutwalker.dbpedia.loader.Loader$;
 import org.junit.Test;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -23,7 +20,8 @@ import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.knutwalker.dbpedia.parser.NtParser$;
+import de.knutwalker.ntparser.NonStrictNtParser;
+import de.knutwalker.ntparser.Statement;
 
 /**
  * @author tgaengler
@@ -70,7 +68,7 @@ public class RDFBatchInserterTest {
 			sb.append(i).append(PATH_POSTFIX);
 
 			//final Path modelPath = Paths.get("/home/tgaengler/git/dmp-graph/dmp-graph/src/test/resources/dmpf_bsp1.nt");
-			final Iterator<Statement> model = NtParser$.MODULE$.parse(sb.toString());
+			final Iterator<Statement> model = NonStrictNtParser.parse(sb.toString());
 
 			LOG.debug("finished loading RDF model");
 
@@ -82,7 +80,7 @@ public class RDFBatchInserterTest {
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
 					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
 					+ "'");
-			Loader$.MODULE$.shutdown();
+			NonStrictNtParser.close();
 		}
 
 		inserter.shutdown();

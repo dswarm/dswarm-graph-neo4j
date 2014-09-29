@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.dswarm</groupId>
@@ -71,10 +71,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
-<configuration>
-        <argLine>-server -d64 -Xms12G -Xmx12G -XX:NewRatio=5 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4 -XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10 -XX:CMSFullGCsBeforeCompaction=1</argLine>
-    </configuration>				
-<executions>
+				<configuration>
+					<argLine>-server -d64 -Xms12G -Xmx12G -XX:NewRatio=5
+						-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4
+						-XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode
+						-XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10
+						-XX:CMSFullGCsBeforeCompaction=1</argLine>
+				</configuration>
+				<executions>
 					<execution>
 						<id>default-test</id>
 						<phase>test</phase>
@@ -200,7 +204,7 @@
 	</distributionManagement>
 
 	<dependencies>
-		<!-- <dependency> <groupId>javax.ws.rs</groupId> <artifactId>javax.ws.rs-api</artifactId>
+		<!-- <dependency> <groupId>javax.ws.rs</groupId> <artifactId>javax.ws.rs-api</artifactId> 
 			<version>2.0</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
@@ -223,7 +227,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId>
+		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId> 
 			<version>${jackson.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.dswarm</groupId>
@@ -278,10 +282,12 @@
 			<artifactId>hppc</artifactId>
 			<version>${hppc.version}</version>
 		</dependency>
+		<!-- <dependency> <groupId>de.knutwalker</groupId> <artifactId>dbpedia-parser_2.10</artifactId> 
+			<version>0.1-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>de.knutwalker</groupId>
-			<artifactId>dbpedia-parser_2.10</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<artifactId>ntparser_2.11</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.emboss</groupId>

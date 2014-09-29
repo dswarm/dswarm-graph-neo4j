@@ -9,6 +9,9 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
+
+import com.carrotsearch.hppc.LongLongMap;
+import com.carrotsearch.hppc.LongLongOpenHashMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -60,15 +63,15 @@ public abstract class Neo4jProcessor {
 	protected final ObjectLongMap<String>	bnodes;
 	private BatchInserterIndex				statementHashes;
 
-	protected final ObjectLongMap<String>	tempStatementHashes;
+	protected final LongLongMap	tempStatementHashes;
 
 	protected final LongObjectMap<String>	nodeResourceMap;
 
-	final DB								mapdb;
-	final HTreeMap<char[], Long>			mapdbResourcesIndex;
-	final HTreeMap<char[], Long>			mapdbResourcesWDataModelIndex;
-	final HTreeMap<char[], Long>			mapdbResourcesTypesIndex;
-	final HTreeMap<char[], Long>			mapdbStatementHashesIndex;
+//	final DB								mapdb;
+//	final HTreeMap<char[], Long>			mapdbResourcesIndex;
+//	final HTreeMap<char[], Long>			mapdbResourcesWDataModelIndex;
+//	final HTreeMap<char[], Long>			mapdbResourcesTypesIndex;
+//	final HTreeMap<Long, Long>			mapdbStatementHashesIndex;
 
 	public Neo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
@@ -82,15 +85,15 @@ public abstract class Neo4jProcessor {
 		tempResourcesIndex = new ObjectLongOpenHashMap<>();
 		tempResourcesWDataModelIndex = new ObjectLongOpenHashMap<>();
 		tempResourceTypes = new ObjectLongOpenHashMap<>();
-		tempStatementHashes = new ObjectLongOpenHashMap<>();
+		tempStatementHashes = new LongLongOpenHashMap();
 
 		initIndices();
 
-		mapdb = DBMaker.newFileDB(new File("testmapdb")).cacheSoftRefEnable().mmapFileEnable().transactionDisable().asyncWriteEnable().compressionEnable().closeOnJvmShutdown().make();
-		mapdbResourcesIndex = getOrCreateMapDBIndex("resources");
-		mapdbResourcesWDataModelIndex = getOrCreateMapDBIndex("resources_w_data_model");
-		mapdbResourcesTypesIndex = getOrCreateMapDBIndex("resource_types");
-		mapdbStatementHashesIndex = getOrCreateMapDBIndex("statement_hashes");
+//		mapdb = DBMaker.newFileDB(new File("target/testmapdb")).cacheSoftRefEnable().mmapFileEnable().transactionDisable().asyncWriteEnable().compressionEnable().closeOnJvmShutdown().make();
+//		mapdbResourcesIndex =  mapdb.createHashMap("resources").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+//		mapdbResourcesWDataModelIndex =  mapdb.createHashMap("resources_w_data_model").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+//		mapdbResourcesTypesIndex =  mapdb.createHashMap("resource_types").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+//		mapdbStatementHashesIndex =  mapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
 	}
 
 	protected void initIndices() throws DMPGraphException {
@@ -125,15 +128,15 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourcesIndex(final String key, final Long nodeId) {
 
-		// resources.add(nodeId, MapUtil.map(GraphStatics.URI, key));
-		// tempResourcesIndex.put(key, nodeId);
-		addToIndex(key, nodeId, GraphStatics.URI, resources, tempResourcesIndex, mapdbResourcesIndex);
+		resources.add(nodeId, MapUtil.map(GraphStatics.URI, key));
+		tempResourcesIndex.put(key, nodeId);
+		// addToIndex(key, nodeId, GraphStatics.URI, resources, tempResourcesIndex, mapdbResourcesIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourcesIndex(final String key) {
 
-		//return getIdFromIndex(key, tempResourcesIndex, resources, GraphStatics.URI);
-		return getIdFromIndex(key, tempResourcesIndex, mapdbResourcesIndex);
+		return getIdFromIndex(key, tempResourcesIndex, resources, GraphStatics.URI);
+		//return getIdFromIndex(key, tempResourcesIndex, mapdbResourcesIndex);
 	}
 
 	// public BatchInserterIndex getResourcesWDataModelIndex() {
@@ -143,15 +146,15 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourcesWDataModelIndex(final String key, final Long nodeId) {
 
-		// resourcesWDataModel.add(nodeId, MapUtil.map(GraphStatics.URI_W_DATA_MODEL, key));
-		// tempResourcesWDataModelIndex.put(key, nodeId);
-		addToIndex(key, nodeId, GraphStatics.URI_W_DATA_MODEL, resourcesWDataModel, tempResourcesWDataModelIndex, mapdbResourcesWDataModelIndex);
+		resourcesWDataModel.add(nodeId, MapUtil.map(GraphStatics.URI_W_DATA_MODEL, key));
+		tempResourcesWDataModelIndex.put(key, nodeId);
+		//addToIndex(key, nodeId, GraphStatics.URI_W_DATA_MODEL, resourcesWDataModel, tempResourcesWDataModelIndex, mapdbResourcesWDataModelIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourcesWDataModelIndex(final String key) {
 
-		// return getIdFromIndex(key, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
-		return getIdFromIndex(key, tempResourcesWDataModelIndex, mapdbResourcesWDataModelIndex);
+		return getIdFromIndex(key, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
+		//return getIdFromIndex(key, tempResourcesWDataModelIndex, mapdbResourcesWDataModelIndex);
 	}
 
 	//
@@ -188,15 +191,15 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourceTypesIndex(final String key, final Long nodeId) {
 
-		// resourceTypes.add(nodeId, MapUtil.map(GraphStatics.URI, key));
-		// tempResourceTypes.put(key, nodeId);
-		addToIndex(key, nodeId, GraphStatics.URI, resourceTypes, tempResourceTypes, mapdbResourcesTypesIndex);
+		resourceTypes.add(nodeId, MapUtil.map(GraphStatics.URI, key));
+		tempResourceTypes.put(key, nodeId);
+		//addToIndex(key, nodeId, GraphStatics.URI, resourceTypes, tempResourceTypes, mapdbResourcesTypesIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourceTypesIndex(final String key) {
 
-		// return getIdFromIndex(key, tempResourceTypes, resourceTypes, GraphStatics.URI);
-		return getIdFromIndex(key, tempResourceTypes, mapdbResourcesTypesIndex);
+		return getIdFromIndex(key, tempResourceTypes, resourceTypes, GraphStatics.URI);
+		//return getIdFromIndex(key, tempResourceTypes, mapdbResourcesTypesIndex);
 	}
 
 	//
@@ -216,11 +219,11 @@ public abstract class Neo4jProcessor {
 	// return statementHashes;
 	// }
 
-	public void addToStatementIndex(final String key, final Long nodeId) {
+	public void addToStatementIndex(final long key, final Long nodeId) {
 
-		// statementHashes.add(nodeId, MapUtil.map(GraphStatics.HASH, key));
-		// tempStatementHashes.put(key, nodeId);
-		addToIndex(key, nodeId, GraphStatics.HASH, statementHashes, tempStatementHashes, mapdbStatementHashesIndex);
+		statementHashes.add(nodeId, MapUtil.map(GraphStatics.HASH, key));
+		tempStatementHashes.put(key, nodeId);
+		//addToLongIndex(key, nodeId, GraphStatics.HASH, statementHashes, tempStatementHashes, mapdbStatementHashesIndex);
 	}
 
 	//
@@ -355,10 +358,10 @@ public abstract class Neo4jProcessor {
 		inserter.setNodeLabels(nodeId, label);
 	}
 
-	public Optional<Long> getStatement(final String hash) throws DMPGraphException {
+	public Optional<Long> getStatement(final long hash) throws DMPGraphException {
 
-		// return getIdFromIndex(hash, tempStatementHashes, statementHashes, GraphStatics.HASH);
-		return getIdFromIndex(hash, tempStatementHashes, mapdbStatementHashesIndex);
+		return getIdFromLongIndex(hash, tempStatementHashes, statementHashes, GraphStatics.HASH);
+		//return getIdFromLongIndex(hash, tempStatementHashes, mapdbStatementHashesIndex);
 	}
 
 	public Long prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
@@ -400,7 +403,7 @@ public abstract class Neo4jProcessor {
 		return inserter.createRelationship(subjectNodeId, objectNodeId, relType, relProperties);
 	}
 
-	public String generateStatementHash(final Long subjectNodeId, final String predicateName, final Long objectNodeId,
+	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final Long objectNodeId,
 			final NodeType subjectNodeType, final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -412,7 +415,7 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public String generateStatementHash(final Long subjectNodeId, final String predicateName, final String objectValue,
+	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final String objectValue,
 			final NodeType subjectNodeType, final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -424,7 +427,7 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public String generateStatementHash(final String predicateName, final Optional<NodeType> optionalSubjectNodeType,
+	public long generateStatementHash(final String predicateName, final Optional<NodeType> optionalSubjectNodeType,
 			final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalSubjectIdentifier,
 			final Optional<String> optionalObjectIdentifier) throws DMPGraphException {
 
@@ -438,10 +441,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append(optionalSubjectNodeType.toString()).append(":").append(optionalSubjectIdentifier.get()).append(" ").append(predicateName)
-				.append(" ").append(optionalObjectNodeType.toString()).append(":").append(optionalObjectIdentifier.get()).append(" ");
+		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " " + optionalObjectNodeType
+				.toString() + ":" + optionalObjectIdentifier.get() + " ";
 
 		// MessageDigest messageDigest = null;
 		//
@@ -456,7 +457,7 @@ public abstract class Neo4jProcessor {
 		//
 		// return new String(messageDigest.digest());
 
-		return "" + SipHash.digest(SPEC_KEY, sb.toString().getBytes(Charsets.UTF_8));
+		return SipHash.digest(SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
 	public Optional<String> getIdentifier(final Long nodeId, final Optional<NodeType> optionalNodeType) {
@@ -578,6 +579,31 @@ public abstract class Neo4jProcessor {
 
 		return Optional.absent();
 	}
+
+	private Optional<Long> getIdFromLongIndex(final long key, final LongLongMap tempIndex, final HTreeMap<Long, Long> mapdbIndex) {
+
+		if (tempIndex.containsKey(key)) {
+
+			return Optional.of(tempIndex.get(key));
+		}
+
+		if (mapdbIndex.containsKey(key)) {
+
+			final Long hit = mapdbIndex.get(key);
+
+			final Optional<Long> optionalHit = Optional.fromNullable(hit);
+
+			if (optionalHit.isPresent()) {
+
+				// temp cache index hits again
+				tempIndex.put(key, optionalHit.get());
+			}
+
+			return optionalHit;
+		}
+
+		return Optional.absent();
+	}
 	
 	private Optional<Long> getIdFromIndex(final String key, final ObjectLongMap<String> tempIndex, final BatchInserterIndex index,
 			final String indexProperty) {
@@ -619,26 +645,39 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private HTreeMap<char[], Long> getOrCreateMapDBIndex(final String name) {
+	private Optional<Long> getIdFromLongIndex(final long key, final LongLongMap tempIndex, final BatchInserterIndex index,
+			final String indexProperty) {
 
-		if (doesMapDBIndexExist(name)) {
+		if (tempIndex.containsKey(key)) {
 
-			return mapdb.getHashMap(name);
+			return Optional.of(tempIndex.get(key));
 		}
 
-		return mapdb.createHashMap(name).keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).make();
-	}
+		final IndexHits<Long> hits = index.get(indexProperty, key);
 
-	private boolean doesMapDBIndexExist(final String name) {
+		if (hits != null && hits.hasNext()) {
 
-		final SortedMap<String, Object> catalog = mapdb.getCatalog();
+			final Long hit = hits.next();
 
-		if (catalog == null || catalog.isEmpty()) {
+			hits.close();
 
-			return false;
+			final Optional<Long> optionalHit = Optional.fromNullable(hit);
+
+			if (optionalHit.isPresent()) {
+
+				// temp cache index hits again
+				tempIndex.put(key, optionalHit.get());
+			}
+
+			return optionalHit;
 		}
 
-		return catalog.containsKey(name);
+		if (hits != null) {
+
+			hits.close();
+		}
+
+		return Optional.absent();
 	}
 
 	private void addToIndex(final String key, final Long value, final String indexProperty, final BatchInserterIndex neo4jIndex,
@@ -647,5 +686,13 @@ public abstract class Neo4jProcessor {
 		neo4jIndex.add(value, MapUtil.map(indexProperty, key));
 		tempIndex.put(key, value);
 		mapdbIndex.put(key.toCharArray(), value);
+	}
+
+	private void addToLongIndex(final long key, final long value, final String indexProperty, final BatchInserterIndex neo4jIndex,
+			final LongLongMap tempIndex, final HTreeMap<Long, Long> mapdbIndex) {
+
+		neo4jIndex.add(value, MapUtil.map(indexProperty, key));
+		tempIndex.put(key, value);
+		mapdbIndex.put(key, value);
 	}
 }

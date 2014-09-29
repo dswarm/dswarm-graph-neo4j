@@ -209,7 +209,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 					addedNodes++;
 				}
 
-				final String hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId,
+				final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId,
 						subjectNodeType, finalObjectNodeType);
 
 				final Optional<Long> optionalRelId = processor.getStatement(hash);
@@ -326,7 +326,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 	public void handleLiteral(final Long subjectNodeId, final Statement statement) throws DMPGraphException {
 
-		final String hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), statement
+		final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), statement
 				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
 
 		final Optional<Long> optionalRelId = processor.getStatement(hash);
@@ -370,7 +370,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	public Long addRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final String hash) throws DMPGraphException {
+			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 

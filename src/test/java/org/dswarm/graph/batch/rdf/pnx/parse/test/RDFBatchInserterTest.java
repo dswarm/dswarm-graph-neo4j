@@ -43,6 +43,8 @@ public class RDFBatchInserterTest {
 		final Path path = Paths.get("/var/lib/neo4j/conf/neo4j.properties");
 		final InputStream input = Files.newInputStream(path);
 		final Map<String, String> config = MapUtil.load(input);
+		config.put("cache_type", "none");
+		config.put("use_memory_mapped_buffers", "true");
 		input.close();
 		final BatchInserter inserter = BatchInserters.inserter("/media/tgaengler/data/projects/ekz/neo4j/dnb_data", config);
 

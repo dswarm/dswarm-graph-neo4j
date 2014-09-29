@@ -7,7 +7,12 @@ import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
+
+import com.github.emboss.siphash.SipHash;
+import com.github.emboss.siphash.SipKey;
+import com.google.common.base.Charsets;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
@@ -36,18 +41,23 @@ public abstract class Neo4jProcessor {
 
 	protected int addedLabels = 0;
 
-	protected final BatchInserter  inserter;
-	private       BatchInserterIndex          resources;
-	private       BatchInserterIndex           resourcesWDataModel;
-	private       BatchInserterIndex           resourceTypes;
+	private static final SipKey SPEC_KEY = new SipKey(HashUtils.bytesOf(
+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+	));
+
+	protected final BatchInserter      inserter;
+	private         BatchInserterIndex resources;
+	private         BatchInserterIndex resourcesWDataModel;
+	private         BatchInserterIndex resourceTypes;
 
 	protected final ObjectLongMap<String> tempResourcesIndex;
 	protected final ObjectLongMap<String> tempResourcesWDataModelIndex;
 	protected final ObjectLongMap<String> tempResourceTypes;
 
-	private       BatchInserterIndex           values;
+	private         BatchInserterIndex    values;
 	protected final ObjectLongMap<String> bnodes;
-	private       BatchInserterIndex    statementHashes;
+	private         BatchInserterIndex    statementHashes;
 
 	protected final ObjectLongMap<String> tempStatementHashes;
 
@@ -95,10 +105,10 @@ public abstract class Neo4jProcessor {
 		return inserter;
 	}
 
-//	public BatchInserterIndex getResourcesIndex() {
-//
-//		return resources;
-//	}
+	//	public BatchInserterIndex getResourcesIndex() {
+	//
+	//		return resources;
+	//	}
 
 	public void addToResourcesIndex(final String key, final Long nodeId) {
 
@@ -412,18 +422,20 @@ public abstract class Neo4jProcessor {
 		sb.append(optionalSubjectNodeType.toString()).append(":").append(optionalSubjectIdentifier.get()).append(" ").append(predicateName)
 				.append(" ").append(optionalObjectNodeType.toString()).append(":").append(optionalObjectIdentifier.get()).append(" ");
 
-		MessageDigest messageDigest = null;
+//		MessageDigest messageDigest = null;
+//
+//		try {
+//
+//			messageDigest = MessageDigest.getInstance("SHA-256");
+//		} catch (final NoSuchAlgorithmException e) {
+//
+//			throw new DMPGraphException("couldn't instantiate hash algo");
+//		}
+//		messageDigest.update(sb.toString().getBytes());
+//
+//		return new String(messageDigest.digest());
 
-		try {
-
-			messageDigest = MessageDigest.getInstance("SHA-256");
-		} catch (final NoSuchAlgorithmException e) {
-
-			throw new DMPGraphException("couldn't instantiate hash algo");
-		}
-		messageDigest.update(sb.toString().getBytes());
-
-		return new String(messageDigest.digest());
+		return "" + SipHash.digest(SPEC_KEY, sb.toString().getBytes(Charsets.UTF_8));
 	}
 
 	public Optional<String> getIdentifier(final Long nodeId, final Optional<NodeType> optionalNodeType) {
@@ -532,11 +544,19 @@ public abstract class Neo4jProcessor {
 
 		if (hits != null && hits.hasNext()) {
 
-			final Long rel = hits.next();
+			final Long hit = hits.next();
 
 			hits.close();
 
-			return Optional.fromNullable(rel);
+			final Optional<Long> optionalHit = Optional.fromNullable(hit);
+
+			if(optionalHit.isPresent()) {
+
+				// temp cache index hits again
+				tempIndex.put(key, optionalHit.get());
+			}
+
+			return optionalHit;
 		}
 
 		if (hits != null) {

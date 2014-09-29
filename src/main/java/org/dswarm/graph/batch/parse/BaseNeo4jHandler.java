@@ -271,6 +271,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 		processor.clearMaps();
 		processor.flushIndices();
+		processor.closeMapDB();
 	}
 
 	@Override

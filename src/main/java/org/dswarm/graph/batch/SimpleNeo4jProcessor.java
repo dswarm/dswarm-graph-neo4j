@@ -30,11 +30,18 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 		super(inserter);
 
 		tempStatementUUIDsIndex = new ObjectLongOpenHashMap<>();
+
+		initStatementIndex();
 	}
 
 	@Override protected void initIndices() throws DMPGraphException {
 
 		super.initIndices();
+
+		// initStatementIndex();
+	}
+
+	private void initStatementIndex() throws DMPGraphException {
 
 		try {
 

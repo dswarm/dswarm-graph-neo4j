@@ -36,11 +36,18 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		dataModelURI = dataModelURIArg;
 
 		tempStatementUUIDsWDataModelIndex = new ObjectLongOpenHashMap<>();
+
+		initStatementIndex();
 	}
 
 	@Override protected void initIndices() throws DMPGraphException {
 
 		super.initIndices();
+
+		//initStatementIndex();
+	}
+
+	private void initStatementIndex() throws DMPGraphException {
 
 		try {
 

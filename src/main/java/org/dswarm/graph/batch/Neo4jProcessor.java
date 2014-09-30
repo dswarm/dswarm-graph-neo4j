@@ -312,7 +312,11 @@ public abstract class Neo4jProcessor {
 
 		LOG.debug("start flushing indices");
 
-		initIndices();
+		if(resources == null) {
+			
+			initIndices();
+		}
+		
 		pumpNFlushNClearIndices();
 		//renewMapDB();
 //		resources.flush();

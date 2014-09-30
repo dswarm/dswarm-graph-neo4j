@@ -7,9 +7,10 @@ import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.knutwalker.ntparser.Node;
 
 import com.google.common.base.Optional;
+
+import de.knutwalker.ntparser.Node;
 
 /**
  * @author tgaengler
@@ -18,7 +19,7 @@ public abstract class RDFNeo4jProcessor {
 
 	private static final Logger		LOG	= LoggerFactory.getLogger(RDFNeo4jProcessor.class);
 
-	protected final Neo4jProcessor processor;
+	protected final Neo4jProcessor	processor;
 
 	public RDFNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
 
@@ -55,7 +56,6 @@ public abstract class RDFNeo4jProcessor {
 				}
 
 				if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
-
 
 					optionalResourceUri = Optional.fromNullable(resource.toString());
 					optionalDataModelUri = Optional.absent();

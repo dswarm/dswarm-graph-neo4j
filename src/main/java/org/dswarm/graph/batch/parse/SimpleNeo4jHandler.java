@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
- *
+ * 
  * @author tgaengler
  */
 public class SimpleNeo4jHandler extends BaseNeo4jHandler {

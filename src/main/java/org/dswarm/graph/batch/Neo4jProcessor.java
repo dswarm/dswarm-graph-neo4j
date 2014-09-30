@@ -1,6 +1,5 @@
 package org.dswarm.graph.batch;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,18 +7,9 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
-
-import com.carrotsearch.hppc.cursors.LongLongCursor;
-import com.carrotsearch.hppc.cursors.ObjectLongCursor;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
-import org.mapdb.TxMaker;
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
@@ -35,6 +25,8 @@ import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.LongObjectOpenHashMap;
 import com.carrotsearch.hppc.ObjectLongMap;
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
+import com.carrotsearch.hppc.cursors.LongLongCursor;
+import com.carrotsearch.hppc.cursors.ObjectLongCursor;
 import com.github.emboss.siphash.SipHash;
 import com.github.emboss.siphash.SipKey;
 import com.google.common.base.Charsets;
@@ -65,28 +57,28 @@ public abstract class Neo4jProcessor {
 	protected final ObjectLongMap<String>	bnodes;
 	private BatchInserterIndex				statementHashes;
 
-	protected final LongLongMap	tempStatementHashes;
+	protected final LongLongMap				tempStatementHashes;
 
 	protected final LongObjectMap<String>	nodeResourceMap;
 
-//	private final TxMaker tx;
-//	private DB								mapdb;
-//	private HTreeMap<char[], Long>			mapdbResourcesIndex;
-//	private HTreeMap<char[], Long>			mapdbResourcesWDataModelIndex;
-//	private HTreeMap<char[], Long>			mapdbResourcesTypesIndex;
-//	private HTreeMap<Long, Long>			mapdbStatementHashesIndex;
-//
-//	private DB								snapshotMapdb;
-//	private HTreeMap<char[], Long>			snapshotMapdbResourcesIndex;
-//	private HTreeMap<char[], Long>			snapshotMapdbResourcesWDataModelIndex;
-//	private HTreeMap<char[], Long>			snapshotMapdbResourcesTypesIndex;
-//	private HTreeMap<Long, Long>			snapshotMapdbStatementHashesIndex;
+	// private final TxMaker tx;
+	// private DB mapdb;
+	// private HTreeMap<char[], Long> mapdbResourcesIndex;
+	// private HTreeMap<char[], Long> mapdbResourcesWDataModelIndex;
+	// private HTreeMap<char[], Long> mapdbResourcesTypesIndex;
+	// private HTreeMap<Long, Long> mapdbStatementHashesIndex;
+	//
+	// private DB snapshotMapdb;
+	// private HTreeMap<char[], Long> snapshotMapdbResourcesIndex;
+	// private HTreeMap<char[], Long> snapshotMapdbResourcesWDataModelIndex;
+	// private HTreeMap<char[], Long> snapshotMapdbResourcesTypesIndex;
+	// private HTreeMap<Long, Long> snapshotMapdbStatementHashesIndex;
 
 	public Neo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
 		this.inserter = inserter;
 
-		LOG.debug("start writing");
+		Neo4jProcessor.LOG.debug("start writing");
 
 		bnodes = new ObjectLongOpenHashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
@@ -96,81 +88,89 @@ public abstract class Neo4jProcessor {
 		tempResourceTypes = new ObjectLongOpenHashMap<>();
 		tempStatementHashes = new LongLongOpenHashMap();
 
-		//initIndices();
+		// initIndices();
 
-//		tx = DBMaker.newFileDB(new File("target/testmapdb")).asyncWriteEnable().asyncWriteQueueSize(1000000).cacheDisable().snapshotEnable().cacheSoftRefEnable().mmapFileEnable().compressionEnable().closeOnJvmShutdown().makeTxMaker();
-//		mapdb = tx.makeTx();
-//		initMapDBIndices();
+		// tx = DBMaker.newFileDB(new
+		// File("target/testmapdb")).asyncWriteEnable().asyncWriteQueueSize(1000000).cacheDisable().snapshotEnable().cacheSoftRefEnable().mmapFileEnable().compressionEnable().closeOnJvmShutdown().makeTxMaker();
+		// mapdb = tx.makeTx();
+		// initMapDBIndices();
 	}
 
-//	protected void initMapDBIndices() {
-//
-//		mapdbResourcesIndex =  mapdb.createHashMap("resources").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		mapdbResourcesWDataModelIndex =  mapdb.createHashMap("resources_w_data_model").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		mapdbResourcesTypesIndex =  mapdb.createHashMap("resource_types").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		mapdbStatementHashesIndex =  mapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
-//	}
+	// protected void initMapDBIndices() {
+	//
+	// mapdbResourcesIndex =
+	// mapdb.createHashMap("resources").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// mapdbResourcesWDataModelIndex =
+	// mapdb.createHashMap("resources_w_data_model").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// mapdbResourcesTypesIndex =
+	// mapdb.createHashMap("resource_types").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// mapdbStatementHashesIndex =
+	// mapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
+	// }
 
 	protected void pumpNFlushNClearIndices() {
 
-		LOG.debug("start pumping indices");
+		Neo4jProcessor.LOG.debug("start pumping indices");
 
 		copyNFlushNClearIndex(tempResourcesIndex, resources, GraphStatics.URI);
 		copyNFlushNClearIndex(tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI);
 		copyNFlushNClearIndex(tempResourceTypes, resourceTypes, GraphStatics.URI);
 		copyLongIndex(tempStatementHashes, statementHashes, GraphStatics.HASH);
 
-		LOG.debug("finished pumping indices");
+		Neo4jProcessor.LOG.debug("finished pumping indices");
 	}
 
-	private void copyNFlushNClearIndex(final ObjectLongMap<String> tempIndex,
-			final BatchInserterIndex neo4jIndex, final String indexProperty) {
+	private void copyNFlushNClearIndex(final ObjectLongMap<String> tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
 
-		LOG.debug("start pumping index");
+		Neo4jProcessor.LOG.debug("start pumping index");
 
 		for (final ObjectLongCursor<String> entry : tempIndex) {
 
-			//mapdbIndex.put(entry.key.toCharArray(), entry.value);
+			// mapdbIndex.put(entry.key.toCharArray(), entry.value);
 			neo4jIndex.add(entry.value, MapUtil.map(indexProperty, entry.key.toCharArray()));
 		}
 
-		LOG.debug("finished pumping index");
+		Neo4jProcessor.LOG.debug("finished pumping index");
 
-		LOG.debug("start flushing and clearing index");
+		Neo4jProcessor.LOG.debug("start flushing and clearing index");
 
 		neo4jIndex.flush();
 		tempIndex.clear();
 
-		LOG.debug("finished flushing and clearing index");
+		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
 	private void copyLongIndex(final LongLongMap tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
 
-		LOG.debug("start pumping index");
+		Neo4jProcessor.LOG.debug("start pumping index");
 
 		for (final LongLongCursor entry : tempIndex) {
 
-			//mapdbIndex.put(entry.key, entry.value);
+			// mapdbIndex.put(entry.key, entry.value);
 			neo4jIndex.add(entry.value, MapUtil.map(indexProperty, entry.key));
 		}
 
-		LOG.debug("finished pumping index");
+		Neo4jProcessor.LOG.debug("finished pumping index");
 
-		LOG.debug("start flushing and clearing index");
+		Neo4jProcessor.LOG.debug("start flushing and clearing index");
 
 		neo4jIndex.flush();
 		tempIndex.clear();
 
-		LOG.debug("finished flushing and clearing index");
+		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-//	protected void initSnapshotMapDBIndices() {
-//
-//		snapshotMapdbResourcesIndex =  snapshotMapdb.createHashMap("resources").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		snapshotMapdbResourcesWDataModelIndex =  snapshotMapdb.createHashMap("resources_w_data_model").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		snapshotMapdbResourcesTypesIndex =  snapshotMapdb.createHashMap("resource_types").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
-//		snapshotMapdbStatementHashesIndex =  snapshotMapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
-//	}
+	// protected void initSnapshotMapDBIndices() {
+	//
+	// snapshotMapdbResourcesIndex =
+	// snapshotMapdb.createHashMap("resources").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// snapshotMapdbResourcesWDataModelIndex =
+	// snapshotMapdb.createHashMap("resources_w_data_model").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// snapshotMapdbResourcesTypesIndex =
+	// snapshotMapdb.createHashMap("resource_types").keySerializer(Serializer.CHAR_ARRAY).valueSerializer(Serializer.LONG).makeOrGet();
+	// snapshotMapdbStatementHashesIndex =
+	// snapshotMapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
+	// }
 
 	protected void initIndices() throws DMPGraphException {
 
@@ -204,15 +204,15 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourcesIndex(final String key, final Long nodeId) {
 
-		//resources.add(nodeId, MapUtil.map(GraphStatics.URI, key));
+		// resources.add(nodeId, MapUtil.map(GraphStatics.URI, key));
 		tempResourcesIndex.put(key, nodeId);
-		//addToIndex(key, nodeId, GraphStatics.URI, resources, tempResourcesIndex, mapdbResourcesIndex);
+		// addToIndex(key, nodeId, GraphStatics.URI, resources, tempResourcesIndex, mapdbResourcesIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourcesIndex(final String key) {
 
 		return getIdFromIndex(key, tempResourcesIndex, resources, GraphStatics.URI);
-		//return getIdFromIndex(key, tempResourcesIndex, snapshotMapdbResourcesIndex);
+		// return getIdFromIndex(key, tempResourcesIndex, snapshotMapdbResourcesIndex);
 	}
 
 	// public BatchInserterIndex getResourcesWDataModelIndex() {
@@ -222,15 +222,16 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourcesWDataModelIndex(final String key, final Long nodeId) {
 
-		//resourcesWDataModel.add(nodeId, MapUtil.map(GraphStatics.URI_W_DATA_MODEL, key));
+		// resourcesWDataModel.add(nodeId, MapUtil.map(GraphStatics.URI_W_DATA_MODEL, key));
 		tempResourcesWDataModelIndex.put(key, nodeId);
-		//addToIndex(key, nodeId, GraphStatics.URI_W_DATA_MODEL, resourcesWDataModel, tempResourcesWDataModelIndex, mapdbResourcesWDataModelIndex);
+		// addToIndex(key, nodeId, GraphStatics.URI_W_DATA_MODEL, resourcesWDataModel, tempResourcesWDataModelIndex,
+		// mapdbResourcesWDataModelIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourcesWDataModelIndex(final String key) {
 
 		return getIdFromIndex(key, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
-		//return getIdFromIndex(key, tempResourcesWDataModelIndex, snapshotMapdbResourcesWDataModelIndex);
+		// return getIdFromIndex(key, tempResourcesWDataModelIndex, snapshotMapdbResourcesWDataModelIndex);
 	}
 
 	//
@@ -267,15 +268,15 @@ public abstract class Neo4jProcessor {
 
 	public void addToResourceTypesIndex(final String key, final Long nodeId) {
 
-		//resourceTypes.add(nodeId, MapUtil.map(GraphStatics.URI, key));
+		// resourceTypes.add(nodeId, MapUtil.map(GraphStatics.URI, key));
 		tempResourceTypes.put(key, nodeId);
-		//addToIndex(key, nodeId, GraphStatics.URI, resourceTypes, tempResourceTypes, mapdbResourcesTypesIndex);
+		// addToIndex(key, nodeId, GraphStatics.URI, resourceTypes, tempResourceTypes, mapdbResourcesTypesIndex);
 	}
 
 	public Optional<Long> getNodeIdFromResourceTypesIndex(final String key) {
 
 		return getIdFromIndex(key, tempResourceTypes, resourceTypes, GraphStatics.URI);
-		//return getIdFromIndex(key, tempResourceTypes, snapshotMapdbResourcesTypesIndex);
+		// return getIdFromIndex(key, tempResourceTypes, snapshotMapdbResourcesTypesIndex);
 	}
 
 	//
@@ -297,9 +298,9 @@ public abstract class Neo4jProcessor {
 
 	public void addToStatementIndex(final long key, final Long nodeId) {
 
-		//statementHashes.add(nodeId, MapUtil.map(GraphStatics.HASH, key));
+		// statementHashes.add(nodeId, MapUtil.map(GraphStatics.HASH, key));
 		tempStatementHashes.put(key, nodeId);
-		//addToLongIndex(key, nodeId, GraphStatics.HASH, statementHashes, tempStatementHashes, mapdbStatementHashesIndex);
+		// addToLongIndex(key, nodeId, GraphStatics.HASH, statementHashes, tempStatementHashes, mapdbStatementHashesIndex);
 	}
 
 	//
@@ -310,57 +311,57 @@ public abstract class Neo4jProcessor {
 
 	public void flushIndices() throws DMPGraphException {
 
-		LOG.debug("start flushing indices");
+		Neo4jProcessor.LOG.debug("start flushing indices");
 
-		if(resources == null) {
-			
+		if (resources == null) {
+
 			initIndices();
 		}
-		
+
 		pumpNFlushNClearIndices();
-		//renewMapDB();
-//		resources.flush();
-//		resourcesWDataModel.flush();
-//		resourceTypes.flush();
+		// renewMapDB();
+		// resources.flush();
+		// resourcesWDataModel.flush();
+		// resourceTypes.flush();
 		flushStatementIndices();
 		clearTempIndices();
 
-		LOG.debug("start finished flushing indices");
+		Neo4jProcessor.LOG.debug("start finished flushing indices");
 	}
 
-//	protected void renewMapDB() {
-//
-//		pumpNFlushNClearIndices();
-//		mapdb.commit();
-//		mapdbResourcesIndex.close();
-//		mapdbResourcesWDataModelIndex.close();
-//		mapdbResourcesTypesIndex.close();
-//		mapdbStatementHashesIndex.close();
-//
-//		if(snapshotMapdb != null) {
-//
-//			snapshotMapdbResourcesIndex.close();
-//			snapshotMapdbResourcesWDataModelIndex.close();
-//			snapshotMapdbResourcesTypesIndex.close();
-//			snapshotMapdbStatementHashesIndex.close();
-//			snapshotMapdb.close();
-//		}
-//
-//		mapdb.close();
-//		mapdb = tx.makeTx();
-//
-//		snapshotMapdb = mapdb.snapshot();
-//		initSnapshotMapDBIndices();
-//
-//		initMapDBIndices();
-//	}
-//
-//	public void closeMapDB() {
-//
-//		mapdb.commit();
-//		mapdb.close();
-//		tx.close();
-//	}
+	// protected void renewMapDB() {
+	//
+	// pumpNFlushNClearIndices();
+	// mapdb.commit();
+	// mapdbResourcesIndex.close();
+	// mapdbResourcesWDataModelIndex.close();
+	// mapdbResourcesTypesIndex.close();
+	// mapdbStatementHashesIndex.close();
+	//
+	// if(snapshotMapdb != null) {
+	//
+	// snapshotMapdbResourcesIndex.close();
+	// snapshotMapdbResourcesWDataModelIndex.close();
+	// snapshotMapdbResourcesTypesIndex.close();
+	// snapshotMapdbStatementHashesIndex.close();
+	// snapshotMapdb.close();
+	// }
+	//
+	// mapdb.close();
+	// mapdb = tx.makeTx();
+	//
+	// snapshotMapdb = mapdb.snapshot();
+	// initSnapshotMapDBIndices();
+	//
+	// initMapDBIndices();
+	// }
+	//
+	// public void closeMapDB() {
+	//
+	// mapdb.commit();
+	// mapdb.close();
+	// tx.close();
+	// }
 
 	public void flushStatementIndices() {
 
@@ -369,9 +370,9 @@ public abstract class Neo4jProcessor {
 
 	protected void clearTempIndices() {
 
-//		tempResourcesIndex.clear();
-//		tempResourcesWDataModelIndex.clear();
-//		tempResourceTypes.clear();
+		// tempResourcesIndex.clear();
+		// tempResourcesWDataModelIndex.clear();
+		// tempResourceTypes.clear();
 		clearTempStatementIndices();
 	}
 
@@ -482,13 +483,13 @@ public abstract class Neo4jProcessor {
 	public Optional<Long> getStatement(final long hash) throws DMPGraphException {
 
 		return getIdFromLongIndex(hash, tempStatementHashes, statementHashes, GraphStatics.HASH);
-		//return getIdFromLongIndex(hash, tempStatementHashes, snapshotMapdbStatementHashesIndex);
+		// return getIdFromLongIndex(hash, tempStatementHashes, snapshotMapdbStatementHashesIndex);
 	}
 
-	public Long prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
+	public Map<String, Object> prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes) {
 
-		final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);
+		//final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);
 
 		final Map<String, Object> relProperties = new HashMap<>();
 
@@ -521,11 +522,11 @@ public abstract class Neo4jProcessor {
 			}
 		}
 
-		return inserter.createRelationship(subjectNodeId, objectNodeId, relType, relProperties);
+		return relProperties;
 	}
 
-	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final Long objectNodeId,
-			final NodeType subjectNodeType, final NodeType objectNodeType) throws DMPGraphException {
+	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final Long objectNodeId, final NodeType subjectNodeType,
+			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
 		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
@@ -536,8 +537,8 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final String objectValue,
-			final NodeType subjectNodeType, final NodeType objectNodeType) throws DMPGraphException {
+	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final String objectValue, final NodeType subjectNodeType,
+			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
 		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
@@ -562,8 +563,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " " + optionalObjectNodeType
-				.toString() + ":" + optionalObjectIdentifier.get() + " ";
+		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get() + " ";
 
 		// MessageDigest messageDigest = null;
 		//
@@ -578,7 +579,7 @@ public abstract class Neo4jProcessor {
 		//
 		// return new String(messageDigest.digest());
 
-		return SipHash.digest(SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
+		return SipHash.digest(Neo4jProcessor.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
 	public Optional<String> getIdentifier(final Long nodeId, final Optional<NodeType> optionalNodeType) {
@@ -630,9 +631,10 @@ public abstract class Neo4jProcessor {
 
 	public abstract void addObjectToResourceWDataModelIndex(final Long nodeId, final String URI, final Optional<String> optionalDataModelURI);
 
-	public abstract void handleObjectDataModel(final Long nodeId, Optional<String> optionalDataModelURI);
+	public abstract void handleObjectDataModel(final Map<String, Object> objectNodeProperties, final Optional<String> optionalDataModelURI);
 
-	public abstract void handleSubjectDataModel(final Long nodeId, String URI, final Optional<String> optionalDataModelURI);
+	public abstract void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, String URI,
+			final Optional<String> optionalDataModelURI);
 
 	public abstract void addStatementToIndex(final Long relId, final String statementUUID);
 
@@ -682,11 +684,11 @@ public abstract class Neo4jProcessor {
 
 			return Optional.of(tempIndex.get(key));
 		}
-		
+
 		if (mapdbIndex != null && mapdbIndex.containsKey(key)) {
-			
+
 			final Long hit = mapdbIndex.get(key);
-			
+
 			final Optional<Long> optionalHit = Optional.fromNullable(hit);
 
 			if (optionalHit.isPresent()) {
@@ -725,7 +727,7 @@ public abstract class Neo4jProcessor {
 
 		return Optional.absent();
 	}
-	
+
 	private Optional<Long> getIdFromIndex(final String key, final ObjectLongMap<String> tempIndex, final BatchInserterIndex index,
 			final String indexProperty) {
 
@@ -739,7 +741,7 @@ public abstract class Neo4jProcessor {
 			return Optional.of(tempIndex.get(key));
 		}
 
-		if(index == null) {
+		if (index == null) {
 
 			return Optional.absent();
 		}
@@ -771,15 +773,14 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private Optional<Long> getIdFromLongIndex(final long key, final LongLongMap tempIndex, final BatchInserterIndex index,
-			final String indexProperty) {
+	private Optional<Long> getIdFromLongIndex(final long key, final LongLongMap tempIndex, final BatchInserterIndex index, final String indexProperty) {
 
 		if (tempIndex.containsKey(key)) {
 
 			return Optional.of(tempIndex.get(key));
 		}
 
-		if(index == null) {
+		if (index == null) {
 
 			return Optional.absent();
 		}
@@ -814,16 +815,16 @@ public abstract class Neo4jProcessor {
 	private void addToIndex(final String key, final Long value, final String indexProperty, final BatchInserterIndex neo4jIndex,
 			final ObjectLongMap<String> tempIndex, final HTreeMap<char[], Long> mapdbIndex) {
 
-		//neo4jIndex.add(value, MapUtil.map(indexProperty, key));
+		// neo4jIndex.add(value, MapUtil.map(indexProperty, key));
 		tempIndex.put(key, value);
-		//mapdbIndex.put(key.toCharArray(), value);
+		// mapdbIndex.put(key.toCharArray(), value);
 	}
 
 	private void addToLongIndex(final long key, final long value, final String indexProperty, final BatchInserterIndex neo4jIndex,
 			final LongLongMap tempIndex, final HTreeMap<Long, Long> mapdbIndex) {
 
-		//neo4jIndex.add(value, MapUtil.map(indexProperty, key));
+		// neo4jIndex.add(value, MapUtil.map(indexProperty, key));
 		tempIndex.put(key, value);
-		//mapdbIndex.put(key, value);
+		// mapdbIndex.put(key, value);
 	}
 }

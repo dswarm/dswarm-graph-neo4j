@@ -23,8 +23,8 @@ public abstract class RDFNeo4jHandler implements RDFHandler {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(RDFNeo4jHandler.class);
 
-	protected final BaseNeo4jHandler  handler;
-	protected final RDFNeo4jProcessor processor;
+	protected final BaseNeo4jHandler	handler;
+	protected final RDFNeo4jProcessor	processor;
 
 	public RDFNeo4jHandler(final BaseNeo4jHandler handlerArg, final RDFNeo4jProcessor processorArg) throws DMPGraphException {
 

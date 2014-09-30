@@ -7,14 +7,14 @@ import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
 import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.parse.Neo4jHandler;
-
-import de.knutwalker.ntparser.Node;
-import de.knutwalker.ntparser.Resource;
-import de.knutwalker.ntparser.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+
+import de.knutwalker.ntparser.Node;
+import de.knutwalker.ntparser.Resource;
+import de.knutwalker.ntparser.Statement;
 
 /**
  * @author tgaengler
@@ -23,8 +23,8 @@ public abstract class RDFNeo4jHandler implements RDFHandler {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(RDFNeo4jHandler.class);
 
-	protected final BaseNeo4jHandler  handler;
-	protected final RDFNeo4jProcessor processor;
+	protected final BaseNeo4jHandler	handler;
+	protected final RDFNeo4jProcessor	processor;
 
 	public RDFNeo4jHandler(final BaseNeo4jHandler handlerArg, final RDFNeo4jProcessor processorArg) throws DMPGraphException {
 

@@ -2,16 +2,16 @@ package org.dswarm.graph.batch.rdf.pnx.parse;
 
 import java.util.Iterator;
 
-import de.knutwalker.ntparser.Statement;
-
 import org.dswarm.graph.DMPGraphException;
+
+import de.knutwalker.ntparser.Statement;
 
 /**
  * @author tgaengler
  */
 public class PNXParser implements RDFParser {
 
-	private final RDFHandler rdfHandler;
+	private final RDFHandler	rdfHandler;
 
 	public PNXParser(final RDFHandler handlerArg) {
 
@@ -20,7 +20,6 @@ public class PNXParser implements RDFParser {
 
 	@Override
 	public void parse(final Iterator<Statement> model) throws DMPGraphException {
-
 
 		while (model.hasNext()) {
 

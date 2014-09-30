@@ -4,9 +4,6 @@ import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.model.GraphStatics;
-
-import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
@@ -14,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectLongMap;
+import com.carrotsearch.hppc.ObjectLongOpenHashMap;
 import com.google.common.base.Optional;
 
 /**
@@ -23,11 +21,11 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
-	private BatchInserterIndex statementUUIDsWDataModel;
+	private BatchInserterIndex			statementUUIDsWDataModel;
 
-	private final ObjectLongMap<String> tempStatementUUIDsWDataModelIndex;
+	private final ObjectLongMap<String>	tempStatementUUIDsWDataModelIndex;
 
-	private final String dataModelURI;
+	private final String				dataModelURI;
 
 	public DataModelNeo4jProcessor(final BatchInserter inserter, final String dataModelURIArg) throws DMPGraphException {
 
@@ -40,11 +38,12 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		initStatementIndex();
 	}
 
-	@Override protected void initIndices() throws DMPGraphException {
+	@Override
+	protected void initIndices() throws DMPGraphException {
 
 		super.initIndices();
 
-		//initStatementIndex();
+		// initStatementIndex();
 	}
 
 	private void initStatementIndex() throws DMPGraphException {
@@ -63,10 +62,10 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		}
 	}
 
-//	public BatchInserterIndex getStatementWDataModelIndex() {
-//
-//		return statementUUIDsWDataModel;
-//	}
+	// public BatchInserterIndex getStatementWDataModelIndex() {
+	//
+	// return statementUUIDsWDataModel;
+	// }
 
 	public void addToStatementWDataModelIndex(final String key, final Long nodeId) {
 
@@ -83,7 +82,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		if (!optionalDataModelURI.isPresent()) {
 
-			addToResourcesWDataModelIndex(URI + this.dataModelURI, nodeId);
+			addToResourcesWDataModelIndex(URI + dataModelURI, nodeId);
 		} else {
 
 			addToResourcesWDataModelIndex(URI + optionalDataModelURI.get(), nodeId);
@@ -91,28 +90,28 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void handleObjectDataModel(final Long nodeId, final Optional<String> optionalDataModelURI) {
+	public void handleObjectDataModel(final Map<String, Object> objectNodeProperties, final Optional<String> optionalDataModelURI) {
 
 		if (!optionalDataModelURI.isPresent()) {
 
-			inserter.setNodeProperty(nodeId, GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
+			objectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 		} else {
 
-			inserter.setNodeProperty(nodeId, GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
+			objectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
 		}
 	}
 
 	@Override
-	public void handleSubjectDataModel(final Long nodeId, String URI, final Optional<String> optionalDataModelURI) {
+	public void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, final String URI, final Optional<String> optionalDataModelURI) {
 
 		if (!optionalDataModelURI.isPresent()) {
 
-			inserter.setNodeProperty(nodeId, GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-			addToResourcesWDataModelIndex(URI + this.dataModelURI, nodeId);
+			subjectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+			// addToResourcesWDataModelIndex(URI + dataModelURI, nodeId);
 		} else {
 
-			inserter.setNodeProperty(nodeId, GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
-			addToResourcesWDataModelIndex(URI + optionalDataModelURI.get(), nodeId);
+			subjectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
+			// addToResourcesWDataModelIndex(URI + optionalDataModelURI.get(), nodeId);
 		}
 	}
 
@@ -129,24 +128,26 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public Long prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
+	public Map<String, Object> prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
 			final Optional<Map<String, Object>> qualifiedAttributes) {
 
-		final Long relId = super.prepareRelationship(subjectNodeId, predicateURI, objectNodeId, statementUUID, qualifiedAttributes);
+		final Map<String, Object> relProperties = super.prepareRelationship(subjectNodeId, predicateURI, objectNodeId, statementUUID, qualifiedAttributes);
 
-		inserter.setRelationshipProperty(relId, GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+		relProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 
-		return relId;
+		return relProperties;
 	}
 
-	@Override public void flushStatementIndices() {
+	@Override
+	public void flushStatementIndices() {
 
 		super.flushStatementIndices();
 
 		statementUUIDsWDataModel.flush();
 	}
 
-	@Override protected void clearTempStatementIndices() {
+	@Override
+	protected void clearTempStatementIndices() {
 
 		super.clearTempStatementIndices();
 

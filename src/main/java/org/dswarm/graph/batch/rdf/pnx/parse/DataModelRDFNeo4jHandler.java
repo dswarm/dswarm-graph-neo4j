@@ -3,7 +3,6 @@ package org.dswarm.graph.batch.rdf.pnx.parse;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.batch.parse.DataModelNeo4jHandler;
 import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

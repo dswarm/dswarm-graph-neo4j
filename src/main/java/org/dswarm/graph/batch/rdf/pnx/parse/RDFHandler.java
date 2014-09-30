@@ -1,9 +1,9 @@
 package org.dswarm.graph.batch.rdf.pnx.parse;
 
-import de.knutwalker.ntparser.Statement;
-
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.parse.Handler;
+
+import de.knutwalker.ntparser.Statement;
 
 /**
  * @author tgaengler

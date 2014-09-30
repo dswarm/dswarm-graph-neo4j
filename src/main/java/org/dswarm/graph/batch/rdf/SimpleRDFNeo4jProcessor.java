@@ -2,7 +2,6 @@ package org.dswarm.graph.batch.rdf;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.batch.SimpleNeo4jProcessor;
-
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -20,7 +20,7 @@ public abstract class RDFNeo4jProcessor {
 
 	private static final Logger		LOG	= LoggerFactory.getLogger(RDFNeo4jProcessor.class);
 
-	protected final Neo4jProcessor processor;
+	protected final Neo4jProcessor	processor;
 
 	public RDFNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
 

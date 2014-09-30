@@ -3,6 +3,7 @@ package org.dswarm.graph.batch.rdf.pnx.utils;
 import org.dswarm.graph.NodeType;
 
 import com.google.common.base.Optional;
+
 import de.knutwalker.ntparser.BNode;
 import de.knutwalker.ntparser.Literal;
 import de.knutwalker.ntparser.Node;
@@ -15,12 +16,12 @@ public final class NodeTypeUtils {
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode) {
 
-		return getNodeType(optionalNode, Optional.<Boolean>absent());
+		return NodeTypeUtils.getNodeType(optionalNode, Optional.<Boolean> absent());
 	}
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode, final Optional<Boolean> optionalIsType) {
 
-		if(!optionalNode.isPresent()) {
+		if (!optionalNode.isPresent()) {
 
 			return Optional.absent();
 		}
@@ -28,11 +29,11 @@ public final class NodeTypeUtils {
 		final NodeType nodeType;
 		final Node node = optionalNode.get();
 
-		if(node instanceof Resource) {
+		if (node instanceof Resource) {
 
-			if(optionalIsType.isPresent()) {
+			if (optionalIsType.isPresent()) {
 
-				if(Boolean.FALSE.equals(optionalIsType.get())) {
+				if (Boolean.FALSE.equals(optionalIsType.get())) {
 
 					nodeType = NodeType.Resource;
 				} else {
@@ -43,11 +44,11 @@ public final class NodeTypeUtils {
 
 				nodeType = NodeType.Resource;
 			}
-		} else if(node instanceof BNode) {
+		} else if (node instanceof BNode) {
 
-			if(optionalIsType.isPresent()) {
+			if (optionalIsType.isPresent()) {
 
-				if(Boolean.FALSE.equals(optionalIsType.get())) {
+				if (Boolean.FALSE.equals(optionalIsType.get())) {
 
 					nodeType = NodeType.BNode;
 				} else {
@@ -58,7 +59,7 @@ public final class NodeTypeUtils {
 
 				nodeType = NodeType.BNode;
 			}
-		} else if(node instanceof Literal) {
+		} else if (node instanceof Literal) {
 
 			nodeType = NodeType.Literal;
 		} else {

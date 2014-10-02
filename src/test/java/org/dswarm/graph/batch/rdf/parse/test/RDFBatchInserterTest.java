@@ -1,10 +1,13 @@
 package org.dswarm.graph.batch.rdf.parse.test;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.dswarm.graph.batch.rdf.DataModelRDFNeo4jProcessor;
@@ -21,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -34,7 +38,7 @@ public class RDFBatchInserterTest {
 	private static final String BASE_PATH = "/media/tgaengler/data/dnb_dump/nt/dnb_dump_0000";
 	private static final String PATH_POSTFIX = ".nt";
 
-	@Test
+	//@Test
 	public void testRDFBatchInsertTest() throws Exception {
 
 		LOG.debug("start batch processing");
@@ -88,6 +92,51 @@ public class RDFBatchInserterTest {
 			modelInput.close();
 			model.close();
 		}
+
+		inserter.shutdown();
+
+		LOG.debug("shutdown batch inserter");
+	}
+	
+	@Test
+	public void testRDFBatchInsertTest3() throws Exception {
+
+		LOG.debug("start batch processing");
+
+		final String dataModelURI = "test";
+
+		final Map<String, String> config = new HashMap<>();
+		config.put("cache_type", "none");
+		config.put("use_memory_mapped_buffers", "true");
+		final BatchInserter inserter = BatchInserters.inserter("target/test_data2", config);
+
+		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(inserter, dataModelURI);
+		final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+
+		LOG.debug("finished initializing batch inserter");
+
+			LOG.debug("start batch import");
+
+		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		final byte[] file = Resources.toByteArray(fileURL);
+		final InputStream stream = new ByteArrayInputStream(file);
+		final Model model = ModelFactory.createDefaultModel();
+		model.read(stream, null, "N3");
+
+		LOG.debug("finished loading RDF model");
+
+		final RDFParser parser = new JenaModelParser(model);
+		parser.setRDFHandler(handler);
+		parser.parse();
+
+		// flush indices etc.
+			handler.getHandler().closeTransaction();
+
+		LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
+				+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
+				+ "'");
+		stream.close();
+		model.close();
 
 		inserter.shutdown();
 

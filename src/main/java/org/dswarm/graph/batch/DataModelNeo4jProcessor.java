@@ -63,7 +63,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		}
 	}
 
-	public void addToStatementWDataModelIndex(final String key, final Long nodeId) {
+	public void addToStatementWDataModelIndex(final String key, final long nodeId) {
 
 		statementUUIDsWDataModel.add(nodeId, MapUtil.map(GraphStatics.UUID_W_DATA_MODEL, key));
 	}
@@ -74,7 +74,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addObjectToResourceWDataModelIndex(final Long nodeId, final String URI, final Optional<String> optionalDataModelURI) {
+	public void addObjectToResourceWDataModelIndex(final long nodeId, final String URI, final Optional<String> optionalDataModelURI) {
 
 		if (!optionalDataModelURI.isPresent()) {
 
@@ -110,7 +110,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addStatementToIndex(final Long relId, final String statementUUID) {
+	public void addStatementToIndex(final long relId, final String statementUUID) {
 
 		addToStatementWDataModelIndex(dataModelURI + "." + statementUUID, relId);
 	}
@@ -122,10 +122,9 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public Map<String, Object> prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
-			final Optional<Map<String, Object>> qualifiedAttributes) {
+	public Map<String, Object> prepareRelationship(final String statementUUID, final Optional<Map<String, Object>> qualifiedAttributes) {
 
-		final Map<String, Object> relProperties = super.prepareRelationship(subjectNodeId, predicateURI, objectNodeId, statementUUID, qualifiedAttributes);
+		final Map<String, Object> relProperties = super.prepareRelationship(statementUUID, qualifiedAttributes);
 
 		relProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 

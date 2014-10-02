@@ -41,8 +41,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	protected String				resourceUri;
 
 	protected final Neo4jProcessor	processor;
-	
-	protected static final Label rdfsClassLabel = DynamicLabel.label(RDFS.Class.getURI());
+
+	protected static final Label	rdfsClassLabel		= DynamicLabel.label(RDFS.Class.getURI());
 
 	public BaseNeo4jHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
 
@@ -67,8 +67,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 		i++;
 
-		// System.out.println("handle statement " + i + ": " + st.toString());
-
 		try {
 
 			if (!statement.getOptionalSubjectNodeType().isPresent() || !statement.getOptionalPredicateURI().isPresent()
@@ -84,7 +82,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			// TODO: what should we do, if the subject is a resource type?
 			final Optional<Long> optionalSubjectNodeId = processor.determineNode(statement.getOptionalSubjectNodeType(),
 					statement.getOptionalSubjectId(), statement.getOptionalSubjectURI(), statement.getOptionalSubjectDataModelURI());
-			final Long subjectNodeId;
+			final long subjectNodeId;
 
 			if (optionalSubjectNodeId.isPresent()) {
 
@@ -92,7 +90,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			} else {
 
 				final Map<String, Object> subjectNodeProperties = new HashMap<>();
-				// subjectNodeId = processor.getBatchInserter().createNode(subjectNodeProperties);
 
 				if (NodeType.Resource.equals(subjectNodeType) || NodeType.TypeResource.equals(subjectNodeType)) {
 
@@ -104,9 +101,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 					subjectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
 					processor.handleSubjectDataModel(subjectNodeProperties, subjectURI, statement.getOptionalSubjectDataModelURI());
-					
+
 					subjectNodeId = processor.getBatchInserter().createNode(subjectNodeProperties);
-					
+
 					processor.addToResourcesIndex(subjectURI, subjectNodeId);
 					processor.addObjectToResourceWDataModelIndex(subjectNodeId, subjectURI, statement.getOptionalSubjectDataModelURI());
 				} else {
@@ -115,9 +112,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 					// note: can I expect an id here?
 					subjectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-					
+
 					subjectNodeId = processor.getBatchInserter().createNode(subjectNodeProperties);
-					
+
 					processor.addToBNodesIndex(statement.getOptionalSubjectId().get(), subjectNodeId);
 				}
 
@@ -170,7 +167,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				// Check index for object
 				final Optional<Long> optionalObjectNodeId = processor.determineNode(finalOptionalObjectNodeType, statement.getOptionalObjectId(),
 						statement.getOptionalObjectURI(), statement.getOptionalObjectDataModelURI());
-				final Long objectNodeId;
+				final long objectNodeId;
 				final Optional<String> optionalResourceUri;
 
 				if (optionalObjectNodeId.isPresent()) {
@@ -180,7 +177,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				} else {
 
 					final Map<String, Object> objectNodeProperties = new HashMap<>();
-					// objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
 
 					if (NodeType.Resource.equals(finalObjectNodeType) || NodeType.TypeResource.equals(finalObjectNodeType)) {
 
@@ -197,23 +193,22 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 								objectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 
 								processor.handleObjectDataModel(objectNodeProperties, statement.getOptionalObjectDataModelURI());
-								
+
 								objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
 
 								break;
 							case TypeResource:
 
 								objectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-								//processor.addLabel(objectNodeId, RDFS.Class.getURI());
-								
+
 								objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties, rdfsClassLabel);
 
 								processor.addToResourceTypesIndex(objectURI, objectNodeId);
 
 								break;
 							default:
-								
-								objectNodeId = null;
+
+								throw new DMPGraphException("object must be a resource or a type resource at this moment");
 						}
 
 						processor.addToResourcesIndex(objectURI, objectNodeId);
@@ -221,7 +216,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 						optionalResourceUri = Optional.absent();
 					} else {
 
-						final Pair<Long, Optional<String>> result = handleBNode(subjectNodeId, statement, objectNodeProperties, finalOptionalObjectNodeType);
+						final Pair<Long, Optional<String>> result = handleBNode(subjectNodeId, statement, objectNodeProperties,
+								finalOptionalObjectNodeType);
 						objectNodeId = result.first();
 						optionalResourceUri = result.other();
 					}
@@ -235,8 +231,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				final Optional<Long> optionalRelId = processor.getStatement(hash);
 
 				if (!optionalRelId.isPresent()) {
-
-					// final String hash = null;
 
 					final Optional<String> finalOptionalResourceUri;
 
@@ -259,7 +253,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 200000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
+			if (nodeDelta >= 200000 || timeDelta >= 30) { // "commit" every 200k operations or every 30 seconds
 
 				sinceLastCommit = totalTriples;
 
@@ -267,16 +261,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 				tick = System.currentTimeMillis();
 			}
-
-			// if(nodeDelta >= 1000000 || timeDelta >= 30) {
-			//
-			// LOG.debug("flush indices");
-			//
-			// processor.flushIndices();
-			// }
 		} catch (final Exception e) {
 
-			final String message = "couldn't finish write TX successfully";
+			final String message = "couldn't finish write \"TX\" successfully";
 
 			BaseNeo4jHandler.LOG.error(message, e);
 
@@ -291,7 +278,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 		processor.clearMaps();
 		processor.flushIndices();
-		// processor.closeMapDB();
 	}
 
 	@Override
@@ -316,8 +302,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return literals;
 	}
 
-	public Pair<Long, Optional<String>> handleBNode(final Long subjectNodeId, final Statement statement, final Map<String, Object> objectNodeProperties,
-			final Optional<NodeType> optionalObjectNodeType) throws DMPGraphException {
+	public Pair<Long, Optional<String>> handleBNode(final long subjectNodeId, final Statement statement,
+			final Map<String, Object> objectNodeProperties, final Optional<NodeType> optionalObjectNodeType) throws DMPGraphException {
 
 		if (!optionalObjectNodeType.isPresent()) {
 
@@ -329,38 +315,37 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 		final NodeType objectNodeType = optionalObjectNodeType.get();
 		objectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, objectNodeType.toString());
-		
+
 		final Optional<Label> optionalLabel;
 
 		if (!NodeType.TypeBNode.equals(objectNodeType)) {
 
 			optionalResourceUri = addResourceProperty(subjectNodeId, objectNodeProperties, statement.getOptionalSubjectNodeType(),
 					statement.getOptionalSubjectURI(), statement.getOptionalResourceURI());
-			
+
 			optionalLabel = Optional.absent();
 		} else {
 
-			//processor.addLabel(objectNodeId, RDFS.Class.getURI());
 			optionalLabel = Optional.of(rdfsClassLabel);
 			optionalResourceUri = Optional.absent();
 		}
-		
-		final Long objectNodeId;
-		
-		if(!optionalLabel.isPresent()) {
-		
+
+		final long objectNodeId;
+
+		if (!optionalLabel.isPresent()) {
+
 			objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
 		} else {
-			
+
 			objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties, optionalLabel.get());
 		}
-		
+
 		processor.addToBNodesIndex(statement.getOptionalObjectId().get(), objectNodeId);
 
 		return Pair.of(objectNodeId, optionalResourceUri);
 	}
 
-	public void handleLiteral(final Long subjectNodeId, final Statement statement) throws DMPGraphException {
+	public void handleLiteral(final long subjectNodeId, final Statement statement) throws DMPGraphException {
 
 		final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), statement
 				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
@@ -372,17 +357,16 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			literals++;
 
 			final Map<String, Object> objectNodeProperties = new HashMap<>();
-			//final Long objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
 			objectNodeProperties.put(GraphStatics.VALUE_PROPERTY, statement.getOptionalObjectValue().get());
 			objectNodeProperties.put(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
 
-			final Optional<String> optionalResourceUri = addResourceProperty(subjectNodeId, objectNodeProperties, statement.getOptionalSubjectNodeType(),
-					statement.getOptionalSubjectURI(), statement.getOptionalResourceURI());
+			final Optional<String> optionalResourceUri = addResourceProperty(subjectNodeId, objectNodeProperties,
+					statement.getOptionalSubjectNodeType(), statement.getOptionalSubjectURI(), statement.getOptionalResourceURI());
 
-			final Long objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
-			
+			final long objectNodeId = processor.getBatchInserter().createNode(objectNodeProperties);
+
 			processor.addToValueIndex(statement.getOptionalObjectValue().get(), objectNodeId);
-			
+
 			addedNodes++;
 
 			addRelationship(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId, statement.getOptionalSubjectNodeType(),
@@ -406,7 +390,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	 * @return
 	 * @throws org.dswarm.graph.DMPGraphException
 	 */
-	public Long addRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId,
+	public long addRelationship(final long subjectNodeId, final String predicateURI, final long objectNodeId,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
@@ -421,14 +405,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			finalStatementUUID = UUID.randomUUID().toString();
 		}
 
-		final Map<String, Object> relProperties = processor.prepareRelationship(subjectNodeId, predicateURI, objectNodeId, finalStatementUUID, optionalQualifiedAttributes);
+		final Map<String, Object> relProperties = processor.prepareRelationship(finalStatementUUID, optionalQualifiedAttributes);
 
 		addResourcePropertyToRelationship(subjectNodeId, relProperties, optionalSubjectNodeType, optionalSubjectURI, optionalResourceUri);
-		
+
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);
-		
-		final Long relId = processor.getBatchInserter().createRelationship(subjectNodeId, objectNodeId, relType, relProperties);
-		
+
+		final long relId = processor.getBatchInserter().createRelationship(subjectNodeId, objectNodeId, relType, relProperties);
+
 		processor.addToStatementIndex(hash, relId);
 		processor.addStatementToIndex(relId, finalStatementUUID);
 
@@ -437,7 +421,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return relId;
 	}
 
-	protected Optional<String> addResourceProperty(final Long subjectNodeId, final Map<String, Object> objectProperties,
+	protected Optional<String> addResourceProperty(final long subjectNodeId, final Map<String, Object> objectProperties,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI, final Optional<String> optionalResourceURI) {
 
 		final Optional<String> optionalResourceUri = processor.determineResourceUri(subjectNodeId, optionalSubjectNodeType, optionalSubjectURI,
@@ -453,7 +437,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return optionalResourceUri;
 	}
 
-	protected Optional<String> addResourcePropertyToRelationship(final Long subjectNodeId, final Map<String, Object> relProperties,
+	protected Optional<String> addResourcePropertyToRelationship(final long subjectNodeId, final Map<String, Object> relProperties,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI, final Optional<String> optionalResourceURI) {
 
 		final Optional<String> finalOptionalResourceUri;
@@ -475,7 +459,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return finalOptionalResourceUri;
 	}
 
-	public void addBNode(final Optional<String> optionalNodeId, final Optional<NodeType> optionalNodeType, final Long nodeId)
+	public void addBNode(final Optional<String> optionalNodeId, final Optional<NodeType> optionalNodeType, final long nodeId)
 			throws DMPGraphException {
 
 		if (!optionalNodeId.isPresent() || !optionalNodeType.isPresent()) {

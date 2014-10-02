@@ -18,14 +18,9 @@ import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.carrotsearch.hppc.LongLongMap;
 import com.carrotsearch.hppc.LongLongOpenHashMap;
-import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.LongObjectOpenHashMap;
-import com.carrotsearch.hppc.ObjectLongMap;
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import com.carrotsearch.hppc.cursors.LongLongCursor;
-import com.carrotsearch.hppc.cursors.ObjectLongCursor;
 import com.github.emboss.siphash.SipHash;
 import com.github.emboss.siphash.SipKey;
 import com.google.common.base.Charsets;
@@ -36,29 +31,29 @@ import com.google.common.base.Optional;
  */
 public abstract class Neo4jProcessor {
 
-	private static final Logger				LOG			= LoggerFactory.getLogger(Neo4jProcessor.class);
+	private static final Logger						LOG			= LoggerFactory.getLogger(Neo4jProcessor.class);
 
-	protected int							addedLabels	= 0;
+	protected int									addedLabels	= 0;
 
-	private static final SipKey				SPEC_KEY	= new SipKey(HashUtils.bytesOf(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
-																0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f));
+	private static final SipKey						SPEC_KEY	= new SipKey(HashUtils.bytesOf(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+																		0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f));
 
-	protected final BatchInserter			inserter;
-	private BatchInserterIndex				resources;
-	private BatchInserterIndex				resourcesWDataModel;
-	private BatchInserterIndex				resourceTypes;
+	protected final BatchInserter					inserter;
+	private BatchInserterIndex						resources;
+	private BatchInserterIndex						resourcesWDataModel;
+	private BatchInserterIndex						resourceTypes;
 
-	protected final ObjectLongMap<String>	tempResourcesIndex;
-	protected final ObjectLongMap<String>	tempResourcesWDataModelIndex;
-	protected final ObjectLongMap<String>	tempResourceTypes;
+	protected final ObjectLongOpenHashMap<String>	tempResourcesIndex;
+	protected final ObjectLongOpenHashMap<String>	tempResourcesWDataModelIndex;
+	protected final ObjectLongOpenHashMap<String>	tempResourceTypes;
 
-	private BatchInserterIndex				values;
-	protected final ObjectLongMap<String>	bnodes;
-	private BatchInserterIndex				statementHashes;
+	private BatchInserterIndex						values;
+	protected final ObjectLongOpenHashMap<String>	bnodes;
+	private BatchInserterIndex						statementHashes;
 
-	protected final LongLongMap				tempStatementHashes;
+	protected final LongLongOpenHashMap				tempStatementHashes;
 
-	protected final LongObjectMap<String>	nodeResourceMap;
+	protected final LongObjectOpenHashMap<String>	nodeResourceMap;
 
 	public Neo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
@@ -74,7 +69,8 @@ public abstract class Neo4jProcessor {
 		tempResourceTypes = new ObjectLongOpenHashMap<>();
 		tempStatementHashes = new LongLongOpenHashMap();
 
-		// TODO: init all indice, when batch inserter should work on a pre-filled database (otherwise, the existing index would utilised in the first run)
+		// TODO: init all indices, when batch inserter should work on a pre-filled database (otherwise, the existing index would
+		// utilised in the first run)
 		// initIndices();
 		initValueIndex();
 	}
@@ -91,13 +87,21 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished pumping indices");
 	}
 
-	private void copyNFlushNClearIndex(final ObjectLongMap<String> tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
+	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
 
 		Neo4jProcessor.LOG.debug("start pumping index");
 
-		for (final ObjectLongCursor<String> entry : tempIndex) {
+		final Object[] keys = tempIndex.keys;
+		final long[] values = tempIndex.values;
+		final boolean[] states = tempIndex.allocated;
 
-			neo4jIndex.add(entry.value, MapUtil.map(indexProperty, entry.key.toCharArray()));
+		for (int i = 0; i < states.length; i++) {
+
+			if (states[i]) {
+
+				// @tgaengler: I can't remember why I'm utilising an char array here ...
+				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i].toString().toCharArray()));
+			}
 		}
 
 		Neo4jProcessor.LOG.debug("finished pumping index");
@@ -110,13 +114,20 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-	private void copyLongIndex(final LongLongMap tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
+	private void copyLongIndex(final LongLongOpenHashMap tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
 
 		Neo4jProcessor.LOG.debug("start pumping index");
 
-		for (final LongLongCursor entry : tempIndex) {
+		final long[] keys = tempIndex.keys;
+		final long[] values = tempIndex.values;
+		final boolean[] states = tempIndex.allocated;
 
-			neo4jIndex.add(entry.value, MapUtil.map(indexProperty, entry.key));
+		for (int i = 0; i < states.length; i++) {
+
+			if (states[i]) {
+
+				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i]));
+			}
 		}
 
 		Neo4jProcessor.LOG.debug("finished pumping index");
@@ -132,7 +143,7 @@ public abstract class Neo4jProcessor {
 	protected void initValueIndex() throws DMPGraphException {
 
 		try {
-			
+
 			values = getOrCreateIndex("values", GraphStatics.VALUE, true);
 		} catch (final Exception e) {
 
@@ -144,7 +155,6 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 	}
-
 
 	protected void initIndices() throws DMPGraphException {
 
@@ -170,7 +180,7 @@ public abstract class Neo4jProcessor {
 		return inserter;
 	}
 
-	public void addToResourcesIndex(final String key, final Long nodeId) {
+	public void addToResourcesIndex(final String key, final long nodeId) {
 
 		tempResourcesIndex.put(key, nodeId);
 	}
@@ -180,7 +190,7 @@ public abstract class Neo4jProcessor {
 		return getIdFromIndex(key, tempResourcesIndex, resources, GraphStatics.URI);
 	}
 
-	public void addToResourcesWDataModelIndex(final String key, final Long nodeId) {
+	public void addToResourcesWDataModelIndex(final String key, final long nodeId) {
 
 		tempResourcesWDataModelIndex.put(key, nodeId);
 	}
@@ -190,7 +200,7 @@ public abstract class Neo4jProcessor {
 		return getIdFromIndex(key, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
 	}
 
-	public void addToBNodesIndex(final String key, final Long nodeId) {
+	public void addToBNodesIndex(final String key, final long nodeId) {
 
 		bnodes.put(key, nodeId);
 	}
@@ -204,13 +214,13 @@ public abstract class Neo4jProcessor {
 
 		if (bnodes.containsKey(key)) {
 
-			return Optional.fromNullable(bnodes.get(key));
+			return Optional.of(bnodes.lget());
 		}
 
 		return Optional.absent();
 	}
 
-	public void addToResourceTypesIndex(final String key, final Long nodeId) {
+	public void addToResourceTypesIndex(final String key, final long nodeId) {
 
 		tempResourceTypes.put(key, nodeId);
 	}
@@ -220,12 +230,12 @@ public abstract class Neo4jProcessor {
 		return getIdFromIndex(key, tempResourceTypes, resourceTypes, GraphStatics.URI);
 	}
 
-	public void addToValueIndex(final String key, final Long nodeId) {
+	public void addToValueIndex(final String key, final long nodeId) {
 
 		values.add(nodeId, MapUtil.map(GraphStatics.VALUE, key));
 	}
 
-	public void addToStatementIndex(final long key, final Long nodeId) {
+	public void addToStatementIndex(final long key, final long nodeId) {
 
 		tempStatementHashes.put(key, nodeId);
 	}
@@ -317,7 +327,7 @@ public abstract class Neo4jProcessor {
 
 		if (nodeResourceMap.containsKey(subjectNodeId)) {
 
-			optionalResourceUri = Optional.of(nodeResourceMap.get(subjectNodeId));
+			optionalResourceUri = Optional.of(nodeResourceMap.lget());
 		} else {
 
 			optionalResourceUri = determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
@@ -353,7 +363,7 @@ public abstract class Neo4jProcessor {
 		return optionalResourceUri;
 	}
 
-	public void addLabel(final Long nodeId, final String labelString) {
+	public void addLabel(final long nodeId, final String labelString) {
 
 		final Label label = DynamicLabel.label(labelString);
 
@@ -365,9 +375,7 @@ public abstract class Neo4jProcessor {
 		return getIdFromLongIndex(hash, tempStatementHashes, statementHashes, GraphStatics.HASH);
 	}
 
-	public Map<String, Object> prepareRelationship(final Long subjectNodeId, final String predicateURI, final Long objectNodeId, final String statementUUID,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes) {
-
+	public Map<String, Object> prepareRelationship(final String statementUUID, final Optional<Map<String, Object>> optionalQualifiedAttributes) {
 
 		final Map<String, Object> relProperties = new HashMap<>();
 
@@ -403,7 +411,7 @@ public abstract class Neo4jProcessor {
 		return relProperties;
 	}
 
-	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final Long objectNodeId, final NodeType subjectNodeType,
+	public long generateStatementHash(final long subjectNodeId, final String predicateName, final long objectNodeId, final NodeType subjectNodeType,
 			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -415,7 +423,7 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public long generateStatementHash(final Long subjectNodeId, final String predicateName, final String objectValue, final NodeType subjectNodeType,
+	public long generateStatementHash(final long subjectNodeId, final String predicateName, final String objectValue, final NodeType subjectNodeType,
 			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -443,11 +451,11 @@ public abstract class Neo4jProcessor {
 
 		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
 				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get() + " ";
-		
+
 		return SipHash.digest(Neo4jProcessor.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
-	public Optional<String> getIdentifier(final Long nodeId, final Optional<NodeType> optionalNodeType) {
+	public Optional<String> getIdentifier(final long nodeId, final Optional<NodeType> optionalNodeType) {
 
 		if (!optionalNodeType.isPresent()) {
 
@@ -494,14 +502,14 @@ public abstract class Neo4jProcessor {
 		return Optional.fromNullable(identifier);
 	}
 
-	public abstract void addObjectToResourceWDataModelIndex(final Long nodeId, final String URI, final Optional<String> optionalDataModelURI);
+	public abstract void addObjectToResourceWDataModelIndex(final long nodeId, final String URI, final Optional<String> optionalDataModelURI);
 
 	public abstract void handleObjectDataModel(final Map<String, Object> objectNodeProperties, final Optional<String> optionalDataModelURI);
 
 	public abstract void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, String URI,
 			final Optional<String> optionalDataModelURI);
 
-	public abstract void addStatementToIndex(final Long relId, final String statementUUID);
+	public abstract void addStatementToIndex(final long relId, final String statementUUID);
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
 
@@ -538,7 +546,7 @@ public abstract class Neo4jProcessor {
 		return properties.get(key);
 	}
 
-	private Optional<Long> getIdFromIndex(final String key, final ObjectLongMap<String> tempIndex, final BatchInserterIndex index,
+	private Optional<Long> getIdFromIndex(final String key, final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex index,
 			final String indexProperty) {
 
 		if (key == null) {
@@ -548,7 +556,7 @@ public abstract class Neo4jProcessor {
 
 		if (tempIndex.containsKey(key)) {
 
-			return Optional.of(tempIndex.get(key));
+			return Optional.of(tempIndex.lget());
 		}
 
 		if (index == null) {
@@ -583,11 +591,12 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private Optional<Long> getIdFromLongIndex(final long key, final LongLongMap tempIndex, final BatchInserterIndex index, final String indexProperty) {
+	private Optional<Long> getIdFromLongIndex(final long key, final LongLongOpenHashMap tempIndex, final BatchInserterIndex index,
+			final String indexProperty) {
 
 		if (tempIndex.containsKey(key)) {
 
-			return Optional.of(tempIndex.get(key));
+			return Optional.of(tempIndex.lget());
 		}
 
 		if (index == null) {

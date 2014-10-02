@@ -60,7 +60,7 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addObjectToResourceWDataModelIndex(final Long nodeId, final String URI, final Optional<String> optionalDataModelURI) {
+	public void addObjectToResourceWDataModelIndex(final long nodeId, final String URI, final Optional<String> optionalDataModelURI) {
 
 		if (optionalDataModelURI.isPresent()) {
 
@@ -87,7 +87,7 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addStatementToIndex(final Long relId, final String statementUUID) {
+	public void addStatementToIndex(final long relId, final String statementUUID) {
 
 		statementUUIDs.add(relId, MapUtil.map(GraphStatics.UUID, statementUUID));
 	}

@@ -89,6 +89,7 @@ public abstract class Neo4jProcessor {
 		tempStatementHashes = new LongLongOpenHashMap();
 
 		// initIndices();
+		initValueIndex();
 
 		// tx = DBMaker.newFileDB(new
 		// File("target/testmapdb")).asyncWriteEnable().asyncWriteQueueSize(1000000).cacheDisable().snapshotEnable().cacheSoftRefEnable().mmapFileEnable().compressionEnable().closeOnJvmShutdown().makeTxMaker();
@@ -172,6 +173,23 @@ public abstract class Neo4jProcessor {
 	// snapshotMapdb.createHashMap("statement_hashes").keySerializer(Serializer.LONG).valueSerializer(Serializer.LONG).makeOrGet();
 	// }
 
+	protected void initValueIndex() throws DMPGraphException {
+
+		try {
+;
+			values = getOrCreateIndex("values", GraphStatics.VALUE, true);
+		} catch (final Exception e) {
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jProcessor.LOG.error(message, e);
+			Neo4jProcessor.LOG.debug("couldn't finish writing successfully");
+
+			throw new DMPGraphException(message);
+		}
+	}
+
+
 	protected void initIndices() throws DMPGraphException {
 
 		try {
@@ -179,7 +197,6 @@ public abstract class Neo4jProcessor {
 			resources = getOrCreateIndex("resources", GraphStatics.URI, true);
 			resourcesWDataModel = getOrCreateIndex("resources_w_data_model", GraphStatics.URI_W_DATA_MODEL, true);
 			resourceTypes = getOrCreateIndex("resource_types", GraphStatics.URI, true);
-			values = getOrCreateIndex("values", GraphStatics.VALUE, true);
 			statementHashes = getOrCreateIndex("statement_hashes", GraphStatics.HASH, false);
 		} catch (final Exception e) {
 

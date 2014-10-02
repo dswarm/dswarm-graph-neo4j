@@ -23,6 +23,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 	private BatchInserterIndex			statementUUIDsWDataModel;
 
+	// TODO: utilise temp index (if necessary)
 	private final ObjectLongMap<String>	tempStatementUUIDsWDataModelIndex;
 
 	private final String				dataModelURI;
@@ -61,11 +62,6 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 	}
-
-	// public BatchInserterIndex getStatementWDataModelIndex() {
-	//
-	// return statementUUIDsWDataModel;
-	// }
 
 	public void addToStatementWDataModelIndex(final String key, final Long nodeId) {
 
@@ -107,11 +103,9 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		if (!optionalDataModelURI.isPresent()) {
 
 			subjectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
-			// addToResourcesWDataModelIndex(URI + dataModelURI, nodeId);
 		} else {
 
 			subjectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
-			// addToResourcesWDataModelIndex(URI + optionalDataModelURI.get(), nodeId);
 		}
 	}
 

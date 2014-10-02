@@ -23,6 +23,7 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 	protected BatchInserterIndex		statementUUIDs;
 
+	// TODO: utilise temp index (if necessary)
 	private final ObjectLongMap<String>	tempStatementUUIDsIndex;
 
 	public SimpleNeo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
@@ -82,7 +83,6 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 		if (optionalDataModelURI.isPresent()) {
 
 			subjectNodeProperties.put(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
-			// addToResourcesWDataModelIndex(URI + optionalDataModelURI.get(), nodeId);
 		}
 	}
 

@@ -57,7 +57,7 @@ public class GDMModelParser implements GDMParser {
 
 			long i = 0;
 
-			gdmHandler.setResourceUri(resource.getUri());
+			gdmHandler.getHandler().setResourceUri(resource.getUri());
 
 			for (final Statement statement : statements) {
 

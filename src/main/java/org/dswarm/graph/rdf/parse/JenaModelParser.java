@@ -1,9 +1,9 @@
 package org.dswarm.graph.rdf.parse;
 
+import org.dswarm.graph.DMPGraphException;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-
-import org.dswarm.graph.DMPGraphException;
 
 /**
  * @author tgaengler
@@ -35,7 +35,5 @@ public class JenaModelParser implements RDFParser {
 		}
 
 		iter.close();
-
-		rdfHandler.closeTransaction();
 	}
 }

@@ -1,9 +1,13 @@
-package org.dswarm.graph.gdm.versioning;
+package org.dswarm.graph.versioning;
 
 import java.util.UUID;
 
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -11,21 +15,15 @@ import org.neo4j.graphdb.RelationshipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.Range;
-import org.dswarm.graph.versioning.VersionHandler;
-import org.dswarm.graph.versioning.VersioningStatics;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * @author tgaengler
  */
-public abstract class BaseNeo4jGDMVersionHandler implements VersionHandler {
+public abstract class Neo4jVersionHandler implements VersionHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(BaseNeo4jGDMVersionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Neo4jVersionHandler.class);
 
 	protected boolean latestVersionInitialized = false;
 
@@ -33,9 +31,9 @@ public abstract class BaseNeo4jGDMVersionHandler implements VersionHandler {
 
 	private Range range;
 
-	protected final BaseNeo4jGDMProcessor processor;
+	protected final Neo4jProcessor processor;
 
-	public BaseNeo4jGDMVersionHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 	}
@@ -59,37 +57,42 @@ public abstract class BaseNeo4jGDMVersionHandler implements VersionHandler {
 
 	protected abstract int retrieveLatestVersion();
 
-	public void setLatestVersion(final String dataModelURI) throws DMPGraphException {
+	public void setLatestVersion(final Optional<String> optionalDataModelURI) throws DMPGraphException {
 
 		if (!latestVersionInitialized) {
 
-			if (dataModelURI == null) {
+			if (!optionalDataModelURI.isPresent()) {
 
 				return;
 			}
 
-			Node dataModelNode = processor.determineNode(new ResourceNode(dataModelURI), false);
+			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(), optionalDataModelURI, Optional.<String>absent());
 
-			if (dataModelNode != null) {
+			if (optionalDataModelNode.isPresent()) {
 
 				latestVersionInitialized = true;
 
 				return;
 			}
 
-			dataModelNode = processor.getDatabase().createNode();
+			final Node dataModelNode = processor.getDatabase().createNode();
 			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
-			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, dataModelURI);
-			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, dataModelURI + VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, optionalDataModelURI.get());
+			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, optionalDataModelURI.get() + VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-			Node dataModelTypeNode = processor.determineNode(new ResourceNode(VersioningStatics.DATA_MODEL_TYPE), true);
+			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.fromNullable(VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
 
-			if (dataModelTypeNode == null) {
+			final Node dataModelTypeNode;
+
+			if (optionaDataModelTypeNode.isPresent()) {
+
+				dataModelTypeNode = optionaDataModelTypeNode.get();
+			} else {
 
 				dataModelTypeNode = processor.getDatabase().createNode();
 				processor.addLabel(dataModelTypeNode, RDFS.Class.getURI());
@@ -100,8 +103,7 @@ public abstract class BaseNeo4jGDMVersionHandler implements VersionHandler {
 				processor.getResourceTypesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
 			}
 
-			final String hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, org.dswarm.graph.json.NodeType.Resource,
-					org.dswarm.graph.json.NodeType.Resource);
+			final String hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);
 
 			Relationship rel = processor.getStatement(hash);
 

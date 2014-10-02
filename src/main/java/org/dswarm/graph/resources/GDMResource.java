@@ -2,8 +2,6 @@ package org.dswarm.graph.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,12 +41,12 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
 import org.dswarm.graph.delta.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
-import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
-import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
-import org.dswarm.graph.gdm.Neo4jGDMProcessor;
-import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
-import org.dswarm.graph.gdm.parse.BaseNeo4jGDMHandler;
+import org.dswarm.graph.gdm.DataModelGDMNeo4jProcessor;
+import org.dswarm.graph.gdm.GDMNeo4jProcessor;
+import org.dswarm.graph.gdm.SimpleGDMNeo4jProcessor;
+import org.dswarm.graph.gdm.parse.DataModelGDMNeo4jHandler;
+import org.dswarm.graph.gdm.parse.GDMNeo4jHandler;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
@@ -57,8 +55,7 @@ import org.dswarm.graph.gdm.parse.GDMResourceParser;
 import org.dswarm.graph.gdm.parse.GDMUpdateHandler;
 import org.dswarm.graph.gdm.parse.GDMUpdateParser;
 import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMHandler;
-import org.dswarm.graph.gdm.parse.Neo4jGDMWDataModelHandler;
+import org.dswarm.graph.gdm.parse.SimpleGDMNeo4jHandler;
 import org.dswarm.graph.gdm.read.GDMModelReader;
 import org.dswarm.graph.gdm.read.GDMResourceReader;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
@@ -72,9 +69,9 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
 
-import com.google.common.io.Resources;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.neo4j.graphdb.DynamicLabel;
@@ -83,7 +80,6 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -178,11 +174,11 @@ public class GDMResource {
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
 
-		final BaseNeo4jGDMProcessor processor = new Neo4jGDMWDataModelProcessor(database, dataModelURI);
+		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, dataModelURI);
 
 		try {
 
-			final BaseNeo4jGDMHandler handler = new Neo4jGDMWDataModelHandler(processor);
+			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
 
 			if (multiPart.getBodyParts().size() >= 3) {
 
@@ -249,8 +245,8 @@ public class GDMResource {
 
 					final Set<String> processedResources = result.other();
 
-					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, handler.getVersionHandler().getLatestVersion(),
-							processor);
+					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, ((Neo4jUpdateHandler) handler.getHandler())
+							.getVersionHandler().getLatestVersion(), processor);
 				}
 			}
 
@@ -266,23 +262,25 @@ public class GDMResource {
 				GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
 			}
 
-			final Long size = handler.getCountedStatements();
+			final Long size = handler.getHandler().getCountedStatements();
 
 			if (size > 0) {
 
 				// update data model version only when some statements are written to the DB
-				handler.getVersionHandler().updateLatestVersion();
+				((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().updateLatestVersion();
 			}
 
-			handler.closeTransaction();
+			handler.getHandler().closeTransaction();
 
 			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
 			return Response.ok().build();
 
-		} catch (final DMPGraphException e) {
+		} catch (final Exception e) {
 
-			processor.failTx();
+			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
 
 			throw e;
 		}
@@ -331,14 +329,25 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		final BaseNeo4jGDMProcessor processor = new Neo4jGDMProcessor(database);
-		final GDMHandler handler = new Neo4jGDMHandler(processor);
-		final GDMParser parser = new GDMModelParser(model);
-		parser.setGDMHandler(handler);
-		parser.parse();
-		handler.closeTransaction();
+		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database);
 
-		LOG.debug("finished writing " + ((Neo4jGDMHandler) handler).getCountedStatements() + " GDM statements into graph db");
+		try {
+
+			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
+			final GDMParser parser = new GDMModelParser(model);
+			parser.setGDMHandler(handler);
+			parser.parse();
+			handler.getHandler().closeTransaction();
+
+			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
+
+			throw e;
+		}
 
 		return Response.ok().build();
 	}
@@ -723,18 +732,18 @@ public class GDMResource {
 		GDMResource.LOG.debug("finished shutting down working graph data model DBs for resources");
 	}
 
-	private void deprecateMissingRecords(final Set<String> processedResources, final String recordClassUri, final String dataModelUri, final int latestVersion, final BaseNeo4jGDMProcessor processor) throws DMPGraphException {
+	private void deprecateMissingRecords(final Set<String> processedResources, final String recordClassUri, final String dataModelUri, final int latestVersion, final GDMNeo4jProcessor processor) throws DMPGraphException {
 
 		// determine all record URIs of the data model
 		// how? - via record class?
 
-		processor.ensureRunningTx();
+		processor.getProcessor().ensureRunningTx();
 
 		try {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = processor.getDatabase().findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+			final ResourceIterable<Node> recordNodes = processor.getProcessor().getDatabase().findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 				dataModelUri);
 
 			if (recordNodes == null) {
@@ -767,7 +776,7 @@ public class GDMResource {
 
 			for(final Node notProcessedResource : notProcessedResources) {
 
-				final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getDatabase(), notProcessedResource);
+				final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getProcessor().getDatabase(), notProcessedResource);
 
 				if(notProcessedResourcePaths == null) {
 
@@ -793,7 +802,7 @@ public class GDMResource {
 
 			final String message = "couldn't determine record URIs of the data model successfully";
 
-			processor.failTx();
+			processor.getProcessor().failTx();
 
 			GDMResource.LOG.error(message, e);
 

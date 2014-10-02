@@ -22,6 +22,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -110,6 +111,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 			}
 		}
 
+		ResourceIterator<Node> recordNodesIter = null;
+
 		try {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
@@ -121,15 +124,37 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
+
+				return null;
+			}
+
+			recordNodesIter = recordNodes.iterator();
+
+			if(recordNodesIter == null) {
+
+				tx.success();
+
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
+
+				return null;
+			}
+
+			if(!recordNodesIter.hasNext()) {
+
+				recordNodesIter.close();
+				tx.success();
+
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
 
 				return null;
 			}
 
 			model = new Model();
 
-			for (final Node recordNode : recordNodes) {
+			while(recordNodesIter.hasNext()) {
 
+				final Node recordNode = recordNodesIter.next();
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
 				if (resourceUri == null) {
@@ -168,12 +193,18 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				currentResourceStatements.clear();
 			}
 
+			recordNodesIter.close();
 			tx.success();
 
 			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX successfully");
 		} catch (final Exception e) {
 
 			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);
+
+			if(recordNodesIter != null) {
+
+				recordNodesIter.close();
+			}
 
 			tx.failure();
 		} finally {

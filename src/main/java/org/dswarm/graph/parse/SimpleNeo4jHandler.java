@@ -1,13 +1,9 @@
-package org.dswarm.graph.gdm.parse;
+package org.dswarm.graph.parse;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.gdm.BaseNeo4jGDMProcessor;
-import org.dswarm.graph.gdm.Neo4jGDMProcessor;
-import org.dswarm.graph.gdm.Neo4jGDMWDataModelProcessor;
-import org.dswarm.graph.gdm.versioning.Neo4jGDMVersionHandler;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.model.GraphStatics;
-
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.dswarm.graph.versioning.SimpleNeo4jVersionHandler;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -18,11 +14,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgaengler
  */
-public class Neo4jGDMHandler extends BaseNeo4jGDMHandler {
+public class SimpleNeo4jHandler extends BaseNeo4jHandler {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jGDMHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleNeo4jHandler.class);
 
-	public Neo4jGDMHandler(final BaseNeo4jGDMProcessor processorArg) throws DMPGraphException {
+	public SimpleNeo4jHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
 
 		super(processorArg);
 	}
@@ -30,11 +26,10 @@ public class Neo4jGDMHandler extends BaseNeo4jGDMHandler {
 	@Override
 	protected void init() throws DMPGraphException {
 
-		versionHandler = new Neo4jGDMVersionHandler(processor);
+		versionHandler = new SimpleNeo4jVersionHandler(processor);
 	}
 
-	@Override
-	protected Relationship getRelationship(final String uuid) {
+	@Override public Relationship getRelationship(final String uuid) {
 
 		final IndexHits<Relationship> hits = processor.getStatementIndex().get(GraphStatics.UUID, uuid);
 

@@ -63,7 +63,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 			LOG.debug("there is no change set or resource working sets");
 
-			gdmHandler.closeTransaction();
+			gdmHandler.getHandler().closeTransaction();
 
 			return;
 		}

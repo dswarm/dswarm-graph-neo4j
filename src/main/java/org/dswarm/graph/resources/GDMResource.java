@@ -46,10 +46,10 @@ import org.dswarm.graph.gdm.DataModelGDMNeo4jProcessor;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.SimpleGDMNeo4jProcessor;
 import org.dswarm.graph.gdm.parse.DataModelGDMNeo4jHandler;
-import org.dswarm.graph.gdm.parse.GDMNeo4jHandler;
 import org.dswarm.graph.gdm.parse.GDMChangesetParser;
 import org.dswarm.graph.gdm.parse.GDMHandler;
 import org.dswarm.graph.gdm.parse.GDMModelParser;
+import org.dswarm.graph.gdm.parse.GDMNeo4jHandler;
 import org.dswarm.graph.gdm.parse.GDMParser;
 import org.dswarm.graph.gdm.parse.GDMResourceParser;
 import org.dswarm.graph.gdm.parse.GDMUpdateHandler;
@@ -71,9 +71,6 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
-
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -91,6 +88,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -128,7 +127,7 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
 
@@ -139,7 +138,7 @@ public class GDMResource {
 
 			final String message = "input stream for write to graph DB request is null";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
 
 			throw new DMPGraphException(message);
 		}
@@ -157,7 +156,7 @@ public class GDMResource {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
 
 			throw new DMPGraphException(message, e);
 		}
@@ -166,7 +165,9 @@ public class GDMResource {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
+
+			gdmInputStream.close();
 
 			throw new DMPGraphException(message);
 		}
@@ -272,6 +273,8 @@ public class GDMResource {
 
 			handler.getHandler().closeTransaction();
 
+			gdmInputStream.close();
+
 			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
 			return Response.ok().build();
@@ -279,6 +282,8 @@ public class GDMResource {
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			gdmInputStream.close();
 
 			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
 
@@ -289,7 +294,7 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
 
@@ -297,7 +302,7 @@ public class GDMResource {
 
 			final String message = "input stream for write to graph DB request is null";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
 
 			throw new DMPGraphException(message);
 		}
@@ -311,7 +316,7 @@ public class GDMResource {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
 
 			throw new DMPGraphException(message, e);
 		}
@@ -320,7 +325,9 @@ public class GDMResource {
 
 			final String message = "could not deserialise GDM JSON for write to graph DB request";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
+
+			inputStream.close();
 
 			throw new DMPGraphException(message);
 		}
@@ -339,10 +346,14 @@ public class GDMResource {
 			parser.parse();
 			handler.getHandler().closeTransaction();
 
+			inputStream.close();
+
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
+
+			inputStream.close();
 
 			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
 

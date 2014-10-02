@@ -12,7 +12,7 @@ public interface Neo4jHandler {
 
 	public void setResourceUri(final String resourceUri);
 
-	public void closeTransaction();
+	public void closeTransaction() throws DMPGraphException;
 
 	public long getCountedStatements();
 

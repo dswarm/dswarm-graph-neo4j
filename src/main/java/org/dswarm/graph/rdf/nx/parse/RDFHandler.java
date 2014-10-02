@@ -1,14 +1,13 @@
-package org.dswarm.graph.rdf.parse;
+package org.dswarm.graph.rdf.nx.parse;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.parse.Handler;
-
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.semanticweb.yars.nx.Node;
 
 /**
  * @author tgaengler
  */
 public interface RDFHandler extends Handler {
 
-	public void handleStatement(final Statement st) throws DMPGraphException;
+	public void handleStatement(Node[] st) throws DMPGraphException;
 }

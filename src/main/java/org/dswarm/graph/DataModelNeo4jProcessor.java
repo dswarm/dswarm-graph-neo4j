@@ -22,13 +22,20 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
-	private final Index<Relationship>	statementUUIDsWDataModel;
+	private Index<Relationship>	statementUUIDsWDataModel;
 
 	private final String				dataModelURI;
 
 	public DataModelNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
 		super(database);
+
+		dataModelURI = dataModelURIArg;
+	}
+
+	@Override protected void initIndices() throws DMPGraphException {
+
+		super.initIndices();
 
 		try {
 
@@ -44,8 +51,6 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 			throw new DMPGraphException(message);
 		}
-
-		dataModelURI = dataModelURIArg;
 	}
 
 	public Index<Relationship> getStatementWDataModelIndex() {
@@ -109,8 +114,8 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public Relationship prepareRelationship(Node subjectNode, String predicateURI, Node objectNode, String statementUUID,
-			Optional<Map<String, Object>> qualifiedAttributes, VersionHandler versionHandler) {
+	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
+			final Optional<Map<String, Object>> qualifiedAttributes, final VersionHandler versionHandler) {
 
 		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, versionHandler);
 

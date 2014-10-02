@@ -20,6 +20,8 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.LongObjectOpenHashMap;
 import com.google.common.base.Optional;
 
 /**
@@ -32,35 +34,38 @@ public abstract class Neo4jProcessor {
 	protected int							addedLabels	= 0;
 
 	protected final GraphDatabaseService	database;
-	protected final Index<Node>				resources;
-	protected final Index<Node>				resourcesWDataModel;
-	protected final Index<Node>				resourceTypes;
-	protected final Index<Node>				values;
+	protected Index<Node>				resources;
+	protected Index<Node>				resourcesWDataModel;
+	protected Index<Node>				resourceTypes;
+	protected Index<Node>				values;
 	protected final Map<String, Node>		bnodes;
-	protected final Index<Relationship>		statementHashes;
-	protected final Map<Long, String>		nodeResourceMap;
+	protected Index<Relationship>		statementHashes;
+	protected final LongObjectMap<String> nodeResourceMap;
 
-	protected Transaction					tx;
+	protected Transaction tx;
 
-	boolean									txIsClosed	= false;
+	boolean txIsClosed = false;
 
 	public Neo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
 		beginTx();
 
-		try {
+		LOG.debug("start write TX");
 
-			LOG.debug("start write TX");
+		bnodes = new HashMap<>();
+		nodeResourceMap = new LongObjectOpenHashMap<>();
+	}
+
+	protected void initIndices() throws DMPGraphException {
+
+		try {
 
 			resources = database.index().forNodes("resources");
 			resourcesWDataModel = database.index().forNodes("resources_w_data_model");
 			resourceTypes = database.index().forNodes("resource_types");
 			values = database.index().forNodes("values");
-			bnodes = new HashMap<>();
 			statementHashes = database.index().forRelationships("statement_hashes");
-			nodeResourceMap = new HashMap<>();
-
 		} catch (final Exception e) {
 
 			failTx();
@@ -109,20 +114,27 @@ public abstract class Neo4jProcessor {
 		return statementHashes;
 	}
 
-	public Map<Long, String> getNodeResourceMap() {
+	public LongObjectMap<String> getNodeResourceMap() {
 
 		return nodeResourceMap;
 	}
 
-	public void beginTx() {
+	public void clearMaps() {
+
+		nodeResourceMap.clear();
+		bnodes.clear();
+	}
+
+	public void beginTx() throws DMPGraphException {
 
 		tx = database.beginTx();
+		initIndices();
 		txIsClosed = false;
 
 		Neo4jProcessor.LOG.debug("begin new tx");
 	}
 
-	public void renewTx() {
+	public void renewTx() throws DMPGraphException {
 
 		succeedTx();
 		beginTx();
@@ -146,7 +158,7 @@ public abstract class Neo4jProcessor {
 		txIsClosed = true;
 	}
 
-	public void ensureRunningTx() {
+	public void ensureRunningTx() throws DMPGraphException {
 
 		if (txIsClosed()) {
 
@@ -225,7 +237,7 @@ public abstract class Neo4jProcessor {
 	public Optional<String> determineResourceUri(final Node subjectNode, final Optional<NodeType> optionalSubjectNodeType,
 			final Optional<String> optionalSubjectURI, final Optional<String> optionalResourceURI) {
 
-		final Long nodeId = subjectNode.getId();
+		final long nodeId = subjectNode.getId();
 
 		final Optional<String> optionalResourceUri;
 

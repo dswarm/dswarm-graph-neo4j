@@ -1,4 +1,4 @@
-package org.dswarm.graph.rdf.parse.nx;
+package org.dswarm.graph.rdf.nx.parse;
 
 import org.dswarm.graph.DMPGraphException;
 

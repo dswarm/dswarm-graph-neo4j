@@ -61,11 +61,11 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			resources = database.index().forNodes("resources");
-			resourcesWDataModel = database.index().forNodes("resources_w_data_model");
-			resourceTypes = database.index().forNodes("resource_types");
-			values = database.index().forNodes("values");
-			statementHashes = database.index().forRelationships("statement_hashes");
+			resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
+			resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
+			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
+			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
+			statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 		} catch (final Exception e) {
 
 			failTx();

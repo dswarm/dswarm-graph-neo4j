@@ -1,5 +1,6 @@
 package org.dswarm.graph.gdm.read;
 
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -23,7 +24,7 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	@Override
 	protected Node getResourceNode() {
 
-		final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
+		final Index<Node> resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + dataModelUri);
 
 		if (hits == null) {

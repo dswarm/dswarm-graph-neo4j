@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DMPStatics;
 import org.dswarm.graph.json.LiteralNode;
@@ -72,12 +73,12 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			LOG.debug("start write TX");
 
-			resources = database.index().forNodes("resources");
-			resourceTypes = database.index().forNodes("resource_types");
-			values = database.index().forNodes("values");
+			resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
+			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
+			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
 			bnodes = new HashMap<>();
-			statementHashes = database.index().forRelationships("statement_hashes");
-			statementUUIDs = database.index().forRelationships("statement_uuids");
+			statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 			nodeResourceMap = new HashMap<>();
 		} catch (final Exception e) {
 

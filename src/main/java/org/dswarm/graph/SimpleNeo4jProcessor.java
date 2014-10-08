@@ -29,7 +29,7 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 		try {
 
-			statementUUIDs = database.index().forRelationships("statement_uuids");
+			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 		} catch (final Exception e) {
 
 			failTx();

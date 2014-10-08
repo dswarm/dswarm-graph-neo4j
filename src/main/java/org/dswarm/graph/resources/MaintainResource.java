@@ -30,6 +30,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 
 /**
  * @author tgaengler
@@ -238,32 +239,32 @@ public class MaintainResource {
 
 		try(final Transaction itx = database.beginTx()) {
 
-			final Index<Node> resources = database.index().forNodes("resources");
-			final Index<Node> values = database.index().forNodes("values");
-			final Index<Node> resourcesWDataModel = database.index().forNodes("resources_w_data_model");
-			final Index<Node> resourceTypes = database.index().forNodes("resource_types");
+			final Index<Node> resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
+			final Index<Node> values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
+			final Index<Node> resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
+			final Index<Node> resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			final Index<Relationship> statements = database.index().forRelationships("statements");
-			final Index<Relationship> statementHashes = database.index().forRelationships("statement_hashes");
-			final Index<Relationship> statementUUIDs = database.index().forRelationships("statement_uuids");
-			final Index<Relationship> statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
+			final Index<Relationship> statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			final Index<Relationship> statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
+			final Index<Relationship> statementUUIDsWDataModel = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 
 			if (resources != null) {
 
-				MaintainResource.LOG.debug("delete resources legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCES_INDEX_NAME + " legacy index");
 
 				resources.delete();
 			}
 
 			if (resourcesWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete resources with data model legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME + " legacy index");
 
 				resourcesWDataModel.delete();
 			}
 
 			if (resourceTypes != null) {
 
-				MaintainResource.LOG.debug("delete resource types legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME + " legacy index");
 
 				resourceTypes.delete();
 			}
@@ -277,28 +278,28 @@ public class MaintainResource {
 
 			if (statementHashes != null) {
 
-				MaintainResource.LOG.debug("delete statement hashes legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME + " legacy index");
 
 				statementHashes.delete();
 			}
 
 			if (statementUUIDs != null) {
 
-				MaintainResource.LOG.debug("delete statement uuids legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME + " legacy index");
 
 				statementUUIDs.delete();
 			}
 
 			if (statementUUIDsWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete statement uuids with data model legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME + " legacy index");
 
 				statementUUIDsWDataModel.delete();
 			}
 
 			if (values != null) {
 
-				MaintainResource.LOG.debug("delete values legacy index");
+				MaintainResource.LOG.debug("delete " + GraphIndexStatics.VALUES_INDEX_NAME + " legacy index");
 
 				values.delete();
 			}

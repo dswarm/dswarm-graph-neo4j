@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Resource;
@@ -373,7 +374,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 		int latestVersion = 1;
 
-		final Index<Node> resources = database.index().forNodes("resources");
+		final Index<Node> resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
 		final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelUri);
 
 		if (hits != null && hits.iterator().hasNext()) {

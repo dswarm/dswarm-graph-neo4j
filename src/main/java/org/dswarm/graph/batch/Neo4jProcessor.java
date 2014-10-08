@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
@@ -79,21 +80,23 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.debug("start pumping indices");
 
-		copyNFlushNClearIndex(tempResourcesIndex, resources, GraphStatics.URI);
-		copyNFlushNClearIndex(tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI);
-		copyNFlushNClearIndex(tempResourceTypes, resourceTypes, GraphStatics.URI);
-		copyLongIndex(tempStatementHashes, statementHashes, GraphStatics.HASH);
+		copyNFlushNClearIndex(tempResourcesIndex, resources, GraphStatics.URI, GraphIndexStatics.RESOURCES_INDEX_NAME);
+		copyNFlushNClearIndex(tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL, GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
+		copyNFlushNClearIndex(tempResourceTypes, resourceTypes, GraphStatics.URI, GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
+		copyNFlushNClearLongIndex(tempStatementHashes, statementHashes, GraphStatics.HASH, GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
 		Neo4jProcessor.LOG.debug("finished pumping indices");
 	}
 
-	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
+	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty, final String indexName) {
 
-		Neo4jProcessor.LOG.debug("start pumping index");
+		Neo4jProcessor.LOG.debug("start pumping '" + indexName + "' index of size '" + tempIndex.size() + "'");
 
 		final Object[] keys = tempIndex.keys;
 		final long[] values = tempIndex.values;
 		final boolean[] states = tempIndex.allocated;
+
+		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length + "'");
 
 		for (int i = 0; i < states.length; i++) {
 
@@ -114,13 +117,15 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-	private void copyLongIndex(final LongLongOpenHashMap tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty) {
+	private void copyNFlushNClearLongIndex(final LongLongOpenHashMap tempIndex, final BatchInserterIndex neo4jIndex, final String indexProperty, final String indexName) {
 
-		Neo4jProcessor.LOG.debug("start pumping index");
+		Neo4jProcessor.LOG.debug("start pumping '" + indexName + "' index of size '" + tempIndex.size() + "'");
 
 		final long[] keys = tempIndex.keys;
 		final long[] values = tempIndex.values;
 		final boolean[] states = tempIndex.allocated;
+
+		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length + "'");
 
 		for (int i = 0; i < states.length; i++) {
 
@@ -144,7 +149,7 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			values = getOrCreateIndex("values", GraphStatics.VALUE, true);
+			values = getOrCreateIndex(GraphIndexStatics.VALUES_INDEX_NAME, GraphStatics.VALUE, true, 1);
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";
@@ -160,10 +165,10 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			resources = getOrCreateIndex("resources", GraphStatics.URI, true);
-			resourcesWDataModel = getOrCreateIndex("resources_w_data_model", GraphStatics.URI_W_DATA_MODEL, true);
-			resourceTypes = getOrCreateIndex("resource_types", GraphStatics.URI, true);
-			statementHashes = getOrCreateIndex("statement_hashes", GraphStatics.HASH, false);
+			resources = getOrCreateIndex(GraphIndexStatics.RESOURCES_INDEX_NAME, GraphStatics.URI, true, 1);
+			resourcesWDataModel = getOrCreateIndex(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME, GraphStatics.URI_W_DATA_MODEL, true, 1);
+			resourceTypes = getOrCreateIndex(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME, GraphStatics.URI, true, 1);
+			statementHashes = getOrCreateIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, GraphStatics.HASH, false, 1000000);
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";
@@ -513,7 +518,7 @@ public abstract class Neo4jProcessor {
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
 
-	protected BatchInserterIndex getOrCreateIndex(final String name, final String property, final boolean nodeIndex) {
+	protected BatchInserterIndex getOrCreateIndex(final String name, final String property, final boolean nodeIndex, final int cachSize) {
 
 		final BatchInserterIndexProvider indexProvider = new LuceneBatchInserterIndexProvider(inserter);
 		final BatchInserterIndex index;
@@ -526,7 +531,7 @@ public abstract class Neo4jProcessor {
 			index = indexProvider.relationshipIndex(name, MapUtil.stringMap("type", "exact"));
 		}
 
-		index.setCacheCapacity(property, 1);
+		index.setCacheCapacity(property, cachSize);
 
 		return index;
 	}

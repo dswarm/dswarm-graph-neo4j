@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.Attribute;
 import org.dswarm.graph.delta.AttributePath;
@@ -99,7 +100,7 @@ public final class GraphDBUtil {
 	 */
 	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI) {
 
-		final Index<Node> resources = graphDB.index().forNodes("resources");
+		final Index<Node> resources = graphDB.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
 
 		if (resources == null) {
 
@@ -134,14 +135,14 @@ public final class GraphDBUtil {
 	 */
 	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
 
-		final Index<Node> resources = graphDB.index().forNodes("resources_w_data_model");
+		final Index<Node> resources = graphDB.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 
 		if (resources == null) {
 
 			return null;
 		}
 
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceURI + dataModelURI);
+		final IndexHits<Node> hits = resources.get(GraphStatics.URI_W_DATA_MODEL, resourceURI + dataModelURI);
 
 		if (hits == null || !hits.hasNext()) {
 
@@ -1105,7 +1106,7 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node:resources(").append(GraphStatics.URI).append("=\"").append(recordURI).append("\")\nMATCH (n)");
+		sb.append("START n=node:").append(GraphIndexStatics.RESOURCES_INDEX_NAME).append("(").append(GraphStatics.URI).append(" =\"").append(recordURI).append("\")\nMATCH (n)");
 
 		int i = 1;
 		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {
@@ -1135,7 +1136,7 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START o=node:values(").append(GraphStatics.VALUE).append("=\"").append(recordId).append("\")\nMATCH (n)");
+		sb.append("START o=node:").append(GraphIndexStatics.VALUES_INDEX_NAME).append("(").append(GraphStatics.VALUE).append("=\"").append(recordId).append("\")\nMATCH (n)");
 
 		int i = 1;
 		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {

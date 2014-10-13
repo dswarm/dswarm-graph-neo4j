@@ -1,7 +1,7 @@
 An unmanaged extension for Neo4j for processing the GDM
 =======================================================
 
-This is an unmanaged extension. 
+This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing the [GDM](https://github.com/dswarm/dswarm-documentation/wiki/Graph-Data-Model) and RDF. 
 
 1. Build it: 
 

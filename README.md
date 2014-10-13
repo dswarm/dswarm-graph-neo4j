@@ -37,13 +37,22 @@ This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing
 
         http://localhost:7474/graph/gdm/get
  
-   You can POST to this service a JSON object with key-value pairs for "record_class_uri" and "data_model_uri"
+   You can POST to this service a JSON object with key-value pairs for "record_class_uri" and "data_model_uri", e.g.,
+   
+        {
+	        "record_class_uri": "http://example.com/myrecordclass",
+	        "data_model_uri": "http://data.example.com/resources/1"
+        }
+   
+   via
+   
+        curl -H "Content-Type:application/json" -H "Accept:application/json" --data-binary @test_request.json -X POST http://localhost:7474/graph/gdm/get -i -v
 
 To compile the package to be able to run the JUnit tests, you need to run maven with the ````TEST```` profile.
 
 Note: You can call
 
-        http://localhost:7474/graph/maintain/delete
+        curl -X DELETE http://localhost:7474/graph/maintain/delete
 
 to trigger a clean-up remotely.
 

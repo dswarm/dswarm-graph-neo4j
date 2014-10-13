@@ -37,7 +37,7 @@ This is an unmanaged extension.
 
 To compile the package to be able to run the JUnit tests, you need to run maven with the ````TEST```` profile.
 
-Note: the database wouldn't get cleaned after the unit tests were executed, so you need to take care of cleaning up the database to ensure test correctness. You ca also call
+Note: the database wouldn't get cleaned after the unit tests were executed, so you need to take care of cleaning up the database to ensure test correctness. You can also call
 
         http://localhost:7474/graph/maintain/delete
 

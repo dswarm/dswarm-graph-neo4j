@@ -58,3 +58,4 @@ to trigger a clean-up remotely.
 
 Note: the port of your neo4j stand-alone installation may vary from the standard port 7474. If you run your neo4j stand-alone installation on another port, you need to modify the unit tests re. this configuration.
 
+See also: [documentation @ d:swarm wiki](https://github.com/dswarm/dswarm-documentation/wiki/Neo4j-extension)

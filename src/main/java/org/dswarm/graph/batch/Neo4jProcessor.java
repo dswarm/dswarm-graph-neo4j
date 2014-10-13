@@ -98,16 +98,34 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length + "'");
 
+		int j = 0;
+		long tick = System.currentTimeMillis();
+		int sinceLast = 0;
+
 		for (int i = 0; i < states.length; i++) {
 
 			if (states[i]) {
 
 				// @tgaengler: I can't remember why I'm utilising an char array here ...
 				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i].toString().toCharArray()));
+
+				j++;
+
+				final int entryDelta = j - sinceLast;
+				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
+
+				if (entryDelta >= 1000000 || timeDelta >= 60) {
+
+					sinceLast = j;
+
+					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
+
+					tick = System.currentTimeMillis();
+				}
 			}
 		}
 
-		Neo4jProcessor.LOG.debug("finished pumping index");
+		Neo4jProcessor.LOG.debug("finished pumping '" + indexName + "' index; wrote '" + j + "' entries");
 
 		Neo4jProcessor.LOG.debug("start flushing and clearing index");
 
@@ -127,15 +145,33 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length + "'");
 
+		int j = 0;
+		long tick = System.currentTimeMillis();
+		int sinceLast = 0;
+
 		for (int i = 0; i < states.length; i++) {
 
 			if (states[i]) {
 
 				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i]));
+
+				j++;
+
+				final int entryDelta = j - sinceLast;
+				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
+
+				if (entryDelta >= 1000000 || timeDelta >= 60) {
+
+					sinceLast = j;
+
+					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
+
+					tick = System.currentTimeMillis();
+				}
 			}
 		}
 
-		Neo4jProcessor.LOG.debug("finished pumping index");
+		Neo4jProcessor.LOG.debug("finished pumping index '" + indexName + "' index; wrote '" + j + "' entries");
 
 		Neo4jProcessor.LOG.debug("start flushing and clearing index");
 

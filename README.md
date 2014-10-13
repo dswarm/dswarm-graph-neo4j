@@ -1,5 +1,5 @@
-Sample Neo4j unmanaged extension for processing RDF
-===================================================
+An unmanaged extension for Neo4j for processing the GDM
+=======================================================
 
 This is an unmanaged extension. 
 

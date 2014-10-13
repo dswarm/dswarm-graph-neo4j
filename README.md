@@ -15,7 +15,7 @@ This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing
 
         org.neo4j.server.thirdparty_jaxrs_classes=org.dswarm.graph.resources=/graph
         
-   (wherby, ````/graph```` is relative (base) path of this unmanaged extension)
+   (wherby, ````/graph```` is the relative (base) path of this unmanaged extension)
 
 4. Start Neo4j server.
 
@@ -27,7 +27,11 @@ This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing
 
         http://localhost:7474/graph/gdm/put
 
-   You can POST to this service a multipart/mixed object with the bytes of the GDM and the second part should be a data model URI (as string)
+   You can POST to this service a ````multipart/mixed```` object with the bytes of the GDM and the second part should be a data model URI (as string), e.g.,
+   
+        curl -H "Content-Type:multipart/mixed" -F "content=@test-gdm.json; type=application/octet-stream" -F "content=http://data.example.com/resources/1" -X POST http://localhost:7474/graph/gdm/put -i -v
+        
+   (````test-gdm.json```` is the file name (relative path) of the GDM JSON and ````http://data.example.com/resources/1```` is the data model URI)
 
 7. You can retrieve GDM from the database via
 
@@ -37,7 +41,7 @@ This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing
 
 To compile the package to be able to run the JUnit tests, you need to run maven with the ````TEST```` profile.
 
-Note: the database wouldn't get cleaned after the unit tests were executed, so you need to take care of cleaning up the database to ensure test correctness. You can also call
+Note: You can call
 
         http://localhost:7474/graph/maintain/delete
 

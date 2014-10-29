@@ -95,7 +95,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		}
 	}
 
-	//@Test
+	@Test
 	public void readGDMFromDBThatWasWrittenAsRDF() throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
@@ -128,7 +128,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	//@Test
+	@Test
 	public void readGDMFromDBThatWasWrittenAsGDM() throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");

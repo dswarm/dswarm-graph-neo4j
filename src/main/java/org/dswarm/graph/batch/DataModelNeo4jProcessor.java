@@ -3,6 +3,7 @@ package org.dswarm.graph.batch;
 import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -51,7 +52,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		try {
 
-			statementUUIDsWDataModel = getOrCreateIndex("statement_uuids_w_data_model", GraphStatics.UUID_W_DATA_MODEL, false);
+			statementUUIDsWDataModel = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME, GraphStatics.UUID_W_DATA_MODEL, false, 1);
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";

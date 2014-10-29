@@ -39,7 +39,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		try {
 
-			statementUUIDsWDataModel = database.index().forRelationships("statement_uuids_w_data_model");
+			statementUUIDsWDataModel = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 		} catch (final Exception e) {
 
 			failTx();

@@ -19,7 +19,6 @@ package org.dswarm.graph.gdm.parse;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Node;
 import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.versioning.VersionHandler;
 
 /**
  * @author tgaengler

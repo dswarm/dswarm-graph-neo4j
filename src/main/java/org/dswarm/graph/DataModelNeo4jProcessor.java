@@ -21,11 +21,11 @@ import java.util.Map;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,10 +84,10 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		if (!optionalDataModelURI.isPresent()) {
 
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
+			addNodeToResourcesWDataModelIndex(URI, this.dataModelURI, node);
 		} else {
 
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
+			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
 		}
 	}
 
@@ -109,11 +109,11 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		if (!optionalDataModelURI.isPresent()) {
 
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + this.dataModelURI);
+			addNodeToResourcesWDataModelIndex(URI, this.dataModelURI, node);
 		} else {
 
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
-			resourcesWDataModel.add(node, GraphStatics.URI_W_DATA_MODEL, URI + optionalDataModelURI.get());
+			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
 		}
 	}
 
@@ -124,9 +124,9 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public IndexHits<Node> getResourceNodeHits(final String resourceURI) {
+	public Optional<Node> getResourceNodeHits(final String resourceURI) {
 
-		return resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, resourceURI + dataModelURI);
+		return getNodeFromResourcesWDataModelIndex(resourceURI, dataModelURI);
 	}
 
 	@Override

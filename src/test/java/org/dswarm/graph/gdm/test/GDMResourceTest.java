@@ -22,25 +22,25 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import junit.framework.Assert;
+
+import org.dswarm.graph.json.util.Util;
+import org.dswarm.graph.test.BasicResourceTest;
+import org.dswarm.graph.test.Neo4jDBWrapper;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
-
-import org.dswarm.graph.json.util.Util;
-import org.dswarm.graph.test.BasicResourceTest;
-import org.dswarm.graph.test.Neo4jDBWrapper;
 
 /**
  * @author tgaengler
@@ -48,6 +48,8 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
 public abstract class GDMResourceTest extends BasicResourceTest {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResourceTest.class);
+
+	private static final String DEFAULT_GDM_FILE_NAME = "test-mabxml.gson";
 
 	public GDMResourceTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -57,14 +59,33 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 	@Test
 	public void writeGDMToDB() throws IOException {
 
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
+	}
+
+	@Test
+	public void writeGDMToDB2() throws IOException {
+
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/4/data", "versioning/dd-854/example_1.task.result.json");
+	}
+
+	@Test
+	public void writeGDMToDB3() throws IOException {
+
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/5/data", "versioning/dd-854/example_2.task.result.json");
+	}
+
+	@Test
+	public void writeGDMToDB4() throws IOException {
+
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/2/data", "versioning/dd-854/example_1.task.result.json");
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/2/data", "versioning/dd-854/example_2.task.result.json");
 	}
 
 	@Test
 	public void testResourceTypeNodeUniqueness() throws IOException {
 
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/2");
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/2", DEFAULT_GDM_FILE_NAME);
 
 		final String typeQuery = "MATCH (n) WHERE n.__NODETYPE__ = \"__TYPE_RESOURCE__\" RETURN id(n) AS node_id, n.__URI__ AS node_uri;";
 
@@ -149,7 +170,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1");
+		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -199,11 +220,11 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished writing RDF statements for GDM resource at " + dbType + " DB");
 	}
 
-	private void writeGDMToDBInternal(final String dataModelURI) throws IOException {
+	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
-		final URL fileURL = Resources.getResource("test-mabxml.gson");
+		final URL fileURL = Resources.getResource(fileName);
 		final byte[] file = Resources.toByteArray(fileURL);
 
 		// Construct a MultiPart with two body parts

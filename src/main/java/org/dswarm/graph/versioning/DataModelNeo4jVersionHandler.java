@@ -19,13 +19,12 @@ package org.dswarm.graph.versioning;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
 import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.model.GraphStatics;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
 
 /**
  * @author tgaengler
@@ -77,22 +76,17 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		int latestVersion = 0;
 
-		final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI, ((DataModelNeo4jProcessor) processor).getDataModelURI());
+		final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(((DataModelNeo4jProcessor) processor).getDataModelURI(), VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-		if (hits != null && hits.hasNext()) {
+		if (optionalNode.isPresent()) {
 
-			final Node dataModelNode = hits.next();
+			final Node dataModelNode = optionalNode.get();
 			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
 			if (latestVersionFromDB != null) {
 
 				latestVersion = latestVersionFromDB;
 			}
-		}
-
-		if (hits != null) {
-
-			hits.close();
 		}
 
 		return latestVersion;
@@ -105,17 +99,12 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		try {
 
-			final IndexHits<Node> hits = processor.getResourcesIndex().get(GraphStatics.URI, ((DataModelNeo4jProcessor) processor).getDataModelURI());
+			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(((DataModelNeo4jProcessor) processor).getDataModelURI(), VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-			if (hits != null && hits.hasNext()) {
+			if (optionalNode.isPresent()) {
 
-				final Node dataModelNode = hits.next();
+				final Node dataModelNode = optionalNode.get();
 				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
-			}
-
-			if (hits != null) {
-
-				hits.close();
 			}
 		} catch (final Exception e) {
 

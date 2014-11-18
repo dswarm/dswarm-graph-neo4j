@@ -23,7 +23,6 @@ import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.GraphStatics;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -31,6 +30,7 @@ import org.neo4j.graphdb.RelationshipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -82,7 +82,8 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
-			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(), optionalDataModelURI, Optional.<String>absent());
+			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(),
+					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
 
 			if (optionalDataModelNode.isPresent()) {
 
@@ -98,10 +99,10 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			processor.getResourcesIndex().add(dataModelNode, GraphStatics.URI, optionalDataModelURI.get());
-			processor.getResourcesWDataModelIndex().add(dataModelNode, GraphStatics.URI_W_DATA_MODEL, optionalDataModelURI.get() + VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			processor.addNodeToResourcesWDataModelIndex(optionalDataModelURI.get(), VersioningStatics.VERSIONING_DATA_MODEL_URI, dataModelNode);
 
-			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.fromNullable(VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
+			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.of(
+					VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
 
 			final Node dataModelTypeNode;
 
@@ -115,8 +116,7 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
 				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 
-				processor.getResourcesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
-				processor.getResourceTypesIndex().add(dataModelTypeNode, GraphStatics.URI, VersioningStatics.DATA_MODEL_TYPE);
+				processor.addNodeToResourceTypesIndex(VersioningStatics.DATA_MODEL_TYPE, dataModelNode);
 			}
 
 			final String hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);

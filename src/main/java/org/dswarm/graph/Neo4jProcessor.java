@@ -110,25 +110,10 @@ public abstract class Neo4jProcessor {
 		return database;
 	}
 
-	//	public Index<Node> getResourcesIndex() {
-	//
-	//		return resources;
-	//	}
-	//
-	//	public Index<Node> getResourcesWDataModelIndex() {
-	//
-	//		return resourcesWDataModel;
-	//	}
-
 	public Map<String, Node> getBNodesIndex() {
 
 		return bnodes;
 	}
-
-	//	public Index<Node> getResourceTypesIndex() {
-	//
-	//		return resourceTypes;
-	//	}
 
 	public Index<Node> getValueIndex() {
 

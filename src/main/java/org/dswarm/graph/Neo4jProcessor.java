@@ -512,10 +512,10 @@ public abstract class Neo4jProcessor {
 		addNodeToResourcesIndex(resourceUri, node);
 	}
 
-	public void addNodeToResourceTypesIndex(final String value, final Node node) {
+	public void addNodeToResourceTypesIndex(final String key, final Node node) {
 
-		addNodeToIndex(GraphStatics.URI, value, node, tempResourceTypes, resourceTypes);
-		addNodeToResourcesIndex(value, node);
+		addNodeToIndex(GraphStatics.URI, key, node, tempResourceTypes, resourceTypes);
+		addNodeToResourcesIndex(key, node);
 	}
 
 	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index,
@@ -558,9 +558,9 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private void addNodeToIndex(final String key, final String value, final Node node, final Map<String, Node> tempIndex, final Index<Node> index) {
+	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex, final Index<Node> index) {
 
 		tempIndex.put(key, node);
-		index.add(node, key, value);
+		index.add(node, indexProperty, key);
 	}
 }

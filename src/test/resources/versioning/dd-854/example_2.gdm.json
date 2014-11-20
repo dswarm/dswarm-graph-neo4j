@@ -1,0 +1,3990 @@
+[ {
+  "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751" : [ {
+    "order" : 1,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#typ",
+    "o" : {
+      "v" : "h"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#status",
+    "o" : {
+      "v" : "n"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#mabVersion",
+    "o" : {
+      "v" : "M2.0"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 1
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 1
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 1
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "###"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 1
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 1
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "02413nM2.01200024      h"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 2
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 2
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 2
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "001"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 2
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 2
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "014788373"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 3
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 3
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 3
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "002"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 3
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 3
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "19880803"
+    }
+  }, {
+    "order" : 4,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 4
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 4
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 4
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "003"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 4
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 4
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "20140626023044"
+    }
+  }, {
+    "order" : 5,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 5
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 5
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 5
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "025"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 5
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 5
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "011030852"
+    }
+  }, {
+    "order" : 6,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 6
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 6
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 6
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "025"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 6
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 6
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "00247740"
+    }
+  }, {
+    "order" : 7,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 7
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 7
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 7
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "025"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 7
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 7
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "187730-6"
+    }
+  }, {
+    "order" : 8,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 8
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 8
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 8
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "026"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 8
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 8
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ZDB187730-6"
+    }
+  }, {
+    "order" : 9,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 9
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 9
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 9
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "029"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 9
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "m"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 9
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ZS"
+    }
+  }, {
+    "order" : 10,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 10
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 10
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 10
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "030"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 10
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 10
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "d|zu|||z|0037"
+    }
+  }, {
+    "order" : 11,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 11
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 11
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 11
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "036"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 11
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 11
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "XA-DE"
+    }
+  }, {
+    "order" : 12,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 12
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 12
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 12
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "037"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 12
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 12
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ger"
+    }
+  }, {
+    "order" : 13,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 13
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 13
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 13
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "050"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 13
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 13
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "a|||||||||||||"
+    }
+  }, {
+    "order" : 14,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 14
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 14
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 14
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "052"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 14
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 14
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "p|||||||s||||||"
+    }
+  }, {
+    "order" : 15,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 15
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 15
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 15
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "070"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 15
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 15
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "BSZ"
+    }
+  }, {
+    "order" : 16,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 16
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 16
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 16
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "073"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 16
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 16
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "3,8"
+    }
+  }, {
+    "order" : 17,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 17
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 17
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 17
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "073"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 17
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 17
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "14"
+    }
+  }, {
+    "order" : 18,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 18
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "073"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 18
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "8,1"
+    }
+  }, {
+    "order" : 19,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 19
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 19
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 19
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "073"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 19
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 19
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "20,1"
+    }
+  }, {
+    "order" : 20,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 20
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 20
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 20
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "076"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 20
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 20
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "SAXB"
+    }
+  }, {
+    "order" : 21,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 21
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 21
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 21
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "076"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 21
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 21
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "zd"
+    }
+  }, {
+    "order" : 22,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 22
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 22
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 22
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "076"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 22
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "c"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 22
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "druck"
+    }
+  }, {
+    "order" : 23,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 23
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 23
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 23
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "077"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 23
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 23
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "284749591           Online-Ausg.: ‡Informationen zur Raumentwicklung"
+    }
+  }, {
+    "order" : 24,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 24
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 24
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 24
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "077"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 24
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "e"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 24
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "016249461           Vorg.: ‡Institut für Raumordnung <Bonn>: Informationen / Institut für Raumordnung, Bonn"
+    }
+  }, {
+    "order" : 25,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 25
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 25
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 25
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "077"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 25
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "e"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 25
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "016249666           Vorg.: ‡Institut für Landeskunde <Bonn>: Rundbrief / Institut für Landeskunde"
+    }
+  }, {
+    "order" : 26,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 26
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 26
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 26
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "080"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 26
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 26
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ZRBWZ"
+    }
+  }, {
+    "order" : 27,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 27
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 27
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 27
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "200"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 27
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 27
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bundesforschungsanstalt für Landeskunde und Raumordnung <Bonn>"
+    }
+  }, {
+    "order" : 28,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 28
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 28
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 28
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "202"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 28
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 28
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "191147060"
+    }
+  }, {
+    "order" : 29,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 29
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 29
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 29
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "204"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 29
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 29
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Deutschland / Bundesamt für Bauwesen und Raumordnung"
+    }
+  }, {
+    "order" : 30,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 30
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 30
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 30
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "206"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 30
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 30
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "196824524"
+    }
+  }, {
+    "order" : 31,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 31
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 31
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 31
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "208"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 31
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 31
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bundesinstitut für Bau-, Stadt- und Raumforschung"
+    }
+  }, {
+    "order" : 32,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 32
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 32
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 32
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "210"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 32
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 32
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "303505982"
+    }
+  }, {
+    "order" : 33,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 33
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 33
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 33
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "331"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 33
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 33
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Informationen zur Raumentwicklung"
+    }
+  }, {
+    "order" : 34,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 34
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 34
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 34
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "359"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 34
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 34
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR) im Bundesamt für Bauwesen und Raumordnung (BBR)"
+    }
+  }, {
+    "order" : 35,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 35
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 35
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 35
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "370"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 35
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 35
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "IzR"
+    }
+  }, {
+    "order" : 36,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 36
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 36
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 36
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "376"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 36
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 36
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Inf. Raumentwickl."
+    }
+  }, {
+    "order" : 37,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 37
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 37
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 37
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "376"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 37
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 37
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Inform.Raumentwickl., Bonn"
+    }
+  }, {
+    "order" : 38,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 38
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 38
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 38
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "376"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 38
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 38
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "INRAD"
+    }
+  }, {
+    "order" : 39,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 39
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "405"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 39
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "1974 -"
+    }
+  }, {
+    "order" : 40,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 40
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "406"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 40
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 41
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 41
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 41
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "j"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 41
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "1974"
+    }
+  }, {
+    "order" : 41,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 42
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 42
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 42
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "410"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 42
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 42
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Stuttgart"
+    }
+  }, {
+    "order" : 42,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 43
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 43
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 43
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "412"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 43
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 43
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Steiner"
+    }
+  }, {
+    "order" : 43,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 44
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "418"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 45
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 45
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 45
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 45
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bonn-Bad Godesberg"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 46
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 46
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 46
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "g"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 46
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bundesforschungsanstalt für Landeskunde und Raumordnung"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "id" : 44
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 47
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 47
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 47
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "h"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 47
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "anfangs"
+    }
+  }, {
+    "order" : 44,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 48
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "418"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 49
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 49
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 49
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 49
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bonn"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 50
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 50
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 50
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "g"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 50
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bundesamt für Bauwesen und Raumordnung"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "id" : 48
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 51
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 51
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 51
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "h"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 51
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "-2008"
+    }
+  }, {
+    "order" : 45,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 52
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "418"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 53
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 53
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 53
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 53
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Bonn"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 54
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 54
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 54
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "g"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 54
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "BBSR"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "id" : 52
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 55
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 55
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 55
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "h"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 55
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "2009-2011"
+    }
+  }, {
+    "order" : 46,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 56
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 56
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 56
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "425"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 56
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 56
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "1974"
+    }
+  }, {
+    "order" : 47,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 57
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 57
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 57
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "507"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 57
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 57
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Zusatz anfangs: IzR"
+    }
+  }, {
+    "order" : 48,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 58
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 58
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 58
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "509"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 58
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 58
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Beteil. Körp. bis 1997: Bundesforschungsanstalt für Landeskunde und Raumordnung"
+    }
+  }, {
+    "order" : 49,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 59
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 59
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 59
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "523"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 59
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 59
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "Anfangs monatl., später 6x jährl."
+    }
+  }, {
+    "order" : 50,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 60
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 60
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 60
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "527"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 60
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "y"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 60
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "24407033            Online-Ausg.: ‡Informationen zur Raumentwicklung"
+    }
+  }, {
+    "order" : 51,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 61
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 61
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 61
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "531"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 61
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 61
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "9592489             Vorg.: ‡Institut für Raumordnung <Bonn>: Informationen / Institut für Raumordnung, Bonn"
+    }
+  }, {
+    "order" : 52,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 62
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 62
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 62
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "531"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 62
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 62
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "9593779             Vorg.: ‡Institut für Landeskunde <Bonn>: Rundbrief / Institut für Landeskunde"
+    }
+  }, {
+    "order" : 53,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 63
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 63
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 63
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "534"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 63
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 63
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "1981,11/12=1981; 1982,11/12=1982; 1983,12=1983; 1984,12=1984; 1985,11/12=1985; 1986,11/12=1986; 1987,11/12=1987; 1988,11/12=1988; 1989,11/12=1989; 1991,11/12=1991 von: Aktuelle Daten und Prognosen zur räumlichen Entwicklung"
+    }
+  }, {
+    "order" : 54,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 64
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 64
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 64
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "537"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 64
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 64
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "100!se-Änderung(18-07-01)464!zs-Änderung(16-08-01). - 100!se-Änderung464!zs-Änderung(16-08-01)"
+    }
+  }, {
+    "order" : 55,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 65
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 65
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 65
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "542"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 65
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 65
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ISSN 0303-2493"
+    }
+  }, {
+    "order" : 56,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 66
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 66
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 66
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "542"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 66
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 66
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ISSN 0303-2493 = Informationen zur Raumentwicklung"
+    }
+  }, {
+    "order" : 57,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 67
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 67
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 67
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "545"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 67
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 67
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 68
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 68
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 68
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 68
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "0303-2493"
+    }
+  }, {
+    "order" : 58,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 69
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 69
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 69
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "574"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 69
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 69
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "07,B38,0039"
+    }
+  }, {
+    "order" : 59,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 70
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 70
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 70
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 70
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 70
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|690"
+    }
+  }, {
+    "order" : 60,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 71
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 71
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 71
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 71
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 71
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|914.3"
+    }
+  }, {
+    "order" : 61,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 72
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 72
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 72
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 72
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 72
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|943"
+    }
+  }, {
+    "order" : 62,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 73
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 73
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 73
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 73
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "b"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 73
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|550"
+    }
+  }, {
+    "order" : 63,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 74
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 74
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 74
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 74
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "g"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 74
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "203387074           AR 10100"
+    }
+  }, {
+    "order" : 64,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 75
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 75
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 75
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 75
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "g"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 75
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "201525771           RC 25903"
+    }
+  }, {
+    "order" : 65,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 76
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 76
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 76
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 76
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 76
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|960"
+    }
+  }, {
+    "order" : 66,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 77
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 77
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 77
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 77
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 77
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|340"
+    }
+  }, {
+    "order" : 67,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 78
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 78
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 78
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "700"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 78
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "z"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 78
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "|760"
+    }
+  }, {
+    "order" : 68,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 79
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "705"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 80
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 80
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 80
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 80
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "711.105"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 81
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 81
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 81
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "c"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 81
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "711.1"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 82
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 82
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 82
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "e"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 82
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "DDC22ger"
+    }
+  }, {
+    "order" : 4,
+    "s" : {
+      "id" : 79
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 83
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 83
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 83
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "f"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 83
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "05"
+    }
+  }, {
+    "order" : 69,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 84
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "705"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 85
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 85
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 85
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 85
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "307.1205"
+    }
+  }, {
+    "order" : 2,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 86
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 86
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 86
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "c"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 86
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "307.12"
+    }
+  }, {
+    "order" : 3,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 87
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 87
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 87
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "e"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 87
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "DDC22ger"
+    }
+  }, {
+    "order" : 4,
+    "s" : {
+      "id" : 84
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#uf",
+    "o" : {
+      "id" : 88
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 88
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ufType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 88
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#code",
+    "o" : {
+      "v" : "f"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 88
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "05"
+    }
+  }, {
+    "order" : 70,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 89
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 89
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 89
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "902"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 89
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "s"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 89
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "  211166413           Raumentwicklung"
+    }
+  }, {
+    "order" : 71,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 90
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 90
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 90
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "902"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 90
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "f"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 90
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "  |Zeitschrift"
+    }
+  }, {
+    "order" : 72,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 91
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 91
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 91
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "904"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 91
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : "a"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 91
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "DDB"
+    }
+  }, {
+    "order" : 73,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 92
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 92
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 92
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "997"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 92
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 92
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ret"
+    }
+  }, {
+    "order" : 74,
+    "s" : {
+      "uri" : "http://data.slub-dresden.de/datamodels/5/records/911c43ff-df20-4938-803c-2a7514900751"
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld",
+    "o" : {
+      "id" : 93
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 93
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "o" : {
+      "uri" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feldType"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 93
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr",
+    "o" : {
+      "v" : "998"
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 93
+    },
+    "p" : "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind",
+    "o" : {
+      "v" : " "
+    }
+  }, {
+    "order" : 1,
+    "s" : {
+      "id" : 93
+    },
+    "p" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+    "o" : {
+      "v" : "ret"
+    }
+  } ]
+} ]

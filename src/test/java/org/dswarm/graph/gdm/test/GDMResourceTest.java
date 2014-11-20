@@ -77,6 +77,8 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 	@Test
 	public void writeGDMToDB4() throws IOException {
 
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/4/data", "versioning/dd-854/example_1.gdm.json");
+		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/5/data", "versioning/dd-854/example_2.gdm.json");
 		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/2/data", "versioning/dd-854/example_1.task.result.json");
 		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/2/data", "versioning/dd-854/example_2.task.result.json");
 	}

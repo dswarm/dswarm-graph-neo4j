@@ -62,7 +62,7 @@ public abstract class Neo4jProcessor {
 
 	private Map<String, Node> tempResourcesIndex;
 	private Map<String, Node> tempResourcesWDataModelIndex;
-	private Map<String, Node> tempResourceTypes;
+	private Map<String, Node> tempResourceTypesIndex;
 
 	protected Transaction tx;
 
@@ -91,7 +91,7 @@ public abstract class Neo4jProcessor {
 
 			tempResourcesIndex = Maps.newHashMap();
 			tempResourcesWDataModelIndex = Maps.newHashMap();
-			tempResourceTypes = Maps.newHashMap();
+			tempResourceTypesIndex = Maps.newHashMap();
 		} catch (final Exception e) {
 
 			failTx();
@@ -110,25 +110,25 @@ public abstract class Neo4jProcessor {
 		return database;
 	}
 
-//	public Index<Node> getResourcesIndex() {
-//
-//		return resources;
-//	}
-//
-//	public Index<Node> getResourcesWDataModelIndex() {
-//
-//		return resourcesWDataModel;
-//	}
+	//	public Index<Node> getResourcesIndex() {
+	//
+	//		return resources;
+	//	}
+	//
+	//	public Index<Node> getResourcesWDataModelIndex() {
+	//
+	//		return resourcesWDataModel;
+	//	}
 
 	public Map<String, Node> getBNodesIndex() {
 
 		return bnodes;
 	}
 
-//	public Index<Node> getResourceTypesIndex() {
-//
-//		return resourceTypes;
-//	}
+	//	public Index<Node> getResourceTypesIndex() {
+	//
+	//		return resourceTypes;
+	//	}
 
 	public Index<Node> getValueIndex() {
 
@@ -152,7 +152,7 @@ public abstract class Neo4jProcessor {
 
 		tempResourcesIndex.clear();
 		tempResourcesWDataModelIndex.clear();
-		tempResourceTypes.clear();
+		tempResourceTypesIndex.clear();
 	}
 
 	public void beginTx() throws DMPGraphException {
@@ -493,7 +493,7 @@ public abstract class Neo4jProcessor {
 
 	public Optional<Node> getNodeFromResourceTypesIndex(final String key) {
 
-		return getNodeFromIndex(key, tempResourceTypes, resourceTypes, GraphStatics.URI);
+		return getNodeFromIndex(key, tempResourceTypesIndex, resourceTypes, GraphStatics.URI);
 	}
 
 	public Optional<Node> getNodeFromResourcesWDataModelIndex(final String resourceUri, final String dataModelUri) {
@@ -514,7 +514,7 @@ public abstract class Neo4jProcessor {
 
 	public void addNodeToResourceTypesIndex(final String key, final Node node) {
 
-		addNodeToIndex(GraphStatics.URI, key, node, tempResourceTypes, resourceTypes);
+		addNodeToIndex(GraphStatics.URI, key, node, tempResourceTypesIndex, resourceTypes);
 		addNodeToResourcesIndex(key, node);
 	}
 

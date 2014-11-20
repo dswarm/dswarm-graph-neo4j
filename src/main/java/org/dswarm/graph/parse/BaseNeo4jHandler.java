@@ -228,7 +228,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 								objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 								processor.addLabel(objectNode, RDFS.Class.getURI());
 
-								processor.addNodeToResourcesIndex(objectURI, objectNode);
+								processor.addNodeToResourceTypesIndex(objectURI, objectNode);
 
 								break;
 						}

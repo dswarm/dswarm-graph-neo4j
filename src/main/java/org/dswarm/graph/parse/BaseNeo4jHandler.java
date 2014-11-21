@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.NotImplementedException;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
@@ -135,7 +136,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 					processor.handleSubjectDataModel(subjectNode, subjectURI, statement.getOptionalSubjectDataModelURI());
 
-					processor.getResourcesIndex().add(subjectNode, GraphStatics.URI, subjectURI);
+					processor.addNodeToResourcesIndex(subjectURI, subjectNode);
 				} else {
 
 					// subject is a blank node
@@ -227,12 +228,11 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 								objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 								processor.addLabel(objectNode, RDFS.Class.getURI());
 
-								processor.getResourceTypesIndex().add(objectNode, GraphStatics.URI, objectURI);
+								processor.addNodeToResourceTypesIndex(objectURI, objectNode);
 
 								break;
 						}
 
-						processor.getResourcesIndex().add(objectNode, GraphStatics.URI, objectURI);
 						processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, statement.getOptionalObjectDataModelURI());
 						optionalResourceUri = Optional.absent();
 					} else {

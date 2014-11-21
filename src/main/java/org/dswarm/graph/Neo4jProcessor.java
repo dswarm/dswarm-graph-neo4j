@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
+
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.LongObjectOpenHashMap;
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 /**
  * @author tgaengler
@@ -50,13 +52,17 @@ public abstract class Neo4jProcessor {
 	protected int							addedLabels	= 0;
 
 	protected final GraphDatabaseService	database;
-	protected Index<Node>				resources;
-	protected Index<Node>				resourcesWDataModel;
-	protected Index<Node>				resourceTypes;
-	protected Index<Node>				values;
+	private Index<Node>				resources;
+	private Index<Node>				resourcesWDataModel;
+	private Index<Node>				resourceTypes;
+	private Index<Node>				values;
 	protected final Map<String, Node>		bnodes;
 	protected Index<Relationship>		statementHashes;
 	protected final LongObjectMap<String> nodeResourceMap;
+
+	private Map<String, Node> tempResourcesIndex;
+	private Map<String, Node> tempResourcesWDataModelIndex;
+	private Map<String, Node> tempResourceTypesIndex;
 
 	protected Transaction tx;
 
@@ -82,6 +88,10 @@ public abstract class Neo4jProcessor {
 			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
 			statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+
+			tempResourcesIndex = Maps.newHashMap();
+			tempResourcesWDataModelIndex = Maps.newHashMap();
+			tempResourceTypesIndex = Maps.newHashMap();
 		} catch (final Exception e) {
 
 			failTx();
@@ -100,24 +110,9 @@ public abstract class Neo4jProcessor {
 		return database;
 	}
 
-	public Index<Node> getResourcesIndex() {
-
-		return resources;
-	}
-
-	public Index<Node> getResourcesWDataModelIndex() {
-
-		return resourcesWDataModel;
-	}
-
 	public Map<String, Node> getBNodesIndex() {
 
 		return bnodes;
-	}
-
-	public Index<Node> getResourceTypesIndex() {
-
-		return resourceTypes;
 	}
 
 	public Index<Node> getValueIndex() {
@@ -139,6 +134,10 @@ public abstract class Neo4jProcessor {
 
 		nodeResourceMap.clear();
 		bnodes.clear();
+
+		tempResourcesIndex.clear();
+		tempResourcesWDataModelIndex.clear();
+		tempResourceTypesIndex.clear();
 	}
 
 	public void beginTx() throws DMPGraphException {
@@ -195,45 +194,27 @@ public abstract class Neo4jProcessor {
 			return Optional.absent();
 		}
 
-		final Node node;
-
 		if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 			// resource node
 
-			final IndexHits<Node> hits;
+			final Optional<Node> optionalNode;
 
 			if (!NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 				if (!optionalDataModelURI.isPresent()) {
 
-					hits = getResourceNodeHits(optionalResourceURI.get());
+					optionalNode = getResourceNodeHits(optionalResourceURI.get());
 				} else {
 
-					hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, optionalResourceURI.get() + optionalDataModelURI.get());
+					optionalNode = getNodeFromResourcesWDataModelIndex(optionalResourceURI.get(), optionalDataModelURI.get());
 				}
 			} else {
 
-				hits = resourceTypes.get(GraphStatics.URI, optionalResourceURI.get());
+				optionalNode = getNodeFromResourceTypesIndex(optionalResourceURI.get());
 			}
 
-			if (hits != null && hits.hasNext()) {
-
-				// node exists
-
-				node = hits.next();
-
-				hits.close();
-
-				return Optional.fromNullable(node);
-			}
-
-			if (hits != null) {
-
-				hits.close();
-			}
-
-			return Optional.absent();
+			return optionalNode;
 		}
 
 		if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
@@ -245,7 +226,7 @@ public abstract class Neo4jProcessor {
 
 		// resource must be a blank node
 
-		node = bnodes.get(optionalResourceId.get());
+		final Node node = bnodes.get(optionalResourceId.get());
 
 		return Optional.fromNullable(node);
 	}
@@ -488,5 +469,83 @@ public abstract class Neo4jProcessor {
 
 	public abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
 
-	public abstract IndexHits<Node> getResourceNodeHits(final String resourceURI);
+	public abstract Optional<Node> getResourceNodeHits(final String resourceURI);
+
+	public Optional<Node> getNodeFromResourcesIndex(final String key) {
+
+		return getNodeFromIndex(key,tempResourcesIndex, resources, GraphStatics.URI);
+	}
+
+	public Optional<Node> getNodeFromResourceTypesIndex(final String key) {
+
+		return getNodeFromIndex(key, tempResourceTypesIndex, resourceTypes, GraphStatics.URI);
+	}
+
+	public Optional<Node> getNodeFromResourcesWDataModelIndex(final String resourceUri, final String dataModelUri) {
+
+		return getNodeFromIndex(resourceUri + dataModelUri, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
+	}
+
+	public void addNodeToResourcesIndex(final String value, final Node node) {
+
+		addNodeToIndex(GraphStatics.URI, value, node, tempResourcesIndex, resources);
+	}
+
+	public void addNodeToResourcesWDataModelIndex(final String resourceUri, final String dataModelUri, final Node node) {
+
+		addNodeToIndex(GraphStatics.URI_W_DATA_MODEL, resourceUri + dataModelUri, node, tempResourcesWDataModelIndex, resourcesWDataModel);
+		addNodeToResourcesIndex(resourceUri, node);
+	}
+
+	public void addNodeToResourceTypesIndex(final String key, final Node node) {
+
+		addNodeToIndex(GraphStatics.URI, key, node, tempResourceTypesIndex, resourceTypes);
+		addNodeToResourcesIndex(key, node);
+	}
+
+	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index,
+			final String indexProperty) {
+
+		if (tempIndex.containsKey(key)) {
+
+			return Optional.of(tempIndex.get(key));
+		}
+
+		if (index == null) {
+
+			return Optional.absent();
+		}
+
+		final IndexHits<Node> hits = index.get(indexProperty, key);
+
+		if (hits != null && hits.hasNext()) {
+
+			final Node hit = hits.next();
+
+			hits.close();
+
+			final Optional<Node> optionalHit = Optional.fromNullable(hit);
+
+			if (optionalHit.isPresent()) {
+
+				// temp cache index hits again
+				tempIndex.put(key, optionalHit.get());
+			}
+
+			return optionalHit;
+		}
+
+		if (hits != null) {
+
+			hits.close();
+		}
+
+		return Optional.absent();
+	}
+
+	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex, final Index<Node> index) {
+
+		tempIndex.put(key, node);
+		index.add(node, indexProperty, key);
+	}
 }

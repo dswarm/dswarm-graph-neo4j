@@ -20,7 +20,6 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.parse.Handler;
-import org.dswarm.graph.parse.Neo4jHandler;
 
 /**
  * @author tgaengler

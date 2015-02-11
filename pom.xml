@@ -51,6 +51,7 @@
 		<hppc.version>0.6.0</hppc.version>
 		<ntparser.version>0.1.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
+		<fasterxml.version>0.9.9</fasterxml.version>
 	</properties>
 
 	<build>
@@ -344,6 +345,11 @@
 			<groupId>com.github.emboss</groupId>
 			<artifactId>siphash-java</artifactId>
 			<version>${siphash.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml</groupId>
+			<artifactId>aalto-xml</artifactId>
+			<version>${fasterxml.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -14,19 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.xml.read;
-
-import java.io.OutputStream;
+package org.dswarm.graph.xml.utils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.dswarm.graph.DMPGraphException;
+import org.dswarm.common.web.URI;
 
 /**
  * @author tgaengler
  */
-public interface XMLReader {
+public final class XMLStreamWriterUtils {
 
-	public XMLStreamWriter read(final OutputStream stream) throws DMPGraphException, XMLStreamException;
+	public static void writeXMLElementTag(final XMLStreamWriter writer, final URI uri) throws XMLStreamException {
+
+		if (uri.hasNamespaceURI()) {
+
+			writer.writeStartElement(uri.getNamespaceURI(), uri.getLocalName());
+		} else {
+
+			writer.writeStartElement(uri.getLocalName());
+		}
+	}
+
+	public static void writeXMLAttribute(final XMLStreamWriter writer, final URI uri, final String value) throws XMLStreamException {
+
+		if (uri.hasNamespaceURI()) {
+
+			writer.writeAttribute(uri.getNamespaceURI(), uri.getLocalName(), value);
+		} else {
+
+			writer.writeAttribute(uri.getLocalName(), value);
+		}
+	}
 }

@@ -16,17 +16,19 @@
  */
 package org.dswarm.graph.xml.read;
 
-import java.io.OutputStream;
-
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.read.RelationshipHandler;
+
+import org.neo4j.graphdb.Node;
 
 /**
+ *
  * @author tgaengler
+ *
  */
-public interface XMLReader {
+public interface XMLNodeHandler {
 
-	public XMLStreamWriter read(final OutputStream stream) throws DMPGraphException, XMLStreamException;
+	public void handleNode(Node node) throws DMPGraphException, XMLStreamException;
 }

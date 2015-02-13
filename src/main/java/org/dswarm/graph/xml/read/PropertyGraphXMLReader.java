@@ -36,6 +36,8 @@ import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.Attribute;
+import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
@@ -56,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
@@ -78,21 +81,22 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private final String dataModelUri;
 	private final URI    recordTagURI;
+	private final Optional<AttributePath> optionalRootAttributePath;
 
 	private final Map<String, Tuple<Predicate, URI>> predicates = new HashMap<>();
 
 	private final GraphDatabaseService database;
 
-	//private Resource currentResource;
-	//private final Map<Long, Statement> currentResourceStatements = new HashMap<>();
+	private long recordCount = 0;
 
 	private Integer version;
 
 	private Transaction tx = null;
 
-	public PropertyGraphXMLReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
+	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
 			final GraphDatabaseService databaseArg) throws DMPGraphException {
 
+		optionalRootAttributePath = optionalRootAttributePathArg;
 		recordTagURI = new URI(recordClassUriArg);
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
@@ -190,7 +194,18 @@ public class PropertyGraphXMLReader implements XMLReader {
 			final XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
 
 			writer.writeStartDocument(Charsets.UTF_8.toString(), XML_VERSION);
-			// TODO: write root XML elements tags (from root AP)
+
+			if(optionalRootAttributePath.isPresent()) {
+
+				// open root attribute path tags
+
+				for(final Attribute attribute : optionalRootAttributePath.get().getAttributes()) {
+
+					final URI attributeURI = new URI(attribute.getUri());
+
+					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI);
+				}
+			}
 
 			final XMLRelationshipHandler relationshipHandler = new CBDRelationshipHandler(writer);
 			final XMLNodeHandler nodeHandler = new CBDNodeHandler(writer, relationshipHandler);
@@ -209,40 +224,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 					continue;
 				}
 
-				//currentResource = new Resource(resourceUri);
 				// open record XML tag
 				XMLStreamWriterUtils.writeXMLElementTag(writer, recordTagURI);
 
 				startNodeHandler.handleNode(recordNode);
-
-				// we should write the content directly, i.e., not at once
-				//				if (!currentResourceStatements.isEmpty()) {
-				//
-				//					// note, this is just an integer number (i.e. NOT long)
-				//					final int mapSize = currentResourceStatements.size();
-				//
-				//					long i = 0;
-				//
-				//					final Set<Statement> statements = new LinkedHashSet<>();
-				//
-				//					while (i < mapSize) {
-				//
-				//						i++;
-				//
-				//						final Statement statement = currentResourceStatements.get(i);
-				//
-				//						statements.add(statement);
-				//					}
-				//
-				//					currentResource.setStatements(statements);
-				//				}
-				//
-				//				model.addResource(currentResource);
-				//
-				//				currentResourceStatements.clear();
-
 				// close record
 				writer.writeEndElement();
+
+				recordCount++;
 			}
 
 			recordNodesIter.close();
@@ -250,13 +239,18 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			PropertyGraphXMLReader.LOG.debug("finished read XML TX successfully");
 
-			// TODO: close root tags
+			if(optionalRootAttributePath.isPresent()) {
+
+				// close root attribute path tags
+
+				for(int i = 0; i < optionalRootAttributePath.get().getAttributes().size(); i++) {
+
+					writer.writeEndElement();
+				}
+			}
+
 			// close document
 			writer.writeEndDocument();
-
-			// TODO: do this, when necessary and needed
-			//writer.flush();
-			//writer.close();
 
 			return writer;
 		} catch (final Exception e) {
@@ -278,6 +272,11 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		// not fine, but okay for now ;)
 		return null;
+	}
+
+	@Override public long recordCount() {
+
+		return recordCount;
 	}
 
 	private class CBDNodeHandler implements XMLNodeHandler {

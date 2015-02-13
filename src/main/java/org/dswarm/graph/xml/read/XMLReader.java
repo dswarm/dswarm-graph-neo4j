@@ -29,4 +29,6 @@ import org.dswarm.graph.DMPGraphException;
 public interface XMLReader {
 
 	public XMLStreamWriter read(final OutputStream stream) throws DMPGraphException, XMLStreamException;
+
+	public long recordCount();
 }

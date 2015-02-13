@@ -30,4 +30,12 @@ public interface DMPStatics {
 	 * The delimiter of an attribute path.
 	 */
 	public static final Character	ATTRIBUTE_DELIMITER	= '\u001E';
+
+	public static final String RECORD_CLASS_URI_IDENTIFIER = "record_class_uri";
+
+	public static final String DATA_MODEL_URI_IDENTIFIER = "data_model_uri";
+
+	public static final String VERSION_IDENTIFIER = "version";
+
+	public static final String ROOT_ATTRIBUTE_PATH_IDENTIFIER = "root_attribute_path";
 }

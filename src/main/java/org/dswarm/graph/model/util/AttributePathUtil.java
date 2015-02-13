@@ -20,12 +20,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang.StringUtils;
+
 import org.dswarm.graph.model.Attribute;
 import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.ContentSchema;
 import org.dswarm.graph.model.DMPStatics;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.base.Optional;
 
 /**
  * Created by tgaengler on 29/07/14.
@@ -97,6 +101,107 @@ public final class AttributePathUtil {
 		}
 
 		return Optional.of(new AttributePath(apAttributes));
+	}
+
+	public static LinkedList<AttributePath> parseAttributePathsNode(final JsonNode attributePathsNode) {
+
+		return  parseAttributePathsNode(attributePathsNode, null, null);
+	}
+
+	public static LinkedList<AttributePath> parseAttributePathsNode(final JsonNode attributePathsNode, final Map<String, Attribute> attributeMap, final Map<String, AttributePath> attributePathMap) {
+
+		if(attributePathsNode == null || !ArrayNode.class.isInstance(attributePathsNode)) {
+
+			return null;
+		}
+
+		final LinkedList<AttributePath> attributePaths = new LinkedList<>();
+
+		for(final JsonNode attributePathNode : attributePathsNode) {
+
+			final AttributePath attributePath = parseAttributePathNode(attributePathNode, attributeMap, attributePathMap);
+
+			if(attributePath != null) {
+
+				attributePaths.add(attributePath);
+			}
+		}
+
+		return attributePaths;
+	}
+
+	public static AttributePath parseAttributePathNode(final JsonNode attributePathNode) {
+
+		return parseAttributePathNode(attributePathNode, null, null);
+	}
+
+	public static AttributePath parseAttributePathNode(final JsonNode attributePathNode, final Map<String, Attribute> attributeMap, final Map<String, AttributePath> attributePathMap) {
+
+		if (attributePathNode == null) {
+
+			return null;
+		}
+
+		final String attributePathString = attributePathNode.asText();
+
+		return parseAttributePathString(attributePathString, attributeMap, attributePathMap);
+	}
+
+	public static AttributePath parseAttributePathString(final String attributePathString) {
+
+		return parseAttributePathString(attributePathString, null, null);
+	}
+
+	public static AttributePath parseAttributePathString(final String attributePathString, final Map<String, Attribute> attributeMap, final Map<String, AttributePath> attributePathMap) {
+
+		final String[] attributes = attributePathString.split(DMPStatics.ATTRIBUTE_DELIMITER.toString());
+
+		if(attributes.length <= 0) {
+
+			return null;
+		}
+
+		final LinkedList<Attribute> attributeList = new LinkedList<>();
+
+		for (final String attributeURI : attributes) {
+
+			final Attribute attribute = getOrCreateAttribute(attributeURI, Optional.fromNullable(attributeMap));
+			attributeList.add(attribute);
+		}
+
+		return getOrCreateAttributePath(attributeList, Optional.fromNullable(attributePathMap));
+	}
+
+	private static Attribute getOrCreateAttribute(final String uri, final Optional<Map<String, Attribute>> optionalAttributeMap) {
+
+		if(!optionalAttributeMap.isPresent()) {
+
+			return new Attribute(uri);
+		}
+
+		if(!optionalAttributeMap.get().containsKey(uri)) {
+
+			optionalAttributeMap.get().put(uri, new Attribute(uri));
+		}
+
+		return optionalAttributeMap.get().get(uri);
+	}
+
+	private static AttributePath getOrCreateAttributePath(final LinkedList<Attribute> attributePath, final Optional<Map<String, AttributePath>> optionalAttributePathMap) {
+
+		if(!optionalAttributePathMap.isPresent()) {
+
+			return new AttributePath(attributePath);
+		}
+
+		final String attributePathString = AttributePathUtil.generateAttributePath(attributePath);
+
+		if(!optionalAttributePathMap.get().containsKey(attributePathString)) {
+
+			optionalAttributePathMap.get().put(attributePathString, new AttributePath(attributePath));
+		}
+
+		return optionalAttributePathMap.get().get(attributePathString);
 	}
 
 	private static void fillMaps(final AttributePath attributePath, final Map<String, AttributePath> attributePaths,

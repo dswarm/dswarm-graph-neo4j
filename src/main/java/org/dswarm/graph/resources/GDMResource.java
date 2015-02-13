@@ -37,9 +37,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.AttributePath;
+import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.delta.Changeset;
-import org.dswarm.graph.delta.ContentSchema;
+import org.dswarm.graph.model.ContentSchema;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSEntityMatcher;
 import org.dswarm.graph.delta.match.FirstDegreeExactCSValueMatcher;
@@ -55,7 +55,8 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
-import org.dswarm.graph.delta.util.AttributePathUtil;
+import org.dswarm.graph.model.DMPStatics;
+import org.dswarm.graph.model.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.DataModelGDMNeo4jProcessor;
@@ -401,9 +402,9 @@ public class GDMResource {
 			throw new DMPGraphException(message, e);
 		}
 
-		final String recordClassUri = json.get("record_class_uri").asText();
-		final String dataModelUri = json.get("data_model_uri").asText();
-		final JsonNode versionNode = json.get("version");
+		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
+		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
 		final Integer version;
 
 		if (versionNode != null) {

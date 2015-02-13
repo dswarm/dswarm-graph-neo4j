@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.google.common.base.Optional;
+
 import org.dswarm.graph.DMPGraphException;
 
 /**
@@ -28,7 +30,7 @@ import org.dswarm.graph.DMPGraphException;
  */
 public interface XMLReader {
 
-	public XMLStreamWriter read(final OutputStream stream) throws DMPGraphException, XMLStreamException;
+	public Optional<XMLStreamWriter> read(final OutputStream stream) throws DMPGraphException, XMLStreamException;
 
 	public long recordCount();
 }

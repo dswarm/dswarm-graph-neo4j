@@ -38,7 +38,7 @@ import com.google.common.base.Optional;
  *
  * @author tgaengler
  */
-@Path("/gdm")
+@Path("/xml")
 public class XMLResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(XMLResource.class);
@@ -89,6 +89,19 @@ public class XMLResource {
 		final JsonNode rootAttributePathNode = json.get(DMPStatics.ROOT_ATTRIBUTE_PATH_IDENTIFIER);
 		final Optional<AttributePath> optionalRootAttributePath = Optional
 				.fromNullable(AttributePathUtil.parseAttributePathNode(rootAttributePathNode));
+
+		final Optional<String> optionalRecordTag;
+
+		final JsonNode recordTagNode = json.get(DMPStatics.RECORD_TAG_IDENTIFIER);
+
+		if (recordTagNode != null) {
+
+			optionalRecordTag = Optional.fromNullable(recordTagNode.asText());
+		} else {
+
+			optionalRecordTag = Optional.absent();
+		}
+
 		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
 		final Integer version;
 
@@ -103,17 +116,21 @@ public class XMLResource {
 		LOG.debug("try to read XML records for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");
 
-		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, recordClassUri, dataModelUri, version, database);
+		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
+				database);
 		final StreamingOutput stream = new StreamingOutput() {
 
 			@Override
 			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
 				try {
-					final XMLStreamWriter writer = xmlReader.read(os);
+					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(os);
 
-					writer.flush();
-					writer.close();
+					if(optionalWriter.isPresent()) {
+
+						optionalWriter.get().flush();
+						optionalWriter.get().close();
+					}
 				} catch (final DMPGraphException | XMLStreamException e) {
 
 					throw new WebApplicationException(e);

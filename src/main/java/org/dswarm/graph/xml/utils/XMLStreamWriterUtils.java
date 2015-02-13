@@ -16,6 +16,9 @@
  */
 package org.dswarm.graph.xml.utils;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -26,25 +29,45 @@ import org.dswarm.common.web.URI;
  */
 public final class XMLStreamWriterUtils {
 
-	public static void writeXMLElementTag(final XMLStreamWriter writer, final URI uri) throws XMLStreamException {
+	private static final AtomicInteger counter = new AtomicInteger(0);
+	private static final String NAMESPACE_PREFIX_BASE = "ns";
+
+	public static void writeXMLElementTag(final XMLStreamWriter writer, final URI uri, final Map<String, String> namespacesPrefixesMap)
+			throws XMLStreamException {
 
 		if (uri.hasNamespaceURI()) {
 
-			writer.writeStartElement(uri.getNamespaceURI(), uri.getLocalName());
+			final String prefix = getPrefix(uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+
+			writer.writeStartElement(prefix, uri.getLocalName(), uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1));
+			//writer.writeNamespace(prefix, uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1));
 		} else {
 
 			writer.writeStartElement(uri.getLocalName());
 		}
 	}
 
-	public static void writeXMLAttribute(final XMLStreamWriter writer, final URI uri, final String value) throws XMLStreamException {
+	public static void writeXMLAttribute(final XMLStreamWriter writer, final URI uri, final String value,
+			final Map<String, String> namespacesPrefixesMap) throws XMLStreamException {
 
 		if (uri.hasNamespaceURI()) {
 
-			writer.writeAttribute(uri.getNamespaceURI(), uri.getLocalName(), value);
+			final String prefix = getPrefix(uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+
+			writer.writeAttribute(prefix, uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1), uri.getLocalName(), value);
 		} else {
 
 			writer.writeAttribute(uri.getLocalName(), value);
 		}
+	}
+
+	public static String getPrefix(final String namespace, final Map<String, String> namespacesPrefixesMap) {
+
+		if (!namespacesPrefixesMap.containsKey(namespace)) {
+
+			namespacesPrefixesMap.put(namespace, NAMESPACE_PREFIX_BASE + counter.incrementAndGet());
+		}
+
+		return namespacesPrefixesMap.get(namespace);
 	}
 }

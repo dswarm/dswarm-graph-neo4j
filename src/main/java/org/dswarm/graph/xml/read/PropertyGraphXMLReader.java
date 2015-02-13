@@ -1,18 +1,10 @@
 /**
- * This file is part of d:swarm graph extension.
- *
- * d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * d:swarm graph extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.dswarm.graph.xml.read;
 
@@ -66,10 +58,10 @@ import com.hp.hpl.jena.vocabulary.RDF;
  */
 public class PropertyGraphXMLReader implements XMLReader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphXMLReader.class);
+	private static final Logger							LOG						= LoggerFactory.getLogger(PropertyGraphXMLReader.class);
 
-	private static final String XML_VERSION = "1.0";
-	private static final XMLOutputFactory2 xmlOutputFactory;
+	private static final String							XML_VERSION				= "1.0";
+	private static final XMLOutputFactory2				xmlOutputFactory;
 
 	static {
 
@@ -79,25 +71,39 @@ public class PropertyGraphXMLReader implements XMLReader {
 		xmlOutputFactory.configureForSpeed();
 	}
 
-	private final String dataModelUri;
-	private final URI    recordTagURI;
-	private final Optional<AttributePath> optionalRootAttributePath;
+	private final String								dataModelUri;
+	private final String								recordClassURI;
+	private final URI									recordTagURI;
+	private final Optional<AttributePath>				optionalRootAttributePath;
 
-	private final Map<String, Tuple<Predicate, URI>> predicates = new HashMap<>();
+	private final Map<String, Tuple<Predicate, URI>>	predicates				= new HashMap<>();
+	private final Map<String, String>					namespacesPrefixesMap	= new HashMap<>();
 
-	private final GraphDatabaseService database;
+	private final GraphDatabaseService					database;
 
-	private long recordCount = 0;
+	private long										recordCount				= 0;
 
-	private Integer version;
+	private Integer										version;
 
-	private Transaction tx = null;
+	private Transaction									tx						= null;
 
-	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
-			final GraphDatabaseService databaseArg) throws DMPGraphException {
+	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
+			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final GraphDatabaseService databaseArg)
+			throws DMPGraphException {
 
 		optionalRootAttributePath = optionalRootAttributePathArg;
-		recordTagURI = new URI(recordClassUriArg);
+		recordClassURI = recordClassUriArg;
+
+		if (optionalRecordTagArg.isPresent()) {
+
+			recordTagURI = new URI(optionalRecordTagArg.get());
+		} else {
+
+			// record class URI as fall back
+
+			recordTagURI = new URI(recordClassUriArg);
+		}
+
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 
@@ -128,7 +134,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 		}
 	}
 
-	@Override public XMLStreamWriter read(final OutputStream outputStream) throws DMPGraphException, XMLStreamException {
+	@Override
+	public Optional<XMLStreamWriter> read(final OutputStream outputStream) throws DMPGraphException, XMLStreamException {
 
 		if (tx == null) {
 
@@ -152,7 +159,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		try {
 
-			final Label recordClassLabel = DynamicLabel.label(recordTagURI.toString());
+			final Label recordClassLabel = DynamicLabel.label(recordClassURI);
 
 			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
@@ -164,7 +171,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
 
-				return null;
+				return Optional.absent();
 			}
 
 			recordNodesIter = recordNodes.iterator();
@@ -176,7 +183,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
 
-				return null;
+				return Optional.absent();
 			}
 
 			if (!recordNodesIter.hasNext()) {
@@ -187,7 +194,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
 
-				return null;
+				return Optional.absent();
 			}
 
 			// (XMLStreamWriter2)
@@ -195,19 +202,39 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			writer.writeStartDocument(Charsets.UTF_8.toString(), XML_VERSION);
 
-			if(optionalRootAttributePath.isPresent()) {
+			boolean defaultNamespaceWritten = false;
+
+			if (optionalRootAttributePath.isPresent()) {
 
 				// open root attribute path tags
 
-				for(final Attribute attribute : optionalRootAttributePath.get().getAttributes()) {
+				for (final Attribute attribute : optionalRootAttributePath.get().getAttributes()) {
 
 					final URI attributeURI = new URI(attribute.getUri());
 
-					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI);
+					if (!defaultNamespaceWritten && attributeURI.hasNamespaceURI()) {
+
+						// set default namespace
+
+						writer.setDefaultNamespace(attributeURI.getNamespaceURI());
+
+						defaultNamespaceWritten = true;
+					}
+
+					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI, namespacesPrefixesMap);
 				}
 			}
 
+			if (!defaultNamespaceWritten && recordTagURI.hasNamespaceURI()) {
+
+				// set default namespace
+
+				// TODO: shall we cut the last character?
+				writer.setDefaultNamespace(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
+			}
+
 			final XMLRelationshipHandler relationshipHandler = new CBDRelationshipHandler(writer);
+			// note: relationship handler knows this node handler
 			final XMLNodeHandler nodeHandler = new CBDNodeHandler(writer, relationshipHandler);
 			final XMLNodeHandler startNodeHandler = new CBDStartNodeHandler(writer, relationshipHandler);
 
@@ -225,7 +252,12 @@ public class PropertyGraphXMLReader implements XMLReader {
 				}
 
 				// open record XML tag
-				XMLStreamWriterUtils.writeXMLElementTag(writer, recordTagURI);
+				XMLStreamWriterUtils.writeXMLElementTag(writer, recordTagURI, namespacesPrefixesMap);
+				// TODO: shall we cut the last character?
+				// TODO: shall we write the default namespace?
+				//writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
+				final String prefix = XMLStreamWriterUtils.getPrefix(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+				writer.writeNamespace(prefix, recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
 
 				startNodeHandler.handleNode(recordNode);
 				// close record
@@ -239,11 +271,11 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			PropertyGraphXMLReader.LOG.debug("finished read XML TX successfully");
 
-			if(optionalRootAttributePath.isPresent()) {
+			if (optionalRootAttributePath.isPresent()) {
 
 				// close root attribute path tags
 
-				for(int i = 0; i < optionalRootAttributePath.get().getAttributes().size(); i++) {
+				for (int i = 0; i < optionalRootAttributePath.get().getAttributes().size(); i++) {
 
 					writer.writeEndElement();
 				}
@@ -252,7 +284,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 			// close document
 			writer.writeEndDocument();
 
-			return writer;
+			return Optional.of(writer);
 		} catch (final Exception e) {
 
 			PropertyGraphXMLReader.LOG.error("couldn't finished read XML TX successfully", e);
@@ -270,19 +302,19 @@ public class PropertyGraphXMLReader implements XMLReader {
 			tx.close();
 		}
 
-		// not fine, but okay for now ;)
-		return null;
+		return Optional.absent();
 	}
 
-	@Override public long recordCount() {
+	@Override
+	public long recordCount() {
 
 		return recordCount;
 	}
 
 	private class CBDNodeHandler implements XMLNodeHandler {
 
-		private final XMLStreamWriter        writer;
-		private final XMLRelationshipHandler relationshipHandler;
+		private final XMLStreamWriter			writer;
+		private final XMLRelationshipHandler	relationshipHandler;
 
 		protected CBDNodeHandler(final XMLStreamWriter writerArg, final XMLRelationshipHandler relationshipHandlerArg) {
 
@@ -320,14 +352,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 						relationshipHandler.handleRelationship(relationship);
 					}
 
-					if(!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
+					if (!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
 
 						containsOnlyXMLAttributes = false;
 					}
 				}
 
 				// close element here (?) - however, then we need to know whether it was a branch with elements or not
-				if(!containsOnlyXMLAttributes) {
+				if (!containsOnlyXMLAttributes) {
 
 					// close inner XML tag
 					writer.writeEndElement();
@@ -336,14 +368,15 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// try to pop something from the stack
 				// TODO: do we really need the stack?
 				((CBDRelationshipHandler) relationshipHandler).popRecordBNodeStack();
+				//((CBDRelationshipHandler) relationshipHandler).reset();
 			}
 		}
 	}
 
 	private class CBDStartNodeHandler implements XMLNodeHandler {
 
-		private final XMLStreamWriter        writer;
-		private final XMLRelationshipHandler relationshipHandler;
+		private final XMLStreamWriter			writer;
+		private final XMLRelationshipHandler	relationshipHandler;
 
 		protected CBDStartNodeHandler(final XMLStreamWriter writerArg, final XMLRelationshipHandler relationshipHandlerArg) {
 
@@ -380,14 +413,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 						relationshipHandler.handleRelationship(relationship);
 					}
 
-					if(!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
+					if (!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
 
 						containsOnlyXMLAttributes = false;
 					}
 				}
 
 				// close element here (?) - however, then we need to know whether it was a branch with elements or not
-				if(!containsOnlyXMLAttributes) {
+				if (!containsOnlyXMLAttributes) {
 
 					// close inner XML tag
 					writer.writeEndElement();
@@ -396,23 +429,24 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// try to pop something from the stack
 				// TODO: do we really need the stack?
 				((CBDRelationshipHandler) relationshipHandler).popRecordBNodeStack();
+				//((CBDRelationshipHandler) relationshipHandler).reset();
 			}
 		}
 	}
 
 	private class CBDRelationshipHandler implements XMLRelationshipHandler {
 
-		private final PropertyGraphGDMReader propertyGraphGDMReader = new PropertyGraphGDMReader();
+		private final PropertyGraphGDMReader		propertyGraphGDMReader		= new PropertyGraphGDMReader();
 
-		private final XMLStreamWriter writer;
-		private       XMLNodeHandler  nodeHandler;
-		private Statement previousStatement = null;
-		private Statement currentStatement  = null;
+		private final XMLStreamWriter				writer;
+		private XMLNodeHandler						nodeHandler;
+		private Statement							previousStatement			= null;
+		private Statement							currentStatement			= null;
 
-		private boolean predicateIsXMLAttribute = false;
+		private boolean								predicateIsXMLAttribute		= false;
+		private boolean								predicateIsSpecialPredicate	= false;
 
-		private Stack<org.dswarm.graph.json.Node> recordBNodeStack = new Stack<>();
-
+		private Stack<org.dswarm.graph.json.Node>	recordBNodeStack			= new Stack<>();
 
 		protected CBDRelationshipHandler(final XMLStreamWriter writerArg) {
 
@@ -426,7 +460,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		public void popRecordBNodeStack() {
 
-			if(!recordBNodeStack.empty()) {
+			if (!recordBNodeStack.empty()) {
 
 				recordBNodeStack.pop();
 			}
@@ -435,6 +469,19 @@ public class PropertyGraphXMLReader implements XMLReader {
 		public boolean predicateIsXMLAttribute() {
 
 			return predicateIsXMLAttribute;
+		}
+
+		public boolean predicateIsSpecialPredicate() {
+
+			return predicateIsSpecialPredicate;
+		}
+
+		public void reset() {
+
+			previousStatement = null;
+			currentStatement = null;
+			predicateIsXMLAttribute = false;
+			predicateIsSpecialPredicate = false;
 		}
 
 		@Override
@@ -448,13 +495,15 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				final Node subjectNode = rel.getStartNode();
 				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readSubject(subjectNode);
-				// => TODO, we need to compare the node, with the previous node, to write the content (key(predicate)/value(object)) into the current element or another of this tag
-				// TODO: how to determine, when we should close a tag (or parent tag etc.) => we need to keep a stack, of open elements
+				// => TODO, we need to compare the node, with the previous node, to write the content
+				// (key(predicate)/value(object)) into the current element or another of this tag
+				// TODO: how to determine, when we should close a tag (or parent tag etc.) => we need to keep a stack, of open
+				// elements
 
 				// predicate => XML element or XML attribute
 
 				final String predicateString = rel.getType().name();
-				//final URI uriPredicate = URI.create(predicate);
+				// final URI uriPredicate = URI.create(predicate);
 				final Tuple<Predicate, URI> predicateTuple = getPredicate(predicateString);
 				final URI predicateURI = predicateTuple.v2();
 
@@ -465,70 +514,77 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				currentStatement = new Statement(subjectGDMNode, predicateTuple.v1(), objectGDMNode);
 
-				if (!(RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString)) && NodeType.Literal
-						.equals(objectGDMNode.getType())) {
+				if (!(RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString))
+						&& NodeType.Literal.equals(objectGDMNode.getType())) {
 
 					// predicate is an XML Attribute => write XML Attribute to this XML Element
 					predicateIsXMLAttribute = true;
 
-					XMLStreamWriterUtils.writeXMLAttribute(writer, predicateURI, ((LiteralNode) objectGDMNode).getValue());
-				} else if
-						(RDF.value.getURI().equals(predicateString) && NodeType.Literal
-								.equals(objectGDMNode.getType())) {
+					XMLStreamWriterUtils.writeXMLAttribute(writer, predicateURI, ((LiteralNode) objectGDMNode).getValue(), namespacesPrefixesMap);
+				} else if (RDF.value.getURI().equals(predicateString) && NodeType.Literal.equals(objectGDMNode.getType())) {
 
 					// predicate is an XML Element
 
-					// TODO: maybe should compare with subject from stack, i.e., this might not always be the direct predecessor
-					final boolean subjectsAreEqual =
-							previousStatement != null && previousStatement.getSubject().equals(currentStatement.getSubject());
+					// TODO: maybe we should compare with subject from stack, i.e., this might not always be the direct
+					// predecessor
+					final boolean subjectsAreEqual = previousStatement != null
+							&& previousStatement.getSubject().equals(currentStatement.getSubject());
 
-					if (subjectsAreEqual) {
-
-						// close previous
-
-						writer.writeEndElement();
-					} else {
-
-						if(!recordBNodeStack.empty()) {
-
-							// TODO: how to determine the right place, when one should close a bnode
-						}
-					}
-
-					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI);
+					// TODO: disabled for now, this is not working as expected
+//					if (subjectsAreEqual) {
+//
+//					// close previous
+//
+//					// TODO: how do we reopen a tag with the same name, e.g. a list of items (=> i.e. we need to stack the
+//					// predicates somehow, because at this point we only have rdf:value as predicate available)
+//
+//					writer.writeEndElement();
+//					} else {
+//
+//					if(!recordBNodeStack.empty()) {
+//
+//					// TODO: how to determine the right place, when one should close a bnode
+//					}
+//					}
 
 					// TODO: what should we do with objects that are resources?
-					if (objectGDMNode.getType().equals(NodeType.Literal)) {
+					writer.writeCData(((LiteralNode) objectGDMNode).getValue());
+					writer.writeEndElement();
 
-						writer.writeCData(((LiteralNode) objectGDMNode).getValue());
-					}
+				} else if (RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString)) {
+
+					predicateIsSpecialPredicate = true;
 				} else {
 
 					// ???
 				}
 
 				//
-				//				// index should never be null (when resource was written as GDM JSON)
-				//				final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
+				// // index should never be null (when resource was written as GDM JSON)
+				// final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
 				//
-				//				if (index != null) {
+				// if (index != null) {
 				//
-				//					currentResourceStatements.put(index, statement);
-				//				} else {
+				// currentResourceStatements.put(index, statement);
+				// } else {
 				//
-				//					// note maybe improve this here (however, this is the case for model that where written from RDF)
+				// // note maybe improve this here (however, this is the case for model that where written from RDF)
 				//
-				//					currentResource.addStatement(statement);
-				//				}
+				// currentResource.addStatement(statement);
+				// }
 
 				previousStatement = currentStatement;
 				currentStatement = null;
 
-				// note: we can only iterate deeper into one direction, i.e., we need to cut the stream, when the object is another resource => i.e. we iterate only when object are bnodes
+				// note: we can only iterate deeper into one direction, i.e., we need to cut the stream, when the object is
+				// another resource => i.e. we iterate only when object are bnodes
 				// TODO: what should we do with objects that are resources?
 				if (objectGDMNode.getType().equals(NodeType.BNode)) {
 
 					recordBNodeStack.push(objectGDMNode);
+
+					// open tag
+					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap);
 
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());

@@ -14,42 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
-
-import org.dswarm.graph.delta.util.AttributePathUtil;
-
-import java.util.LinkedList;
+package org.dswarm.graph.model;
 
 /**
  * Created by tgaengler on 29/07/14.
  */
-public class AttributePath {
+public class Attribute {
 
-	private final LinkedList<Attribute> attributes;
+	private final String	uri;
 
-	public AttributePath(final LinkedList<Attribute> attributesArg) {
+	public Attribute(final String uriArg) {
 
-		attributes = attributesArg;
+		uri = uriArg;
 	}
 
-	public LinkedList<Attribute> getAttributes() {
+	public String getUri() {
 
-		return attributes;
+		return uri;
 	}
 
 	@Override
 	public boolean equals(final Object o) {
 
 		if (this == o) {
+
 			return true;
 		}
 		if (o == null || getClass() != o.getClass()) {
+
 			return false;
 		}
 
-		final AttributePath that = (AttributePath) o;
+		final Attribute attribute = (Attribute) o;
 
-		if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) {
+		if (!uri.equals(attribute.uri)) {
 
 			return false;
 		}
@@ -60,11 +58,12 @@ public class AttributePath {
 	@Override
 	public int hashCode() {
 
-		return attributes != null ? attributes.hashCode() : 0;
+		return uri.hashCode();
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 
-		return AttributePathUtil.generateAttributePath(attributes);
+		return uri;
 	}
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.model;
 
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
@@ -26,5 +26,8 @@ import org.neo4j.graphdb.Label;
  */
 public interface DMPStatics {
 
-	public static final Label LEAF_LABEL = DynamicLabel.label("__LEAF__");
+	/**
+	 * The delimiter of an attribute path.
+	 */
+	public static final Character	ATTRIBUTE_DELIMITER	= '\u001E';
 }

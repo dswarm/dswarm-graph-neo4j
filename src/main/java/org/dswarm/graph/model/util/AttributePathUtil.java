@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta.util;
+package org.dswarm.graph.model.util;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,11 +22,10 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang.StringUtils;
-import org.dswarm.graph.delta.Attribute;
-import org.dswarm.graph.delta.AttributePath;
-import org.dswarm.graph.delta.ContentSchema;
-import org.dswarm.graph.delta.DMPStatics;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.dswarm.graph.model.Attribute;
+import org.dswarm.graph.model.AttributePath;
+import org.dswarm.graph.model.ContentSchema;
+import org.dswarm.graph.model.DMPStatics;
 
 /**
  * Created by tgaengler on 29/07/14.

@@ -17,7 +17,7 @@
 package org.dswarm.graph.gdm.read;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.AttributePath;
+import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta.deserializer;
+package org.dswarm.graph.model.deserializer;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.dswarm.graph.delta.Attribute;
-import org.dswarm.graph.delta.AttributePath;
-import org.dswarm.graph.delta.ContentSchema;
-import org.dswarm.graph.delta.DMPStatics;
-import org.dswarm.graph.delta.util.AttributePathUtil;
+import org.dswarm.graph.model.Attribute;
+import org.dswarm.graph.model.AttributePath;
+import org.dswarm.graph.model.ContentSchema;
+import org.dswarm.graph.model.DMPStatics;
+import org.dswarm.graph.model.util.AttributePathUtil;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;

@@ -11,7 +11,6 @@ package org.dswarm.graph.xml.read;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -27,7 +26,6 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.Attribute;
 import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.GraphStatics;
@@ -235,8 +233,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			final XMLRelationshipHandler relationshipHandler = new CBDRelationshipHandler(writer);
 			// note: relationship handler knows this node handler
-			final XMLNodeHandler nodeHandler = new CBDNodeHandler(writer, relationshipHandler);
-			final XMLNodeHandler startNodeHandler = new CBDStartNodeHandler(writer, relationshipHandler);
+			new CBDNodeHandler(relationshipHandler);
+			final XMLNodeHandler startNodeHandler = new CBDStartNodeHandler(relationshipHandler);
 
 			// iterate over the records
 			while (recordNodesIter.hasNext()) {
@@ -255,8 +253,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 				XMLStreamWriterUtils.writeXMLElementTag(writer, recordTagURI, namespacesPrefixesMap);
 				// TODO: shall we cut the last character?
 				// TODO: shall we write the default namespace?
-				//writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
-				final String prefix = XMLStreamWriterUtils.getPrefix(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+				// writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0,
+				// recordTagURI.getNamespaceURI().length() - 1));
+				final String prefix = XMLStreamWriterUtils.getPrefix(
+						recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
 				writer.writeNamespace(prefix, recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
 
 				startNodeHandler.handleNode(recordNode);
@@ -313,12 +313,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private class CBDNodeHandler implements XMLNodeHandler {
 
-		private final XMLStreamWriter			writer;
 		private final XMLRelationshipHandler	relationshipHandler;
 
-		protected CBDNodeHandler(final XMLStreamWriter writerArg, final XMLRelationshipHandler relationshipHandlerArg) {
+		protected CBDNodeHandler(final XMLRelationshipHandler relationshipHandlerArg) {
 
-			writer = writerArg;
 			relationshipHandler = relationshipHandlerArg;
 			((CBDRelationshipHandler) relationshipHandler).setNodeHandler(this);
 		}
@@ -333,8 +331,6 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
-				boolean containsOnlyXMLAttributes = true;
-
 				for (final Relationship relationship : relationships) {
 
 					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
@@ -351,36 +347,17 @@ public class PropertyGraphXMLReader implements XMLReader {
 						// TODO: remove this later, when every stmt is versioned
 						relationshipHandler.handleRelationship(relationship);
 					}
-
-					if (!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
-
-						containsOnlyXMLAttributes = false;
-					}
 				}
-
-				// close element here (?) - however, then we need to know whether it was a branch with elements or not
-				if (!containsOnlyXMLAttributes) {
-
-					// close inner XML tag
-					//writer.writeEndElement();
-				}
-
-				// try to pop something from the stack
-				// TODO: do we really need the stack?
-				((CBDRelationshipHandler) relationshipHandler).popRecordBNodeStack();
-				//((CBDRelationshipHandler) relationshipHandler).reset();
 			}
 		}
 	}
 
 	private class CBDStartNodeHandler implements XMLNodeHandler {
 
-		private final XMLStreamWriter			writer;
 		private final XMLRelationshipHandler	relationshipHandler;
 
-		protected CBDStartNodeHandler(final XMLStreamWriter writerArg, final XMLRelationshipHandler relationshipHandlerArg) {
+		protected CBDStartNodeHandler(final XMLRelationshipHandler relationshipHandlerArg) {
 
-			writer = writerArg;
 			relationshipHandler = relationshipHandlerArg;
 		}
 
@@ -394,8 +371,6 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
-				boolean containsOnlyXMLAttributes = true;
-
 				for (final Relationship relationship : relationships) {
 
 					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
@@ -412,41 +387,17 @@ public class PropertyGraphXMLReader implements XMLReader {
 						// TODO: remove this later, when every stmt is versioned
 						relationshipHandler.handleRelationship(relationship);
 					}
-
-					if (!((CBDRelationshipHandler) relationshipHandler).predicateIsXMLAttribute()) {
-
-						containsOnlyXMLAttributes = false;
-					}
 				}
-
-				// close element here (?) - however, then we need to know whether it was a branch with elements or not
-				if (!containsOnlyXMLAttributes) {
-
-					// close inner XML tag
-					//writer.writeEndElement();
-				}
-
-				// try to pop something from the stack
-				// TODO: do we really need the stack?
-				((CBDRelationshipHandler) relationshipHandler).popRecordBNodeStack();
-				//((CBDRelationshipHandler) relationshipHandler).reset();
 			}
 		}
 	}
 
 	private class CBDRelationshipHandler implements XMLRelationshipHandler {
 
-		private final PropertyGraphGDMReader		propertyGraphGDMReader		= new PropertyGraphGDMReader();
+		private final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
 
-		private final XMLStreamWriter				writer;
-		private XMLNodeHandler						nodeHandler;
-		private Statement							previousStatement			= null;
-		private Statement							currentStatement			= null;
-
-		private boolean								predicateIsXMLAttribute		= false;
-		private boolean								predicateIsSpecialPredicate	= false;
-
-		private Stack<org.dswarm.graph.json.Node>	recordBNodeStack			= new Stack<>();
+		private final XMLStreamWriter			writer;
+		private XMLNodeHandler					nodeHandler;
 
 		protected CBDRelationshipHandler(final XMLStreamWriter writerArg) {
 
@@ -456,32 +407,6 @@ public class PropertyGraphXMLReader implements XMLReader {
 		protected void setNodeHandler(final XMLNodeHandler nodeHandlerArg) {
 
 			nodeHandler = nodeHandlerArg;
-		}
-
-		public void popRecordBNodeStack() {
-
-			if (!recordBNodeStack.empty()) {
-
-				recordBNodeStack.pop();
-			}
-		}
-
-		public boolean predicateIsXMLAttribute() {
-
-			return predicateIsXMLAttribute;
-		}
-
-		public boolean predicateIsSpecialPredicate() {
-
-			return predicateIsSpecialPredicate;
-		}
-
-		public void reset() {
-
-			previousStatement = null;
-			currentStatement = null;
-			predicateIsXMLAttribute = false;
-			predicateIsSpecialPredicate = false;
 		}
 
 		@Override
@@ -512,77 +437,35 @@ public class PropertyGraphXMLReader implements XMLReader {
 				final Node objectNode = rel.getEndNode();
 				final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(objectNode);
 
-				currentStatement = new Statement(subjectGDMNode, predicateTuple.v1(), objectGDMNode);
-
 				if (!(RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString))
 						&& NodeType.Literal.equals(objectGDMNode.getType())) {
 
 					// predicate is an XML Attribute => write XML Attribute to this XML Element
-					predicateIsXMLAttribute = true;
 
 					XMLStreamWriterUtils.writeXMLAttribute(writer, predicateURI, ((LiteralNode) objectGDMNode).getValue(), namespacesPrefixesMap);
 				} else if (RDF.value.getURI().equals(predicateString) && NodeType.Literal.equals(objectGDMNode.getType())) {
 
 					// predicate is an XML Element
-
-					// TODO: maybe we should compare with subject from stack, i.e., this might not always be the direct
-					// predecessor
-					final boolean subjectsAreEqual = previousStatement != null
-							&& previousStatement.getSubject().equals(currentStatement.getSubject());
-
-					// TODO: disabled for now, this is not working as expected
-//					if (subjectsAreEqual) {
-//
-//					// close previous
-//
-//					// TODO: how do we reopen a tag with the same name, e.g. a list of items (=> i.e. we need to stack the
-//					// predicates somehow, because at this point we only have rdf:value as predicate available)
-//
-//					writer.writeEndElement();
-//					} else {
-//
-//					if(!recordBNodeStack.empty()) {
-//
-//					// TODO: how to determine the right place, when one should close a bnode
-//					}
-//					}
-
 					// TODO: what should we do with objects that are resources?
 					writer.writeCData(((LiteralNode) objectGDMNode).getValue());
-					// note: tag will be closed, when bnode processing was finished
-					//writer.writeEndElement();
-
-				} else if (RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString)) {
-
-					predicateIsSpecialPredicate = true;
 				} else {
 
 					// ???
 				}
 
 				//
-				// // index should never be null (when resource was written as GDM JSON)
-				// final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
-				//
-				// if (index != null) {
-				//
-				// currentResourceStatements.put(index, statement);
-				// } else {
-				//
-				// // note maybe improve this here (however, this is the case for model that where written from RDF)
-				//
-				// currentResource.addStatement(statement);
-				// }
+				// index should never be null (when resource was written as GDM JSON)
+				final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
 
-				previousStatement = currentStatement;
-				currentStatement = null;
+				if (index != null) {
+
+					System.out.println("predicate = '" + predicateURI.getLocalName() + "' :: index = '" + index + "'");
+				}
 
 				// note: we can only iterate deeper into one direction, i.e., we need to cut the stream, when the object is
 				// another resource => i.e. we iterate only when object are bnodes
 				// TODO: what should we do with objects that are resources?
 				if (objectGDMNode.getType().equals(NodeType.BNode)) {
-
-					recordBNodeStack.push(objectGDMNode);
 
 					// open tag
 					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap);

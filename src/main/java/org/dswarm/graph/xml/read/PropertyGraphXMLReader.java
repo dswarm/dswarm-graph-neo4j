@@ -362,7 +362,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				if (!containsOnlyXMLAttributes) {
 
 					// close inner XML tag
-					writer.writeEndElement();
+					//writer.writeEndElement();
 				}
 
 				// try to pop something from the stack
@@ -423,7 +423,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				if (!containsOnlyXMLAttributes) {
 
 					// close inner XML tag
-					writer.writeEndElement();
+					//writer.writeEndElement();
 				}
 
 				// try to pop something from the stack
@@ -549,7 +549,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 					// TODO: what should we do with objects that are resources?
 					writer.writeCData(((LiteralNode) objectGDMNode).getValue());
-					writer.writeEndElement();
+					// note: tag will be closed, when bnode processing was finished
+					//writer.writeEndElement();
 
 				} else if (RDF.type.getURI().equals(predicateString) || RDF.value.getURI().equals(predicateString)) {
 
@@ -588,6 +589,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());
+
+					// close
+					writer.writeEndElement();
 				}
 			}
 		}

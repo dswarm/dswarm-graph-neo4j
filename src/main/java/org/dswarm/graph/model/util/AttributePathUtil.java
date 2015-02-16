@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.model.Attribute;
 import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.ContentSchema;
-import org.dswarm.graph.model.DMPStatics;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

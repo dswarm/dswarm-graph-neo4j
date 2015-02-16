@@ -36,6 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.delta.Changeset;
@@ -55,7 +56,6 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.delta.match.model.util.CSEntityUtil;
-import org.dswarm.graph.model.DMPStatics;
 import org.dswarm.graph.model.util.AttributePathUtil;
 import org.dswarm.graph.delta.util.ChangesetUtil;
 import org.dswarm.graph.delta.util.GraphDBUtil;

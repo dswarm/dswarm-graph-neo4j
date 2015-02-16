@@ -37,9 +37,10 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+
+import org.dswarm.common.DMPStatics;
 import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.model.DMPStatics;
 import org.dswarm.graph.rdf.DataModelRDFNeo4jProcessor;
 import org.dswarm.graph.rdf.RDFNeo4jProcessor;
 import org.dswarm.graph.rdf.SimpleRDFNeo4jProcessor;

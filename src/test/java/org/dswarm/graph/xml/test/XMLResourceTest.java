@@ -21,8 +21,8 @@ import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.util.Util;
-import org.dswarm.graph.model.DMPStatics;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 

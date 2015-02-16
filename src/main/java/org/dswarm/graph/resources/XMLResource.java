@@ -32,9 +32,9 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.model.AttributePath;
-import org.dswarm.graph.model.DMPStatics;
 import org.dswarm.graph.model.util.AttributePathUtil;
 import org.dswarm.graph.xml.read.PropertyGraphXMLReader;
 import org.dswarm.graph.xml.read.XMLReader;

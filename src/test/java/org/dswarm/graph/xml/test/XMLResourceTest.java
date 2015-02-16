@@ -26,6 +26,7 @@ import org.dswarm.graph.model.DMPStatics;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
+import com.google.common.base.Charsets;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -66,12 +67,12 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.of(recordTag), Optional.<Integer>absent());
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.of(recordTag), Optional.<Integer>absent(), "test-pnx.xml");
 
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
 
-	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath, final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion) throws IOException {
+	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath, final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion, final String expectedFileName) throws IOException {
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -102,11 +103,17 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 				.post(ClientResponse.class, requestJsonString);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
+		Assert.assertEquals(MediaType.APPLICATION_XML_TYPE, response.getType());
 
-		final String body = response.getEntity(String.class);
+		final String actualXML = response.getEntity(String.class);
 
-		// TODO: compare result with expected result
-		System.out.println("result = '" + body + "'");
+		Assert.assertNotNull(actualXML);
+
+		// compare result with expected result
+		final URL expectedFileURL = Resources.getResource(expectedFileName);
+		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
+
+		Assert.assertEquals(expectedXML, actualXML);
 	}
 
 	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {

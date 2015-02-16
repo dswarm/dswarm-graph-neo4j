@@ -10,6 +10,7 @@ package org.dswarm.graph.xml.read;
 
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -46,6 +47,8 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.lambdaj.Lambda;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -331,7 +334,17 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
-				for (final Relationship relationship : relationships) {
+				if(relationships == null || !relationships.iterator().hasNext()) {
+
+					return;
+				}
+
+				// sort rels by index value
+				// TODO: what should we do, if index is null (currently, the case for import via RDF)
+				final List<Relationship> sortedRels = Lambda.sort(relationships,
+						Lambda.on(Relationship.class).getProperty(GraphStatics.INDEX_PROPERTY));
+
+				for (final Relationship relationship : sortedRels) {
 
 					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
 					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
@@ -371,7 +384,17 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
-				for (final Relationship relationship : relationships) {
+				if(relationships == null || !relationships.iterator().hasNext()) {
+
+					return;
+				}
+
+				// sort rels by index value
+				// TODO: what should we do, if index is null (currently, the case for import via RDF)
+				final List<Relationship> sortedRels = Lambda.sort(relationships,
+						Lambda.on(Relationship.class).getProperty(GraphStatics.INDEX_PROPERTY));
+
+				for (final Relationship relationship : sortedRels) {
 
 					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
 					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
@@ -428,7 +451,6 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// predicate => XML element or XML attribute
 
 				final String predicateString = rel.getType().name();
-				// final URI uriPredicate = URI.create(predicate);
 				final Tuple<Predicate, URI> predicateTuple = getPredicate(predicateString);
 				final URI predicateURI = predicateTuple.v2();
 
@@ -446,20 +468,12 @@ public class PropertyGraphXMLReader implements XMLReader {
 				} else if (RDF.value.getURI().equals(predicateString) && NodeType.Literal.equals(objectGDMNode.getType())) {
 
 					// predicate is an XML Element
+
 					// TODO: what should we do with objects that are resources?
 					writer.writeCData(((LiteralNode) objectGDMNode).getValue());
 				} else {
 
-					// ???
-				}
-
-				//
-				// index should never be null (when resource was written as GDM JSON)
-				final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
-
-				if (index != null) {
-
-					System.out.println("predicate = '" + predicateURI.getLocalName() + "' :: index = '" + index + "'");
+					// ??? - log these occurrences?
 				}
 
 				// note: we can only iterate deeper into one direction, i.e., we need to cut the stream, when the object is

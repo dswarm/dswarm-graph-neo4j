@@ -81,27 +81,29 @@ public class PropertyGraphXMLReader implements XMLReader {
 	}
 
 	private final String								dataModelUri;
-	private final String								recordClassURI;
-	private final URI									recordTagURI;
-	private final Optional<AttributePath>				optionalRootAttributePath;
+	private final String                  recordClassURIString;
+	private final URI recordClassURI;
+	private final URI                     recordTagURI;
+	private final Optional<AttributePath> optionalRootAttributePath;
 
-	private final Map<String, Tuple<Predicate, URI>>	predicates				= new HashMap<>();
-	private final Map<String, String>					namespacesPrefixesMap	= new HashMap<>();
+	private final Map<String, Tuple<Predicate, URI>> predicates            = new HashMap<>();
+	private final Map<String, String>                namespacesPrefixesMap = new HashMap<>();
 
-	private final GraphDatabaseService					database;
+	private final GraphDatabaseService database;
 
-	private long										recordCount				= 0;
+	private long recordCount = 0;
 
-	private Integer										version;
+	private Integer version;
 
-	private Transaction									tx						= null;
+	private Transaction tx = null;
 
 	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
 			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final GraphDatabaseService databaseArg)
 			throws DMPGraphException {
 
 		optionalRootAttributePath = optionalRootAttributePathArg;
-		recordClassURI = recordClassUriArg;
+		recordClassURIString = recordClassUriArg;
+		recordClassURI = new URI(recordClassURIString);
 
 		if (optionalRecordTagArg.isPresent()) {
 
@@ -168,7 +170,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		try {
 
-			final Label recordClassLabel = DynamicLabel.label(recordClassURI);
+			final Label recordClassLabel = DynamicLabel.label(recordClassURIString);
 
 			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
@@ -239,7 +241,18 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// set default namespace
 
 				// TODO: shall we cut the last character?
-				writer.setDefaultNamespace(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
+
+				final String defaultNameSpace;
+
+				if(recordTagURI.hasNamespaceURI()) {
+
+					defaultNameSpace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
+				} else {
+
+					defaultNameSpace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() -1);
+				}
+
+				writer.setDefaultNamespace(defaultNameSpace);
 			}
 
 			final XMLRelationshipHandler relationshipHandler = new CBDRelationshipHandler(writer);
@@ -260,15 +273,36 @@ public class PropertyGraphXMLReader implements XMLReader {
 					continue;
 				}
 
+				final String prefix;
+				final String namespace;
+				final String finalRecordTagURIString;
+
+				if(recordTagURI.hasNamespaceURI()) {
+
+					prefix = XMLStreamWriterUtils.getPrefix(
+							recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+					namespace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
+
+					finalRecordTagURIString = recordTagURI.getNamespaceURI() + recordTagURI.getLocalName();
+				} else {
+
+					prefix = XMLStreamWriterUtils.getPrefix(
+							recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
+					namespace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+
+					finalRecordTagURIString = recordClassURI.getNamespaceURI() + recordTagURI.getLocalName();
+				}
+
+				final URI finalRecordTagURI = new URI(finalRecordTagURIString);
+
 				// open record XML tag
-				XMLStreamWriterUtils.writeXMLElementTag(writer, recordTagURI, namespacesPrefixesMap);
+				XMLStreamWriterUtils.writeXMLElementTag(writer, finalRecordTagURI, namespacesPrefixesMap);
 				// TODO: shall we cut the last character?
 				// TODO: shall we write the default namespace?
 				// writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0,
 				// recordTagURI.getNamespaceURI().length() - 1));
-				final String prefix = XMLStreamWriterUtils.getPrefix(
-						recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
-				writer.writeNamespace(prefix, recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1));
+
+				writer.writeNamespace(prefix, namespace);
 
 				startNodeHandler.handleNode(recordNode);
 				// close record

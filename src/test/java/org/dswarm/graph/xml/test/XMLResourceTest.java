@@ -40,6 +40,9 @@ import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
 
 /**
  * @author tgaengler
@@ -113,7 +116,11 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		final URL expectedFileURL = Resources.getResource(expectedFileName);
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
-		Assert.assertEquals(expectedXML, actualXML);
+		// do comparison: check for XML similarity
+		final Diff xmlDiff = DiffBuilder.compare(Input.fromMemory(expectedXML))
+				.withTest(Input.fromMemory(actualXML)).checkForSimilar().build();
+
+		Assert.assertFalse(xmlDiff.hasDifferences());
 	}
 
 	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {

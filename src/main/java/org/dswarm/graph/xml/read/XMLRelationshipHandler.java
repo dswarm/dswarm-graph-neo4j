@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.xml.read;
 
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Label;
+import javax.xml.stream.XMLStreamException;
+
+import org.dswarm.graph.DMPGraphException;
+
+import org.neo4j.graphdb.Relationship;
 
 /**
- * Holds references for static fields.
- * 
  * @author tgaengler
  */
-public interface DMPStatics {
+public interface XMLRelationshipHandler {
 
-	public static final Label LEAF_LABEL = DynamicLabel.label("__LEAF__");
+	public void handleRelationship(Relationship rel) throws DMPGraphException, XMLStreamException;
 }

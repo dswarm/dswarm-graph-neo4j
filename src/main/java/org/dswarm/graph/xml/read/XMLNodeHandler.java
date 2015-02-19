@@ -14,56 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.xml.read;
+
+import javax.xml.stream.XMLStreamException;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.read.RelationshipHandler;
+
+import org.neo4j.graphdb.Node;
 
 /**
- * Created by tgaengler on 29/07/14.
+ *
+ * @author tgaengler
+ *
  */
-public class Attribute {
+public interface XMLNodeHandler {
 
-	private final String	uri;
-
-	public Attribute(final String uriArg) {
-
-		uri = uriArg;
-	}
-
-	public String getUri() {
-
-		return uri;
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-
-		if (this == o) {
-
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-
-			return false;
-		}
-
-		final Attribute attribute = (Attribute) o;
-
-		if (!uri.equals(attribute.uri)) {
-
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-
-		return uri.hashCode();
-	}
-
-	@Override
-	public String toString() {
-
-		return uri;
-	}
+	public void handleNode(Node node) throws DMPGraphException, XMLStreamException;
 }

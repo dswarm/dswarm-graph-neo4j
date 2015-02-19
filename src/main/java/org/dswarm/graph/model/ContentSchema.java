@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.model;
 
 import java.util.LinkedList;
 
-import org.dswarm.graph.delta.deserializer.ContentSchemaDeserializer;
+import org.dswarm.graph.model.deserializer.ContentSchemaDeserializer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -30,13 +30,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public class ContentSchema {
 
 	@JsonProperty("record_identifier_attribute_path")
-	private final AttributePath				recordIdentifierAttributePath;
+	private final AttributePath recordIdentifierAttributePath;
 
 	@JsonProperty("key_attribute_paths")
-	private final LinkedList<AttributePath>	keyAttributePaths;
+	private final LinkedList<AttributePath> keyAttributePaths;
 
 	@JsonProperty("value_attribute_path")
-	private final AttributePath				valueAttributePath;
+	private final AttributePath valueAttributePath;
 
 	public ContentSchema(final AttributePath recordIdentifierAttributePathArg, final LinkedList<AttributePath> keyAttributePathsArg,
 			final AttributePath valueAttributePathArg) {

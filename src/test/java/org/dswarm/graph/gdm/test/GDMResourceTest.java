@@ -22,12 +22,11 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import junit.framework.Assert;
-
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

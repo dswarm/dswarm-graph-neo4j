@@ -37,6 +37,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+
+import org.dswarm.common.DMPStatics;
 import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.rdf.DataModelRDFNeo4jProcessor;
@@ -305,8 +307,8 @@ public class RDFResource {
 			throw new DMPGraphException(message, e);
 		}
 
-		final String recordClassUri = json.get("record_class_uri").asText();
-		final String dataModelUri = json.get("data_model_uri").asText();
+		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
+		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 
 		LOG.debug("try to read RDF statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' from graph db");

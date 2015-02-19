@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.xml.test;
 
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Label;
+import org.dswarm.graph.test.Neo4jEmbeddedDBWrapper;
 
 /**
- * Holds references for static fields.
- * 
+ *
  * @author tgaengler
+ *
  */
-public interface DMPStatics {
+public class XMLResourceOnEmbeddedDBTest extends XMLResourceTest {
 
-	public static final Label LEAF_LABEL = DynamicLabel.label("__LEAF__");
+	public XMLResourceOnEmbeddedDBTest() {
+
+		super(new Neo4jEmbeddedDBWrapper("/ext"), "embedded");
+	}
 }

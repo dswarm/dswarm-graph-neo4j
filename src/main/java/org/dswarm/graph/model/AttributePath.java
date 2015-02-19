@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
+package org.dswarm.graph.model;
 
-import org.dswarm.graph.delta.util.AttributePathUtil;
+import org.dswarm.graph.model.util.AttributePathUtil;
 
 import java.util.LinkedList;
 

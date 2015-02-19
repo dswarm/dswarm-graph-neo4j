@@ -18,7 +18,7 @@ package org.dswarm.graph.delta.evaluator;
 
 import java.util.LinkedList;
 
-import org.dswarm.graph.delta.Attribute;
+import org.dswarm.graph.model.Attribute;
 import org.dswarm.graph.delta.util.PathPrinter;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Path;

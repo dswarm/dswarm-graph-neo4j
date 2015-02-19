@@ -14,17 +14,56 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.delta;
-
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Label;
+package org.dswarm.graph.model;
 
 /**
- * Holds references for static fields.
- * 
- * @author tgaengler
+ * Created by tgaengler on 29/07/14.
  */
-public interface DMPStatics {
+public class Attribute {
 
-	public static final Label LEAF_LABEL = DynamicLabel.label("__LEAF__");
+	private final String	uri;
+
+	public Attribute(final String uriArg) {
+
+		uri = uriArg;
+	}
+
+	public String getUri() {
+
+		return uri;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+
+		if (this == o) {
+
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+
+			return false;
+		}
+
+		final Attribute attribute = (Attribute) o;
+
+		if (!uri.equals(attribute.uri)) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+
+		return uri.hashCode();
+	}
+
+	@Override
+	public String toString() {
+
+		return uri;
+	}
 }

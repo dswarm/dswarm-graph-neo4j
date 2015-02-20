@@ -22,6 +22,14 @@
  * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
  * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.xml.read;
 
 import java.io.OutputStream;
@@ -69,6 +77,7 @@ import ch.lambdaj.Lambda;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
@@ -202,6 +211,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 				return Optional.absent();
 			}
 
+			final int recordsSize = Iterables.size(recordNodes);
+
 			recordNodesIter = recordNodes.iterator();
 
 			if (recordNodesIter == null) {
@@ -251,25 +262,18 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI, namespacesPrefixesMap, nameMap);
 				}
+			} else if (recordsSize > 1) {
+
+				// write default root
+				final URI defaultRootURI = new URI(recordTagURI.toString() + "s");
+
+				determineAndWriteXMLElementAndNamespace(defaultRootURI, writer);
 			}
 
 			if (!defaultNamespaceWritten && recordTagURI.hasNamespaceURI()) {
 
 				// set default namespace
-
-				// TODO: shall we cut the last character?
-
-				final String defaultNameSpace;
-
-				if (recordTagURI.hasNamespaceURI()) {
-
-					defaultNameSpace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
-				} else {
-
-					defaultNameSpace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
-				}
-
-				writer.setDefaultNamespace(defaultNameSpace);
+				setDefaultNamespace(writer);
 			}
 
 			final XMLRelationshipHandler relationshipHandler;
@@ -299,36 +303,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 					continue;
 				}
 
-				final String prefix;
-				final String namespace;
-				final String finalRecordTagURIString;
-
-				if (recordTagURI.hasNamespaceURI()) {
-
-					prefix = XMLStreamWriterUtils.getPrefix(recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1),
-							namespacesPrefixesMap);
-					namespace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
-
-					finalRecordTagURIString = recordTagURI.getNamespaceURI() + recordTagURI.getLocalName();
-				} else {
-
-					prefix = XMLStreamWriterUtils.getPrefix(
-							recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1), namespacesPrefixesMap);
-					namespace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
-
-					finalRecordTagURIString = recordClassURI.getNamespaceURI() + recordTagURI.getLocalName();
-				}
-
-				final URI finalRecordTagURI = new URI(finalRecordTagURIString);
-
-				// open record XML tag
-				XMLStreamWriterUtils.writeXMLElementTag(writer, finalRecordTagURI, namespacesPrefixesMap, nameMap);
-				// TODO: shall we cut the last character?
-				// TODO: shall we write the default namespace?
-				// writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0,
-				// recordTagURI.getNamespaceURI().length() - 1));
-
-				writer.writeNamespace(prefix, namespace);
+				determineAndWriteXMLElementAndNamespace(recordTagURI, writer);
 
 				startNodeHandler.handleNode(recordNode);
 				// close record
@@ -350,6 +325,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 					writer.writeEndElement();
 				}
+			} else if (recordsSize > 1) {
+
+				// close default root
+				writer.writeEndElement();
 			}
 
 			// close document
@@ -374,6 +353,63 @@ public class PropertyGraphXMLReader implements XMLReader {
 		}
 
 		return Optional.absent();
+	}
+
+	private void setDefaultNamespace(final XMLStreamWriter writer) throws XMLStreamException {
+
+		// TODO: shall we cut the last character?
+
+		final String defaultNameSpace;
+
+		if (recordTagURI.hasNamespaceURI()) {
+
+			defaultNameSpace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
+		} else {
+
+			defaultNameSpace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+		}
+
+		writer.setDefaultNamespace(defaultNameSpace);
+	}
+
+	private URI determineAndWriteXMLElementAndNamespace(final URI uri, final XMLStreamWriter writer) throws XMLStreamException {
+
+		final String prefix;
+		final String namespace;
+		final String finalURIString;
+		final boolean namespaceAlreadySet;
+
+		if (uri.hasNamespaceURI()) {
+
+			namespace = uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1);
+			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
+			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
+
+			finalURIString = uri.getNamespaceURI() + uri.getLocalName();
+		} else {
+
+			namespace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
+			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
+
+			finalURIString = recordClassURI.getNamespaceURI() + uri.getLocalName();
+		}
+
+		final URI finalURI = new URI(finalURIString);
+
+		// open record XML tag
+		XMLStreamWriterUtils.writeXMLElementTag(writer, finalURI, namespacesPrefixesMap, nameMap);
+		// TODO: shall we cut the last character?
+		// TODO: shall we write the default namespace?
+		// writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0,
+		// recordTagURI.getNamespaceURI().length() - 1));
+
+		if (!namespaceAlreadySet) {
+
+			writer.writeNamespace(prefix, namespace);
+		}
+
+		return finalURI;
 	}
 
 	@Override

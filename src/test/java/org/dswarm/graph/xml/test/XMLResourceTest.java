@@ -100,6 +100,22 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		LOG.debug("finished read CSV XML test at " + dbType + " DB");
 	}
 
+	@Test
+	public void readMultipleRecordsCSVXMLFromDB() throws IOException {
+
+		LOG.debug("start read multiple records CSV XML test at " + dbType + " DB");
+
+		final String dataModelURI = "http://data.slub-dresden.de/resources/3";
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/lic_dmp_v1.csv.gson");
+
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
+				Optional.<String>absent(), "lic_dmp_v1.csv.xml");
+
+		LOG.debug("finished read multiple records  CSV XML test at " + dbType + " DB");
+	}
+
 	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath,
 			final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion, final Optional<String> optionalOriginalDataType,
 			final String expectedFileName) throws IOException {

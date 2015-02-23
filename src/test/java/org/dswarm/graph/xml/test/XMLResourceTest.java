@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.xml.test;
 
 import java.io.IOException;
@@ -26,33 +34,33 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
-import com.google.common.base.Charsets;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Diff;
 
 /**
  * @author tgaengler
  */
 public abstract class XMLResourceTest extends BasicResourceTest {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(XMLResourceTest.class);
+	private static final Logger	LOG						= LoggerFactory.getLogger(XMLResourceTest.class);
 
 	// we need PNX gson
-	private static final String DEFAULT_GDM_FILE_NAME = "test-pnx.gson";
+	private static final String	DEFAULT_GDM_FILE_NAME	= "test-pnx.gson";
 
 	public XMLResourceTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -62,7 +70,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 	@Test
 	public void readPNXXMLFromDB() throws IOException {
 
-		LOG.debug("start read test for GDM resource at " + dbType + " DB");
+		LOG.debug("start read PNX XML test at " + dbType + " DB");
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
 		final String recordClassURI = "http://www.exlibrisgroup.com/xsd/primo/primo_nm_bib#recordType";
@@ -70,12 +78,31 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.of(recordTag), Optional.<Integer>absent(), "test-pnx.xml");
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.of(recordTag), Optional.<Integer> absent(),
+				Optional.of(DMPStatics.XML_DATA_TYPE), "test-pnx.xml");
 
-		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished read PNX XML test at " + dbType + " DB");
 	}
 
-	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath, final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion, final String expectedFileName) throws IOException {
+	@Test
+	public void readCSVXMLFromDB() throws IOException {
+
+		LOG.debug("start read CSV XML test at " + dbType + " DB");
+
+		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson");
+
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
+				Optional.<String>absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
+
+		LOG.debug("finished read CSV XML test at " + dbType + " DB");
+	}
+
+	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath,
+			final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion, final Optional<String> optionalOriginalDataType,
+			final String expectedFileName) throws IOException {
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -84,19 +111,24 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		requestJson.put(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, recordClassURI);
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 
-		if(optionalRootAttributePath.isPresent()) {
+		if (optionalRootAttributePath.isPresent()) {
 
 			requestJson.put(DMPStatics.ROOT_ATTRIBUTE_PATH_IDENTIFIER, optionalRootAttributePath.get());
 		}
 
-		if(optionalRecordTag.isPresent()) {
+		if (optionalRecordTag.isPresent()) {
 
 			requestJson.put(DMPStatics.RECORD_TAG_IDENTIFIER, optionalRecordTag.get());
 		}
 
-		if(optionalVersion.isPresent()) {
+		if (optionalVersion.isPresent()) {
 
 			requestJson.put(DMPStatics.VERSION_IDENTIFIER, optionalVersion.get());
+		}
+
+		if (optionalOriginalDataType.isPresent()) {
+
+			requestJson.put(DMPStatics.ORIGINAL_DATA_TYPE_IDENTIFIER, optionalOriginalDataType.get());
 		}
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
@@ -117,8 +149,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
 		// do comparison: check for XML similarity
-		final Diff xmlDiff = DiffBuilder.compare(Input.fromMemory(expectedXML))
-				.withTest(Input.fromMemory(actualXML)).checkForSimilar().build();
+		final Diff xmlDiff = DiffBuilder.compare(Input.fromMemory(expectedXML)).withTest(Input.fromMemory(actualXML)).checkForSimilar().build();
 
 		Assert.assertFalse(xmlDiff.hasDifferences());
 	}

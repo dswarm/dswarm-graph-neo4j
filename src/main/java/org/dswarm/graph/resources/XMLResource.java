@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.resources;
 
 import java.io.IOException;
@@ -49,20 +57,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
 
 /**
- * TODO: refactor the design of the resources. this is not RESTy atm, i.e., there should be one pattern how the receive a certain data model from this unmanaged extension and depending on the Accept-Type of the request the result will be in this format (media type), i.e., "gdm", various RDF serialisation, XML, or whatever ...
- * => i.e., we don't need separate resources (endpoints) for certain descriptions (abstract formats) or representations (concrete formats, mediatypes, serialisations)
+ * TODO: refactor the design of the resources. this is not RESTy atm, i.e., there should be one pattern how the receive a certain
+ * data model from this unmanaged extension and depending on the Accept-Type of the request the result will be in this format
+ * (media type), i.e., "gdm", various RDF serialisation, XML, or whatever ... => i.e., we don't need separate resources
+ * (endpoints) for certain descriptions (abstract formats) or representations (concrete formats, mediatypes, serialisations)
  *
  * @author tgaengler
  */
 @Path("/xml")
 public class XMLResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(XMLResource.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(XMLResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper objectMapper;
+	private final ObjectMapper	objectMapper;
 
 	public XMLResource() {
 
@@ -103,8 +113,8 @@ public class XMLResource {
 		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
 		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 		final JsonNode rootAttributePathNode = json.get(DMPStatics.ROOT_ATTRIBUTE_PATH_IDENTIFIER);
-		final Optional<AttributePath> optionalRootAttributePath = Optional
-				.fromNullable(AttributePathUtil.parseAttributePathNode(rootAttributePathNode));
+		final Optional<AttributePath> optionalRootAttributePath = Optional.fromNullable(AttributePathUtil
+				.parseAttributePathNode(rootAttributePathNode));
 
 		final Optional<String> optionalRecordTag;
 
@@ -129,11 +139,30 @@ public class XMLResource {
 			version = null;
 		}
 
-		LOG.debug("try to read XML records for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+		final Optional<JsonNode> optionalOriginalDataTypeNode = Optional.fromNullable(json.get(DMPStatics.ORIGINAL_DATA_TYPE_IDENTIFIER));
+
+		final Optional<String> optionalOriginalDataType;
+
+		if (optionalOriginalDataTypeNode.isPresent()) {
+
+			final Optional<String> optionalOriginalDataTypeFromJSON = Optional.fromNullable(optionalOriginalDataTypeNode.get().asText());
+
+			if (optionalOriginalDataTypeFromJSON.isPresent()) {
+
+				optionalOriginalDataType = optionalOriginalDataTypeFromJSON;
+			} else {
+
+				optionalOriginalDataType = Optional.absent();
+			}
+		} else {
+
+			optionalOriginalDataType = Optional.absent();
+		}
+
+		LOG.debug("try to read XML records for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' from graph db");
 
 		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
-				database);
+				optionalOriginalDataType, database);
 		final StreamingOutput stream = new StreamingOutput() {
 
 			@Override
@@ -142,7 +171,7 @@ public class XMLResource {
 				try {
 					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(os);
 
-					if(optionalWriter.isPresent()) {
+					if (optionalWriter.isPresent()) {
 
 						optionalWriter.get().flush();
 						optionalWriter.get().close();
@@ -154,9 +183,8 @@ public class XMLResource {
 			}
 		};
 
-		LOG.debug(
-				"finished reading '" + xmlReader.recordCount() + "' XML records for data model uri = '" + dataModelUri + "' and record class uri = '"
-						+ recordClassUri + "' from graph db");
+		LOG.debug("finished reading '" + xmlReader.recordCount() + "' XML records for data model uri = '" + dataModelUri
+				+ "' and record class uri = '" + recordClassUri + "' from graph db");
 
 		return Response.ok(stream, MediaType.APPLICATION_XML_TYPE).build();
 	}

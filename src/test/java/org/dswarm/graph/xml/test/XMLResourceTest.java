@@ -165,7 +165,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
 		// do comparison: check for XML similarity
-		final Diff xmlDiff = DiffBuilder.compare(Input.fromMemory(expectedXML)).withTest(Input.fromMemory(actualXML)).checkForSimilar().build();
+		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromString(actualXML)).checkForSimilar().build();
 
 		Assert.assertFalse(xmlDiff.hasDifferences());
 	}

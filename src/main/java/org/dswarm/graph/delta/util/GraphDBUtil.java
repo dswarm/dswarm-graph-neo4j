@@ -1133,6 +1133,8 @@ public final class GraphDBUtil {
 
 				sb.append("()");
 			}
+
+			i++;
 		}
 
 		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\no.")
@@ -1163,6 +1165,8 @@ public final class GraphDBUtil {
 
 				sb.append("()");
 			}
+
+			i++;
 		}
 
 		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")

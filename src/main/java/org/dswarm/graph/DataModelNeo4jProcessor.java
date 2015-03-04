@@ -112,7 +112,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 			addNodeToResourcesWDataModelIndex(URI, this.dataModelURI, node);
 		} else {
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI);
+			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
 			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
 		}
 	}

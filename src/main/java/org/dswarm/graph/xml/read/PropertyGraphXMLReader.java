@@ -363,10 +363,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		if (recordTagURI.hasNamespaceURI()) {
 
-			defaultNameSpace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
+			defaultNameSpace = XMLStreamWriterUtils.determineBaseURI(recordTagURI);
 		} else {
 
-			defaultNameSpace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+			defaultNameSpace = XMLStreamWriterUtils.determineBaseURI(recordClassURI);
 		}
 
 		writer.setDefaultNamespace(defaultNameSpace);
@@ -381,14 +381,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		if (uri.hasNamespaceURI()) {
 
-			namespace = uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1);
+			namespace = XMLStreamWriterUtils.determineBaseURI(uri);
 			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
 			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
 
 			finalURIString = uri.getNamespaceURI() + uri.getLocalName();
 		} else {
 
-			namespace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+			namespace = XMLStreamWriterUtils.determineBaseURI(recordClassURI);
 			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
 			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
 

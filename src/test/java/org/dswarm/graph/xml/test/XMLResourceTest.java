@@ -1,18 +1,18 @@
 /**
- * This file is part of d:swarm graph extension.
- *
- * d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * d:swarm graph extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
 /**
  * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
@@ -95,7 +95,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal(dataModelURI, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson");
 
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String>absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
+				Optional.<String> absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
 
 		LOG.debug("finished read CSV XML test at " + dbType + " DB");
 	}
@@ -111,9 +111,25 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal(dataModelURI, "versioning/lic_dmp_v1.csv.gson");
 
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String>absent(), "lic_dmp_v1.csv.xml");
+				Optional.<String> absent(), "lic_dmp_v1.csv.xml");
 
 		LOG.debug("finished read multiple records  CSV XML test at " + dbType + " DB");
+	}
+
+	@Test
+	public void readXMLFromDB() throws IOException {
+
+		LOG.debug("start read test XML test at " + dbType + " DB");
+
+		final String dataModelURI = "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data";
+		final String recordClassURI = "http://purl.org/ontology/bibo/Document";
+
+		writeGDMToDBInternal(dataModelURI, "xml_test.gson");
+
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
+				Optional.<String> absent(), "xml_test.xml");
+
+		LOG.debug("finished read test XML test at " + dbType + " DB");
 	}
 
 	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath,
@@ -165,7 +181,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
 		// do comparison: check for XML similarity
-		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromString(actualXML)).checkForSimilar().build();
+		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromString(actualXML)).ignoreWhitespace()
+				.checkForSimilar().build();
 
 		Assert.assertFalse(xmlDiff.hasDifferences());
 	}

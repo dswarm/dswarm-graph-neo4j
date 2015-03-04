@@ -132,6 +132,22 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		LOG.debug("finished read test XML test at " + dbType + " DB");
 	}
 
+	@Test
+	public void readXML2FromDB() throws IOException {
+
+		LOG.debug("start read test XML 2 test at " + dbType + " DB");
+
+		final String dataModelURI = "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data";
+		final String recordClassURI = "http://purl.org/ontology/bibo/Document";
+
+		writeGDMToDBInternal(dataModelURI, "xml_test2.gson");
+
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
+				Optional.<String> absent(), "xml_test2.xml");
+
+		LOG.debug("finished read test XML test 2 at " + dbType + " DB");
+	}
+
 	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath,
 			final Optional<String> optionalRecordTag, final Optional<Integer> optionalVersion, final Optional<String> optionalOriginalDataType,
 			final String expectedFileName) throws IOException {

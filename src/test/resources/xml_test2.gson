@@ -1,0 +1,62 @@
+[
+  {
+    "http://data.slub-dresden.de/datamodels/7ff0c9d6-6126-59db-98d4-bbd0bd6bd9a5/records/cc4ab0e9-8312-4375-957d-725d744b7591": [
+      {
+        "id": 82,
+        "uuid": "4ec13805-57f4-4215-aea6-9751f801870f",
+        "s": {
+          "id": 81,
+          "uri": "http://data.slub-dresden.de/datamodels/7ff0c9d6-6126-59db-98d4-bbd0bd6bd9a5/records/cc4ab0e9-8312-4375-957d-725d744b7591",
+          "data_model": "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data"
+        },
+        "p": "http://data.slub-dresden.de/schemas/Schema-5664ba0e-ccb3-4b71-8823-13281490de30/id",
+        "o": {
+          "id": 83,
+          "v": "oai:deutschefotothek.de:a8450::obj|71272899|wf_hab_0000000_exlib-berlepsch-17-1-00027"
+        }
+      },
+      {
+        "id": 83,
+        "uuid": "44a8d0a2-fd46-4c5a-8c2d-8cfe239b3143",
+        "s": {
+          "id": 81,
+          "uri": "http://data.slub-dresden.de/datamodels/7ff0c9d6-6126-59db-98d4-bbd0bd6bd9a5/records/cc4ab0e9-8312-4375-957d-725d744b7591",
+          "data_model": "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data"
+        },
+        "p": "http://data.slub-dresden.de/schemas/Schema-222/author",
+        "o": {
+          "id": 84,
+          "v": "unbekannt"
+        }
+      },
+      {
+        "id": 84,
+        "uuid": "575ee393-b7ad-4e08-9b5a-cc2597cd3ce9",
+        "s": {
+          "id": 81,
+          "uri": "http://data.slub-dresden.de/datamodels/7ff0c9d6-6126-59db-98d4-bbd0bd6bd9a5/records/cc4ab0e9-8312-4375-957d-725d744b7591",
+          "data_model": "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data"
+        },
+        "p": "http://data.slub-dresden.de/schemas/Schema-333/title",
+        "o": {
+          "id": 85,
+          "v": "Wappen des Marcus Christoph Gugel"
+        }
+      },
+      {
+        "id": 85,
+        "uuid": "6564ee12-3dcc-4460-9bc9-f78310b31c68",
+        "s": {
+          "id": 81,
+          "uri": "http://data.slub-dresden.de/datamodels/7ff0c9d6-6126-59db-98d4-bbd0bd6bd9a5/records/cc4ab0e9-8312-4375-957d-725d744b7591",
+          "data_model": "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data"
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 86,
+          "uri": "http://purl.org/ontology/bibo/Document"
+        }
+      }
+    ]
+  }
+]

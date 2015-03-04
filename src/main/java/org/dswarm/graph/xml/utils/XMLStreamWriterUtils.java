@@ -37,7 +37,7 @@ public final class XMLStreamWriterUtils {
 	private static final char			DEFAULT_NAME_CHAR		= '-';
 
 	public static void writeXMLElementTag(final XMLStreamWriter writer, final URI uri, final Map<String, String> namespacesPrefixesMap,
-			final Map<String, String> nameMap) throws XMLStreamException {
+			final Map<String, String> nameMap, final boolean isElementOpen) throws XMLStreamException {
 
 		if (uri.hasNamespaceURI()) {
 
@@ -45,12 +45,23 @@ public final class XMLStreamWriterUtils {
 			final boolean containsNamespace = namespacesPrefixesMap.containsKey(baseURI);
 			final String prefix = getPrefix(baseURI, namespacesPrefixesMap);
 
-			if(!containsNamespace) {
+			final boolean namespaceAlreadyWritten;
+
+			if(!containsNamespace && isElementOpen) {
 
 				writer.writeNamespace(prefix, baseURI);
+				namespaceAlreadyWritten = true;
+			} else {
+
+				namespaceAlreadyWritten = false;
 			}
 
 			writer.writeStartElement(prefix, createXMLName(uri, nameMap), baseURI);
+
+			if(!containsNamespace && !namespaceAlreadyWritten) {
+
+				writer.writeNamespace(prefix, baseURI);
+			}
 		} else {
 
 			writer.writeStartElement(createXMLName(uri, nameMap));

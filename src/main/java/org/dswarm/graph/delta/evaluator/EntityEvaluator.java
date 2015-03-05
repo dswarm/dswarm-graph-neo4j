@@ -18,7 +18,7 @@ package org.dswarm.graph.delta.evaluator;
 
 import java.util.LinkedList;
 
-import org.dswarm.graph.model.Attribute;
+import org.dswarm.common.model.Attribute;
 import org.dswarm.graph.delta.util.PathPrinter;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Path;
@@ -32,8 +32,8 @@ import org.neo4j.kernel.Traversal;
  */
 public class EntityEvaluator implements Evaluator {
 
-	final LinkedList<Attribute>	relativeAttributePathAttributes;
-	final int relativeAttributePathSizeAttributePathSize;
+	final LinkedList<Attribute> relativeAttributePathAttributes;
+	final int                   relativeAttributePathSizeAttributePathSize;
 	int currentHierarchy = 1;
 
 	public EntityEvaluator(final LinkedList<Attribute> relativeAttributePathAttributesArg) {

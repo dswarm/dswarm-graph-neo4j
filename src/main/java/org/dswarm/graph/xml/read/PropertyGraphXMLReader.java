@@ -1,4 +1,20 @@
 /**
+ * This file is part of d:swarm graph extension.
+ *
+ * d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * d:swarm graph extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
  * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
@@ -36,6 +52,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.stax2.XMLOutputFactory2;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.Attribute;
+import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
@@ -44,8 +62,6 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.model.Attribute;
-import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
@@ -97,23 +113,23 @@ public class PropertyGraphXMLReader implements XMLReader {
 	private final String								recordClassURIString;
 	private final URI									recordClassURI;
 	private final URI									recordTagURI;
-	private final Optional<AttributePath>				optionalRootAttributePath;
+	private final Optional<AttributePath> optionalRootAttributePath;
 
-	private final Map<String, Tuple<Predicate, URI>>	predicates				= new HashMap<>();
-	private final Map<String, String>					namespacesPrefixesMap	= new HashMap<>();
-	private final Map<String, String>					nameMap					= new HashMap<>();
+	private final Map<String, Tuple<Predicate, URI>> predicates            = new HashMap<>();
+	private final Map<String, String>                namespacesPrefixesMap = new HashMap<>();
+	private final Map<String, String>                nameMap               = new HashMap<>();
 
-	private final GraphDatabaseService					database;
+	private final GraphDatabaseService database;
 
-	private long										recordCount				= 0;
+	private long recordCount = 0;
 
-	private Integer										version;
+	private Integer version;
 
-	private final boolean								originalDataTypeIsXML;
+	private final boolean originalDataTypeIsXML;
 
-	private boolean										isElementOpen			= false;
+	private boolean isElementOpen = false;
 
-	private Transaction									tx						= null;
+	private Transaction tx = null;
 
 	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
 			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<String> optionalOriginalDataType,

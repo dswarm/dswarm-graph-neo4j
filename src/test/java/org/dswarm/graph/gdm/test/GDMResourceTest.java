@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.gdm.test;
 
 import java.io.IOException;
@@ -22,6 +30,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
@@ -35,6 +44,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
@@ -46,9 +56,9 @@ import com.sun.jersey.multipart.MultiPart;
  */
 public abstract class GDMResourceTest extends BasicResourceTest {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResourceTest.class);
+	private static final Logger	LOG						= LoggerFactory.getLogger(GDMResourceTest.class);
 
-	private static final String DEFAULT_GDM_FILE_NAME = "test-mabxml.gson";
+	private static final String	DEFAULT_GDM_FILE_NAME	= "test-mabxml.gson";
 
 	public GDMResourceTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -138,30 +148,14 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeRDFToDBInternal("http://data.slub-dresden.de/resources/1");
+		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
 
-		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		final ObjectNode requestJson = objectMapper.createObjectNode();
+		writeRDFToDBInternal(dataModelURI);
 
-		requestJson.put("record_class_uri", "http://www.openarchives.org/OAI/2.0/recordType");
-		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
+		final String recordClassURI = "http://www.openarchives.org/OAI/2.0/recordType";
+		final int numberOfStatements = 2601;
 
-		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
-
-		// POST the request
-		final ClientResponse response = target().path("/get").type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, requestJsonString);
-
-		Assert.assertEquals("expected 200", 200, response.getStatus());
-
-		final String body = response.getEntity(String.class);
-
-		final org.dswarm.graph.json.Model model = objectMapper.readValue(body, org.dswarm.graph.json.Model.class);
-
-		LOG.debug("read '" + model.size() + "' statements");
-
-		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer> absent());
 
 		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
 	}
@@ -171,14 +165,50 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
-		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
+		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
+
+		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
+
+		final String recordClassURI = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType";
+		final int numberOfStatements = 191;
+
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer> absent());
+
+		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+	}
+
+	@Test
+	public void testAtMostParameter() throws IOException {
+
+		LOG.debug("start at-most parameter test for GDM resource at " + dbType + " DB");
+
+		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
+		final String fileName = "versioning/lic_dmp_v1.csv.gson";
+
+		writeGDMToDBInternal(dataModelURI, fileName);
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+		final int numberOfStatements = 230;
+
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.of(10));
+
+		LOG.debug("finished at-most parameter test for GDM resource at " + dbType + " DB");
+	}
+
+	private void readGDMFromDB(final String recordClassURI, final String dataModelURI, final int numberOfStatements,
+			final Optional<Integer> optionalAtMost) throws IOException {
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 
-		requestJson.put("record_class_uri", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType");
-		requestJson.put("data_model_uri", "http://data.slub-dresden.de/resources/1");
+		requestJson.put(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, recordClassURI);
+		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		if (optionalAtMost.isPresent()) {
+
+			requestJson.put(DMPStatics.AT_MOST_IDENTIFIER, optionalAtMost.get());
+		}
 
 		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
 
@@ -188,15 +218,13 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final String actualResult = response.getEntity(String.class);
 
-		final org.dswarm.graph.json.Model model = objectMapper.readValue(body, org.dswarm.graph.json.Model.class);
+		final org.dswarm.graph.json.Model model = objectMapper.readValue(actualResult, org.dswarm.graph.json.Model.class);
 
 		LOG.debug("read '" + model.size() + "' statements");
 
-		Assert.assertEquals("the number of statements should be 191", 191, model.size());
-
-		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+		Assert.assertEquals("the number of statements should be " + numberOfStatements, numberOfStatements, model.size());
 	}
 
 	private void writeRDFToDBInternal(final String dataModelURI) throws IOException {

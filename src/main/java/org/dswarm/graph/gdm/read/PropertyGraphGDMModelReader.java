@@ -32,6 +32,8 @@ import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
+
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -67,10 +69,11 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
 	private Integer version;
+	private Optional<Integer> optionalAtMost;
 
 	private Transaction tx = null;
 
-	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
+	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<Integer> optionalAtMostArg,
 			final GraphDatabaseService databaseArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
@@ -105,6 +108,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				throw new DMPGraphException(message);
 			}
 		}
+
+		optionalAtMost = optionalAtMostArg;
 	}
 
 	@Override
@@ -169,7 +174,10 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			model = new Model();
 
-			while(recordNodesIter.hasNext()) {
+			int recordCount = 1;
+			boolean limitReached = false;
+
+			while(recordNodesIter.hasNext() && !limitReached) {
 
 				final Node recordNode = recordNodesIter.next();
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
@@ -208,6 +216,13 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				model.addResource(currentResource);
 
 				currentResourceStatements.clear();
+
+				if(optionalAtMost.isPresent() && optionalAtMost.get() == recordCount) {
+
+					limitReached = true;
+				}
+
+				recordCount++;
 			}
 
 			recordNodesIter.close();

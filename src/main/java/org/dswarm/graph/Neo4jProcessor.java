@@ -14,13 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.openhft.chronicle.map.ChronicleMap;
+
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.ChronicleMapUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
 
@@ -39,6 +51,8 @@ import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.LongObjectOpenHashMap;
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
@@ -52,21 +66,22 @@ public abstract class Neo4jProcessor {
 	protected int							addedLabels	= 0;
 
 	protected final GraphDatabaseService	database;
-	private Index<Node>				resources;
-	private Index<Node>				resourcesWDataModel;
-	private Index<Node>				resourceTypes;
-	private Index<Node>				values;
+	private Index<Node>						resources;
+	private Index<Node>						resourcesWDataModel;
+	private Index<Node>						resourceTypes;
+	private Index<Node>						values;
 	protected final Map<String, Node>		bnodes;
-	protected Index<Relationship>		statementHashes;
-	protected final LongObjectMap<String> nodeResourceMap;
+	// protected Index<Relationship> statementHashes;
+	protected ChronicleMap<Long, Long>		statementHashes;
+	protected final LongObjectMap<String>	nodeResourceMap;
 
-	private Map<String, Node> tempResourcesIndex;
-	private Map<String, Node> tempResourcesWDataModelIndex;
-	private Map<String, Node> tempResourceTypesIndex;
+	private Map<String, Node>				tempResourcesIndex;
+	private Map<String, Node>				tempResourcesWDataModelIndex;
+	private Map<String, Node>				tempResourceTypesIndex;
 
-	protected Transaction tx;
+	protected Transaction					tx;
 
-	boolean txIsClosed = false;
+	boolean									txIsClosed	= false;
 
 	public Neo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
@@ -87,7 +102,8 @@ public abstract class Neo4jProcessor {
 			resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
-			statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			// statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
 			tempResourcesIndex = Maps.newHashMap();
 			tempResourcesWDataModelIndex = Maps.newHashMap();
@@ -120,7 +136,7 @@ public abstract class Neo4jProcessor {
 		return values;
 	}
 
-	public Index<Relationship> getStatementIndex() {
+	public ChronicleMap<Long, Long> getStatementHashesIndex() {
 
 		return statementHashes;
 	}
@@ -129,6 +145,8 @@ public abstract class Neo4jProcessor {
 
 		return nodeResourceMap;
 	}
+
+	public abstract Index<Relationship> getStatementUUIDsIndex();
 
 	public void clearMaps() {
 
@@ -298,25 +316,16 @@ public abstract class Neo4jProcessor {
 		}
 	}
 
-	public Relationship getStatement(final String hash) throws DMPGraphException {
+	public Relationship getStatement(final long hash) throws DMPGraphException {
 
-		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
+		final Long relationshipId = statementHashes.get(hash);
 
-		if (hits != null && hits.hasNext()) {
+		if (relationshipId == null) {
 
-			final Relationship rel = hits.next();
-
-			hits.close();
-
-			return rel;
+			return null;
 		}
 
-		if (hits != null) {
-
-			hits.close();
-		}
-
-		return null;
+		return database.getRelationshipById(relationshipId);
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
@@ -336,7 +345,7 @@ public abstract class Neo4jProcessor {
 				rel.setProperty(GraphStatics.ORDER_PROPERTY, qualifiedAttributes.get(GraphStatics.ORDER_PROPERTY));
 			}
 
-			if(qualifiedAttributes.containsKey(GraphStatics.INDEX_PROPERTY)) {
+			if (qualifiedAttributes.containsKey(GraphStatics.INDEX_PROPERTY)) {
 
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, qualifiedAttributes.get(GraphStatics.INDEX_PROPERTY));
 			}
@@ -357,7 +366,7 @@ public abstract class Neo4jProcessor {
 		return rel;
 	}
 
-	public String generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode, final NodeType subjectNodeType,
+	public long generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode, final NodeType subjectNodeType,
 			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -369,7 +378,7 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public String generateStatementHash(final Node subjectNode, final String predicateName, final String objectValue, final NodeType subjectNodeType,
+	public long generateStatementHash(final Node subjectNode, final String predicateName, final String objectValue, final NodeType subjectNodeType,
 			final NodeType objectNodeType) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
@@ -381,7 +390,7 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public String generateStatementHash(final String predicateName, final Optional<NodeType> optionalSubjectNodeType,
+	public long generateStatementHash(final String predicateName, final Optional<NodeType> optionalSubjectNodeType,
 			final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalSubjectIdentifier,
 			final Optional<String> optionalObjectIdentifier) throws DMPGraphException {
 
@@ -395,23 +404,10 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final StringBuilder sb = new StringBuilder();
+		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get();
 
-		sb.append(optionalSubjectNodeType.toString()).append(":").append(optionalSubjectIdentifier.get()).append(" ").append(predicateName)
-				.append(" ").append(optionalObjectNodeType.toString()).append(":").append(optionalObjectIdentifier.get()).append(" ");
-
-		MessageDigest messageDigest = null;
-
-		try {
-
-			messageDigest = MessageDigest.getInstance("SHA-256");
-		} catch (final NoSuchAlgorithmException e) {
-
-			throw new DMPGraphException("couldn't instantiate hash algo");
-		}
-		messageDigest.update(sb.toString().getBytes());
-
-		return new String(messageDigest.digest());
+		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
 	public Optional<String> getIdentifier(final Node node, final Optional<NodeType> optionalNodeType) {
@@ -473,7 +469,7 @@ public abstract class Neo4jProcessor {
 
 	public Optional<Node> getNodeFromResourcesIndex(final String key) {
 
-		return getNodeFromIndex(key,tempResourcesIndex, resources, GraphStatics.URI);
+		return getNodeFromIndex(key, tempResourcesIndex, resources, GraphStatics.URI);
 	}
 
 	public Optional<Node> getNodeFromResourceTypesIndex(final String key) {
@@ -503,8 +499,7 @@ public abstract class Neo4jProcessor {
 		addNodeToResourcesIndex(key, node);
 	}
 
-	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index,
-			final String indexProperty) {
+	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index, final String indexProperty) {
 
 		if (tempIndex.containsKey(key)) {
 
@@ -543,7 +538,16 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex, final Index<Node> index) {
+	protected ChronicleMap<Long, Long> getOrCreateLongIndex(final String name) throws IOException {
+
+		// TODO: how to retrieve store dir here?
+		final String storeDir = System.getProperty("java.io.tmpdir");
+
+		return ChronicleMapUtils.createOrGetLongIndex(storeDir + File.separator + ChronicleMapUtils.INDEX_DIR + File.separator + name);
+	}
+
+	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex,
+			final Index<Node> index) {
 
 		tempIndex.put(key, node);
 		index.add(node, indexProperty, key);

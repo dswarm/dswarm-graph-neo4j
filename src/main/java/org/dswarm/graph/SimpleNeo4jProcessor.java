@@ -58,6 +58,11 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 		}
 	}
 
+	@Override public Index<Relationship> getStatementUUIDsIndex() {
+
+		return statementUUIDs;
+	}
+
 	@Override
 	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI) {
 

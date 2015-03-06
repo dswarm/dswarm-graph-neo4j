@@ -53,6 +53,7 @@
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
 		<fasterxml.version>0.9.9</fasterxml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
+		<chronicle-map.version>2.1.4</chronicle-map.version>
 	</properties>
 
 	<build>
@@ -374,6 +375,11 @@
 			<artifactId>xmlunit-core</artifactId>
 			<version>${xmlunit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.openhft</groupId>
+			<artifactId>chronicle-map</artifactId>
+			<version>${chronicle-map.version}</version>
 		</dependency>
 	</dependencies>
 

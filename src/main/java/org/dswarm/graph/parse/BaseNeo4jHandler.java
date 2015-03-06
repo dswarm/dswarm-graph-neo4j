@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.parse;
 
 import java.util.Map;
@@ -243,7 +251,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					addedNodes++;
 				}
 
-				final String hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), objectNode,
+				final long hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), objectNode,
 						subjectNodeType, finalObjectNodeType);
 
 				final Relationship rel = processor.getStatement(hash);
@@ -390,8 +398,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 	public void handleLiteral(final Node subjectNode, final Statement statement) throws DMPGraphException {
 
-		final String hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), statement
-				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
+		final long hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), statement.getOptionalObjectValue()
+				.get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
 
 		final Relationship rel = processor.getStatement(hash);
 
@@ -433,7 +441,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	public Relationship addRelationship(final Node subjectNode, final String predicateURI, final Node objectNode,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final String hash) throws DMPGraphException {
+			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
@@ -448,7 +456,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, finalStatementUUID,
 				optionalQualifiedAttributes, versionHandler);
 
-		processor.getStatementIndex().add(rel, GraphStatics.HASH, hash);
+		processor.getStatementHashesIndex().acquireUsing(hash, rel.getId());
 		processor.addStatementToIndex(rel, finalStatementUUID);
 
 		addedRelationships++;
@@ -487,7 +495,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			finalOptionalResourceUri = processor.determineResourceUri(subjectNode, optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 		}
 
-		if(finalOptionalResourceUri.isPresent()) {
+		if (finalOptionalResourceUri.isPresent()) {
 
 			rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceUri.get());
 		}

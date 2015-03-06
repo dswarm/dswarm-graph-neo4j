@@ -128,7 +128,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the
 			// index
 			// be update with the new stmt (?)
-			final String hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+			final long hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
 			final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(stmt.getSubject()));
 			final Optional<String> optionalSubjectURI;
 

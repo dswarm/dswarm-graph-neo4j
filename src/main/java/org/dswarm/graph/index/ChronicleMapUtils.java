@@ -22,57 +22,31 @@
  * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
  * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.parse;
+package org.dswarm.graph.index;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.SimpleNeo4jVersionHandler;
+import java.io.File;
+import java.io.IOException;
 
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.IndexHits;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.openhft.chronicle.map.ChronicleMap;
+import net.openhft.chronicle.map.ChronicleMapBuilder;
 
 /**
- * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
- *
  * @author tgaengler
  */
-public class SimpleNeo4jHandler extends BaseNeo4jHandler {
+public final class ChronicleMapUtils {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleNeo4jHandler.class);
+	private static final String	INDEX_FILE_ENDING	= ".dat";
 
-	public SimpleNeo4jHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public static final String	INDEX_DIR			= "cmindex";
 
-		super(processorArg);
-	}
+	public static ChronicleMap<Long, Long> createOrGetLongIndex(final String indexFileName) throws IOException {
 
-	@Override
-	protected void init() throws DMPGraphException {
+		final File file = new File(indexFileName + INDEX_FILE_ENDING);
 
-		versionHandler = new SimpleNeo4jVersionHandler(processor);
-	}
+		final ChronicleMapBuilder<Long, Long> builder = ChronicleMapBuilder.of(Long.class, Long.class).entries(Integer.MAX_VALUE)
+				.constantKeySizeBySample(Long.MAX_VALUE).constantValueSizeBySample(Long.MAX_VALUE);
 
-	@Override
-	public Relationship getRelationship(final String uuid) {
-
-		final IndexHits<Relationship> hits = processor.getStatementUUIDsIndex().get(GraphStatics.UUID, uuid);
-
-		if (hits != null && hits.hasNext()) {
-
-			final Relationship rel = hits.next();
-
-			hits.close();
-
-			return rel;
-		}
-
-		if (hits != null) {
-
-			hits.close();
-		}
-
-		return null;
+		// TODO: optimize builder, e.g., set chunk size
+		return builder.createPersistedTo(file);
 	}
 }

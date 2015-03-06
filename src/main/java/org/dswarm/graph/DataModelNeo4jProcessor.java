@@ -69,7 +69,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		}
 	}
 
-	public Index<Relationship> getStatementWDataModelIndex() {
+	public Index<Relationship> getStatementUUIDsIndex() {
 
 		return statementUUIDsWDataModel;
 	}

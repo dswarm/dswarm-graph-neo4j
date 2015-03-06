@@ -21,7 +21,7 @@ import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
@@ -280,7 +280,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		keyAttributePaths.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#nr");
 		keyAttributePaths
 				.add("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.ddb.de/professionell/mabxml/mabxml-1.xsd#ind");
-		requestJson.put("key_attribute_paths", keyAttributePaths);
+		requestJson.set("key_attribute_paths", keyAttributePaths);
 		requestJson.put("value_attribute_path",
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value");
 

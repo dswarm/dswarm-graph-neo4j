@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import javax.ws.rs.core.MediaType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.http.HttpStatus;
 import org.apache.jena.riot.Lang;

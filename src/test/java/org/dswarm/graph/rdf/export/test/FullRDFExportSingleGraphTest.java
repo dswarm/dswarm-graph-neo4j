@@ -21,25 +21,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import com.google.common.io.ByteSource;
+import org.junit.Assert;
+
 import org.apache.http.HttpStatus;
-import com.google.common.io.InputSupplier;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+
+import org.dswarm.common.MediaTypeUtil;
+import org.dswarm.common.rdf.utils.RDFUtils;
+import org.dswarm.graph.test.Neo4jDBWrapper;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
-import junit.framework.Assert;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.dswarm.common.MediaTypeUtil;
-import org.dswarm.common.rdf.utils.RDFUtils;
-import org.dswarm.graph.test.Neo4jDBWrapper;
 
 /**
  * @author polowins

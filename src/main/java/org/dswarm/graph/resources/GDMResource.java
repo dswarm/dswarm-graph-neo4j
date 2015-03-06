@@ -415,10 +415,22 @@ public class GDMResource {
 			version = null;
 		}
 
+		final JsonNode atMostNode = json.get(DMPStatics.AT_MOST_IDENTIFIER);
+
+		final Optional<Integer> optionalAtMost;
+
+		if(atMostNode != null) {
+
+			optionalAtMost = Optional.fromNullable(atMostNode.asInt());
+		} else {
+
+			optionalAtMost = Optional.absent();
+		}
+
 		GDMResource.LOG.debug("try to read GDM statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
 				+ "' and version = '" + version + "' from graph db");
 
-		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, version, database);
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, version, optionalAtMost, database);
 		final Model model = gdmReader.read();
 
 		String result = null;

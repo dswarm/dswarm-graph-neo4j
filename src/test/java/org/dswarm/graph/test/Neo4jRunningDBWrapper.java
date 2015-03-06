@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.slf4j.Logger;

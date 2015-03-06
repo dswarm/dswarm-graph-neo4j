@@ -19,7 +19,7 @@ package org.dswarm.graph.rdf.export.test;
 import java.util.List;
 
 import com.sun.jersey.api.client.ClientResponse;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ExportUtils {
 

@@ -1,22 +1,15 @@
 /**
- * This file is part of d:swarm graph extension.
- *
- * d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * d:swarm graph extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.dswarm.graph.gdm.read;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +27,7 @@ import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterators;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -60,21 +54,21 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 	private final RelationshipHandler	relationshipHandler;
 
 	private final String				recordClassUri;
-	private final String dataModelUri;
+	private final String				dataModelUri;
 
-	private final GraphDatabaseService database;
+	private final GraphDatabaseService	database;
 
-	private Model    model;
-	private Resource currentResource;
-	private final Map<Long, Statement> currentResourceStatements = new HashMap<>();
+	private Model						model;
+	private Resource					currentResource;
+	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
 
-	private Integer version;
-	private Optional<Integer> optionalAtMost;
+	private Integer						version;
+	private Optional<Integer>			optionalAtMost;
 
-	private Transaction tx = null;
+	private Transaction					tx							= null;
 
-	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<Integer> optionalAtMostArg,
-			final GraphDatabaseService databaseArg) throws DMPGraphException {
+	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg,
+			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
 		dataModelUri = dataModelUriArg;
@@ -146,38 +140,48 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
+						+ "'finished read GDM TX successfully");
 
 				return null;
 			}
 
 			recordNodesIter = recordNodes.iterator();
 
-			if(recordNodesIter == null) {
+			if (recordNodesIter == null) {
 
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
+						+ "'finished read GDM TX successfully");
 
 				return null;
 			}
 
-			if(!recordNodesIter.hasNext()) {
+			if (!recordNodesIter.hasNext()) {
 
 				recordNodesIter.close();
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri + "'finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
+						+ "'finished read GDM TX successfully");
 
 				return null;
 			}
 
 			model = new Model();
 
-			int recordCount = 1;
-			boolean limitReached = false;
+			final Iterator<Node> nodeIterator;
 
-			while(recordNodesIter.hasNext() && !limitReached) {
+			if (optionalAtMost.isPresent()) {
+
+				nodeIterator = Iterators.limit(recordNodesIter, optionalAtMost.get());
+			} else {
+
+				nodeIterator = recordNodesIter;
+			}
+
+			while (nodeIterator.hasNext()) {
 
 				final Node recordNode = recordNodesIter.next();
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
@@ -216,13 +220,6 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				model.addResource(currentResource);
 
 				currentResourceStatements.clear();
-
-				if(optionalAtMost.isPresent() && optionalAtMost.get() == recordCount) {
-
-					limitReached = true;
-				}
-
-				recordCount++;
 			}
 
 			recordNodesIter.close();
@@ -233,7 +230,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);
 
-			if(recordNodesIter != null) {
+			if (recordNodesIter != null) {
 
 				recordNodesIter.close();
 			}
@@ -359,22 +356,22 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 				final Statement statement = new Statement(subjectGDMNode, predicateProperty, objectGDMNode);
 				statement.setId(statementId);
 
-				if(order != null) {
+				if (order != null) {
 
 					statement.setOrder(order);
 				}
 
-				if(uuid != null) {
+				if (uuid != null) {
 
 					statement.setUUID(uuid);
 				}
 
-				if(confidence != null) {
+				if (confidence != null) {
 
 					statement.setConfidence(confidence);
 				}
 
-				if(evidence != null) {
+				if (evidence != null) {
 
 					statement.setEvidence(evidence);
 				}
@@ -419,7 +416,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 			}
 		}
 
-		if(hits != null) {
+		if (hits != null) {
 
 			hits.close();
 		}

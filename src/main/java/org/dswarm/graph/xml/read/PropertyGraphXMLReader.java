@@ -30,6 +30,14 @@
  * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
  * graph extension. If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.xml.read;
 
 import java.io.OutputStream;
@@ -44,6 +52,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.stax2.XMLOutputFactory2;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.Attribute;
+import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
@@ -52,8 +62,6 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.model.Attribute;
-import org.dswarm.graph.model.AttributePath;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
@@ -105,21 +113,23 @@ public class PropertyGraphXMLReader implements XMLReader {
 	private final String								recordClassURIString;
 	private final URI									recordClassURI;
 	private final URI									recordTagURI;
-	private final Optional<AttributePath>				optionalRootAttributePath;
+	private final Optional<AttributePath> optionalRootAttributePath;
 
-	private final Map<String, Tuple<Predicate, URI>>	predicates				= new HashMap<>();
-	private final Map<String, String>					namespacesPrefixesMap	= new HashMap<>();
-	private final Map<String, String>					nameMap					= new HashMap<>();
+	private final Map<String, Tuple<Predicate, URI>> predicates            = new HashMap<>();
+	private final Map<String, String>                namespacesPrefixesMap = new HashMap<>();
+	private final Map<String, String>                nameMap               = new HashMap<>();
 
-	private final GraphDatabaseService					database;
+	private final GraphDatabaseService database;
 
-	private long										recordCount				= 0;
+	private long recordCount = 0;
 
-	private Integer										version;
+	private Integer version;
 
-	private final boolean								originalDataTypeIsXML;
+	private final boolean originalDataTypeIsXML;
 
-	private Transaction									tx						= null;
+	private boolean isElementOpen = false;
+
+	private Transaction tx = null;
 
 	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
 			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<String> optionalOriginalDataType,
@@ -260,7 +270,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 						defaultNamespaceWritten = true;
 					}
 
-					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI, namespacesPrefixesMap, nameMap);
+					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI, namespacesPrefixesMap, nameMap, isElementOpen);
+					isElementOpen = true;
 				}
 			} else if (recordsSize > 1) {
 
@@ -308,6 +319,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				startNodeHandler.handleNode(recordNode);
 				// close record
 				writer.writeEndElement();
+				isElementOpen = false;
 
 				recordCount++;
 			}
@@ -363,10 +375,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		if (recordTagURI.hasNamespaceURI()) {
 
-			defaultNameSpace = recordTagURI.getNamespaceURI().substring(0, recordTagURI.getNamespaceURI().length() - 1);
+			defaultNameSpace = XMLStreamWriterUtils.determineBaseURI(recordTagURI);
 		} else {
 
-			defaultNameSpace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+			defaultNameSpace = XMLStreamWriterUtils.determineBaseURI(recordClassURI);
 		}
 
 		writer.setDefaultNamespace(defaultNameSpace);
@@ -381,14 +393,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		if (uri.hasNamespaceURI()) {
 
-			namespace = uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1);
+			namespace = XMLStreamWriterUtils.determineBaseURI(uri);
 			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
 			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
 
 			finalURIString = uri.getNamespaceURI() + uri.getLocalName();
 		} else {
 
-			namespace = recordClassURI.getNamespaceURI().substring(0, recordClassURI.getNamespaceURI().length() - 1);
+			namespace = XMLStreamWriterUtils.determineBaseURI(recordClassURI);
 			namespaceAlreadySet = namespacesPrefixesMap.containsKey(namespace);
 			prefix = XMLStreamWriterUtils.getPrefix(namespace, namespacesPrefixesMap);
 
@@ -398,7 +410,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 		final URI finalURI = new URI(finalURIString);
 
 		// open record XML tag
-		XMLStreamWriterUtils.writeXMLElementTag(writer, finalURI, namespacesPrefixesMap, nameMap);
+		XMLStreamWriterUtils.writeXMLElementTag(writer, finalURI, namespacesPrefixesMap, nameMap, isElementOpen);
+		isElementOpen = true;
 		// TODO: shall we cut the last character?
 		// TODO: shall we write the default namespace?
 		// writer.writeDefaultNamespace(recordTagURI.getNamespaceURI().substring(0,
@@ -574,13 +587,15 @@ public class PropertyGraphXMLReader implements XMLReader {
 				if (objectGDMNode.getType().equals(NodeType.BNode)) {
 
 					// open tag
-					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap);
+					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap, isElementOpen);
+					isElementOpen = true;
 
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());
 
 					// close
 					writer.writeEndElement();
+					isElementOpen = false;
 				}
 			}
 		}
@@ -591,12 +606,13 @@ public class PropertyGraphXMLReader implements XMLReader {
 			if (!RDF.type.getURI().equals(predicateURI.toString()) && NodeType.Literal.equals(objectGDMNode.getType())) {
 
 				// open tag
-				XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap);
+				XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap, isElementOpen);
 
 				writer.writeCData(((LiteralNode) objectGDMNode).getValue());
 
 				// close
 				writer.writeEndElement();
+				isElementOpen = false;
 			} else {
 
 				// TODO: ???

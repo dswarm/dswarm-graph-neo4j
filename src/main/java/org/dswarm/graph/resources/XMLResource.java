@@ -41,9 +41,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.common.model.util.AttributePathUtil;
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.model.AttributePath;
-import org.dswarm.graph.model.util.AttributePathUtil;
 import org.dswarm.graph.xml.read.PropertyGraphXMLReader;
 import org.dswarm.graph.xml.read.XMLReader;
 
@@ -175,6 +175,9 @@ public class XMLResource {
 
 						optionalWriter.get().flush();
 						optionalWriter.get().close();
+
+						LOG.debug("finished reading '" + xmlReader.recordCount() + "' XML records for data model uri = '" + dataModelUri
+								+ "' and record class uri = '" + recordClassUri + "' from graph db");
 					}
 				} catch (final DMPGraphException | XMLStreamException e) {
 
@@ -182,9 +185,6 @@ public class XMLResource {
 				}
 			}
 		};
-
-		LOG.debug("finished reading '" + xmlReader.recordCount() + "' XML records for data model uri = '" + dataModelUri
-				+ "' and record class uri = '" + recordClassUri + "' from graph db");
 
 		return Response.ok(stream, MediaType.APPLICATION_XML_TYPE).build();
 	}

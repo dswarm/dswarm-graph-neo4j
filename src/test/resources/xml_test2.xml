@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns1:Document xmlns:ns1="http://purl.org/ontology/bibo/" xmlns:ns2="http://data.slub-dresden.de/schemas/Schema-5664ba0e-ccb3-4b71-8823-13281490de30/">
+	<ns2:id><![CDATA[oai:deutschefotothek.de:a8450::obj|71272899|wf_hab_0000000_exlib-berlepsch-17-1-00027]]></ns2:id>
+	<ns3:author xmlns:ns3="http://data.slub-dresden.de/schemas/Schema-222/"><![CDATA[unbekannt]]></ns3:author>
+	<ns4:title xmlns:ns4="http://data.slub-dresden.de/schemas/Schema-333/"><![CDATA[Wappen des Marcus Christoph Gugel]]></ns4:title>
+</ns1:Document>

@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dswarm.common.model.Attribute;
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.model.Attribute;
-import org.dswarm.graph.model.AttributePath;
-import org.dswarm.graph.model.ContentSchema;
 import org.dswarm.graph.delta.DMPStatics;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
@@ -1133,6 +1133,8 @@ public final class GraphDBUtil {
 
 				sb.append("()");
 			}
+
+			i++;
 		}
 
 		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\no.")
@@ -1163,6 +1165,8 @@ public final class GraphDBUtil {
 
 				sb.append("()");
 			}
+
+			i++;
 		}
 
 		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")

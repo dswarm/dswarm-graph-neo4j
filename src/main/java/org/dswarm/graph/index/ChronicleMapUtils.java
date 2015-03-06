@@ -39,14 +39,25 @@ public final class ChronicleMapUtils {
 
 	public static final String	INDEX_DIR			= "cmindex";
 
-	public static ChronicleMap<Long, Long> createOrGetLongIndex(final String indexFileName) throws IOException {
+	public static ChronicleMap<Long, Long> createOrGetPersistentLongIndex(final String indexFileName) throws IOException {
 
 		final File file = new File(indexFileName + INDEX_FILE_ENDING);
 
-		final ChronicleMapBuilder<Long, Long> builder = ChronicleMapBuilder.of(Long.class, Long.class).entries(Integer.MAX_VALUE)
-				.constantKeySizeBySample(Long.MAX_VALUE).constantValueSizeBySample(Long.MAX_VALUE);
+		final ChronicleMapBuilder<Long, Long> builder = getLongLongChronicleMapBuilder();
+
+		return builder.entries(Integer.MAX_VALUE).createPersistedTo(file);
+	}
+
+	public static ChronicleMap<Long, Long> createOrGetLongIndex() {
+
+		final ChronicleMapBuilder<Long, Long> builder = getLongLongChronicleMapBuilder();
+
+		return builder.minSegments(10000).entriesPerSegment(10 * 1000).create();
+	}
+
+	private static ChronicleMapBuilder<Long, Long> getLongLongChronicleMapBuilder() {
 
 		// TODO: optimize builder, e.g., set chunk size
-		return builder.createPersistedTo(file);
+		return ChronicleMapBuilder.of(Long.class, Long.class).constantKeySizeBySample(Long.MAX_VALUE).constantValueSizeBySample(Long.MAX_VALUE);
 	}
 }

@@ -543,7 +543,7 @@ public abstract class Neo4jProcessor {
 		// TODO: how to retrieve store dir here?
 		final String storeDir = System.getProperty("java.io.tmpdir");
 
-		return ChronicleMapUtils.createOrGetLongIndex(storeDir + File.separator + ChronicleMapUtils.INDEX_DIR + File.separator + name);
+		return ChronicleMapUtils.createOrGetPersistentLongIndex(storeDir + File.separator + ChronicleMapUtils.INDEX_DIR + File.separator + name);
 	}
 
 	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex,

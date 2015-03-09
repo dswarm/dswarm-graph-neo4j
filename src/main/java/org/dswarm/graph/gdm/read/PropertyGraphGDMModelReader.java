@@ -183,7 +183,7 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			while (nodeIterator.hasNext()) {
 
-				final Node recordNode = recordNodesIter.next();
+				final Node recordNode = nodeIterator.next();
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
 				if (resourceUri == null) {

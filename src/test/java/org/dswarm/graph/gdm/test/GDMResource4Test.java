@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.Assert;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
@@ -45,9 +46,14 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(GDMResource4Test.class);
 
+	private final ObjectMapper	objectMapper;
+
 	public GDMResource4Test(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/gdm", dbTypeArg);
+
+		objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
 	@Test
@@ -90,10 +96,15 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final URL fileURL = Resources.getResource("test-mabxml_w_data_model_resource.gson");
 		final byte[] file = Resources.toByteArray(fileURL);
 
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		final String requestJsonString = objectMapper.writeValueAsString(metadata);
+
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

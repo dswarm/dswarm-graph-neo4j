@@ -21,11 +21,13 @@ import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Assert;
-
+import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
+
+import com.google.common.base.Optional;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/mabxml_dmp.gson", "versioning/mabxml_dmp2.gson",
-				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149, false, "");
+				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149, false,
+				Optional.<String>absent());
 	}
 
 	@Test
@@ -73,7 +76,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson",
 				"versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_02.csv.gson", "http://data.slub-dresden.de/resources/2",
-				"http://data.slub-dresden.de/resources/1/schema#RecordType", 36, 35, false, "");
+				"http://data.slub-dresden.de/resources/1/schema#RecordType", 36, 35, false, Optional.<String>absent());
 	}
 
 	/**
@@ -87,9 +90,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 		requestJson.put("record_identifier_attribute_path", "http://data.slub-dresden.de/resources/1/schema#EZB-Id");
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_01_v1.csv.gson",
-				"versioning/lic_dmp_01_v2.csv.gson", "http://data.slub-dresden.de/resources/9",
-				"http://data.slub-dresden.de/resources/1/schema#RecordType", 23, 23, false, "");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_01_v1.csv.gson", "versioning/lic_dmp_01_v2.csv.gson",
+				"http://data.slub-dresden.de/resources/9", "http://data.slub-dresden.de/resources/1/schema#RecordType", 23, 23, false,
+				Optional.<String>absent());
 	}
 
 	/**
@@ -103,9 +106,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 		requestJson.put("record_identifier_attribute_path", "http://data.slub-dresden.de/resources/1/schema#EZB-Id");
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_02_v1.csv.gson",
-				"versioning/lic_dmp_02_v2.csv.gson", "http://data.slub-dresden.de/resources/10",
-				"http://data.slub-dresden.de/resources/1/schema#RecordType", 46, 69, true, "http://data.slub-dresden.de/resources/1/schema#RecordType");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_02_v1.csv.gson", "versioning/lic_dmp_02_v2.csv.gson",
+				"http://data.slub-dresden.de/resources/10", "http://data.slub-dresden.de/resources/1/schema#RecordType", 46, 69, true,
+				Optional.of("http://data.slub-dresden.de/resources/1/schema#RecordType"));
 	}
 
 	@Test
@@ -114,9 +117,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = objectMapper.createObjectNode();
 		requestJson.put("record_identifier_attribute_path", "http://data.slub-dresden.de/resources/1/schema#EZB-Id");
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_v1.csv.gson",
-				"versioning/lic_dmp_v2.csv.gson", "http://data.slub-dresden.de/resources/8",
-				"http://data.slub-dresden.de/resources/1/schema#RecordType", 759, 621, true, "http://data.slub-dresden.de/resources/1/schema#RecordType");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/lic_dmp_v1.csv.gson", "versioning/lic_dmp_v2.csv.gson",
+				"http://data.slub-dresden.de/resources/8", "http://data.slub-dresden.de/resources/1/schema#RecordType", 759, 621, true,
+				Optional.of("http://data.slub-dresden.de/resources/1/schema#RecordType"));
 	}
 
 	@Test
@@ -124,8 +127,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_01_v1.xml.gson", "versioning/selectedUpdates_01_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/3", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 113, 95, false, "");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_01_v1.xml.gson",
+				"versioning/selectedUpdates_01_v2.xml.gson", "http://data.slub-dresden.de/resources/3",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 113, 95, false, Optional.<String> absent());
 	}
 
 	@Test
@@ -133,8 +137,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_02_v1.xml.gson", "versioning/selectedUpdates_02_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/4", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 75, 55, false, "");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_02_v1.xml.gson",
+				"versioning/selectedUpdates_02_v2.xml.gson", "http://data.slub-dresden.de/resources/4",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 75, 55, false, Optional.<String> absent());
 	}
 
 	@Test
@@ -142,8 +147,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_03_v1.xml.gson", "versioning/selectedUpdates_03_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/5", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 223, 180, false, "");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_03_v1.xml.gson",
+				"versioning/selectedUpdates_03_v2.xml.gson", "http://data.slub-dresden.de/resources/5",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 223, 180, false, Optional.<String> absent());
 	}
 
 	@Test
@@ -151,8 +157,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
-		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_04_v1.xml.gson", "versioning/selectedUpdates_04_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/6", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 423, 310, false, "");
+		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_04_v1.xml.gson",
+				"versioning/selectedUpdates_04_v2.xml.gson", "http://data.slub-dresden.de/resources/6",
+				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 423, 310, false, Optional.<String> absent());
 	}
 
 	@Test
@@ -161,17 +168,18 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
 		readGDMFromDBThatWasWrittenAsGDM(requestJson, "versioning/selectedOriginalsDump2011_v1.xml.gson", "versioning/selectedUpdates_v2.xml.gson",
-				"http://data.slub-dresden.de/resources/7", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 834, 640, false, "");
+				"http://data.slub-dresden.de/resources/7", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 834, 640, false,
+				Optional.<String> absent());
 	}
 
 	private void readGDMFromDBThatWasWrittenAsGDM(final ObjectNode contentSchemaRequestJSON, final String resourcePathV1,
 			final String resourcePathV2, final String dataModelURI, final String recordClassURI, final long statementCountCurrentVersion,
-			final long statementCountV1, final boolean deprecateMissingRecords, final String recordClassUri) throws IOException {
+			final long statementCountV1, final boolean deprecateMissingRecords, final Optional<String> optionalRecordClassUri) throws IOException {
 
 		LOG.debug("start read test for GDM resource at " + dbType + " DB");
 
 		writeGDMToDBInternal(resourcePathV1, dataModelURI);
-		writeGDMToDBInternalWithContentSchema(resourcePathV2, dataModelURI, contentSchemaRequestJSON, deprecateMissingRecords, recordClassUri);
+		writeGDMToDBInternalWithContentSchema(resourcePathV2, dataModelURI, contentSchemaRequestJSON, deprecateMissingRecords, optionalRecordClassUri);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -223,22 +231,30 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	}
 
 	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String dataModelURI,
-			final ObjectNode contentSchemaRequestJSON, final boolean deprecateMissingRecords, final String recordClassUri) throws IOException {
+			final ObjectNode contentSchemaRequestJSON, final boolean deprecateMissingRecords, final Optional<String> optionalRecordClassUri)
+			throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
 
 		final URL fileURL = Resources.getResource(dataResourceFileName);
 		final byte[] file = Resources.toByteArray(fileURL);
 
-		final String requestJsonString = objectMapper.writeValueAsString(contentSchemaRequestJSON);
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+		metadata.set(DMPStatics.CONTENT_SCHEMA_IDENTIFIER, contentSchemaRequestJSON);
+		metadata.put(DMPStatics.DEPRECATE_MISSING_RECORDS_IDENTIFIER, Boolean.valueOf(deprecateMissingRecords).toString());
+
+		if (optionalRecordClassUri.isPresent()) {
+
+			metadata.put(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, optionalRecordClassUri.get());
+		}
+
+		final String requestJsonString = objectMapper.writeValueAsString(metadata);
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE))
-				.bodyPart(new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE))
-				.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE))
-				.bodyPart(new BodyPart(Boolean.valueOf(deprecateMissingRecords).toString(), MediaType.TEXT_PLAIN_TYPE))
-				.bodyPart(new BodyPart(recordClassUri, MediaType.TEXT_PLAIN_TYPE));
+		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -257,10 +273,15 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final URL fileURL = Resources.getResource(dataResourceFileName);
 		final byte[] file = Resources.toByteArray(fileURL);
 
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		final String requestJsonString = objectMapper.writeValueAsString(metadata);
+
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
 		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
+				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.resources;
 
 import java.io.IOException;
@@ -21,6 +29,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -88,6 +97,7 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
+
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -141,6 +151,20 @@ public class GDMResource {
 		return "pong";
 	}
 
+	/**
+	 * multipart/mixed payload contains two body parts:<br/>
+	 * - first body part is the content (i.e. the real data)<br/>
+	 * - second body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
+	 * content):<br/>
+	 * - "data_model_URI" (mandatory) - "content_schema" (obligatory) - "deprecate_missing_records" (obligatory) -
+	 * "record_class_uri" (mandatory for "deprecate_missing_records")
+	 *
+	 * @param multiPart
+	 * @param database
+	 * @return
+	 * @throws DMPGraphException
+	 * @throws IOException
+	 */
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
@@ -148,46 +172,15 @@ public class GDMResource {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
 
-		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
-		final InputStream gdmInputStream = bpe.getInputStream();
+		final List<BodyPart> bodyParts = getBodyParts(multiPart);
+		final InputStream content = getContent(bodyParts);
+		final ObjectNode metadata = getMetadata(bodyParts);
 
-		if (gdmInputStream == null) {
+		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
+		final String dataModelURI = optionalDataModelURI.get();
 
-			final String message = "input stream for write to graph DB request is null";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message);
-		}
-
-		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
-
-		final ObjectMapper mapper = Util.getJSONObjectMapper();
-
-		Model model = null;
-
-		try {
-
-			model = mapper.readValue(gdmInputStream, Model.class);
-		} catch (IOException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		if (model == null) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			gdmInputStream.close();
-
-			throw new DMPGraphException(message);
-		}
+		// TODO: maybe do this later, when everything else is checked
+		Model model = getModel(content);
 
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
@@ -197,64 +190,24 @@ public class GDMResource {
 		try {
 
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
+			final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-			if (multiPart.getBodyParts().size() >= 3) {
+			if (optionalContentSchema.isPresent()) {
 
-				final BodyPart contentSchemaBP = multiPart.getBodyParts().get(2);
-				final ContentSchema contentSchema;
-
-				if (contentSchemaBP != null) {
-
-					final String contentSchemaJSONString = multiPart.getBodyParts().get(2).getEntityAs(String.class);
-
-					try {
-
-						contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
-					} catch (final IOException e) {
-
-						final String message = "could not deserialise content schema JSON for write from graph DB request";
-
-						GDMResource.LOG.debug(message);
-
-						throw new DMPGraphException(message);
-					}
-				} else {
-
-					// no content schema available for data model
-
-					contentSchema = null;
-				}
-
-				final BodyPart deprecateMissingRecordsBP = multiPart.getBodyParts().get(3);
-				final Boolean deprecateMissingRecords;
-
-				if (deprecateMissingRecordsBP != null) {
-
-					deprecateMissingRecords = Boolean.valueOf(deprecateMissingRecordsBP.getEntityAs(String.class));
-				} else {
-
-					deprecateMissingRecords = Boolean.FALSE;
-				}
+				final ContentSchema contentSchema = optionalContentSchema.get();
 
 				// = new resources model, since existing, modified resources were already written to the DB
 				final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database, handler);
 
 				model = result.first();
 
-				if (deprecateMissingRecords != null && deprecateMissingRecords) {
+				final Optional<Boolean> optionalDepreacteMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
-					final BodyPart recordClassUriBP = multiPart.getBodyParts().get(4);
-					final String recordClassUri;
+				if (optionalDepreacteMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDepreacteMissingRecords.get())) {
 
-					if (recordClassUriBP != null) {
+					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
 
-						recordClassUri = recordClassUriBP.getEntityAs(String.class);
-					} else {
-
-						recordClassUri = null;
-					}
-
-					if (recordClassUri == null) {
+					if (!optionalRecordClassURI.isPresent()) {
 
 						throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
 					}
@@ -263,8 +216,8 @@ public class GDMResource {
 
 					final Set<String> processedResources = result.other();
 
-					deprecateMissingRecords(processedResources, recordClassUri, dataModelURI, ((Neo4jUpdateHandler) handler.getHandler())
-							.getVersionHandler().getLatestVersion(), processor);
+					deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
+							((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(), processor);
 				}
 			}
 
@@ -290,7 +243,7 @@ public class GDMResource {
 
 			handler.getHandler().closeTransaction();
 
-			gdmInputStream.close();
+			content.close();
 
 			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
 
@@ -300,7 +253,7 @@ public class GDMResource {
 
 			processor.getProcessor().failTx();
 
-			gdmInputStream.close();
+			content.close();
 
 			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
 
@@ -419,7 +372,7 @@ public class GDMResource {
 
 		final Optional<Integer> optionalAtMost;
 
-		if(atMostNode != null) {
+		if (atMostNode != null) {
 
 			optionalAtMost = Optional.fromNullable(atMostNode.asInt());
 		} else {
@@ -503,7 +456,7 @@ public class GDMResource {
 
 			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
 
-			if(!changeset.hasChanges()) {
+			if (!changeset.hasChanges()) {
 
 				// process changeset only, if it provides changes
 
@@ -528,8 +481,8 @@ public class GDMResource {
 		return Pair.of(newResourcesModel, processedResources);
 	}
 
-	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB, final Resource newResource, final GraphDatabaseService newResourceDB,
-			final ContentSchema contentSchema) throws DMPGraphException {
+	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
+			final Resource newResource, final GraphDatabaseService newResourceDB, final ContentSchema contentSchema) throws DMPGraphException {
 
 		enrichModel(existingResourceDB, existingResource.getUri());
 		enrichModel(newResourceDB, newResource.getUri());
@@ -538,18 +491,18 @@ public class GDMResource {
 		// GraphDBUtil.printRelationships(existingResourceDB);
 		// GraphDBUtil.printPaths(existingResourceDB, existingResource.getUri());
 		// GraphDBPrintUtil.printDeltaRelationships(existingResourceDB);
-//		final URL resURL = Resources.getResource("versioning/lic_dmp_v2.csv");
-//		final String resURLString = resURL.toString();
-//		try {
-//			final URL existingResURL = new URL(newResource.getUri());
-//			final String path = existingResURL.getPath();
-//			final String uuid = path.substring(path.lastIndexOf("/") + 1, path.length());
-//			final String newResURLString = resURLString + "." + uuid + ".txt";
-//			final URL newResURL = new URL(newResURLString);
-//			GraphDBPrintUtil.writeDeltaRelationships(newResourceDB, newResURL);
-//		} catch (MalformedURLException e) {
-//			e.printStackTrace();
-//		}
+		// final URL resURL = Resources.getResource("versioning/lic_dmp_v2.csv");
+		// final String resURLString = resURL.toString();
+		// try {
+		// final URL existingResURL = new URL(newResource.getUri());
+		// final String path = existingResURL.getPath();
+		// final String uuid = path.substring(path.lastIndexOf("/") + 1, path.length());
+		// final String newResURLString = resURLString + "." + uuid + ".txt";
+		// final URL newResURL = new URL(newResURLString);
+		// GraphDBPrintUtil.writeDeltaRelationships(newResourceDB, newResURL);
+		// } catch (MalformedURLException e) {
+		// e.printStackTrace();
+		// }
 
 		// GraphDBUtil.printNodes(newResourceDB);
 		// GraphDBUtil.printRelationships(newResourceDB);
@@ -560,33 +513,36 @@ public class GDMResource {
 
 		final Optional<AttributePath> optionalCommonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
 
-		if(optionalCommonAttributePath.isPresent()) {
+		if (optionalCommonAttributePath.isPresent()) {
 
 			// do specific processing with content schema knowledge
 
 			final AttributePath commonAttributePath = optionalCommonAttributePath.get();
 
-			final Collection<CSEntity> newCSEntities = GraphDBUtil
-					.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath, contentSchema);
-			final Collection<CSEntity> existingCSEntities = GraphDBUtil
-					.getCSEntities(existingResourceDB, existingResource.getUri(), commonAttributePath,
-							contentSchema);
+			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath,
+					contentSchema);
+			final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(),
+					commonAttributePath, contentSchema);
 
 			// do delta calculation on enriched GDM models in graph
-			// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do for
+			// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do
+			// for
 			// each exact level all steps first and continue afterwards (?)
 			// 1. identify exact matches for cs entities
 			// 1.1 hash with key, value(s) + entity order + value(s) order => matches complete cs entities
-			// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity => see step 7
+			// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity =>
+			// see step 7
 			// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
-			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(Optional.fromNullable(existingCSEntities), Optional.fromNullable(newCSEntities),
-					existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(Optional.fromNullable(existingCSEntities),
+					Optional.fromNullable(newCSEntities), existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
 			exactCSMatcher.match();
 
 			final Optional<? extends Collection<CSEntity>> newExactCSNonMatches = exactCSMatcher.getNewEntitiesNonMatches();
 			final Optional<? extends Collection<CSEntity>> existingExactCSNonMatches = exactCSMatcher.getExistingEntitiesNonMatches();
-			final Optional<? extends Collection<ValueEntity>> newFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(newExactCSNonMatches);
-			final Optional<? extends Collection<ValueEntity>> existingFirstDegreeExactCSValueNonMatches = CSEntityUtil.getValueEntities(existingExactCSNonMatches);
+			final Optional<? extends Collection<ValueEntity>> newFirstDegreeExactCSValueNonMatches = CSEntityUtil
+					.getValueEntities(newExactCSNonMatches);
+			final Optional<? extends Collection<ValueEntity>> existingFirstDegreeExactCSValueNonMatches = CSEntityUtil
+					.getValueEntities(existingExactCSNonMatches);
 			// 1.2 hash with key, value + entity order + value order => matches value entities
 			final FirstDegreeExactCSValueMatcher firstDegreeExactCSValueMatcher = new FirstDegreeExactCSValueMatcher(
 					existingFirstDegreeExactCSValueNonMatches, newFirstDegreeExactCSValueNonMatches, existingResourceDB, newResourceDB,
@@ -594,7 +550,8 @@ public class GDMResource {
 			firstDegreeExactCSValueMatcher.match();
 
 			final Optional<? extends Collection<ValueEntity>> newExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getNewEntitiesNonMatches();
-			final Optional<? extends Collection<ValueEntity>> existingExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getExistingEntitiesNonMatches();
+			final Optional<? extends Collection<ValueEntity>> existingExactCSValueNonMatches = firstDegreeExactCSValueMatcher
+					.getExistingEntitiesNonMatches();
 			// 1.3 hash with key, value + entity order => matches value entities
 			// 1.4 hash with key, value => matches value entities
 			// 2. identify modifications for cs entities
@@ -617,8 +574,8 @@ public class GDMResource {
 			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
 			// 7.1.1 key + predicate + sub graph hash + order
 			final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
-					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB, existingResource.getUri(),
-					newResource.getUri());
+					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB,
+					existingResource.getUri(), newResource.getUri());
 			firstDegreeExactSubGraphEntityMatcher.match();
 
 			final Optional<? extends Collection<SubGraphEntity>> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
@@ -648,14 +605,16 @@ public class GDMResource {
 					newResourceDB, existingResource.getUri(), newResource.getUri());
 			firstDegreeModificationSubGraphLeafEntityMatcher.match();
 
-			for(final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modificationCSMatcher.getModifications().entrySet()) {
+			for (final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modificationCSMatcher.getModifications().entrySet()) {
 
 				changesetModifications.put(modificationEntry.getKey().getNodeId(), modificationEntry.getValue().getNodeId());
 			}
 
-			for(final Map.Entry<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModificationEntry : firstDegreeModificationSubGraphLeafEntityMatcher.getModifications().entrySet()) {
+			for (final Map.Entry<SubGraphLeafEntity, SubGraphLeafEntity> firstDegreeModificationSubGraphLeafEntityModificationEntry : firstDegreeModificationSubGraphLeafEntityMatcher
+					.getModifications().entrySet()) {
 
-				changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(), firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
+				changesetModifications.put(firstDegreeModificationSubGraphLeafEntityModificationEntry.getKey().getNodeId(),
+						firstDegreeModificationSubGraphLeafEntityModificationEntry.getValue().getNodeId());
 			}
 		}
 
@@ -665,7 +624,8 @@ public class GDMResource {
 				existingResourceDB);
 		// 3.1 with key (predicate), value + value order => matches value entities
 		final FirstDegreeExactGDMValueMatcher firstDegreeExactGDMValueMatcher = new FirstDegreeExactGDMValueMatcher(
-				Optional.fromNullable(existingFlatResourceNodeValueEntities), Optional.fromNullable(newFlatResourceNodeValueEntities), existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+				Optional.fromNullable(existingFlatResourceNodeValueEntities), Optional.fromNullable(newFlatResourceNodeValueEntities),
+				existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
 		firstDegreeExactGDMValueMatcher.match();
 
 		final Optional<? extends Collection<ValueEntity>> newFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher
@@ -675,7 +635,8 @@ public class GDMResource {
 		// 4. identify modifications of resource node-based statements
 		// 4.1 with key (predicate), value + value order => matches value entities
 		final FirstDegreeModificationGDMValueMatcher firstDegreeModificationGDMValueMatcher = new FirstDegreeModificationGDMValueMatcher(
-				existingFirstDegreeExactGDMValueNonMatches, newFirstDegreeExactGDMValueNonMatches, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+				existingFirstDegreeExactGDMValueNonMatches, newFirstDegreeExactGDMValueNonMatches, existingResourceDB, newResourceDB,
+				existingResource.getUri(), newResource.getUri());
 		firstDegreeModificationGDMValueMatcher.match();
 
 		// 5. identify additions in new model graph
@@ -692,41 +653,48 @@ public class GDMResource {
 		// check graph matching completeness
 		final boolean isExistingResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(existingResourceDB);
 
-		if(!isExistingResourceMatchedCompletely) {
+		if (!isExistingResourceMatchedCompletely) {
 
 			throw new DMPGraphException("existing resource wasn't matched completely by the delta algo");
 		}
 
 		final boolean isNewResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(newResourceDB);
 
-		if(!isNewResourceMatchedCompletely) {
+		if (!isNewResourceMatchedCompletely) {
 
 			throw new DMPGraphException("new resource wasn't matched completely by the delta algo");
 		}
 
 		// traverse resource graphs to extract changeset
-		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.ADDITION, newResourceDB);
+		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(),
+				DeltaState.ADDITION, newResourceDB);
 		final Map<String, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
 
-		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.DELETION, existingResourceDB);
+		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
+				existingResource.getUri(), DeltaState.DELETION, existingResourceDB);
 		final Map<String, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
 
-		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(), DeltaState.MODIFICATION, newResourceDB);
+		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(),
+				DeltaState.MODIFICATION, newResourceDB);
 		final Map<String, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
 
-		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
+		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
+				existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
 		final Map<String, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
-		for(final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher.getModifications().entrySet()) {
+		for (final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher
+				.getModifications().entrySet()) {
 
-			changesetModifications.put(firstDegreeModificationGDMValueModificationEntry.getKey().getNodeId(), firstDegreeModificationGDMValueModificationEntry.getValue().getNodeId());
+			changesetModifications.put(firstDegreeModificationGDMValueModificationEntry.getKey().getNodeId(),
+					firstDegreeModificationGDMValueModificationEntry.getValue().getNodeId());
 		}
 
 		final Map<Long, Statement> preparedExistingModifiedStatements = ChangesetUtil.providedModifiedStatements(existingModifiedStatements);
 		final Map<Long, Statement> preparedNewModifiedStatements = ChangesetUtil.providedModifiedStatements(newModifiedStatements);
 
 		// return a changeset model (i.e. with information for add, delete, update per triple)
-		return new Changeset(addedStatements, removedStatements, changesetModifications, preparedExistingModifiedStatements, preparedNewModifiedStatements);
+		return new Changeset(addedStatements, removedStatements, changesetModifications, preparedExistingModifiedStatements,
+				preparedNewModifiedStatements);
 	}
 
 	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) throws DMPGraphException {
@@ -772,7 +740,8 @@ public class GDMResource {
 		GDMResource.LOG.debug("finished shutting down working graph data model DBs for resources");
 	}
 
-	private void deprecateMissingRecords(final Set<String> processedResources, final String recordClassUri, final String dataModelUri, final int latestVersion, final GDMNeo4jProcessor processor) throws DMPGraphException {
+	private void deprecateMissingRecords(final Set<String> processedResources, final String recordClassUri, final String dataModelUri,
+			final int latestVersion, final GDMNeo4jProcessor processor) throws DMPGraphException {
 
 		// determine all record URIs of the data model
 		// how? - via record class?
@@ -783,8 +752,8 @@ public class GDMResource {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = processor.getProcessor().getDatabase().findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-				dataModelUri);
+			final ResourceIterable<Node> recordNodes = processor.getProcessor().getDatabase()
+					.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY, dataModelUri);
 
 			if (recordNodes == null) {
 
@@ -806,7 +775,7 @@ public class GDMResource {
 					continue;
 				}
 
-				if(!processedResources.contains(resourceUri)) {
+				if (!processedResources.contains(resourceUri)) {
 
 					notProcessedResources.add(recordNode);
 
@@ -814,25 +783,26 @@ public class GDMResource {
 				}
 			}
 
-			for(final Node notProcessedResource : notProcessedResources) {
+			for (final Node notProcessedResource : notProcessedResources) {
 
-				final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getProcessor().getDatabase(), notProcessedResource);
+				final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getProcessor()
+						.getDatabase(), notProcessedResource);
 
-				if(notProcessedResourcePaths == null) {
+				if (notProcessedResourcePaths == null) {
 
 					continue;
 				}
 
-				for(final org.neo4j.graphdb.Path notProcessedResourcePath : notProcessedResourcePaths) {
+				for (final org.neo4j.graphdb.Path notProcessedResourcePath : notProcessedResourcePaths) {
 
 					final Iterable<Relationship> rels = notProcessedResourcePath.relationships();
 
-					if(rels == null) {
+					if (rels == null) {
 
 						continue;
 					}
 
-					for(final Relationship rel : rels) {
+					for (final Relationship rel : rels) {
 
 						rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
 					}
@@ -848,5 +818,250 @@ public class GDMResource {
 
 			throw new DMPGraphException(message);
 		}
+	}
+
+	private List<BodyPart> getBodyParts(final MultiPart multiPart) throws DMPGraphException {
+
+		if (multiPart == null) {
+
+			final String message = "couldn't write GDM, no multipart payload available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		final List<BodyPart> bodyParts = multiPart.getBodyParts();
+
+		if (bodyParts == null || bodyParts.isEmpty()) {
+
+			final String message = "couldn't write GDM, no body parts available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		if (bodyParts.size() < 2) {
+
+			final String message = "couldn't write GDM, there must be a content and a metadata body part";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		return bodyParts;
+	}
+
+	private InputStream getContent(final List<BodyPart> bodyParts) throws DMPGraphException {
+
+		final BodyPart contentBodyPart = bodyParts.get(0);
+
+		if (contentBodyPart == null) {
+
+			final String message = "couldn't write GDM, no content part available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		final BodyPartEntity bpe = (BodyPartEntity) contentBodyPart.getEntity();
+
+		if (bpe == null) {
+
+			final String message = "couldn't write GDM, no content part entity available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		final InputStream gdmInputStream = bpe.getInputStream();
+
+		if (gdmInputStream == null) {
+
+			final String message = "input stream for write to graph DB request is null";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		return gdmInputStream;
+	}
+
+	private ObjectNode getMetadata(final List<BodyPart> bodyParts) throws DMPGraphException {
+
+		final BodyPart metadataBodyPart = bodyParts.get(1);
+
+		if (metadataBodyPart == null) {
+
+			final String message = "couldn't write GDM, no metadata part available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		final String metadataString = metadataBodyPart.getEntityAs(String.class);
+
+		if (metadataString == null) {
+
+			final String message = "couldn't write GDM, no metadata entity part available";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message);
+		}
+
+		try {
+
+			return objectMapper.readValue(metadataString, ObjectNode.class);
+		} catch (final IOException e) {
+
+			final String message = "couldn't write GDM, couldn't deserialize metadata part";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message, e);
+		}
+	}
+
+	private Model getModel(final InputStream content) throws DMPGraphException, IOException {
+
+		Model model;
+
+		try {
+
+			model = objectMapper.readValue(content, Model.class);
+		} catch (IOException e) {
+
+			final String message = "couldn't write GDM, could not deserialise GDM JSON";
+
+			GDMResource.LOG.error(message);
+
+			throw new DMPGraphException(message, e);
+		}
+
+		if (model == null) {
+
+			final String message = "couldn't write GDM, deserialised GDM JSON is null";
+
+			GDMResource.LOG.error(message);
+
+			content.close();
+
+			throw new DMPGraphException(message);
+		}
+
+		return model;
+	}
+
+	private Optional<JsonNode> getMetadataPartNode(final String property, final ObjectNode metadata, final boolean mandatory)
+			throws DMPGraphException {
+
+		final JsonNode metadataPartNode = metadata.get(property);
+
+		if (metadataPartNode == null) {
+
+			final String message;
+
+			if (mandatory) {
+				message = "couldn't write GDM, mandatory property '" + property + "' is not available in request metadata";
+
+				GDMResource.LOG.error(message);
+
+				throw new DMPGraphException(message);
+			} else {
+
+				message = "couldn't find obligatory property '" + property + "' in request metadata";
+
+				GDMResource.LOG.debug(message);
+
+				return Optional.absent();
+			}
+		}
+
+		return Optional.of(metadataPartNode);
+	}
+
+	private Optional<String> getMetadataPart(final String property, final ObjectNode metadata, final boolean mandatory) throws DMPGraphException {
+
+		final Optional<JsonNode> optionalMetadataPartNode = getMetadataPartNode(property, metadata, mandatory);
+
+		if (!optionalMetadataPartNode.isPresent()) {
+
+			return Optional.absent();
+		}
+
+		final JsonNode metadataPartNode = optionalMetadataPartNode.get();
+
+		final String metadataPartValue = metadataPartNode.asText();
+
+		if (metadataPartValue == null) {
+
+			final String message;
+
+			if (mandatory) {
+				message = "couldn't write GDM, mandatory value for property '" + property + "' is not available in request metadata";
+
+				GDMResource.LOG.error(message);
+
+				throw new DMPGraphException(message);
+			} else {
+
+				message = "couldn't find obligatory value for property '" + property + "' in request metadata";
+
+				GDMResource.LOG.debug(message);
+
+				return Optional.absent();
+			}
+		}
+
+		return Optional.of(metadataPartValue);
+	}
+
+	private Optional<ContentSchema> getContentSchema(final ObjectNode metadata) throws DMPGraphException {
+
+		final Optional<JsonNode> optionalContentSchemaJSON = getMetadataPartNode(DMPStatics.CONTENT_SCHEMA_IDENTIFIER, metadata, false);
+
+		if (!optionalContentSchemaJSON.isPresent()) {
+
+			return Optional.absent();
+		}
+
+		try {
+
+			final String contentSchemaJSONString = objectMapper.writeValueAsString(optionalContentSchemaJSON.get());
+			final ContentSchema contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
+
+			return Optional.fromNullable(contentSchema);
+		} catch (final IOException e) {
+
+			final String message = "could not deserialise content schema JSON for write from graph DB request";
+
+			GDMResource.LOG.debug(message);
+
+			return Optional.absent();
+		}
+	}
+
+	private Optional<Boolean> getDeprecateMissingRecordsFlag(final ObjectNode metadata) throws DMPGraphException {
+
+		final Optional<String> optionalDeprecateMissingRecords = getMetadataPart(DMPStatics.DEPRECATE_MISSING_RECORDS_IDENTIFIER, metadata, false);
+
+		final Optional<Boolean> result;
+
+		if (optionalDeprecateMissingRecords.isPresent()) {
+
+			result = Optional.fromNullable(Boolean.valueOf(optionalDeprecateMissingRecords.get()));
+		} else {
+
+			result = Optional.of(Boolean.FALSE);
+		}
+
+		return result;
 	}
 }

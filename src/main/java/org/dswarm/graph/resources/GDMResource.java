@@ -14,14 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
- * graph extension. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.dswarm.graph.resources;
 
 import java.io.IOException;
@@ -127,14 +119,14 @@ import com.sun.jersey.multipart.MultiPart;
 @Path("/gdm")
 public class GDMResource {
 
-	private static final Logger				LOG								= LoggerFactory.getLogger(GDMResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper				objectMapper;
-	private final TestGraphDatabaseFactory	impermanentGraphDatabaseFactory;
-	private static final String				IMPERMANENT_GRAPH_DATABASE_PATH	= "target/test-data/impermanent-db/";
+	private final ObjectMapper             objectMapper;
+	private final TestGraphDatabaseFactory impermanentGraphDatabaseFactory;
+	private static final String IMPERMANENT_GRAPH_DATABASE_PATH = "target/test-data/impermanent-db/";
 
 	public GDMResource() {
 
@@ -192,33 +184,28 @@ public class GDMResource {
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
 			final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-			if (optionalContentSchema.isPresent()) {
+			// = new resources model, since existing, modified resources were already written to the DB
+			final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI, database, handler);
 
-				final ContentSchema contentSchema = optionalContentSchema.get();
+			model = result.first();
 
-				// = new resources model, since existing, modified resources were already written to the DB
-				final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, contentSchema, dataModelURI, database, handler);
+			final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
-				model = result.first();
+			if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
 
-				final Optional<Boolean> optionalDepreacteMissingRecords = getDeprecateMissingRecordsFlag(metadata);
+				final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
 
-				if (optionalDepreacteMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDepreacteMissingRecords.get())) {
+				if (!optionalRecordClassURI.isPresent()) {
 
-					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
-
-					if (!optionalRecordClassURI.isPresent()) {
-
-						throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
-					}
-
-					// deprecate missing records in DB
-
-					final Set<String> processedResources = result.other();
-
-					deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
-							((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(), processor);
+					throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
 				}
+
+				// deprecate missing records in DB
+
+				final Set<String> processedResources = result.other();
+
+				deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
+						((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(), processor);
 			}
 
 			if (model.size() > 0) {
@@ -401,7 +388,8 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Model model, final ContentSchema contentSchema, final String dataModelURI,
+	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Model model, final Optional<ContentSchema> optionalContentSchema,
+			final String dataModelURI,
 			final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
@@ -419,14 +407,15 @@ public class GDMResource {
 			final Resource existingResource;
 			final GDMResourceReader gdmReader;
 
-			if (contentSchema.getRecordIdentifierAttributePath() != null) {
+			if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
 				// determine legacy resource identifier via content schema
 				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB,
-						contentSchema.getRecordIdentifierAttributePath(), newResource.getUri());
+						optionalContentSchema.get().getRecordIdentifierAttributePath(), newResource.getUri());
 
 				// try to retrieve existing model via legacy record identifier
-				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, contentSchema.getRecordIdentifierAttributePath(), dataModelURI,
+				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, optionalContentSchema.get().getRecordIdentifierAttributePath(),
+						dataModelURI,
 						permanentDatabase);
 			} else {
 
@@ -454,7 +443,8 @@ public class GDMResource {
 
 			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
 
-			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB, contentSchema);
+			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
+					optionalContentSchema);
 
 			if (!changeset.hasChanges()) {
 
@@ -482,7 +472,8 @@ public class GDMResource {
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
-			final Resource newResource, final GraphDatabaseService newResourceDB, final ContentSchema contentSchema) throws DMPGraphException {
+			final Resource newResource, final GraphDatabaseService newResourceDB, final Optional<ContentSchema> optionalContentSchema)
+			throws DMPGraphException {
 
 		enrichModel(existingResourceDB, existingResource.getUri());
 		enrichModel(newResourceDB, newResource.getUri());
@@ -511,7 +502,15 @@ public class GDMResource {
 
 		final Map<Long, Long> changesetModifications = new HashMap<>();
 
-		final Optional<AttributePath> optionalCommonAttributePath = AttributePathUtil.determineCommonAttributePath(contentSchema);
+		final Optional<AttributePath> optionalCommonAttributePath;
+
+		if (optionalContentSchema.isPresent()) {
+
+			optionalCommonAttributePath = AttributePathUtil.determineCommonAttributePath(optionalContentSchema.get());
+		} else {
+
+			optionalCommonAttributePath = Optional.absent();
+		}
 
 		if (optionalCommonAttributePath.isPresent()) {
 
@@ -520,9 +519,9 @@ public class GDMResource {
 			final AttributePath commonAttributePath = optionalCommonAttributePath.get();
 
 			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath,
-					contentSchema);
+					optionalContentSchema.get());
 			final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(),
-					commonAttributePath, contentSchema);
+					commonAttributePath, optionalContentSchema.get());
 
 			// do delta calculation on enriched GDM models in graph
 			// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do

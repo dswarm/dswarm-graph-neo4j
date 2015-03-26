@@ -31,14 +31,14 @@ import org.neo4j.graphdb.index.IndexHits;
  */
 public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourceReader {
 
-	private static final String type = "GDM record by URI";
+	private static final String TYPE = "GDM record by URI";
 
 	private final String	recordUri;
 
 	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final Optional<Integer> optionalVersionArg, final GraphDatabaseService database)
 			throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, type);
+		super(dataModelUri, optionalVersionArg, database, TYPE);
 
 		recordUri = recordUriArg;
 	}

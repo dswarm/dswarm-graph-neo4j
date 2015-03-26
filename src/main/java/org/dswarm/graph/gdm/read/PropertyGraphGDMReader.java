@@ -45,27 +45,30 @@ import com.google.common.base.Optional;
  */
 public abstract class PropertyGraphGDMReader implements GDMReader {
 
-	private static final Logger				LOG							= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMReader.class);
 
-	protected final NodeHandler				nodeHandler;
-	protected final NodeHandler				startNodeHandler;
-	protected final RelationshipHandler		relationshipHandler;
+	protected final NodeHandler         nodeHandler;
+	protected final NodeHandler         startNodeHandler;
+	protected final RelationshipHandler relationshipHandler;
 
-	protected final String					dataModelUri;
-	protected Integer							version;
+	protected final String  dataModelUri;
+	protected       Integer version;
 
-	protected final GraphDatabaseService	database;
+	protected final GraphDatabaseService database;
 
-	protected Resource						currentResource;
-	protected final Map<Long, Statement>		currentResourceStatements	= new HashMap<>();
+	protected Resource currentResource;
+	protected final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
-	protected Transaction						tx							= null;
+	protected Transaction tx = null;
+
+	protected final String type;
 
 	public PropertyGraphGDMReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg,
-			final String type) throws DMPGraphException {
+			final String typeArg) throws DMPGraphException {
 
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
+		type = typeArg;
 
 		if (optionalVersionArg.isPresent()) {
 
@@ -166,7 +169,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		private final PropertyGraphGDMReaderHelper	propertyGraphGDMReaderHelper	= new PropertyGraphGDMReaderHelper();
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -240,6 +243,27 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());
 				}
+			}
+		}
+	}
+
+	protected void ensureTx() throws DMPGraphException {
+
+		if (tx == null) {
+
+			try {
+
+				PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
+
+				tx = database.beginTx();
+			} catch (final Exception e) {
+
+				final String message = "couldn't acquire tx successfully";
+
+				PropertyGraphGDMReader.LOG.error(message, e);
+				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
+
+				throw new DMPGraphException(message);
 			}
 		}
 	}

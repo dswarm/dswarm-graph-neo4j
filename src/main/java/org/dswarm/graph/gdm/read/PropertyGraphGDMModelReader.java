@@ -41,19 +41,19 @@ import org.dswarm.graph.model.GraphStatics;
  */
 public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implements GDMModelReader {
 
-	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMModelReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMModelReader.class);
 
-	private static final String type = "GDM model";
+	private static final String TYPE = "GDM model";
 
-	private final String				recordClassUri;
-	private Optional<Integer>			optionalAtMost;
+	private final String            recordClassUri;
+	private       Optional<Integer> optionalAtMost;
 
-	private Model						model;
+	private Model model;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
 			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
 
-		super(dataModelUriArg, optionalVersionArg, databaseArg, type);
+		super(dataModelUriArg, optionalVersionArg, databaseArg, TYPE);
 
 		recordClassUri = recordClassUriArg;
 		optionalAtMost = optionalAtMostArg;
@@ -62,23 +62,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	@Override
 	public Model read() throws DMPGraphException {
 
-		if (tx == null) {
-
-			try {
-
-				PropertyGraphGDMModelReader.LOG.debug("start read GDM TX");
-
-				tx = database.beginTx();
-			} catch (final Exception e) {
-
-				final String message = "couldn't acquire tx successfully";
-
-				PropertyGraphGDMModelReader.LOG.error(message, e);
-				PropertyGraphGDMModelReader.LOG.debug("couldn't finish read GDM TX successfully");
-
-				throw new DMPGraphException(message);
-			}
-		}
+		ensureTx();
 
 		ResourceIterator<Node> recordNodesIter = null;
 
@@ -93,8 +77,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG
+						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+								type);
 
 				return null;
 			}
@@ -104,8 +89,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				recordNodesIter.close();
 				tx.success();
 
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read GDM TX successfully");
+				PropertyGraphGDMModelReader.LOG
+						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+								type);
 
 				return null;
 			}
@@ -129,7 +115,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				if (resourceUri == null) {
 
-					LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
+					LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
 
 					continue;
 				}
@@ -166,10 +152,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			recordNodesIter.close();
 			tx.success();
 
-			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX successfully");
+			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX successfully", type);
 		} catch (final Exception e) {
 
-			PropertyGraphGDMModelReader.LOG.error("couldn't finished read GDM TX successfully", e);
+			PropertyGraphGDMModelReader.LOG.error("couldn't finished read {} TX successfully", type, e);
 
 			if (recordNodesIter != null) {
 
@@ -179,7 +165,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			tx.failure();
 		} finally {
 
-			PropertyGraphGDMModelReader.LOG.debug("finished read GDM TX finally");
+			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX finally", type);
 
 			tx.close();
 		}

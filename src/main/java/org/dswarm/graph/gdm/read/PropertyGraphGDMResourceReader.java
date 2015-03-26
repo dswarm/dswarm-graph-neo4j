@@ -49,9 +49,11 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 	@Override
 	public Resource read() throws DMPGraphException {
 
-		try (final Transaction tx = database.beginTx()) {
+		ensureTx();
 
-			PropertyGraphGDMResourceReader.LOG.debug("start read GDM TX");
+		try {
+
+			PropertyGraphGDMResourceReader.LOG.debug("start read {} TX", type);
 
 			final Node recordNode = getResourceNode();
 
@@ -61,7 +63,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 				tx.success();
 
-				PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
+				PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 
 				return null;
 			}
@@ -70,11 +72,11 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 			if (resourceUri == null) {
 
-				LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
+				LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
 
 				tx.success();
 
-				PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
+				PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 
 				return null;
 			}
@@ -105,14 +107,21 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 			tx.success();
 
-			PropertyGraphGDMResourceReader.LOG.debug("finished read GDM TX successfully");
+			PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 		} catch (final Exception e) {
 
-			final String message = "couldn't finished read GDM TX successfully";
+			tx.failure();
+
+			final String message = String.format("couldn't finished read %s TX successfully", type);
 
 			PropertyGraphGDMResourceReader.LOG.error(message, e);
 
 			throw new DMPGraphException(message);
+		}  finally {
+
+			PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX finally", type);
+
+			tx.close();
 		}
 
 		return currentResource;

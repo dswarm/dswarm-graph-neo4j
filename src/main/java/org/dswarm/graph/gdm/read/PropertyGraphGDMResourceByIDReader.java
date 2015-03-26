@@ -33,7 +33,7 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(PropertyGraphGDMResourceByIDReader.class);
 
-	private static final String type = "GDM record by ID";
+	private static final String TYPE = "GDM record by ID";
 
 	private final String		recordId;
 	private String recordURI;
@@ -42,7 +42,7 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri, final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService database) throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, type);
+		super(dataModelUri, optionalVersionArg, database, TYPE);
 
 		recordId = recordIdArg;
 		recordIdentifierAP = recordIdentifierAPArg;

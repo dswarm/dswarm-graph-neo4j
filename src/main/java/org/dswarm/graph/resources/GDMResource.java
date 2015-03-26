@@ -127,6 +127,9 @@ public class GDMResource {
 	private final TestGraphDatabaseFactory impermanentGraphDatabaseFactory;
 	private static final String IMPERMANENT_GRAPH_DATABASE_PATH = "target/test-data/impermanent-db/";
 
+	private static final String READ_GDM_MODEL_TYPE = "read GDM record from graph DB request";
+	private static final String READ_GDM_RECORD_TYPE = "read GDM record from graph DB request";
+
 	public GDMResource() {
 
 		objectMapper = Util.getJSONObjectMapper();
@@ -327,44 +330,12 @@ public class GDMResource {
 
 		GDMResource.LOG.debug("try to read GDM statements from graph db");
 
-		final ObjectNode json;
+		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, READ_GDM_MODEL_TYPE);
 
-		try {
-
-			json = objectMapper.readValue(jsonObjectString, ObjectNode.class);
-		} catch (final IOException e) {
-
-			final String message = "could not deserialise request JSON for read from graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
-		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
-		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
-		final Optional<Integer> optionalVersion;
-
-		if (versionNode != null) {
-
-			optionalVersion = Optional.fromNullable(versionNode.asInt());
-		} else {
-
-			optionalVersion = Optional.absent();
-		}
-
-		final JsonNode atMostNode = json.get(DMPStatics.AT_MOST_IDENTIFIER);
-
-		final Optional<Integer> optionalAtMost;
-
-		if (atMostNode != null) {
-
-			optionalAtMost = Optional.fromNullable(atMostNode.asInt());
-		} else {
-
-			optionalAtMost = Optional.absent();
-		}
+		final String recordClassUri = requestJSON.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
+		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
+		final Optional<Integer> optionalAtMost = getIntValue(DMPStatics.AT_MOST_IDENTIFIER, requestJSON);
 
 		GDMResource.LOG.debug("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 				dataModelUri, recordClassUri, optionalVersion);
@@ -372,14 +343,7 @@ public class GDMResource {
 		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
 		final Model model = gdmReader.read();
 
-		String result;
-		try {
-
-			result = objectMapper.writeValueAsString(model);
-		} catch (final JsonProcessingException e) {
-
-			throw new DMPGraphException("some problems occur, while processing the JSON from the GDM model", e);
-		}
+		String result = serializeJSON(model, READ_GDM_MODEL_TYPE);
 
 		GDMResource.LOG
 				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
@@ -396,52 +360,40 @@ public class GDMResource {
 
 		GDMResource.LOG.debug("try to read GDM record from graph db");
 
-		final ObjectNode json;
+		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, READ_GDM_RECORD_TYPE);
 
-		try {
-
-			json = objectMapper.readValue(jsonObjectString, ObjectNode.class);
-		} catch (final IOException e) {
-
-			final String message = "could not deserialise request JSON for read GDM record from graph DB request";
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		final String recordUri = json.get(DMPStatics.RECORD_URI_IDENTIFIER).asText();
-		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
-		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
-		final Optional<Integer> optionalVersion;
-
-		if (versionNode != null) {
-
-			optionalVersion = Optional.fromNullable(versionNode.asInt());
-		} else {
-
-			optionalVersion = Optional.absent();
-		}
+		final Optional<String> optionalRecordUri = getStringValue(DMPStatics.RECORD_URI_IDENTIFIER, requestJSON);
+		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
+		final Optional<String> optionalLegacyRecordIdentifierAP = getStringValue(DMPStatics.LEGACY_RECORD_IDENTIFIER_ATTRIBUTE_PATH, requestJSON);
+		final Optional<String> optionalRecordId = getStringValue(DMPStatics.RECORD_ID_IDENTIFIER, requestJSON);
 
 		GDMResource.LOG.debug("try to read GDM record for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
-				dataModelUri, recordUri, optionalVersion);
+				dataModelUri, optionalRecordUri, optionalVersion);
 
-		final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri, optionalVersion, database);
+		final GDMResourceReader gdmReader;
+
+		if (optionalRecordUri.isPresent()) {
+
+			gdmReader = new PropertyGraphGDMResourceByURIReader(optionalRecordUri.get(), dataModelUri, optionalVersion, database);
+		} else if (optionalLegacyRecordIdentifierAP.isPresent() && optionalRecordId.isPresent()) {
+
+			final AttributePath legacyRecordIdentifierAP = AttributePathUtil.parseAttributePathString(optionalLegacyRecordIdentifierAP.get());
+
+			gdmReader = new PropertyGraphGDMResourceByIDReader(optionalRecordId.get(), legacyRecordIdentifierAP, dataModelUri, optionalVersion, database);
+		} else {
+
+			throw new DMPGraphException(
+					"no identifiers given to retrieve a GDM record from the grap db. Please specify a record URI or legacy record identifier attribute path + record identifier");
+		}
+		
 		final Resource resource = gdmReader.read();
 
-		String result;
-
-		try {
-
-			result = objectMapper.writeValueAsString(resource);
-		} catch (final JsonProcessingException e) {
-
-			throw new DMPGraphException("some problems occur, while processing the JSON from the GDM model", e);
-		}
+		String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
 
 		GDMResource.LOG
 				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
-						resource.size(), gdmReader.countStatements(), dataModelUri, recordUri, optionalVersion);
+						resource.size(), gdmReader.countStatements(), dataModelUri, optionalRecordUri, optionalVersion);
 
 		return Response.ok().entity(result).build();
 	}
@@ -1124,5 +1076,65 @@ public class GDMResource {
 		}
 
 		return result;
+	}
+
+	private Optional<String> getStringValue(final String key, final JsonNode json) {
+
+		final JsonNode node = json.get(key);
+		final Optional<String> optionalValue;
+
+		if (node != null) {
+
+			optionalValue = Optional.fromNullable(node.asText());
+		} else {
+
+			optionalValue = Optional.absent();
+		}
+
+		return optionalValue;
+	}
+
+	private Optional<Integer> getIntValue(final String key, final JsonNode json) {
+
+		final JsonNode node = json.get(key);
+		final Optional<Integer> optionalValue;
+
+		if (node != null) {
+
+			optionalValue = Optional.fromNullable(node.asInt());
+		} else {
+
+			optionalValue = Optional.absent();
+		}
+
+		return optionalValue;
+	}
+
+	private ObjectNode deserializeJSON(final String jsonString, final String type) throws DMPGraphException {
+
+		try {
+
+			return objectMapper.readValue(jsonString, ObjectNode.class);
+		} catch (final IOException e) {
+
+			final String message = String.format("could not deserialise request JSON for %s", type);
+
+			GDMResource.LOG.debug(message);
+
+			throw new DMPGraphException(message, e);
+		}
+	}
+
+	private String serializeJSON(final Object object, final String type) throws DMPGraphException {
+
+		try {
+
+			return objectMapper.writeValueAsString(object);
+		} catch (final JsonProcessingException e) {
+
+			final String message = String.format("some problems occur, while processing the JSON for %s", type);
+
+			throw new DMPGraphException(message, e);
+		}
 	}
 }

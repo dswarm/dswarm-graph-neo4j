@@ -36,6 +36,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 			final Label recordClassLabel = DynamicLabel.label("__LEAF__");
 
-			final ResourceIterable<Node> leafNodes = database.findNodesByLabelAndProperty(recordClassLabel, "__LEAF__", true);
+			final ResourceIterator<Node> leafNodes = database.findNodes(recordClassLabel, "__LEAF__", true);
 
 			if (leafNodes == null) {
 
@@ -88,11 +89,14 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 				return;
 			}
 
-			for (final Node leafNode : leafNodes) {
+			while(leafNodes.hasNext()) {
+
+				final Node leafNode = leafNodes.next();
 
 				startNodeHandler.handleNode(leafNode);
 			}
 
+			leafNodes.close();
 			tx.success();
 
 			PropertyGraphSignGDMWorker.LOG.debug("finished sign GDM TX successfully");

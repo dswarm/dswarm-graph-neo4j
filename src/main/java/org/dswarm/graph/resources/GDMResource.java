@@ -37,6 +37,28 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.MultiPart;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.helpers.Pair;
+import org.neo4j.test.TestGraphDatabaseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
@@ -89,30 +111,6 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
-
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.helpers.Pair;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 
 /**
  * @author tgaengler
@@ -205,8 +203,8 @@ public class GDMResource {
 
 				final Set<String> processedResources = result.other();
 
-				deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
-						((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().getLatestVersion(), processor);
+				deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI, ((Neo4jUpdateHandler) handler.getHandler())
+						.getVersionHandler().getLatestVersion(), processor);
 			}
 
 			if (model.size() > 0) {
@@ -233,7 +231,7 @@ public class GDMResource {
 
 			content.close();
 
-			LOG.debug("finished writing " + size + " GDM statements into graph db for data model URI '" + dataModelURI + "'");
+			LOG.debug("finished writing {} GDM statements into graph db for data model URI '{}'", size, dataModelURI);
 
 			return Response.ok().build();
 
@@ -346,14 +344,14 @@ public class GDMResource {
 		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
 		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
-		final Integer version;
+		final Optional<Integer> optionalVersion;
 
 		if (versionNode != null) {
 
-			version = versionNode.asInt();
+			optionalVersion = Optional.fromNullable(versionNode.asInt());
 		} else {
 
-			version = null;
+			optionalVersion = Optional.absent();
 		}
 
 		final JsonNode atMostNode = json.get(DMPStatics.AT_MOST_IDENTIFIER);
@@ -368,30 +366,88 @@ public class GDMResource {
 			optionalAtMost = Optional.absent();
 		}
 
-		GDMResource.LOG.debug("try to read GDM statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
-				+ "' and version = '" + version + "' from graph db");
+		GDMResource.LOG.debug("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+				dataModelUri, recordClassUri, optionalVersion);
 
-		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, version, optionalAtMost, database);
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
 		final Model model = gdmReader.read();
 
-		String result = null;
+		String result;
 		try {
+
 			result = objectMapper.writeValueAsString(model);
 		} catch (final JsonProcessingException e) {
 
 			throw new DMPGraphException("some problems occur, while processing the JSON from the GDM model", e);
 		}
 
-		GDMResource.LOG.debug("finished reading '" + model.size() + "' GDM statements ('" + gdmReader.countStatements()
-				+ "' via GDM reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' and version = '"
-				+ version + "' from graph db");
+		GDMResource.LOG
+				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+						model.size(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+
+		return Response.ok().entity(result).build();
+	}
+
+	@POST
+	@Path("/getrecord")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response readGDMRecord(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+
+		GDMResource.LOG.debug("try to read GDM record from graph db");
+
+		final ObjectNode json;
+
+		try {
+
+			json = objectMapper.readValue(jsonObjectString, ObjectNode.class);
+		} catch (final IOException e) {
+
+			final String message = "could not deserialise request JSON for read GDM record from graph DB request";
+
+			GDMResource.LOG.debug(message);
+
+			throw new DMPGraphException(message, e);
+		}
+
+		final String recordUri = json.get(DMPStatics.RECORD_URI_IDENTIFIER).asText();
+		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
+		final Optional<Integer> optionalVersion;
+
+		if (versionNode != null) {
+
+			optionalVersion = Optional.fromNullable(versionNode.asInt());
+		} else {
+
+			optionalVersion = Optional.absent();
+		}
+
+		GDMResource.LOG.debug("try to read GDM record for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
+				dataModelUri, recordUri, optionalVersion);
+
+		final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri, optionalVersion, database);
+		final Resource resource = gdmReader.read();
+
+		String result;
+
+		try {
+
+			result = objectMapper.writeValueAsString(resource);
+		} catch (final JsonProcessingException e) {
+
+			throw new DMPGraphException("some problems occur, while processing the JSON from the GDM model", e);
+		}
+
+		GDMResource.LOG
+				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
+						resource.size(), gdmReader.countStatements(), dataModelUri, recordUri, optionalVersion);
 
 		return Response.ok().entity(result).build();
 	}
 
 	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Model model, final Optional<ContentSchema> optionalContentSchema,
-			final String dataModelURI,
-			final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
+			final String dataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
@@ -411,17 +467,18 @@ public class GDMResource {
 			if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
 				// determine legacy resource identifier via content schema
-				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB,
-						optionalContentSchema.get().getRecordIdentifierAttributePath(), newResource.getUri());
+				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
+						.getRecordIdentifierAttributePath(), newResource.getUri());
 
 				// try to retrieve existing model via legacy record identifier
+				// note: version is absent -> should make use of latest version
 				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, optionalContentSchema.get().getRecordIdentifierAttributePath(),
-						dataModelURI,
-						permanentDatabase);
+						dataModelURI, Optional.<Integer>absent(), permanentDatabase);
 			} else {
 
 				// try to retrieve existing model via resource uri
-				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, permanentDatabase);
+				// note: version is absent -> should make use of latest version
+				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(), permanentDatabase);
 			}
 
 			existingResource = gdmReader.read();
@@ -764,7 +821,7 @@ public class GDMResource {
 
 			final Set<Node> notProcessedResources = new HashSet<>();
 
-			while(recordNodes.hasNext()) {
+			while (recordNodes.hasNext()) {
 
 				final Node recordNode = recordNodes.next();
 

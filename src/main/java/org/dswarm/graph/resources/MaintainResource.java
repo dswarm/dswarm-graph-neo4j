@@ -29,21 +29,18 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
@@ -54,13 +51,13 @@ import org.dswarm.graph.GraphIndexStatics;
 @Path("/maintain")
 public class MaintainResource {
 
-	private static final Logger			LOG				= LoggerFactory.getLogger(MaintainResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MaintainResource.class);
 
-	private static final long			chunkSize		= 50000;
+	private static final long chunkSize = 50000;
 
-	private static final String			DELETE_CYPHER	= "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
+	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
-	private static final JsonFactory	jsonFactory		= new JsonFactory();
+	private static final JsonFactory jsonFactory = new JsonFactory();
 
 	public MaintainResource() {
 
@@ -122,9 +119,6 @@ public class MaintainResource {
 
 	private long deleteSomeStatements(final GraphDatabaseService database) throws DMPGraphException {
 
-
-		final ExecutionEngine engine = new ExecutionEngine(database);
-
 		final String deleteQuery = String.format(DELETE_CYPHER, MaintainResource.chunkSize);
 
 		long deleted = 0;
@@ -135,12 +129,12 @@ public class MaintainResource {
 
 			i++;
 
-			try(final Transaction tx = database.beginTx()) {
+			try (final Transaction tx = database.beginTx()) {
 
 				MaintainResource.LOG
-					.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
+						.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
 
-				final ExecutionResult result = engine.execute(deleteQuery);
+				final Result result = database.execute(deleteQuery);
 
 				if (result == null) {
 
@@ -151,34 +145,23 @@ public class MaintainResource {
 					break;
 				}
 
-				final ResourceIterator<Map<String, Object>> iterator = result.iterator();
-
-				if (iterator == null) {
-
-					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is not available");
-
-					tx.success();
-
-					break;
-				}
-
-				if (!iterator.hasNext()) {
+				if (!result.hasNext()) {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result iterator is empty");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
 				}
 
-				final Map<String, Object> row = iterator.next();
+				final Map<String, Object> row = result.next();
 
 				if (row == null || row.isEmpty()) {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. row map is empty");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
@@ -190,7 +173,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entry is not available");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
@@ -202,7 +185,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. value is not available");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
@@ -212,7 +195,7 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. entity count is not available");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
@@ -228,13 +211,13 @@ public class MaintainResource {
 
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. current result is smaller than chunk size");
 
-					iterator.close();
+					result.close();
 					tx.success();
 
 					break;
 				}
 
-				iterator.close();
+				result.close();
 				tx.success();
 			} catch (final Exception e) {
 
@@ -253,7 +236,7 @@ public class MaintainResource {
 
 		MaintainResource.LOG.debug("start delete legacy indices TX");
 
-		try(final Transaction itx = database.beginTx()) {
+		try (final Transaction itx = database.beginTx()) {
 
 			final Index<Node> resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
 			final Index<Node> values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
@@ -262,7 +245,8 @@ public class MaintainResource {
 			final Index<Relationship> statements = database.index().forRelationships("statements");
 			final Index<Relationship> statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 			final Index<Relationship> statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
-			final Index<Relationship> statementUUIDsWDataModel = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
+			final Index<Relationship> statementUUIDsWDataModel = database.index()
+					.forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 
 			if (resources != null) {
 
@@ -337,7 +321,7 @@ public class MaintainResource {
 
 		MaintainResource.LOG.debug("start delete schema indices TX");
 
-		try(final Transaction itx = database.beginTx()) {
+		try (final Transaction itx = database.beginTx()) {
 
 			final Schema schema = database.schema();
 

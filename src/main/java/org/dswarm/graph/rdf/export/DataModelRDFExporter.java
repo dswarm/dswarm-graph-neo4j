@@ -21,10 +21,9 @@ import java.util.Map.Entry;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +56,6 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 		DataModelRDFExporter.LOG.debug("start exporting data for dataModelURI \"" + dataModelURI + "\"");
 
 		try (final Transaction tx = database.beginTx()) {
-			// SR TODO: Keep the ExecutionEngine around, don’t create a new one for each query! (see
-			// http://docs.neo4j.org/chunked/milestone/tutorials-cypher-java.html)
-			// ...on the other hand we won't need the export very often
-			final ExecutionEngine engine = new ExecutionEngine(database);
 
 			dataset = DatasetFactory.createMem();
 
@@ -69,8 +64,15 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 
 			while (requestResults) {
 
-				final ExecutionResult result = engine.execute("MATCH (n)-[r]->(m) WHERE r." + GraphStatics.DATA_MODEL_PROPERTY + " = \""
+				final Result result = database.execute("MATCH (n)-[r]->(m) WHERE r." + GraphStatics.DATA_MODEL_PROPERTY + " = \""
 						+ dataModelURI + "\" RETURN DISTINCT r ORDER BY id(r) SKIP " + start + " LIMIT " + DataModelRDFExporter.CYPHER_LIMIT);
+
+				if(result == null) {
+
+					DataModelRDFExporter.LOG.debug("no results for '{}'", dataModelURI);
+
+					break;
+				}
 
 				start += DataModelRDFExporter.CYPHER_LIMIT;
 				requestResults = false;
@@ -85,7 +87,10 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				// activate for debug
 				// StringBuilder rows = new StringBuilder("\n\n");
 
-				for (final Map<String, Object> row : result) {
+				while(result.hasNext()) {
+
+					final Map<String, Object> row = result.next();
+
 					for (final Entry<String, Object> column : row.entrySet()) {
 
 						final Relationship relationship = (Relationship) column.getValue();
@@ -116,8 +121,11 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				}
 				// rows.append("\n");
 				// LOG.debug(rows.toString());
+
+				result.close();
 			}
 
+			tx.success();
 		}  catch (final Exception e) {
 
 			final String mesage = "couldn't finish read RDF TX successfully";

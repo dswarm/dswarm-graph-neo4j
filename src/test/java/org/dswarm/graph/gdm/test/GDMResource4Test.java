@@ -46,8 +46,8 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  */
 public abstract class GDMResource4Test extends BasicResourceTest {
 
-	private static final Logger LOG            = LoggerFactory.getLogger(GDMResource4Test.class);
-	private static final String DATA_MODEL_URI = "http://data.slub-dresden.de/resources/1";
+	private static final Logger LOG                  = LoggerFactory.getLogger(GDMResource4Test.class);
+	private static final String DATA_MODEL_URI       = "http://data.slub-dresden.de/resources/1";
 	private static final String MABXML_RESOURCE_GSON = "test-mabxml_w_data_model_resource.gson";
 
 	private final ObjectMapper objectMapper;
@@ -152,7 +152,10 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final String dataModelURI = "ttp://data.slub-dresden.de/resources/2222";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
-		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v2.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternalWDeprecation(dataModelURI, "versioning/csv.gdm.v2.json", recordClassURI);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -189,7 +192,10 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final String dataModelURI = "ttp://data.slub-dresden.de/resources/3333";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
-		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v2.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternalWDeprecation(dataModelURI, "versioning/csv.gdm.v2.json", recordClassURI);
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -217,6 +223,142 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("finished read versioned GDM record by URI test for GDM resource at {} DB", dbType);
 	}
 
+	@Test
+	public void searchGDMRecordFromDBThatWasWrittenAsGDM1() throws IOException {
+
+		LOG.debug("start search GDM records test 1 for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "ttp://data.slub-dresden.de/resources/4444";
+
+		writeGDMToDBInternal(dataModelURI, MABXML_RESOURCE_GSON);
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		final String recordURI = "http://data.slub-dresden.de/records/e9e1fa5a-3350-43ec-bb21-6ccfa90a4497";
+		final String keyAP = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#feld\u001Ehttp://www.w3.org/1999/02/22-rdf-syntax-ns#value";
+		final String searchValue = "06978834";
+
+		requestJson.put(DMPStatics.KEY_ATTRIBUTE_PATH_IDENTIFIER, keyAP);
+		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
+		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		final Model actualModel = searchGDMRecords(requestJson, 191);
+
+		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
+
+		LOG.debug("finished search GDM records test 1 for GDM resource at {} DB", dbType);
+	}
+
+	@Test
+	public void searchGDMRecordFromDBThatWasWrittenAsGDM2() throws IOException {
+
+		LOG.debug("start search GDM records test 2 for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "ttp://data.slub-dresden.de/resources/5555";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		final String recordURI = "http://data.slub-dresden.de/datamodels/DataModel-574990f5-4785-4020-b86a-9765bb084f16/records/cb31b25a-7aff-4b1d-a308-91be2fa2cc37";
+		final String keyAP = "http://data.slub-dresden.de/resources/1/schema#name";
+		final String searchValue = "foo";
+
+		requestJson.put(DMPStatics.KEY_ATTRIBUTE_PATH_IDENTIFIER, keyAP);
+		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
+		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		final Model actualModel = searchGDMRecords(requestJson, 6);
+
+		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
+
+		LOG.debug("finished search GDM records test 2 for GDM resource at {} DB", dbType);
+	}
+
+	@Test
+	public void searchGDMRecordFromDBThatWasWrittenAsGDM3() throws IOException {
+
+		LOG.debug("start search GDM records test 3 for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "ttp://data.slub-dresden.de/resources/6666";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternalWDeprecation(dataModelURI, "versioning/csv.gdm.v2.json", recordClassURI);
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		final String recordURI = "http://data.slub-dresden.de/datamodels/DataModel-574990f5-4785-4020-b86a-9765bb084f16/records/34aa79b1-4d70-4511-a36a-4a6311300c47";
+		final String keyAP = "http://data.slub-dresden.de/resources/1/schema#name";
+		final String searchValue = "gluck";
+
+		requestJson.put(DMPStatics.KEY_ATTRIBUTE_PATH_IDENTIFIER, keyAP);
+		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
+		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+		requestJson.put(DMPStatics.VERSION_IDENTIFIER, 1);
+
+		final Model actualModel = searchGDMRecords(requestJson, 6);
+
+		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
+
+		// should retrieve the latest version
+		requestJson.remove(DMPStatics.VERSION_IDENTIFIER);
+
+		final Model actualModel2 = searchGDMRecords(requestJson, 5);
+
+		Assert.assertEquals(recordURI, actualModel2.getResources().iterator().next().getUri());
+
+		LOG.debug("finished search GDM records test 3 for GDM resource at {} DB", dbType);
+	}
+
+	@Test
+	public void searchGDMRecordFromDBThatWasWrittenAsGDM4() throws IOException {
+
+		LOG.debug("start search GDM records test 4 for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "ttp://data.slub-dresden.de/resources/7777";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+
+		writeGDMToDBInternalWDeprecation(dataModelURI, "versioning/csv.gdm.v2.json", recordClassURI);
+
+		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		final ObjectNode requestJson = objectMapper.createObjectNode();
+
+		final String recordURI = "http://data.slub-dresden.de/datamodels/DataModel-574990f5-4785-4020-b86a-9765bb084f16/records/7a7990dd-2e4a-4757-85f2-7de444a0e502";
+		final String keyAP = "http://data.slub-dresden.de/resources/1/schema#name";
+		final String searchValue = "brumm";
+
+		requestJson.put(DMPStatics.KEY_ATTRIBUTE_PATH_IDENTIFIER, keyAP);
+		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
+		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+		requestJson.put(DMPStatics.VERSION_IDENTIFIER, 1);
+
+		final Model actualModel = searchGDMRecords(requestJson, 6);
+
+		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
+
+		// should retrieve the latest version
+		requestJson.remove(DMPStatics.VERSION_IDENTIFIER);
+
+		final Model actualModel2 = searchGDMRecords(requestJson, 0);
+
+		Assert.assertNull(actualModel2);
+
+		LOG.debug("finished search GDM records test 4 for GDM resource at {} DB", dbType);
+	}
+
 	private void writeGDMToDBInternal(final String dataModelURI, final String sourceFileName) throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
@@ -226,6 +368,35 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		final String requestJsonString = objectMapper.writeValueAsString(metadata);
+
+		// Construct a MultiPart with two body parts
+		final MultiPart multiPart = new MultiPart();
+		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+
+		// POST the request
+		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		multiPart.close();
+
+		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
+	}
+
+	private void writeGDMToDBInternalWDeprecation(final String dataModelURI, final String sourceFileName, final String recordClassURI) throws IOException {
+
+		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
+
+		final URL fileURL = Resources.getResource(sourceFileName);
+		final byte[] file = Resources.toByteArray(fileURL);
+
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+		metadata.put(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, recordClassURI);
+		metadata.put(DMPStatics.DEPRECATE_MISSING_RECORDS_IDENTIFIER, Boolean.TRUE.toString());
 
 		final String requestJsonString = objectMapper.writeValueAsString(metadata);
 
@@ -263,5 +434,29 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("the number of statements should be " + expectedNumberOfStatements, expectedNumberOfStatements, resource.size());
 
 		return resource;
+	}
+
+	private Model searchGDMRecords(final JsonNode requestJson, final int expectedNumberOfStatements) throws IOException {
+
+		final String requestJsonString = objectMapper.writeValueAsString(requestJson);
+
+		// POST the request
+		final ClientResponse response = target().path("/searchrecords").type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, requestJsonString);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
+		final String body = response.getEntity(String.class);
+
+		final Model model = objectMapper.readValue(body, Model.class);
+
+		if(model != null) {
+
+			LOG.debug("read '{}' statements", model.size());
+
+			Assert.assertEquals("the number of statements should be " + expectedNumberOfStatements, expectedNumberOfStatements, model.size());
+		}
+
+		return model;
 	}
 }

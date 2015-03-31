@@ -127,8 +127,9 @@ public class GDMResource {
 	private final TestGraphDatabaseFactory impermanentGraphDatabaseFactory;
 	private static final String IMPERMANENT_GRAPH_DATABASE_PATH = "target/test-data/impermanent-db/";
 
-	private static final String READ_GDM_MODEL_TYPE = "read GDM record from graph DB request";
-	private static final String READ_GDM_RECORD_TYPE = "read GDM record from graph DB request";
+	private static final String READ_GDM_MODEL_TYPE     = "read GDM record from graph DB request";
+	private static final String READ_GDM_RECORD_TYPE    = "read GDM record from graph DB request";
+	private static final String SEARCH_GDM_RECORDS_TYPE = "search GDM records";
 
 	public GDMResource() {
 
@@ -380,13 +381,14 @@ public class GDMResource {
 
 			final AttributePath legacyRecordIdentifierAP = AttributePathUtil.parseAttributePathString(optionalLegacyRecordIdentifierAP.get());
 
-			gdmReader = new PropertyGraphGDMResourceByIDReader(optionalRecordId.get(), legacyRecordIdentifierAP, dataModelUri, optionalVersion, database);
+			gdmReader = new PropertyGraphGDMResourceByIDReader(optionalRecordId.get(), legacyRecordIdentifierAP, dataModelUri, optionalVersion,
+					database);
 		} else {
 
 			throw new DMPGraphException(
 					"no identifiers given to retrieve a GDM record from the grap db. Please specify a record URI or legacy record identifier attribute path + record identifier");
 		}
-		
+
 		final Resource resource = gdmReader.read();
 
 		String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
@@ -394,6 +396,83 @@ public class GDMResource {
 		GDMResource.LOG
 				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
 						resource.size(), gdmReader.countStatements(), dataModelUri, optionalRecordUri, optionalVersion);
+
+		return Response.ok().entity(result).build();
+	}
+
+	@POST
+	@Path("/searchrecords")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchGDMRecords(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+
+		GDMResource.LOG.debug("try to {} in graph db", SEARCH_GDM_RECORDS_TYPE);
+
+		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, READ_GDM_RECORD_TYPE);
+
+		final String keyAPString = requestJSON.get(DMPStatics.KEY_ATTRIBUTE_PATH_IDENTIFIER).asText();
+		final String searchValue = requestJSON.get(DMPStatics.SEARCH_VALUE_IDENTIFIER).asText();
+		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
+
+		GDMResource.LOG
+				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+						keyAPString, searchValue, dataModelUri, optionalVersion);
+
+		final AttributePath keyAP = AttributePathUtil.parseAttributePathString(keyAPString);
+
+		final Collection<String> recordURIs = GraphDBUtil.determineRecordUris(searchValue, keyAP, dataModelUri, database);
+
+		if (recordURIs == null || recordURIs.isEmpty()) {
+
+//			final ObjectNode resultJSON = objectMapper.createObjectNode();
+//
+//			final String message = String.format(
+//					"couldn't find a record for for key attribute path = '%s' and search value = '%s' in data model '%s' with and version = '%s' from graph db",
+//					keyAPString, searchValue, dataModelUri, optionalVersion);
+//
+//			resultJSON.put("nok", message);
+//
+//			final String nokResult = serializeJSON(resultJSON, SEARCH_GDM_RECORDS_TYPE);
+
+			final Model model = new Model();
+
+			final String emptyResult = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
+
+			return Response.ok().entity(emptyResult).build();
+		}
+
+		final Model model = new Model();
+
+		for (final String recordUri : recordURIs) {
+
+			final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
+					optionalVersion, database);
+
+			try {
+
+				final Resource resource = gdmReader.read();
+
+				model.addResource(resource);
+			} catch (final DMPGraphException e) {
+
+				GDMResource.LOG.debug("couldn't retrieve record for record URI '{}'", recordUri);
+			}
+		}
+
+		String result = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
+
+		if (model.getResources() != null) {
+
+			GDMResource.LOG
+					.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+							model.getResources().size(), model.size(), keyAPString, searchValue, dataModelUri, optionalVersion);
+		} else {
+
+			GDMResource.LOG
+					.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+							keyAPString, searchValue, dataModelUri, optionalVersion);
+		}
 
 		return Response.ok().entity(result).build();
 	}

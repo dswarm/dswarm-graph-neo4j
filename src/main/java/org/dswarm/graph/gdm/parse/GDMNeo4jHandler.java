@@ -21,7 +21,7 @@ import java.util.Map;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
-import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
@@ -48,7 +48,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	protected final BaseNeo4jHandler		handler;
 	protected final GDMNeo4jProcessor		processor;
 
-	protected final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
+	protected final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
 
 	public GDMNeo4jHandler(final BaseNeo4jHandler handlerArg, final GDMNeo4jProcessor processorArg) throws DMPGraphException {
 
@@ -115,7 +115,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			final Relationship rel = handler.getRelationship(stmtUUID);
 			final Node subject = rel.getStartNode();
 			final Node object = rel.getEndNode();
-			final Statement stmt = propertyGraphGDMReader.readStatement(rel);
+			final Statement stmt = propertyGraphGDMReaderHelper.readStatement(rel);
 			addBNode(stmt.getSubject(), subject);
 			addBNode(stmt.getObject(), object);
 
@@ -173,8 +173,8 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 			final Relationship rel = handler.deprecateStatement(uuid);
 
-			final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readObject(rel.getStartNode());
-			final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(rel.getEndNode());
+			final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReaderHelper.readObject(rel.getStartNode());
+			final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReaderHelper.readObject(rel.getEndNode());
 
 			addBNode(subjectGDMNode, rel.getStartNode());
 			addBNode(objectGDMNode, rel.getEndNode());

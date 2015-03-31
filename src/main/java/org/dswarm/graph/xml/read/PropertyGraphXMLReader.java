@@ -34,7 +34,7 @@ import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.gdm.read.PropertyGraphGDMReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
@@ -514,10 +514,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 	 */
 	protected class CBDRelationshipHandler implements XMLRelationshipHandler {
 
-		private final PropertyGraphGDMReader	propertyGraphGDMReader	= new PropertyGraphGDMReader();
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
 
-		protected final XMLStreamWriter			writer;
-		private XMLNodeHandler					nodeHandler;
+		protected final XMLStreamWriter writer;
+		private         XMLNodeHandler  nodeHandler;
 
 		protected CBDRelationshipHandler(final XMLStreamWriter writerArg) {
 
@@ -539,7 +539,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// subject => start element (???)
 
 				final Node subjectNode = rel.getStartNode();
-				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReader.readSubject(subjectNode);
+				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReaderHelper.readSubject(subjectNode);
 				// => TODO, we need to compare the node, with the previous node, to write the content
 				// (key(predicate)/value(object)) into the current element or another of this tag
 				// TODO: how to determine, when we should close a tag (or parent tag etc.) => we need to keep a stack, of open
@@ -554,7 +554,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// object => XML Element value or XML attribute value or further recursion
 
 				final Node objectNode = rel.getEndNode();
-				final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReader.readObject(objectNode);
+				final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReaderHelper.readObject(objectNode);
 
 				writeKeyValue(predicateURI, objectGDMNode);
 

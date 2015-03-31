@@ -20,211 +20,251 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.utils.GraphUtils;
+import org.dswarm.graph.read.NodeHandler;
+import org.dswarm.graph.read.RelationshipHandler;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
+import org.dswarm.graph.versioning.utils.GraphVersionUtils;
+
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
 
 /**
  * @author tgaengler
  */
-public class PropertyGraphGDMReader {
+public abstract class PropertyGraphGDMReader implements GDMReader {
 
-	private static final Logger					LOG				= LoggerFactory.getLogger(PropertyGraphGDMReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMReader.class);
 
-	final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<>();
-	final Map<String, ResourceNode>                resourceNodes     = new HashMap<>();
-	final Map<String, Predicate> predicates = new HashMap<>();
+	protected final NodeHandler         nodeHandler;
+	protected final NodeHandler         startNodeHandler;
+	protected final RelationshipHandler relationshipHandler;
 
-	public org.dswarm.graph.json.Node readSubject(final Node subjectNode) throws DMPGraphException {
+	protected final String  dataModelUri;
+	protected       Integer version;
 
-		final long subjectId = subjectNode.getId();
-		final NodeType subjectNodeType = GraphUtils.determineNodeType(subjectNode);
+	protected final GraphDatabaseService database;
 
-		final org.dswarm.graph.json.Node subjectGDMNode;
+	protected Resource currentResource;
+	protected final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
-		switch (subjectNodeType) {
+	protected Transaction tx = null;
 
-			case Resource:
-			case TypeResource:
+	protected final String type;
 
-				subjectGDMNode = readResource(subjectNode);
+	public PropertyGraphGDMReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg,
+			final String typeArg) throws DMPGraphException {
 
-				break;
-			case BNode:
-			case TypeBNode:
+		dataModelUri = dataModelUriArg;
+		database = databaseArg;
+		type = typeArg;
 
-				subjectGDMNode = createResourceFromBNode(subjectId);
+		if (optionalVersionArg.isPresent()) {
 
-				break;
-			default:
-
-				final String message = "subject node type can only be a resource (or type resource) or bnode (or type bnode)";
-
-				PropertyGraphGDMReader.LOG.error(message);
-
-				throw new DMPGraphException(message);
-		}
-
-		return subjectGDMNode;
-	}
-
-	public org.dswarm.graph.json.Node readObject(final Node objectNode) throws DMPGraphException {
-
-		final long objectId = objectNode.getId();
-		final NodeType objectNodeType = GraphUtils.determineNodeType(objectNode);
-
-		final org.dswarm.graph.json.Node objectGDMNode;
-
-		switch (objectNodeType) {
-
-			case Resource:
-			case TypeResource:
-
-				objectGDMNode = readResource(objectNode);
-
-				break;
-			case BNode:
-			case TypeBNode:
-
-				objectGDMNode = createResourceFromBNode(objectId);
-
-				break;
-			case Literal:
-
-				final String object = (String) objectNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
-
-				if (object == null) {
-
-					final String message = "object value can't be null";
-
-					PropertyGraphGDMReader.LOG.error(message);
-
-					throw new DMPGraphException(message);
-				}
-
-				objectGDMNode = new LiteralNode(objectId, object);
-
-				break;
-			default:
-
-				final String message = "unknown node type " + objectNodeType.getName() + " for object node";
-
-				PropertyGraphGDMReader.LOG.error(message);
-
-				throw new DMPGraphException(message);
-		}
-
-		return objectGDMNode;
-	}
-
-	public Statement readStatement(final Relationship rel) throws DMPGraphException {
-
-		final org.dswarm.graph.json.Node subject = readObject(rel.getStartNode());
-		final Predicate predicate = getPredicate(rel.getType().name());
-		final org.dswarm.graph.json.Node object = readObject(rel.getEndNode());
-		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
-		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
-		final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
-		final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
-
-		final Statement statement = new Statement(subject, predicate, object);
-		statement.setOrder(order);
-
-		if(uuid != null) {
-
-			statement.setUUID(uuid);
-		}
-
-		if(confidence != null) {
-
-			statement.setConfidence(confidence);
-		}
-
-		if(evidence != null) {
-
-			statement.setEvidence(evidence);
-		}
-
-		return statement;
-	}
-
-	private Predicate getPredicate(final String predicateName) {
-
-		if(!predicates.containsKey(predicateName)) {
-
-			predicates.put(predicateName, new Predicate(predicateName));
-		}
-
-		return predicates.get(predicateName);
-	}
-
-
-	private ResourceNode readResource(final Node node) throws DMPGraphException {
-
-		final String resourceURI = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
-
-		if (resourceURI == null) {
-
-			final String message = "resource URI can't be null";
-
-			PropertyGraphGDMReader.LOG.error(message);
-
-			throw new DMPGraphException(message);
-		}
-
-		final String dataModelURI = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
-
-		final ResourceNode resourceNode;
-
-		if (dataModelURI == null) {
-
-			resourceNode = createResourceFromURI(node.getId(), resourceURI);
+			version = optionalVersionArg.get();
 		} else {
 
-			resourceNode = createResourceFromURIAndDataModel(node.getId(), resourceURI, dataModelURI);
+			tx = database.beginTx();
+
+			PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
+
+			try {
+
+				version = GraphVersionUtils.getLatestVersion(dataModelUri, database);
+			} catch (final Exception e) {
+
+				final String message = "couldn't retrieve latest version successfully";
+
+				PropertyGraphGDMReader.LOG.error(message, e);
+				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
+
+				tx.failure();
+				tx.close();
+
+				throw new DMPGraphException(message);
+			}
 		}
 
-		return resourceNode;
+		nodeHandler = new CBDNodeHandler();
+		startNodeHandler = new CBDStartNodeHandler();
+		relationshipHandler = new CBDRelationshipHandler();
 	}
 
-	private org.dswarm.graph.json.Node createResourceFromBNode(final long bnodeId) {
+	private class CBDNodeHandler implements NodeHandler {
 
-		if (!bnodes.containsKey(bnodeId)) {
+		@Override
+		public void handleNode(final Node node) throws DMPGraphException {
 
-			bnodes.put(bnodeId, new org.dswarm.graph.json.Node(bnodeId));
+			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
+			// node that holds the uri of the resource (record)
+			// => maybe we should find an appropriated cypher query as replacement for this processing
+			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
+
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
+
+				for (final Relationship relationship : relationships) {
+
+					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
+					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
+
+					if (validFrom != null && validTo != null) {
+
+						if (Range.range(validFrom, validTo).contains(version)) {
+
+							relationshipHandler.handleRelationship(relationship);
+						}
+					} else {
+
+						// TODO: remove this later, when every stmt is versioned
+						relationshipHandler.handleRelationship(relationship);
+					}
+				}
+			}
 		}
-
-		return bnodes.get(bnodeId);
 	}
 
-	private ResourceNode createResourceFromURI(final long id, final String uri) {
+	private class CBDStartNodeHandler implements NodeHandler {
 
-		if (!resourceNodes.containsKey(uri)) {
+		@Override
+		public void handleNode(final Node node) throws DMPGraphException {
 
-			resourceNodes.put(uri, new ResourceNode(id, uri));
+			// TODO: find a better way to determine the end of a resource description, e.g., add a property "resource" to each
+			// (this is the case for model that came as GDM JSON)
+			// node that holds the uri of the resource (record)
+			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
+
+				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
+
+				for (final Relationship relationship : relationships) {
+
+					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
+					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
+
+					if (validFrom != null && validTo != null) {
+
+						if (Range.range(validFrom, validTo).contains(version)) {
+
+							relationshipHandler.handleRelationship(relationship);
+						}
+					} else {
+
+						// TODO: remove this later, when every stmt is versioned
+						relationshipHandler.handleRelationship(relationship);
+					}
+				}
+			}
 		}
-
-		return resourceNodes.get(uri);
 	}
 
-	private ResourceNode createResourceFromURIAndDataModel(final long id, final String uri, final String dataModel) {
+	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		if (!resourceNodes.containsKey(uri + dataModel)) {
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
 
-			resourceNodes.put(uri + dataModel, new ResourceNode(id, uri, dataModel));
+		@Override
+		public void handleRelationship(final Relationship rel) throws DMPGraphException {
+
+			// note: we can also optionally check for the "resource property at the relationship (this property will only be
+			// written right now for model that came as GDM JSON)
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+
+				final long statementId = rel.getId();
+
+				// subject
+
+				final Node subjectNode = rel.getStartNode();
+				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReaderHelper.readSubject(subjectNode);
+
+				// predicate
+
+				final String predicate = rel.getType().name();
+				final Predicate predicateProperty = new Predicate(predicate);
+
+				// object
+
+				final Node objectNode = rel.getEndNode();
+				final org.dswarm.graph.json.Node objectGDMNode = propertyGraphGDMReaderHelper.readObject(objectNode);
+
+				// qualified properties at relationship (statement)
+
+				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
+				final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
+				final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
+
+				final Statement statement = new Statement(subjectGDMNode, predicateProperty, objectGDMNode);
+				statement.setId(statementId);
+
+				if (order != null) {
+
+					statement.setOrder(order);
+				}
+
+				if (uuid != null) {
+
+					statement.setUUID(uuid);
+				}
+
+				if (confidence != null) {
+
+					statement.setConfidence(confidence);
+				}
+
+				if (evidence != null) {
+
+					statement.setEvidence(evidence);
+				}
+
+				// index should never be null (when resource was written as GDM JSON)
+				final Long index = (Long) rel.getProperty(GraphStatics.INDEX_PROPERTY, null);
+
+				if (index != null) {
+
+					currentResourceStatements.put(index, statement);
+				} else {
+
+					// note maybe improve this here (however, this is the case for model that where written from RDF)
+
+					currentResource.addStatement(statement);
+				}
+
+				if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
+
+					// continue traversal with object node
+					nodeHandler.handleNode(rel.getEndNode());
+				}
+			}
 		}
-
-		return resourceNodes.get(uri + dataModel);
 	}
 
+	protected void ensureTx() throws DMPGraphException {
 
+		if (tx == null) {
 
+			try {
+
+				PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
+
+				tx = database.beginTx();
+			} catch (final Exception e) {
+
+				final String message = "couldn't acquire tx successfully";
+
+				PropertyGraphGDMReader.LOG.error(message, e);
+				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
+
+				throw new DMPGraphException(message);
+			}
+		}
+	}
 }

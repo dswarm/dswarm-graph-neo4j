@@ -16,10 +16,7 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Model;
+public interface GDMReader {
 
-public interface GDMModelReader extends GDMReader {
-
-	public Model read() throws DMPGraphException;
+	public long countStatements();
 }

@@ -141,20 +141,8 @@ public class PropertyGraphGDMModelReader implements GDMModelReader {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+			recordNodesIter = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
-
-			if (recordNodes == null) {
-
-				tx.success();
-
-				PropertyGraphGDMModelReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read GDM TX successfully");
-
-				return null;
-			}
-
-			recordNodesIter = recordNodes.iterator();
 
 			if (recordNodesIter == null) {
 

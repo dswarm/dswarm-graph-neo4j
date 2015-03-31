@@ -96,6 +96,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -751,8 +752,8 @@ public class GDMResource {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = processor.getProcessor().getDatabase()
-					.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY, dataModelUri);
+			final ResourceIterator<Node> recordNodes = processor.getProcessor().getDatabase()
+					.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY, dataModelUri);
 
 			if (recordNodes == null) {
 
@@ -763,7 +764,9 @@ public class GDMResource {
 
 			final Set<Node> notProcessedResources = new HashSet<>();
 
-			for (final Node recordNode : recordNodes) {
+			while(recordNodes.hasNext()) {
+
+				final Node recordNode = recordNodes.next();
 
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
@@ -807,6 +810,8 @@ public class GDMResource {
 					}
 				}
 			}
+
+			recordNodes.close();
 		} catch (final Exception e) {
 
 			final String message = "couldn't determine record URIs of the data model successfully";

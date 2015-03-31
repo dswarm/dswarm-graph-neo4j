@@ -27,6 +27,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +78,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
+			final ResourceIterator<Node> recordNodes = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
 
 			if (recordNodes == null) {
@@ -89,11 +90,14 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 			model = ModelFactory.createDefaultModel();
 
-			for (final Node recordNode : recordNodes) {
+			while(recordNodes.hasNext()) {
+
+				final Node recordNode = recordNodes.next();
 
 				startNodeHandler.handleNode(recordNode);
 			}
 
+			recordNodes.close();
 			tx.success();
 		} catch (final Exception e) {
 

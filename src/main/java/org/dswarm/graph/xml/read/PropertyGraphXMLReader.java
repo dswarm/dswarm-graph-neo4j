@@ -184,6 +184,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassURIString);
 
+			// TODO: refactor this to #findNodes + something else, then counting over the iterator
 			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
 

@@ -56,6 +56,8 @@ public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 		}
 
 		graphEndpoint = properties.getProperty("dmp_graph_endpoint", "http://localhost:7474/graph");
+
+		Neo4jRunningDBWrapper.LOG.info("DMP graph endpoint URI is = '{}'", graphEndpoint);
 	}
 
 	@After

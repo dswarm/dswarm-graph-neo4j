@@ -1013,7 +1013,7 @@ public class GDMResource {
 			return objectMapper.readValue(metadataString, ObjectNode.class);
 		} catch (final IOException e) {
 
-			final String message = "couldn't write GDM, couldn't deserialize metadata part";
+			final String message = String.format("couldn't write GDM, couldn't deserialize metadata part '%s'", metadataString);
 
 			GDMResource.LOG.error(message);
 

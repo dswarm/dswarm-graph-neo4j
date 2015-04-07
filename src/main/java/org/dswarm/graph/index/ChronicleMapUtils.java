@@ -52,12 +52,13 @@ public final class ChronicleMapUtils {
 
 		final ChronicleMapBuilder<Long, Long> builder = getLongLongChronicleMapBuilder();
 
-		return builder.minSegments(10000).entriesPerSegment(10 * 1000).create();
+		return builder.entries(Integer.MAX_VALUE/17).minSegments(13000).entriesPerSegment(10 * 1000).create();
 	}
 
 	private static ChronicleMapBuilder<Long, Long> getLongLongChronicleMapBuilder() {
 
 		// TODO: optimize builder, e.g., set chunk size
-		return ChronicleMapBuilder.of(Long.class, Long.class).constantKeySizeBySample(Long.MAX_VALUE).constantValueSizeBySample(Long.MAX_VALUE);
+		return ChronicleMapBuilder.of(Long.class, Long.class);
+		// .constantKeySizeBySample(Long.MAX_VALUE).constantValueSizeBySample(Long.MAX_VALUE);
 	}
 }

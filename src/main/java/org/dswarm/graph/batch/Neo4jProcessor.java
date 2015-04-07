@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.carrotsearch.hppc.LongLongOpenHashMap;
 import net.openhft.chronicle.map.ChronicleMap;
 
 import org.dswarm.graph.DMPGraphException;
@@ -81,7 +82,8 @@ public abstract class Neo4jProcessor {
 	// private BatchInserterIndex statementHashes;
 	private ChronicleMap<Long, Long>				statementHashes;
 
-	protected final ChronicleMap<Long, Long> tempStatementHashes;
+	//protected final ChronicleMap<Long, Long> tempStatementHashes;
+	protected final LongLongOpenHashMap tempStatementHashes;
 
 	protected final LongObjectOpenHashMap<String>	nodeResourceMap;
 
@@ -97,8 +99,8 @@ public abstract class Neo4jProcessor {
 		tempResourcesIndex = new ObjectLongOpenHashMap<>();
 		tempResourcesWDataModelIndex = new ObjectLongOpenHashMap<>();
 		tempResourceTypes = new ObjectLongOpenHashMap<>();
-		//tempStatementHashes = new LongLongOpenHashMap();
-		tempStatementHashes = ChronicleMapUtils.createOrGetLongIndex();
+		tempStatementHashes = new LongLongOpenHashMap();
+		//tempStatementHashes = ChronicleMapUtils.createOrGetLongIndex();
 
 		// TODO: init all indices, when batch inserter should work on a pre-filled database (otherwise, the existing index would
 		// utilised in the first run)
@@ -168,44 +170,44 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-	private void copyNFlushNClearLongIndex(final ChronicleMap<Long, Long> tempIndex, final ChronicleMap<Long, Long> persistentIndex, final String indexName) {
+	private void copyNFlushNClearLongIndex(final LongLongOpenHashMap tempIndex, final ChronicleMap<Long, Long> persistentIndex, final String indexName) {
 
 		Neo4jProcessor.LOG.debug("start pumping '" + indexName + "' index of size '" + tempIndex.size() + "'");
 
-//		final long[] keys = tempIndex.keys;
-//		final long[] values = tempIndex.values;
-//		final boolean[] states = tempIndex.allocated;
+		final long[] keys = tempIndex.keys;
+		final long[] values = tempIndex.values;
+		final boolean[] states = tempIndex.allocated;
 
-//		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length
-//				+ "'");
+		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length
+				+ "'");
 
-//		int j = 0;
-//		long tick = System.currentTimeMillis();
-//		int sinceLast = 0;
-//
-//		for (int i = 0; i < states.length; i++) {
-//
-//			if (states[i]) {
-//
-//				persistentIndex.add(values[i], MapUtil.map(indexProperty, keys[i]));
-//
-//				j++;
-//
-//				final int entryDelta = j - sinceLast;
-//				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
-//
-//				if (entryDelta >= 1000000 || timeDelta >= 60) {
-//
-//					sinceLast = j;
-//
-//					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
-//
-//					tick = System.currentTimeMillis();
-//				}
-//			}
-//		}
+		int j = 0;
+		long tick = System.currentTimeMillis();
+		int sinceLast = 0;
 
-		persistentIndex.putAll(tempIndex);
+		for (int i = 0; i < states.length; i++) {
+
+			if (states[i]) {
+
+				persistentIndex.acquireUsing(values[i], keys[i]);
+
+				j++;
+
+				final int entryDelta = j - sinceLast;
+				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
+
+				if (entryDelta >= 1000000 || timeDelta >= 60) {
+
+					sinceLast = j;
+
+					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
+
+					tick = System.currentTimeMillis();
+				}
+			}
+		}
+
+		//persistentIndex.putAll(tempIndex);
 
 		Neo4jProcessor.LOG.debug("finished pumping index '" + indexName + "' index; wrote '" + tempIndex.size() + "' entries");
 
@@ -213,7 +215,7 @@ public abstract class Neo4jProcessor {
 
 		//persistentIndex.flush();
 		tempIndex.clear();
-		tempIndex.close();
+		//tempIndex.close();
 		persistentIndex.close();
 
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
@@ -325,8 +327,8 @@ public abstract class Neo4jProcessor {
 
 	public void addToStatementIndex(final long key, final long nodeId) {
 
-		// tempStatementHashes.put(key, nodeId);
-		tempStatementHashes.acquireUsing(key, nodeId);
+		tempStatementHashes.put(key, nodeId);
+		// tempStatementHashes.acquireUsing(key, nodeId);
 	}
 
 	public void flushIndices() throws DMPGraphException {

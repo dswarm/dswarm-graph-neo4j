@@ -48,7 +48,7 @@
 		<dswarm.graph.model.version>0.0.2-SNAPSHOT</dswarm.graph.model.version>
 		<dswarm.commons.version>0.0.2-SNAPSHOT</dswarm.commons.version>
 		<nxparser.version>2.0-SNAPSHOT</nxparser.version>
-		<hppc.version>0.6.0</hppc.version>
+		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.1.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
 		<fasterxml.version>0.9.9</fasterxml.version>

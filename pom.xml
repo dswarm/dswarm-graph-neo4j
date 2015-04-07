@@ -98,11 +98,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>-server -d64 -Xms4G -Xmx4G -XX:NewRatio=5
+					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=5
 						-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4
 						-XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode
 						-XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10
-						-XX:CMSFullGCsBeforeCompaction=1
+						-XX:CMSFullGCsBeforeCompaction=1 -XX:+CMSClassUnloadingEnabled
+						-XX:-OmitStackTraceInFastThrow -XX:hashCode=5
 					</argLine>
 				</configuration>
 				<executions>

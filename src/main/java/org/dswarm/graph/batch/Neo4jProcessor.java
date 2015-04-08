@@ -34,13 +34,16 @@ import java.util.Properties;
 import com.carrotsearch.hppc.LongLongOpenHashMap;
 import net.openhft.chronicle.map.ChronicleMap;
 
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.ChronicleMapUtils;
+import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.model.GraphStatics;
 
+import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.index.IndexHits;
@@ -80,7 +83,8 @@ public abstract class Neo4jProcessor {
 	private BatchInserterIndex						values;
 	protected final ObjectLongOpenHashMap<String>	bnodes;
 	// private BatchInserterIndex statementHashes;
-	private ChronicleMap<Long, Long>				statementHashes;
+	private Map<Long, Long>				statementHashes;
+	private DB statementHashesDB;
 
 	//protected final ChronicleMap<Long, Long> tempStatementHashes;
 	protected final LongLongOpenHashMap tempStatementHashes;
@@ -116,7 +120,7 @@ public abstract class Neo4jProcessor {
 		copyNFlushNClearIndex(tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL,
 				GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 		copyNFlushNClearIndex(tempResourceTypes, resourceTypes, GraphStatics.URI, GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
-		copyNFlushNClearLongIndex(tempStatementHashes, statementHashes, GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+		copyNFlushNClearLongIndex(tempStatementHashes, statementHashes, GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, statementHashesDB);
 
 		Neo4jProcessor.LOG.debug("finished pumping indices");
 	}
@@ -170,7 +174,7 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-	private void copyNFlushNClearLongIndex(final LongLongOpenHashMap tempIndex, final ChronicleMap<Long, Long> persistentIndex, final String indexName) {
+	private void copyNFlushNClearLongIndex(final LongLongOpenHashMap tempIndex, final Map<Long, Long> persistentIndex, final String indexName, final DB persistentDB) {
 
 		Neo4jProcessor.LOG.debug("start pumping '" + indexName + "' index of size '" + tempIndex.size() + "'");
 
@@ -189,7 +193,7 @@ public abstract class Neo4jProcessor {
 
 			if (states[i]) {
 
-				persistentIndex.acquireUsing(values[i], keys[i]);
+				persistentIndex.put(values[i], keys[i]);
 
 				j++;
 
@@ -216,7 +220,7 @@ public abstract class Neo4jProcessor {
 		//persistentIndex.flush();
 		tempIndex.clear();
 		//tempIndex.close();
-		persistentIndex.close();
+		persistentDB.close();
 
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
@@ -258,7 +262,9 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			statementHashes = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			final Tuple<Map<Long, Long>, DB> mapDBTuple = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = mapDBTuple.v1();
+			statementHashesDB = mapDBTuple.v2();
 		} catch (final IOException e) {
 
 			throw new DMPGraphException("couldn't create or get statement hashes index");
@@ -622,7 +628,7 @@ public abstract class Neo4jProcessor {
 		return index;
 	}
 
-	protected ChronicleMap<Long, Long> getOrCreateLongIndex(final String name) throws IOException {
+	protected Tuple<Map<Long, Long>, DB> getOrCreateLongIndex(final String name) throws IOException {
 
 		final URL resource = Resources.getResource("dmpgraph.properties");
 		final Properties properties = new Properties();
@@ -649,7 +655,7 @@ public abstract class Neo4jProcessor {
 		}
 
 		// + File.separator + ChronicleMapUtils.INDEX_DIR
-		return ChronicleMapUtils.createOrGetPersistentLongIndex(storeDir + File.separator + name);
+		return MapDBUtils.createOrGetPersistentLongIndex(storeDir + File.separator + name);
 	}
 
 	private Object getProperty(final String key, final Map<String, Object> properties) {
@@ -712,7 +718,7 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private Optional<Long> getIdFromLongIndex(final long key, final ChronicleMap<Long, Long> index) {
+	private Optional<Long> getIdFromLongIndex(final long key, final Map<Long, Long> index) {
 
 		if (index == null) {
 

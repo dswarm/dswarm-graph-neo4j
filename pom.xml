@@ -54,6 +54,7 @@
 		<fasterxml.version>0.9.9</fasterxml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
 		<chronicle-map.version>2.1.4</chronicle-map.version>
+		<mapdb.version>1.0.7</mapdb.version>
 	</properties>
 
 	<build>
@@ -381,6 +382,11 @@
 			<groupId>net.openhft</groupId>
 			<artifactId>chronicle-map</artifactId>
 			<version>${chronicle-map.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>${mapdb.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -217,6 +217,7 @@ public abstract class Neo4jProcessor {
 		//persistentIndex.flush();
 		tempIndex.clear();
 		tempIndex.close();
+		persistentDB.commit();
 		persistentDB.close();
 
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");

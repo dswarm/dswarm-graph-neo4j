@@ -31,18 +31,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.carrotsearch.hppc.LongLongOpenHashMap;
+import com.carrotsearch.hppc.LongObjectOpenHashMap;
+import com.carrotsearch.hppc.ObjectLongOpenHashMap;
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.io.Resources;
 import net.openhft.chronicle.map.ChronicleMap;
-
-import org.dswarm.common.types.Tuple;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.hash.HashUtils;
-import org.dswarm.graph.index.ChronicleMapUtils;
-import org.dswarm.graph.index.MapDBUtils;
-import org.dswarm.graph.model.GraphStatics;
-
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
@@ -55,12 +50,14 @@ import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.carrotsearch.hppc.LongObjectOpenHashMap;
-import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
-import com.google.common.io.Resources;
+import org.dswarm.common.types.Tuple;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.ChronicleMapUtils;
+import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -86,8 +83,8 @@ public abstract class Neo4jProcessor {
 	private Map<Long, Long>				statementHashes;
 	private DB statementHashesDB;
 
-	//protected final ChronicleMap<Long, Long> tempStatementHashes;
-	protected final LongLongOpenHashMap tempStatementHashes;
+	protected final ChronicleMap<Long, Long> tempStatementHashes;
+	//protected final LongLongOpenHashMap tempStatementHashes;
 
 	protected final LongObjectOpenHashMap<String>	nodeResourceMap;
 
@@ -103,8 +100,8 @@ public abstract class Neo4jProcessor {
 		tempResourcesIndex = new ObjectLongOpenHashMap<>();
 		tempResourcesWDataModelIndex = new ObjectLongOpenHashMap<>();
 		tempResourceTypes = new ObjectLongOpenHashMap<>();
-		tempStatementHashes = new LongLongOpenHashMap();
-		//tempStatementHashes = ChronicleMapUtils.createOrGetLongIndex();
+		//tempStatementHashes = new LongLongOpenHashMap();
+		tempStatementHashes = ChronicleMapUtils.createOrGetLongIndex();
 
 		// TODO: init all indices, when batch inserter should work on a pre-filled database (otherwise, the existing index would
 		// utilised in the first run)
@@ -174,44 +171,44 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
-	private void copyNFlushNClearLongIndex(final LongLongOpenHashMap tempIndex, final Map<Long, Long> persistentIndex, final String indexName, final DB persistentDB) {
+	private void copyNFlushNClearLongIndex(final ChronicleMap<Long, Long> tempIndex, final Map<Long, Long> persistentIndex, final String indexName, final DB persistentDB) {
 
 		Neo4jProcessor.LOG.debug("start pumping '" + indexName + "' index of size '" + tempIndex.size() + "'");
 
-		final long[] keys = tempIndex.keys;
-		final long[] values = tempIndex.values;
-		final boolean[] states = tempIndex.allocated;
+//		final long[] keys = tempIndex.keys;
+//		final long[] values = tempIndex.values;
+//		final boolean[] states = tempIndex.allocated;
+//
+//		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length
+//				+ "'");
+//
+//		int j = 0;
+//		long tick = System.currentTimeMillis();
+//		int sinceLast = 0;
+//
+//		for (int i = 0; i < states.length; i++) {
+//
+//			if (states[i]) {
+//
+//				persistentIndex.put(values[i], keys[i]);
+//
+//				j++;
+//
+//				final int entryDelta = j - sinceLast;
+//				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
+//
+//				if (entryDelta >= 1000000 || timeDelta >= 60) {
+//
+//					sinceLast = j;
+//
+//					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
+//
+//					tick = System.currentTimeMillis();
+//				}
+//			}
+//		}
 
-		Neo4jProcessor.LOG.debug("keys size = '" + keys.length + "' :: values size = '" + values.length + "' :: states size = '" + states.length
-				+ "'");
-
-		int j = 0;
-		long tick = System.currentTimeMillis();
-		int sinceLast = 0;
-
-		for (int i = 0; i < states.length; i++) {
-
-			if (states[i]) {
-
-				persistentIndex.put(values[i], keys[i]);
-
-				j++;
-
-				final int entryDelta = j - sinceLast;
-				final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
-
-				if (entryDelta >= 1000000 || timeDelta >= 60) {
-
-					sinceLast = j;
-
-					Neo4jProcessor.LOG.debug("wrote '" + j + "' entries @ ~" + (double) entryDelta / timeDelta + " entries/second.");
-
-					tick = System.currentTimeMillis();
-				}
-			}
-		}
-
-		//persistentIndex.putAll(tempIndex);
+		persistentIndex.putAll(tempIndex);
 
 		Neo4jProcessor.LOG.debug("finished pumping index '" + indexName + "' index; wrote '" + tempIndex.size() + "' entries");
 
@@ -219,7 +216,7 @@ public abstract class Neo4jProcessor {
 
 		//persistentIndex.flush();
 		tempIndex.clear();
-		//tempIndex.close();
+		tempIndex.close();
 		persistentDB.close();
 
 		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
@@ -333,8 +330,8 @@ public abstract class Neo4jProcessor {
 
 	public void addToStatementIndex(final long key, final long nodeId) {
 
-		tempStatementHashes.put(key, nodeId);
-		// tempStatementHashes.acquireUsing(key, nodeId);
+		//tempStatementHashes.put(key, nodeId);
+		tempStatementHashes.acquireUsing(key, nodeId);
 	}
 
 	public void flushIndices() throws DMPGraphException {

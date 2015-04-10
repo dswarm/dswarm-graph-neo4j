@@ -244,9 +244,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), objectNodeId,
 						subjectNodeType, finalObjectNodeType);
 
-				final Optional<Long> optionalRelId = processor.getStatement(hash);
+				final boolean statementExists = processor.checkStatementExists(hash);
 
-				if (!optionalRelId.isPresent()) {
+				if (!statementExists) {
 
 					final Optional<String> finalOptionalResourceUri;
 
@@ -272,8 +272,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			if (nodeDelta >= 200000 || timeDelta >= 30) { // "commit" every 200k operations or every 30 seconds
 
 				sinceLastCommit = totalTriples;
+				final double duration = (double) nodeDelta / timeDelta;
 
-				BaseNeo4jHandler.LOG.debug(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+				BaseNeo4jHandler.LOG.debug("{} triples @ ~{} triples/second.", totalTriples, duration);
 
 				tick = System.currentTimeMillis();
 			}
@@ -366,9 +367,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), statement
 				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
 
-		final Optional<Long> optionalRelId = processor.getStatement(hash);
+		final boolean statementExists = processor.checkStatementExists(hash);
 
-		if (!optionalRelId.isPresent()) {
+		if (!statementExists) {
 
 			literals++;
 
@@ -429,7 +430,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 		final long relId = processor.getBatchInserter().createRelationship(subjectNodeId, objectNodeId, relType, relProperties);
 
-		processor.addToStatementIndex(hash, relId);
+		// TODO: for now we only keey the hash
+		processor.addToStatementIndex(hash);
 		processor.addStatementToIndex(relId, finalStatementUUID);
 
 		addedRelationships++;

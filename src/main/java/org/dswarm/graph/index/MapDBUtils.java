@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
@@ -170,18 +169,20 @@ public final class MapDBUtils {
 
 	public static Map<Long, Long> createTreeMap(final DB db, final String indexFileName) {
 
-		return db.createTreeMap(indexFileName).keySerializer(BTreeKeySerializer.LONG)
+		return db.createTreeMap(indexFileName)
+				//.keySerializer(BTreeKeySerializer.LONG) // supported by 2.0-alpha1
 				.valueSerializer(Serializer.LONG).makeOrGet();
 	}
 
 	public static Set<Long> createTreeSet(final DB db, final String indexFileName) {
 
-		return db.createTreeSet(indexFileName).serializer(BTreeKeySerializer.LONG).makeOrGet();
+		return db.createTreeSet(indexFileName).makeOrGet();
 	}
 
 	public static Map<Long, Long> createHashMap(final DB db, final String indexFileName) {
 
-		return db.createHashMap(indexFileName).keySerializer(Serializer.LONG)
+		return db.createHashMap(indexFileName)
+				//.keySerializer(Serializer.LONG) // supported by 2.0-alpha1
 				.valueSerializer(Serializer.LONG).makeOrGet();
 	}
 

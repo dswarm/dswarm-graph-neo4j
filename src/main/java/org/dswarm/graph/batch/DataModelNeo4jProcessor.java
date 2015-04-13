@@ -18,12 +18,14 @@ package org.dswarm.graph.batch;
 
 import java.util.Map;
 
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +41,12 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	private static final Logger			LOG	= LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
 	private BatchInserterIndex			statementUUIDsWDataModel;
+	private BatchInserterIndexProvider statementUUIDsWDataModelProvider;
 
 	// TODO: utilise temp index (if necessary)
-	private final ObjectLongMap<String>	tempStatementUUIDsWDataModelIndex;
+	private final ObjectLongMap<String> tempStatementUUIDsWDataModelIndex;
 
-	private final String				dataModelURI;
+	private final String dataModelURI;
 
 	public DataModelNeo4jProcessor(final BatchInserter inserter, final String dataModelURIArg) throws DMPGraphException {
 
@@ -68,7 +71,10 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		try {
 
-			statementUUIDsWDataModel = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME, GraphStatics.UUID_W_DATA_MODEL, false, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> statementUUIDsWDataModelIndexTuple = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME, GraphStatics.UUID_W_DATA_MODEL,
+					false, 1);
+			statementUUIDsWDataModel = statementUUIDsWDataModelIndexTuple.v1();
+			statementUUIDsWDataModelProvider = statementUUIDsWDataModelIndexTuple.v2();
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";
@@ -154,6 +160,7 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		super.flushStatementIndices();
 
 		statementUUIDsWDataModel.flush();
+		statementUUIDsWDataModelProvider.shutdown();
 	}
 
 	@Override

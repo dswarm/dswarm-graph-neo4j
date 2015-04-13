@@ -14,14 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
- * graph extension. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.dswarm.graph.batch;
 
 import java.io.File;
@@ -38,7 +30,6 @@ import com.github.emboss.siphash.SipHash;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
-import net.openhft.chronicle.map.ChronicleMap;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
@@ -56,7 +47,6 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
-import org.dswarm.graph.index.ChronicleMapUtils;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.model.GraphStatics;
 
@@ -74,11 +64,18 @@ public abstract class Neo4jProcessor {
 	private         BatchInserterIndex resourcesWDataModel;
 	private         BatchInserterIndex resourceTypes;
 
+	private BatchInserterIndexProvider resourcesProvider;
+	private BatchInserterIndexProvider resourcesWDataModelProvider;
+	private BatchInserterIndexProvider resourceTypesProvider;
+
 	protected final ObjectLongOpenHashMap<String> tempResourcesIndex;
 	protected final ObjectLongOpenHashMap<String> tempResourcesWDataModelIndex;
 	protected final ObjectLongOpenHashMap<String> tempResourceTypes;
 
-	private         BatchInserterIndex            values;
+	private BatchInserterIndex values;
+
+	private BatchInserterIndexProvider valuesProvider;
+
 	protected final ObjectLongOpenHashMap<String> bnodes;
 	// private BatchInserterIndex statementHashes;
 	private         Set<Long>                     statementHashes;
@@ -126,6 +123,15 @@ public abstract class Neo4jProcessor {
 				statementHashesDB);
 
 		Neo4jProcessor.LOG.debug("finished pumping indices");
+
+		Neo4jProcessor.LOG.debug("start shutting down indices");
+
+		resourcesProvider.shutdown();
+		resourcesWDataModelProvider.shutdown();
+		resourceTypesProvider.shutdown();
+		valuesProvider.shutdown();
+
+		Neo4jProcessor.LOG.debug("finished shutting down indices");
 	}
 
 	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex,
@@ -224,7 +230,9 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			values = getOrCreateIndex(GraphIndexStatics.VALUES_INDEX_NAME, GraphStatics.VALUE, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> valuesIndexTuple = getOrCreateIndex(GraphIndexStatics.VALUES_INDEX_NAME, GraphStatics.VALUE, true, 1);
+			values = valuesIndexTuple.v1();
+			valuesProvider = valuesIndexTuple.v2();
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";
@@ -240,9 +248,17 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			resources = getOrCreateIndex(GraphIndexStatics.RESOURCES_INDEX_NAME, GraphStatics.URI, true, 1);
-			resourcesWDataModel = getOrCreateIndex(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME, GraphStatics.URI_W_DATA_MODEL, true, 1);
-			resourceTypes = getOrCreateIndex(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME, GraphStatics.URI, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCES_INDEX_NAME, GraphStatics.URI, true, 1);
+			resources = resourcesIndexTuple.v1();
+			resourcesProvider = resourcesIndexTuple.v2();
+
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesWDataModelIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME, GraphStatics.URI_W_DATA_MODEL, true, 1);
+			resourcesWDataModel = resourcesWDataModelIndexTuple.v1();
+			resourcesWDataModelProvider = resourcesWDataModelIndexTuple.v2();
+
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourceTypesIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME, GraphStatics.URI, true, 1);
+			resourceTypes = resourceTypesIndexTuple.v1();
+			resourceTypesProvider = resourceTypesIndexTuple.v2();
 			// statementHashes = getOrCreateIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, GraphStatics.HASH, false,
 			// 1000000);
 		} catch (final Exception e) {
@@ -344,7 +360,7 @@ public abstract class Neo4jProcessor {
 		flushStatementIndices();
 		clearTempIndices();
 
-		Neo4jProcessor.LOG.debug("start finished flushing indices");
+		Neo4jProcessor.LOG.debug("finished flushing indices");
 	}
 
 	public void flushStatementIndices() {
@@ -607,7 +623,8 @@ public abstract class Neo4jProcessor {
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
 
-	protected BatchInserterIndex getOrCreateIndex(final String name, final String property, final boolean nodeIndex, final int cachSize) {
+	protected Tuple<BatchInserterIndex, BatchInserterIndexProvider> getOrCreateIndex(final String name, final String property,
+			final boolean nodeIndex, final int cachSize) {
 
 		final BatchInserterIndexProvider indexProvider = new LuceneBatchInserterIndexProvider(inserter);
 		final BatchInserterIndex index;
@@ -622,7 +639,7 @@ public abstract class Neo4jProcessor {
 
 		index.setCacheCapacity(property, cachSize);
 
-		return index;
+		return Tuple.tuple(index, indexProvider);
 	}
 
 	protected Tuple<Set<Long>, DB> getOrCreateLongIndex(final String name) throws IOException {

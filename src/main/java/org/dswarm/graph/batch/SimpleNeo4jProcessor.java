@@ -18,12 +18,14 @@ package org.dswarm.graph.batch;
 
 import java.util.Map;
 
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.model.GraphStatics;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +41,10 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
 	protected BatchInserterIndex		statementUUIDs;
+	protected BatchInserterIndexProvider statementUUIDsProvider;
 
 	// TODO: utilise temp index (if necessary)
-	private final ObjectLongMap<String>	tempStatementUUIDsIndex;
+	private final ObjectLongMap<String> tempStatementUUIDsIndex;
 
 	public SimpleNeo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
@@ -64,7 +67,9 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 		try {
 
-			statementUUIDs = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME, GraphStatics.UUID, false, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> statementUUIDsIndexTuple = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME, GraphStatics.UUID, false, 1);
+			statementUUIDs = statementUUIDsIndexTuple.v1();
+			statementUUIDsProvider = statementUUIDsIndexTuple.v2();
 		} catch (final Exception e) {
 
 			final String message = "couldn't load indices successfully";
@@ -95,7 +100,8 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, final String URI, final Optional<String> optionalDataModelURI) {
+	public void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, final String URI,
+			final Optional<String> optionalDataModelURI) {
 
 		if (optionalDataModelURI.isPresent()) {
 
@@ -121,6 +127,7 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 		super.flushStatementIndices();
 
 		statementUUIDs.flush();
+		statementUUIDsProvider.shutdown();
 	}
 
 	@Override

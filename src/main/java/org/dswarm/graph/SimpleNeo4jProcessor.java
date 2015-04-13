@@ -102,4 +102,9 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 		return getNodeFromResourcesIndex(resourceURI);
 	}
+
+	@Override protected String putSaltToStatementHash(final String hash) {
+
+		return hash;
+	}
 }

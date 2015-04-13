@@ -144,6 +144,11 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		return getNodeIdFromResourcesWDataModelIndex(resourceURI + dataModelURI);
 	}
 
+	@Override protected String putSaltToStatementHash(final String hash) {
+
+		return hash + " " + this.dataModelURI;
+	}
+
 	@Override
 	public Map<String, Object> prepareRelationship(final String statementUUID, final Optional<Map<String, Object>> qualifiedAttributes) {
 

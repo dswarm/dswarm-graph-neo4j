@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.batch.rdf.pnx.utils;
+package org.dswarm.graph.pnx.utils;
 
 import org.dswarm.graph.NodeType;
 

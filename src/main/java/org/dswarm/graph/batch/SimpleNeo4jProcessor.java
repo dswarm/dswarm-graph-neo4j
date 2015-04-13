@@ -121,6 +121,11 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 		return getNodeIdFromResourcesIndex(resourceURI);
 	}
 
+	@Override protected String putSaltToStatementHash(final String hash) {
+
+		return hash;
+	}
+
 	@Override
 	public void flushStatementIndices() {
 

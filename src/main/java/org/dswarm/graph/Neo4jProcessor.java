@@ -26,16 +26,24 @@ package org.dswarm.graph;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
+import com.google.common.io.Resources;
 import net.openhft.chronicle.map.ChronicleMap;
 
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.ChronicleMapUtils;
+import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.versioning.VersionHandler;
 
+import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -61,27 +69,33 @@ import com.google.common.collect.Maps;
  */
 public abstract class Neo4jProcessor {
 
-	private static final Logger				LOG			= LoggerFactory.getLogger(Neo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Neo4jProcessor.class);
 
-	protected int							addedLabels	= 0;
+	protected int addedLabels = 0;
 
-	protected final GraphDatabaseService	database;
-	private Index<Node>						resources;
-	private Index<Node>						resourcesWDataModel;
-	private Index<Node>						resourceTypes;
-	private Index<Node>						values;
-	protected final Map<String, Node>		bnodes;
+	protected final GraphDatabaseService database;
+	private         Index<Node>          resources;
+	private         Index<Node>          resourcesWDataModel;
+	private         Index<Node>          resourceTypes;
+	private         Index<Node>          values;
+	protected final Map<String, Node>    bnodes;
+
 	// protected Index<Relationship> statementHashes;
-	protected ChronicleMap<Long, Long>		statementHashes;
-	protected final LongObjectMap<String>	nodeResourceMap;
+	private Set<Long> statementHashes;
+	private DB        statementHashesDB;
 
-	private Map<String, Node>				tempResourcesIndex;
-	private Map<String, Node>				tempResourcesWDataModelIndex;
-	private Map<String, Node>				tempResourceTypesIndex;
+	protected final Set<Long> tempStatementHashes;
+	protected final DB        tempStatementHashesDB;
 
-	protected Transaction					tx;
+	protected final LongObjectMap<String> nodeResourceMap;
 
-	boolean									txIsClosed	= false;
+	private Map<String, Node> tempResourcesIndex;
+	private Map<String, Node> tempResourcesWDataModelIndex;
+	private Map<String, Node> tempResourceTypesIndex;
+
+	protected Transaction tx;
+
+	boolean txIsClosed = false;
 
 	public Neo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
@@ -92,6 +106,11 @@ public abstract class Neo4jProcessor {
 
 		bnodes = new HashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
+
+		final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
+				.createOrGetInMemoryLongIndexTreeSetNonTransactional(GraphIndexStatics.TEMP_STATEMENT_HASHES_INDEX_NAME);
+		tempStatementHashes = mapDBTuple.v1();
+		tempStatementHashesDB = mapDBTuple.v2();
 	}
 
 	protected void initIndices() throws DMPGraphException {
@@ -103,7 +122,6 @@ public abstract class Neo4jProcessor {
 			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
 			// statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
-			statementHashes = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
 			tempResourcesIndex = Maps.newHashMap();
 			tempResourcesWDataModelIndex = Maps.newHashMap();
@@ -118,6 +136,18 @@ public abstract class Neo4jProcessor {
 			Neo4jProcessor.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
+		}
+
+		try {
+
+			final Tuple<Set<Long>, DB> mapDBTuple = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = mapDBTuple.v1();
+			statementHashesDB = mapDBTuple.v2();
+		} catch (final IOException e) {
+
+			failTx();
+
+			throw new DMPGraphException("couldn't create or get statement hashes index");
 		}
 	}
 
@@ -136,9 +166,9 @@ public abstract class Neo4jProcessor {
 		return values;
 	}
 
-	public ChronicleMap<Long, Long> getStatementHashesIndex() {
+	public void addHashToStatementIndex(final long hash) {
 
-		return statementHashes;
+		tempStatementHashes.add(hash);
 	}
 
 	public LongObjectMap<String> getNodeResourceMap() {
@@ -156,6 +186,11 @@ public abstract class Neo4jProcessor {
 		tempResourcesIndex.clear();
 		tempResourcesWDataModelIndex.clear();
 		tempResourceTypesIndex.clear();
+
+		if (!tempStatementHashesDB.isClosed()) {
+
+			tempStatementHashes.clear();
+		}
 	}
 
 	public void beginTx() throws DMPGraphException {
@@ -177,6 +212,8 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.error("tx failed; close tx");
 
+		tempStatementHashesDB.close();
+		statementHashesDB.close();
 		tx.failure();
 		tx.close();
 		txIsClosed = true;
@@ -186,6 +223,7 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.debug("tx succeeded; close tx");
 
+		pumpNFlushStatementIndex();
 		tx.success();
 		tx.close();
 		txIsClosed = true;
@@ -316,16 +354,11 @@ public abstract class Neo4jProcessor {
 		}
 	}
 
-	public Relationship getStatement(final long hash) throws DMPGraphException {
+	public boolean checkStatementExists(final long hash) throws DMPGraphException {
 
-		final Long relationshipId = statementHashes.get(hash);
+		return !(statementHashes == null && tempStatementHashes == null) && (tempStatementHashes != null && tempStatementHashes.contains(hash)
+				|| statementHashes != null && statementHashes.contains(hash));
 
-		if (relationshipId == null) {
-
-			return null;
-		}
-
-		return database.getRelationshipById(relationshipId);
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
@@ -378,15 +411,15 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public long generateStatementHash(final Node subjectNode, final String predicateName, final String objectValue, final NodeType subjectNodeType,
-			final NodeType objectNodeType) throws DMPGraphException {
+	public long generateStatementHash(final Node subjectNode, final Statement statement) throws DMPGraphException {
 
-		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
-		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = statement.getOptionalSubjectNodeType();
+		final Optional<NodeType> optionalObjectNodeType = statement.getOptionalObjectNodeType();
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNode, optionalSubjectNodeType);
-		final Optional<String> optionalObjectIdentifier = Optional.fromNullable(objectValue);
+		final Optional<String> optionalObjectIdentifier = statement.getOptionalObjectValue();
 
-		return generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType, optionalSubjectIdentifier,
+		return generateStatementHash(statement.getOptionalPredicateURI().get(), optionalSubjectNodeType, optionalObjectNodeType,
+				optionalSubjectIdentifier,
 				optionalObjectIdentifier);
 	}
 
@@ -404,8 +437,10 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+		final String simpleHashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
 				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get();
+
+		final String hashString = putSaltToStatementHash(simpleHashString);
 
 		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
@@ -499,7 +534,10 @@ public abstract class Neo4jProcessor {
 		addNodeToResourcesIndex(key, node);
 	}
 
-	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index, final String indexProperty) {
+	protected abstract String putSaltToStatementHash(final String hash);
+
+	protected Optional<Node> getNodeFromIndex(final String key, final Map<String, Node> tempIndex, final Index<Node> index,
+			final String indexProperty) {
 
 		if (tempIndex.containsKey(key)) {
 
@@ -538,18 +576,62 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	protected ChronicleMap<Long, Long> getOrCreateLongIndex(final String name) throws IOException {
+	protected Tuple<Set<Long>, DB> getOrCreateLongIndex(final String name) throws IOException {
 
-		// TODO: how to retrieve store dir here?
-		final String storeDir = System.getProperty("java.io.tmpdir");
+		final URL resource = Resources.getResource("dmpgraph.properties");
+		final Properties properties = new Properties();
 
-		return ChronicleMapUtils.createOrGetPersistentLongIndex(storeDir + File.separator + ChronicleMapUtils.INDEX_DIR + File.separator + name);
+		try {
+
+			properties.load(resource.openStream());
+		} catch (final IOException e) {
+
+			LOG.error("Could not load dmpgraph.properties", e);
+		}
+
+		final String tempUserDir = properties.getProperty("index_store_dir");
+
+		// TODO: find a better way to determine the store dir for the statement index
+		final String storeDir;
+
+		if (tempUserDir != null && !tempUserDir.trim().isEmpty()) {
+
+			storeDir = tempUserDir;
+		} else {
+
+			// fallback default
+			storeDir = System.getProperty("user.dir");
+		}
+
+		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
+		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
 	}
 
 	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex,
 			final Index<Node> index) {
 
 		tempIndex.put(key, node);
+
+		// TODO: we probably shall do this at the end of the transaction, or?
 		index.add(node, indexProperty, key);
+	}
+
+	private void pumpNFlushStatementIndex() {
+
+		LOG.debug("start pump'n'flushing statement index");
+
+		for (final Long hash : tempStatementHashes) {
+
+			statementHashes.add(hash);
+		}
+
+		LOG.debug("finished pumping statement index");
+
+		tempStatementHashesDB.commit();
+		//tempStatementHashesDB.close();
+		statementHashesDB.commit();
+		statementHashesDB.close();
+
+		LOG.debug("finished flushing statement index");
 	}
 }

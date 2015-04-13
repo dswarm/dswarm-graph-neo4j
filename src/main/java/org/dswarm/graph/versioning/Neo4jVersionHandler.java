@@ -121,12 +121,12 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 			final long hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);
 
-			Relationship rel = processor.getStatement(hash);
+			final boolean statementExists = processor.checkStatementExists(hash);
 
-			if (rel == null) {
+			if (statementExists) {
 
 				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
-				rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
+				final Relationship rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
 				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
@@ -134,7 +134,7 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 				rel.setProperty(GraphStatics.UUID_PROPERTY, uuid);
 
-				processor.getStatementHashesIndex().acquireUsing(hash, rel.getId());
+				processor.addHashToStatementIndex(hash);
 				processor.addStatementToIndex(rel, uuid);
 			}
 

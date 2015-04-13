@@ -33,6 +33,7 @@ import org.dswarm.common.types.Tuple;
  */
 public final class MapDBUtils {
 
+	public static final String INDEX_DIR = "index/mapdb";
 	public static final String DEFAULT_INDEX_NAME = "default_mapdb_index";
 
 	public static Tuple<Map<Long, Long>, DB> createOrGetPersistentLongLongIndexTreeMapNonTransactional(final String indexFileName, final String indexName) {

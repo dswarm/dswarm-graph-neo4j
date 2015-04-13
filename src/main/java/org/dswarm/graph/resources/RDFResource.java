@@ -19,6 +19,8 @@ package org.dswarm.graph.resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -32,11 +34,23 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.MultiPart;
+import de.knutwalker.ntparser.NonStrictNtParser;
+import de.knutwalker.ntparser.Statement;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.semanticweb.yars.nx.parser.NxParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.MediaTypeUtil;
@@ -53,18 +67,9 @@ import org.dswarm.graph.rdf.parse.JenaModelParser;
 import org.dswarm.graph.rdf.parse.RDFHandler;
 import org.dswarm.graph.rdf.parse.RDFParser;
 import org.dswarm.graph.rdf.parse.SimpleRDFNeo4jHandler;
+import org.dswarm.graph.rdf.pnx.parse.PNXParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.semanticweb.yars.nx.parser.NxParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 
 /**
  * @author tgaengler
@@ -72,12 +77,12 @@ import com.sun.jersey.multipart.MultiPart;
 @Path("/rdf")
 public class RDFResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RDFResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper objectMapper;
 
 	public RDFResource() {
 
@@ -125,12 +130,13 @@ public class RDFResource {
 			rdfInputStream.close();
 
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
-					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI + "'");
+					+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
+					+ "'");
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
-			if(rdfInputStream != null) {
+			if (rdfInputStream != null) {
 
 				rdfInputStream.close();
 			}
@@ -174,7 +180,7 @@ public class RDFResource {
 
 			processor.getProcessor().failTx();
 
-			if(inputStream != null) {
+			if (inputStream != null) {
 
 				inputStream.close();
 			}
@@ -183,8 +189,6 @@ public class RDFResource {
 
 			throw e;
 		}
-
-
 
 		return Response.ok().build();
 	}
@@ -217,16 +221,65 @@ public class RDFResource {
 
 			RDFResource.LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
 					+ " RDF statements into graph db");
-		} catch(final Exception e) {
+		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
-			if(inputStream != null) {
+			if (inputStream != null) {
 
 				inputStream.close();
 			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+
+			throw e;
+		}
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/putpnx")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response writeRDFwPNX(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
+
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
+
+		if (inputStream == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream");
+		}
+
+		final Iterator<Statement> model = NonStrictNtParser.parse(inputStream);
+
+		if (model == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there are no statements");
+		}
+
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
+
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database);
+
+		try {
+
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.SimpleRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
+			parser.parse(model);
+
+			handler.getHandler().closeTransaction();
+			inputStream.close();
+
+			RDFResource.LOG.debug("finished writing {} RDF statements into graph db", handler.getHandler().getCountedStatements());
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			inputStream.close();
+
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -268,16 +321,104 @@ public class RDFResource {
 
 			LOG.debug("finished writing " + handler.getHandler().getCountedStatements()
 					+ " RDF statements into graph db for data model URI '" + dataModelURI + "'");
-		} catch(final Exception e) {
+		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
-			if(rdfInputStream != null) {
+			if (rdfInputStream != null) {
 
 				rdfInputStream.close();
 			}
 
 			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+
+			throw e;
+		}
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/putpnx")
+	@Consumes("multipart/mixed")
+	public Response writeRDFwDataModelwPNX(final MultiPart multiPart, @Context final GraphDatabaseService database)
+			throws DMPGraphException, IOException {
+
+		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
+
+		if (multiPart == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because the mutlipart payload is not available");
+		}
+
+		final List<BodyPart> bodyParts = multiPart.getBodyParts();
+
+		if (bodyParts == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there are no bodyparts in the multipart payload");
+		}
+
+		final BodyPart inputSteamBodyPart = bodyParts.get(0);
+
+		if (inputSteamBodyPart == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream body part");
+		}
+
+		final BodyPartEntity inputStreamBodyPartEntity = (BodyPartEntity) inputSteamBodyPart.getEntity();
+
+		if (inputStreamBodyPartEntity == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream body part entity");
+		}
+
+		final InputStream rdfInputStream = inputStreamBodyPartEntity.getInputStream();
+
+		if (rdfInputStream == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream");
+		}
+
+		final BodyPart dataModelURIBodyPart = bodyParts.get(1);
+
+		if (dataModelURIBodyPart == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no data model URI body part");
+		}
+
+		final String dataModelURI = dataModelURIBodyPart.getEntityAs(String.class);
+
+		final Iterator<Statement> model = NonStrictNtParser.parse(rdfInputStream);
+
+		if (model == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there are no statements");
+		}
+
+		RDFResource.LOG.debug("deserialized RDF statements that were serialised as N-Triples");
+
+		RDFResource.LOG.debug("try to write RDF statements into graph db");
+
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, dataModelURI);
+
+		try {
+
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.DataModelRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
+			parser.parse(model);
+
+			handler.getHandler().closeTransaction();
+			rdfInputStream.close();
+
+			LOG.debug("finished writing {} RDF statements into graph db for data model URI '{}'", handler.getHandler().getCountedStatements(),
+					dataModelURI);
+		} catch (final Exception e) {
+
+			processor.getProcessor().failTx();
+
+			rdfInputStream.close();
+
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -332,7 +473,7 @@ public class RDFResource {
 	 * for triggering a download of all data models. The serialization (export) format is provided via the accept header field. If
 	 * no format is provided, {@link MediaTypeUtil#N_QUADS} is used as default. In case the format is not supported a 406 response
 	 * is sent.
-	 * 
+	 *
 	 * @param database the db to export the data from
 	 * @param exportFormat serialization format all data should be serialized in, injected from accept header field
 	 * @return all data models serialized in exportLanguage
@@ -373,7 +514,7 @@ public class RDFResource {
 	 * trigger a download for a given data model and format. The serialization (export) format is provided via the accept header
 	 * field. If no format is provided, {@link MediaTypeUtil#N_QUADS} is used as default. In case the format is not supported a
 	 * 406 response is sent.
-	 * 
+	 *
 	 * @param database the graph database
 	 * @param exportFormat serialization format ({@link MediaType}) the data model should be serialized in, injected from accept
 	 *            header field

@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.batch.rdf.pnx.parse;
+package org.dswarm.graph.rdf.pnx.parse;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.batch.parse.BaseNeo4jHandler;
-import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
-import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
+import org.dswarm.graph.parse.BaseNeo4jHandler;
 import org.dswarm.graph.parse.Neo4jHandler;
+import org.dswarm.graph.pnx.utils.NodeTypeUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +39,11 @@ public abstract class RDFNeo4jHandler implements RDFHandler {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(RDFNeo4jHandler.class);
 
-	protected final BaseNeo4jHandler	handler;
-	protected final RDFNeo4jProcessor	processor;
+	protected final BaseNeo4jHandler                           handler;
+	protected final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor;
 
-	public RDFNeo4jHandler(final BaseNeo4jHandler handlerArg, final RDFNeo4jProcessor processorArg) throws DMPGraphException {
+	public RDFNeo4jHandler(final BaseNeo4jHandler handlerArg, final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processorArg)
+			throws DMPGraphException {
 
 		handler = handlerArg;
 		processor = processorArg;

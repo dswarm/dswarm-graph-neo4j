@@ -254,9 +254,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 				final long hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), objectNode,
 						subjectNodeType, finalObjectNodeType);
 
-				final Relationship rel = processor.getStatement(hash);
+				final boolean statementExists = processor.checkStatementExists(hash);
 
-				if (rel == null) {
+				if (!statementExists) {
 
 					final Optional<String> finalOptionalResourceUri;
 
@@ -398,12 +398,11 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 	public void handleLiteral(final Node subjectNode, final Statement statement) throws DMPGraphException {
 
-		final long hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), statement.getOptionalObjectValue()
-				.get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
+		final long hash = processor.generateStatementHash(subjectNode, statement);
 
-		final Relationship rel = processor.getStatement(hash);
+		final boolean statementExists = processor.checkStatementExists(hash);
 
-		if (rel == null) {
+		if (!statementExists) {
 
 			literals++;
 
@@ -456,7 +455,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, finalStatementUUID,
 				optionalQualifiedAttributes, versionHandler);
 
-		processor.getStatementHashesIndex().acquireUsing(hash, rel.getId());
+		processor.addHashToStatementIndex(hash);
 		processor.addStatementToIndex(rel, finalStatementUUID);
 
 		addedRelationships++;

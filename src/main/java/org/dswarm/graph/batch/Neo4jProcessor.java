@@ -49,6 +49,7 @@ import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.model.Statement;
 
 /**
  * @author tgaengler
@@ -229,7 +230,8 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> valuesIndexTuple = getOrCreateIndex(GraphIndexStatics.VALUES_INDEX_NAME, GraphStatics.VALUE, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> valuesIndexTuple = getOrCreateIndex(GraphIndexStatics.VALUES_INDEX_NAME,
+					GraphStatics.VALUE, true, 1);
 			values = valuesIndexTuple.v1();
 			valuesProvider = valuesIndexTuple.v2();
 		} catch (final Exception e) {
@@ -247,15 +249,18 @@ public abstract class Neo4jProcessor {
 
 		try {
 
-			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCES_INDEX_NAME, GraphStatics.URI, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCES_INDEX_NAME,
+					GraphStatics.URI, true, 1);
 			resources = resourcesIndexTuple.v1();
 			resourcesProvider = resourcesIndexTuple.v2();
 
-			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesWDataModelIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME, GraphStatics.URI_W_DATA_MODEL, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourcesWDataModelIndexTuple = getOrCreateIndex(
+					GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME, GraphStatics.URI_W_DATA_MODEL, true, 1);
 			resourcesWDataModel = resourcesWDataModelIndexTuple.v1();
 			resourcesWDataModelProvider = resourcesWDataModelIndexTuple.v2();
 
-			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourceTypesIndexTuple = getOrCreateIndex(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME, GraphStatics.URI, true, 1);
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> resourceTypesIndexTuple = getOrCreateIndex(
+					GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME, GraphStatics.URI, true, 1);
 			resourceTypes = resourceTypesIndexTuple.v1();
 			resourceTypesProvider = resourceTypesIndexTuple.v2();
 			// statementHashes = getOrCreateIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, GraphStatics.HASH, false,
@@ -265,7 +270,7 @@ public abstract class Neo4jProcessor {
 			final String message = "couldn't load indices successfully";
 
 			Neo4jProcessor.LOG.error(message, e);
-			Neo4jProcessor.LOG.debug("couldn't finish writing successfully");
+			Neo4jProcessor.LOG.debug("couldn't load indices successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -532,13 +537,13 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public long generateStatementHash(final long subjectNodeId, final String predicateName, final String objectValue, final NodeType subjectNodeType,
-			final NodeType objectNodeType) throws DMPGraphException {
+	public long generateStatementHash(final long subjectNodeId, final Statement statement) throws DMPGraphException {
 
-		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
-		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = statement.getOptionalSubjectNodeType();
+		final Optional<NodeType> optionalObjectNodeType = statement.getOptionalObjectNodeType();
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNodeId, optionalSubjectNodeType);
-		final Optional<String> optionalObjectIdentifier = Optional.fromNullable(objectValue);
+		final Optional<String> optionalObjectIdentifier = statement.getOptionalObjectValue();
+		final String predicateName = statement.getOptionalPredicateURI().get();
 
 		return generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType, optionalSubjectIdentifier,
 				optionalObjectIdentifier);
@@ -558,8 +563,10 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String hashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+		final String simpleHashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
 				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get();
+
+		final String hashString = putSaltToStatementHash(simpleHashString);
 
 		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
@@ -621,6 +628,8 @@ public abstract class Neo4jProcessor {
 	public abstract void addStatementToIndex(final long relId, final String statementUUID);
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
+
+	protected abstract String putSaltToStatementHash(final String hash);
 
 	protected Tuple<BatchInserterIndex, BatchInserterIndexProvider> getOrCreateIndex(final String name, final String property,
 			final boolean nodeIndex, final int cachSize) {

@@ -364,8 +364,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 	public void handleLiteral(final long subjectNodeId, final Statement statement) throws DMPGraphException {
 
-		final long hash = processor.generateStatementHash(subjectNodeId, statement.getOptionalPredicateURI().get(), statement
-				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
+		final long hash = processor.generateStatementHash(subjectNodeId, statement);
 
 		final boolean statementExists = processor.checkStatementExists(hash);
 

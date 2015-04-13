@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.batch.rdf.pnx;
+package org.dswarm.graph.rdf.pnx;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.batch.Neo4jProcessor;
-import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
+import org.dswarm.graph.pnx.utils.NodeTypeUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public abstract class RDFNeo4jProcessor {
 
 	private static final Logger		LOG	= LoggerFactory.getLogger(RDFNeo4jProcessor.class);
 
-	protected final Neo4jProcessor	processor;
+	protected final Neo4jProcessor processor;
 
 	public RDFNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
 

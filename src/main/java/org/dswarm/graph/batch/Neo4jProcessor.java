@@ -153,8 +153,7 @@ public abstract class Neo4jProcessor {
 
 			if (states[i]) {
 
-				// @tgaengler: I can't remember why I'm utilising an char array here ...
-				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i].toString().toCharArray()));
+				neo4jIndex.add(values[i], MapUtil.map(indexProperty, keys[i].toString()));
 
 				j++;
 

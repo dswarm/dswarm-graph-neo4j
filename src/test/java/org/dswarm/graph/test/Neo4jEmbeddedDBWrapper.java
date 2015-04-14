@@ -20,26 +20,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import com.google.common.io.Resources;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Resources;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 
 /**
  * @author tgaengler
  */
 public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jEmbeddedDBWrapper.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Neo4jEmbeddedDBWrapper.class);
 
-	private final String		MOUNT_POINT;
-	private NeoServer			server;
+	private final String    MOUNT_POINT;
+	private       NeoServer server;
 
-	private final int			serverPort;
+	private final int serverPort;
 
 	public Neo4jEmbeddedDBWrapper(final String mountEndpoint) {
 
@@ -66,16 +65,24 @@ public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 		server.start();
 	}
 
-	public WebResource service() {
+	@Override public Client client() {
 
 		final Client c = Client.create();
+		c.setChunkedEncodingSize(1024);
+
+		return c;
+	}
+
+	public WebResource service() {
+
+		final Client c = client();
 
 		return c.resource(server.baseUri().resolve(MOUNT_POINT));
 	}
 
 	@Override public WebResource base() {
 
-		final Client c = Client.create();
+		final Client c = client();
 
 		return c.resource(server.baseUri());
 	}

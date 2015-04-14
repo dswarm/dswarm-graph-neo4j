@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -250,7 +251,9 @@ public class RDFResource {
 			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream");
 		}
 
-		final Iterator<Statement> model = NonStrictNtParser.parse(inputStream);
+		final InputStream in = new BufferedInputStream(inputStream, 1024);
+
+		final Iterator<Statement> model = NonStrictNtParser.parse(in);
 
 		if (model == null) {
 
@@ -270,6 +273,7 @@ public class RDFResource {
 			parser.parse(model);
 
 			handler.getHandler().closeTransaction();
+			in.close();
 			inputStream.close();
 
 			RDFResource.LOG.debug("finished writing {} RDF statements into graph db", handler.getHandler().getCountedStatements());
@@ -277,6 +281,7 @@ public class RDFResource {
 
 			processor.getProcessor().failTx();
 
+			in.close();
 			inputStream.close();
 
 			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
@@ -379,6 +384,8 @@ public class RDFResource {
 			throw new DMPGraphException("couldn't process RDF statements, because there is no input stream");
 		}
 
+		final InputStream in = new BufferedInputStream(rdfInputStream, 1024);
+
 		final BodyPart dataModelURIBodyPart = bodyParts.get(1);
 
 		if (dataModelURIBodyPart == null) {
@@ -388,7 +395,7 @@ public class RDFResource {
 
 		final String dataModelURI = dataModelURIBodyPart.getEntityAs(String.class);
 
-		final Iterator<Statement> model = NonStrictNtParser.parse(rdfInputStream);
+		final Iterator<Statement> model = NonStrictNtParser.parse(in);
 
 		if (model == null) {
 
@@ -408,6 +415,7 @@ public class RDFResource {
 			parser.parse(model);
 
 			handler.getHandler().closeTransaction();
+			in.close();
 			rdfInputStream.close();
 
 			LOG.debug("finished writing {} RDF statements into graph db for data model URI '{}'", handler.getHandler().getCountedStatements(),
@@ -416,6 +424,7 @@ public class RDFResource {
 
 			processor.getProcessor().failTx();
 
+			in.close();
 			rdfInputStream.close();
 
 			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);

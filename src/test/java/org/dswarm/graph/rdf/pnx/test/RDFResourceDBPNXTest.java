@@ -16,11 +16,14 @@
  */
 package org.dswarm.graph.rdf.pnx.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import org.junit.Assert;
@@ -38,7 +41,7 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  */
 public abstract class RDFResourceDBPNXTest extends BasicResourceTest {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(RDFResourceDBPNXTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RDFResourceDBPNXTest.class);
 
 	public RDFResourceDBPNXTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -48,25 +51,29 @@ public abstract class RDFResourceDBPNXTest extends BasicResourceTest {
 	@Test
 	public void writeRDFToDB() throws IOException {
 
-		LOG.debug("start write test for RDF resource at " + dbType + " DB");
+		LOG.debug("start write test for RDF resource at {} DB", dbType);
 
 		writeRDFToDBInternal();
 
-		LOG.debug("finished write test for RDF resource at " + dbType + " DB");
+		LOG.debug("finished write test for RDF resource at {} DB", dbType);
 	}
 
 	private void writeRDFToDBInternal() throws IOException {
 
-		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB");
+		LOG.debug("start writing RDF statements for RDF resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource("dmpf_bsp1.nt");
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream inputStream = byteSource.openStream();
+		final InputStream in = new BufferedInputStream(inputStream, 1024);
 
 		// POST the request
-		final ClientResponse response = target().path("/putpnx").type(MediaType.APPLICATION_OCTET_STREAM).post(ClientResponse.class, file);
+		final ClientResponse response = target().path("/putpnx").type(MediaType.APPLICATION_OCTET_STREAM).post(ClientResponse.class, in);
+		in.close();
+		inputStream.close();
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB");
+		LOG.debug("finished writing RDF statements for RDF resource at {} DB", dbType);
 	}
 }

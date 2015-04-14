@@ -78,8 +78,8 @@ public abstract class Neo4jProcessor {
 	private Set<Long> statementHashes;
 	private DB        statementHashesDB;
 
-	protected final Set<Long> tempStatementHashes;
-	protected final DB        tempStatementHashesDB;
+	protected  Set<Long> tempStatementHashes;
+	protected DB        tempStatementHashesDB;
 
 	protected final LongObjectMap<String> nodeResourceMap;
 
@@ -101,10 +101,22 @@ public abstract class Neo4jProcessor {
 		bnodes = new HashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
 
-		final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
-				.createOrGetInMemoryLongIndexTreeSetNonTransactional(GraphIndexStatics.TEMP_STATEMENT_HASHES_INDEX_NAME);
-		tempStatementHashes = mapDBTuple.v1();
-		tempStatementHashesDB = mapDBTuple.v2();
+		try {
+
+			final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
+					.createOrGetInMemoryLongIndexTreeSetNonTransactional(GraphIndexStatics.TEMP_STATEMENT_HASHES_INDEX_NAME);
+			tempStatementHashes = mapDBTuple.v1();
+			tempStatementHashesDB = mapDBTuple.v2();
+
+			final Tuple<Set<Long>, DB> mapDBTuple2 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = mapDBTuple2.v1();
+			statementHashesDB = mapDBTuple2.v2();
+		} catch (final IOException e) {
+
+			failTx();
+
+			throw new DMPGraphException("couldn't create or get statement hashes index");
+		}
 	}
 
 	protected void initIndices() throws DMPGraphException {
@@ -120,6 +132,11 @@ public abstract class Neo4jProcessor {
 			tempResourcesIndex = Maps.newHashMap();
 			tempResourcesWDataModelIndex = Maps.newHashMap();
 			tempResourceTypesIndex = Maps.newHashMap();
+
+			if(tempStatementHashes != null) {
+
+				tempStatementHashes.clear();
+			}
 		} catch (final Exception e) {
 
 			failTx();
@@ -130,18 +147,6 @@ public abstract class Neo4jProcessor {
 			Neo4jProcessor.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
-		}
-
-		try {
-
-			final Tuple<Set<Long>, DB> mapDBTuple = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
-			statementHashes = mapDBTuple.v1();
-			statementHashesDB = mapDBTuple.v2();
-		} catch (final IOException e) {
-
-			failTx();
-
-			throw new DMPGraphException("couldn't create or get statement hashes index");
 		}
 	}
 
@@ -184,6 +189,12 @@ public abstract class Neo4jProcessor {
 		if (!tempStatementHashesDB.isClosed()) {
 
 			tempStatementHashes.clear();
+			tempStatementHashesDB.close();
+		}
+
+		if(!statementHashesDB.isClosed()) {
+
+			statementHashesDB.close();
 		}
 	}
 
@@ -589,7 +600,7 @@ public abstract class Neo4jProcessor {
 
 	private void pumpNFlushStatementIndex() {
 
-		LOG.debug("start pump'n'flushing statement index");
+		LOG.debug("start pump'n'flushing statement index; size = '{}'", tempStatementHashes.size());
 
 		for (final Long hash : tempStatementHashes) {
 
@@ -599,6 +610,7 @@ public abstract class Neo4jProcessor {
 		LOG.debug("finished pumping statement index");
 
 		tempStatementHashesDB.commit();
+		//tempStatementHashes.clear();
 		//tempStatementHashesDB.close();
 		statementHashesDB.commit();
 		//statementHashesDB.close();

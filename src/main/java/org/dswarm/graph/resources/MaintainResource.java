@@ -16,10 +16,12 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,6 +33,7 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,8 +45,11 @@ import org.neo4j.graphdb.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.utils.GraphDatabaseUtils;
 
 /**
  * @author tgaengler
@@ -55,6 +61,7 @@ public class MaintainResource {
 
 	private static final long chunkSize = 50000;
 
+	// TODO: maybe divide this into 2 queries and without OPTIONAL
 	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
 	private static final JsonFactory jsonFactory = new JsonFactory();
@@ -132,7 +139,7 @@ public class MaintainResource {
 			try (final Transaction tx = database.beginTx()) {
 
 				MaintainResource.LOG
-						.debug("try to delete up to " + MaintainResource.chunkSize + " nodes and their relationships for the " + i + ". time");
+						.debug("try to delete up to {} nodes and their relationships for the {}. time", MaintainResource.chunkSize, i);
 
 				final Result result = database.execute(deleteQuery);
 
@@ -205,7 +212,7 @@ public class MaintainResource {
 
 				deleted += count;
 
-				MaintainResource.LOG.debug("deleted " + count + " entities");
+				MaintainResource.LOG.debug("deleted {} entities", count);
 
 				if (count < chunkSize) {
 
@@ -242,64 +249,60 @@ public class MaintainResource {
 			final Index<Node> values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
 			final Index<Node> resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 			final Index<Node> resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
-			final Index<Relationship> statements = database.index().forRelationships("statements");
-			final Index<Relationship> statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			final Tuple<Set<Long>, DB> statementHashesMapDBIndexTuple = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, database);
 			final Index<Relationship> statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 			final Index<Relationship> statementUUIDsWDataModel = database.index()
 					.forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 
 			if (resources != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCES_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.RESOURCES_INDEX_NAME);
 
 				resources.delete();
 			}
 
 			if (resourcesWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 
 				resourcesWDataModel.delete();
 			}
 
 			if (resourceTypes != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 
 				resourceTypes.delete();
 			}
 
-			if (statements != null) {
+			final DB mapDB = statementHashesMapDBIndexTuple.v2();
 
-				MaintainResource.LOG.debug("delete statements legacy index");
+			if(mapDB.exists(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME)) {
 
-				statements.delete();
-			}
+				MaintainResource.LOG.debug("delete {} mapdb index", GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
-			if (statementHashes != null) {
-
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME + " legacy index");
-
-				statementHashes.delete();
+				mapDB.delete(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+				mapDB.commit();
+				mapDB.close();
 			}
 
 			if (statementUUIDs != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 
 				statementUUIDs.delete();
 			}
 
 			if (statementUUIDsWDataModel != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 
 				statementUUIDsWDataModel.delete();
 			}
 
 			if (values != null) {
 
-				MaintainResource.LOG.debug("delete " + GraphIndexStatics.VALUES_INDEX_NAME + " legacy index");
+				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.VALUES_INDEX_NAME);
 
 				values.delete();
 			}
@@ -347,8 +350,7 @@ public class MaintainResource {
 
 			for (final IndexDefinition indexDefinition : indexDefinitions) {
 
-				MaintainResource.LOG.debug("drop '" + indexDefinition.getLabel().name() + "' : '"
-						+ indexDefinition.getPropertyKeys().iterator().next() + "' schema index");
+				MaintainResource.LOG.debug("drop '{}' : '{}' schema index", indexDefinition.getLabel().name(), indexDefinition.getPropertyKeys().iterator().next());
 
 				indexDefinition.drop();
 			}
@@ -364,5 +366,13 @@ public class MaintainResource {
 		}
 
 		MaintainResource.LOG.debug("finished delete schema indices TX");
+	}
+
+	private Tuple<Set<Long>, DB> getOrCreateLongIndex(final String name, final GraphDatabaseService database) throws IOException {
+
+		final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
+
+		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
+		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
 	}
 }

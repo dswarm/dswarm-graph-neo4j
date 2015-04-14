@@ -54,7 +54,7 @@ public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 			LOG.error("Could not load dmpgraph.properties", e);
 		}
 
-		serverPort = Integer.valueOf(properties.getProperty("embedded_neo4j_server_port", "7499")).intValue();
+		serverPort = Integer.valueOf(properties.getProperty("embedded_neo4j_server_port", "7499"));
 
 		MOUNT_POINT = mountEndpoint;
 	}
@@ -69,17 +69,15 @@ public class Neo4jEmbeddedDBWrapper implements Neo4jDBWrapper {
 	public WebResource service() {
 
 		final Client c = Client.create();
-		final WebResource service = c.resource(server.baseUri().resolve(MOUNT_POINT));
 
-		return service;
+		return c.resource(server.baseUri().resolve(MOUNT_POINT));
 	}
 
 	@Override public WebResource base() {
 
 		final Client c = Client.create();
-		final WebResource service = c.resource(server.baseUri());
 
-		return service;
+		return c.resource(server.baseUri());
 	}
 
 	@Override

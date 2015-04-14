@@ -26,23 +26,16 @@ package org.dswarm.graph;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.io.Resources;
-import net.openhft.chronicle.map.ChronicleMap;
-
-import org.dswarm.common.types.Tuple;
-import org.dswarm.graph.hash.HashUtils;
-import org.dswarm.graph.index.ChronicleMapUtils;
-import org.dswarm.graph.index.MapDBUtils;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.model.Statement;
-import org.dswarm.graph.versioning.VersionHandler;
-
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.LongObjectOpenHashMap;
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -57,12 +50,13 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.carrotsearch.hppc.LongObjectMap;
-import com.carrotsearch.hppc.LongObjectOpenHashMap;
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+import org.dswarm.common.types.Tuple;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.model.Statement;
+import org.dswarm.graph.utils.GraphDatabaseUtils;
+import org.dswarm.graph.versioning.VersionHandler;
 
 /**
  * @author tgaengler
@@ -578,30 +572,7 @@ public abstract class Neo4jProcessor {
 
 	protected Tuple<Set<Long>, DB> getOrCreateLongIndex(final String name) throws IOException {
 
-		final URL resource = Resources.getResource("dmpgraph.properties");
-		final Properties properties = new Properties();
-
-		try {
-
-			properties.load(resource.openStream());
-		} catch (final IOException e) {
-
-			LOG.error("Could not load dmpgraph.properties", e);
-		}
-
-		final String tempUserDir = properties.getProperty("index_store_dir");
-
-		// TODO: find a better way to determine the store dir for the statement index
-		final String storeDir;
-
-		if (tempUserDir != null && !tempUserDir.trim().isEmpty()) {
-
-			storeDir = tempUserDir;
-		} else {
-
-			// fallback default
-			storeDir = System.getProperty("user.dir");
-		}
+		final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
 
 		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
@@ -630,7 +601,7 @@ public abstract class Neo4jProcessor {
 		tempStatementHashesDB.commit();
 		//tempStatementHashesDB.close();
 		statementHashesDB.commit();
-		statementHashesDB.close();
+		//statementHashesDB.close();
 
 		LOG.debug("finished flushing statement index");
 	}

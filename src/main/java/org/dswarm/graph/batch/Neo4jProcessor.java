@@ -663,13 +663,13 @@ public abstract class Neo4jProcessor {
 			LOG.error("Could not load dmpgraph.properties", e);
 		}
 
-		final String tempUserDir = properties.getProperty("index_store_dir");
+		final String indexStoreDir = properties.getProperty("index_store_dir");
 
 		final String storeDir;
 
-		if (tempUserDir != null && !tempUserDir.trim().isEmpty()) {
+		if (indexStoreDir != null && !indexStoreDir.trim().isEmpty()) {
 
-			storeDir = tempUserDir;
+			storeDir = indexStoreDir;
 		} else {
 
 			// fallback default

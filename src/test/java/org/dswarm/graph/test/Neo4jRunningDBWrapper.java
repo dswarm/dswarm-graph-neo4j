@@ -76,9 +76,8 @@ public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 	public WebResource service() {
 
 		final Client c = Client.create();
-		final WebResource service = c.resource(graphEndpoint);
 
-		return service;
+		return c.resource(graphEndpoint);
 	}
 
 	@Override public WebResource base() {
@@ -86,9 +85,8 @@ public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 		final String baseURI = graphEndpoint.substring(0,graphEndpoint.lastIndexOf("/"));
 
 		final Client c = Client.create();
-		final WebResource service = c.resource(baseURI);
 
-		return service;
+		return c.resource(baseURI);
 	}
 
 	@Override

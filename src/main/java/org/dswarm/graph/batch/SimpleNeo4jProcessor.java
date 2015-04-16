@@ -18,67 +18,24 @@ package org.dswarm.graph.batch;
 
 import java.util.Map;
 
-import org.dswarm.common.types.Tuple;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.model.GraphStatics;
-import org.neo4j.helpers.collection.MapUtil;
+import com.google.common.base.Optional;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
-import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
-import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.carrotsearch.hppc.ObjectLongMap;
-import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import com.google.common.base.Optional;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
  */
 public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
-
-	protected BatchInserterIndex		statementUUIDs;
-	protected BatchInserterIndexProvider statementUUIDsProvider;
-
-	// TODO: utilise temp index (if necessary)
-	private final ObjectLongMap<String> tempStatementUUIDsIndex;
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
 	public SimpleNeo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
 		super(inserter);
-
-		tempStatementUUIDsIndex = new ObjectLongOpenHashMap<>();
-
-		initStatementIndex();
-	}
-
-	@Override
-	protected void initIndices() throws DMPGraphException {
-
-		super.initIndices();
-
-		// initStatementIndex();
-	}
-
-	private void initStatementIndex() throws DMPGraphException {
-
-		try {
-
-			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> statementUUIDsIndexTuple = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME, GraphStatics.UUID, false, 1);
-			statementUUIDs = statementUUIDsIndexTuple.v1();
-			statementUUIDsProvider = statementUUIDsIndexTuple.v2();
-		} catch (final Exception e) {
-
-			final String message = "couldn't load indices successfully";
-
-			SimpleNeo4jProcessor.LOG.error(message, e);
-			SimpleNeo4jProcessor.LOG.debug("couldn't finish write TX successfully");
-
-			throw new DMPGraphException(message);
-		}
 	}
 
 	@Override
@@ -110,12 +67,6 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addStatementToIndex(final long relId, final String statementUUID) {
-
-		statementUUIDs.add(relId, MapUtil.map(GraphStatics.UUID, statementUUID));
-	}
-
-	@Override
 	public Optional<Long> getResourceNodeHits(final String resourceURI) {
 
 		return getNodeIdFromResourcesIndex(resourceURI);
@@ -124,22 +75,5 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	@Override protected String putSaltToStatementHash(final String hash) {
 
 		return hash;
-	}
-
-	@Override
-	public void flushStatementIndices() {
-
-		super.flushStatementIndices();
-
-		statementUUIDs.flush();
-		statementUUIDsProvider.shutdown();
-	}
-
-	@Override
-	protected void clearTempStatementIndices() {
-
-		super.clearTempStatementIndices();
-
-		tempStatementUUIDsIndex.clear();
 	}
 }

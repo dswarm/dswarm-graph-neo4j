@@ -16,16 +16,13 @@
  */
 package org.dswarm.graph;
 
-import org.dswarm.graph.model.GraphStatics;
-
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -34,33 +31,9 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
-	protected final Index<Relationship> statementUUIDs;
-
 	public SimpleNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
 		super(database);
-
-		ensureRunningTx();
-
-		try {
-
-			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
-		} catch (final Exception e) {
-
-			failTx();
-
-			final String message = "couldn't load indices successfully";
-
-			SimpleNeo4jProcessor.LOG.error(message, e);
-			SimpleNeo4jProcessor.LOG.debug("couldn't finish write TX successfully");
-
-			throw new DMPGraphException(message);
-		}
-	}
-
-	@Override public Index<Relationship> getStatementUUIDsIndex() {
-
-		return statementUUIDs;
 	}
 
 	@Override
@@ -89,12 +62,6 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
 			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
 		}
-	}
-
-	@Override
-	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
-
-		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
 	}
 
 	@Override

@@ -64,10 +64,12 @@ public abstract class Neo4jProcessor {
 	private         BatchInserterIndex resources;
 	private         BatchInserterIndex resourcesWDataModel;
 	private         BatchInserterIndex resourceTypes;
+	private BatchInserterIndex		statementUUIDs;
 
 	private BatchInserterIndexProvider resourcesProvider;
 	private BatchInserterIndexProvider resourcesWDataModelProvider;
 	private BatchInserterIndexProvider resourceTypesProvider;
+	private BatchInserterIndexProvider statementUUIDsProvider;
 
 	protected final ObjectLongOpenHashMap<String> tempResourcesIndex;
 	protected final ObjectLongOpenHashMap<String> tempResourcesWDataModelIndex;
@@ -110,6 +112,7 @@ public abstract class Neo4jProcessor {
 		// utilised in the first run)
 		// initIndices();
 		initValueIndex();
+		initStatementIndex();
 	}
 
 	protected void pumpNFlushNClearIndices() {
@@ -245,6 +248,24 @@ public abstract class Neo4jProcessor {
 		}
 	}
 
+	private void initStatementIndex() throws DMPGraphException {
+
+		try {
+
+			final Tuple<BatchInserterIndex, BatchInserterIndexProvider> statementUUIDsIndexTuple = getOrCreateIndex(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME, GraphStatics.UUID, false, 1);
+			statementUUIDs = statementUUIDsIndexTuple.v1();
+			statementUUIDsProvider = statementUUIDsIndexTuple.v2();
+		} catch (final Exception e) {
+
+			final String message = "couldn't load indices successfully";
+
+			Neo4jProcessor.LOG.error(message, e);
+			Neo4jProcessor.LOG.debug("couldn't finish write TX successfully");
+
+			throw new DMPGraphException(message);
+		}
+	}
+
 	protected void initIndices() throws DMPGraphException {
 
 		try {
@@ -316,6 +337,11 @@ public abstract class Neo4jProcessor {
 		bnodes.put(key, nodeId);
 	}
 
+	public void addStatementToIndex(final long relId, final String statementUUID) {
+
+		statementUUIDs.add(relId, MapUtil.map(GraphStatics.UUID, statementUUID));
+	}
+
 	public Optional<Long> getNodeIdFromBNodesIndex(final String key) {
 
 		if (key == null) {
@@ -369,7 +395,8 @@ public abstract class Neo4jProcessor {
 
 	public void flushStatementIndices() {
 
-		// statementHashes.flush();
+		statementUUIDs.flush();
+		statementUUIDsProvider.shutdown();
 	}
 
 	protected void clearTempIndices() {
@@ -624,8 +651,6 @@ public abstract class Neo4jProcessor {
 
 	public abstract void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, String URI,
 			final Optional<String> optionalDataModelURI);
-
-	public abstract void addStatementToIndex(final long relId, final String statementUUID);
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
 

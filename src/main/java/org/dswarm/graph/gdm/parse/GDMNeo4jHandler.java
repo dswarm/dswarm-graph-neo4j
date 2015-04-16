@@ -112,7 +112,15 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 		try {
 
-			final Relationship rel = handler.getRelationship(stmtUUID);
+			final Optional<Relationship> optionalRel = handler.getProcessor().getRelationshipFromStatementIndex(stmtUUID);
+
+			if(!optionalRel.isPresent()) {
+
+				GDMNeo4jHandler.LOG.error("couldn't find statement with the uuid '{}' in the database", stmtUUID);
+			}
+
+			final Relationship rel = optionalRel.get();
+
 			final Node subject = rel.getStartNode();
 			final Node object = rel.getEndNode();
 			final Statement stmt = propertyGraphGDMReaderHelper.readStatement(rel);

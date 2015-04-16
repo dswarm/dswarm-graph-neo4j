@@ -251,8 +251,6 @@ public class MaintainResource {
 			final Index<Node> resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			final Tuple<Set<Long>, DB> statementHashesMapDBIndexTuple = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME, database);
 			final Index<Relationship> statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
-			final Index<Relationship> statementUUIDsWDataModel = database.index()
-					.forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
 
 			if (resources != null) {
 
@@ -291,13 +289,6 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 
 				statementUUIDs.delete();
-			}
-
-			if (statementUUIDsWDataModel != null) {
-
-				MaintainResource.LOG.debug("delete {} legacy index", GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
-
-				statementUUIDsWDataModel.delete();
 			}
 
 			if (values != null) {

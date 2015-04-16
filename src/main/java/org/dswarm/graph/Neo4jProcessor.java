@@ -14,14 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
- * graph extension. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.dswarm.graph;
 
 import java.io.File;
@@ -72,20 +64,22 @@ public abstract class Neo4jProcessor {
 	private         Index<Node>          resourcesWDataModel;
 	private         Index<Node>          resourceTypes;
 	private         Index<Node>          values;
+	private Index<Relationship> statementUUIDs;
 	protected final Map<String, Node>    bnodes;
 
 	// protected Index<Relationship> statementHashes;
-	private Set<Long> statementHashes;
-	private DB        statementHashesDB;
+	final private Set<Long> statementHashes;
+	final private DB        statementHashesDB;
 
-	protected  Set<Long> tempStatementHashes;
-	protected DB        tempStatementHashesDB;
+	final private Set<Long> tempStatementHashes;
+	final private DB        tempStatementHashesDB;
 
 	protected final LongObjectMap<String> nodeResourceMap;
 
-	private Map<String, Node> tempResourcesIndex;
-	private Map<String, Node> tempResourcesWDataModelIndex;
-	private Map<String, Node> tempResourceTypesIndex;
+	// TODO: go offheap, if maps get to big
+	final private Map<String, Node> tempResourcesIndex;
+	final private Map<String, Node> tempResourcesWDataModelIndex;
+	final private Map<String, Node> tempResourceTypesIndex;
 
 	protected Transaction tx;
 
@@ -100,6 +94,9 @@ public abstract class Neo4jProcessor {
 
 		bnodes = new HashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
+		tempResourcesIndex = Maps.newHashMap();
+		tempResourcesWDataModelIndex = Maps.newHashMap();
+		tempResourceTypesIndex = Maps.newHashMap();
 
 		try {
 
@@ -108,9 +105,9 @@ public abstract class Neo4jProcessor {
 			tempStatementHashes = mapDBTuple.v1();
 			tempStatementHashesDB = mapDBTuple.v2();
 
-			final Tuple<Set<Long>, DB> mapDBTuple2 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
-			statementHashes = mapDBTuple2.v1();
-			statementHashesDB = mapDBTuple2.v2();
+			final Tuple<Set<Long>, DB> mapDBTuple3 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = mapDBTuple3.v1();
+			statementHashesDB = mapDBTuple3.v2();
 		} catch (final IOException e) {
 
 			failTx();
@@ -127,13 +124,10 @@ public abstract class Neo4jProcessor {
 			resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
 			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
 			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
+			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 			// statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
-			tempResourcesIndex = Maps.newHashMap();
-			tempResourcesWDataModelIndex = Maps.newHashMap();
-			tempResourceTypesIndex = Maps.newHashMap();
-
-			if(tempStatementHashes != null) {
+			if (tempStatementHashes != null) {
 
 				tempStatementHashes.clear();
 			}
@@ -155,14 +149,14 @@ public abstract class Neo4jProcessor {
 		return database;
 	}
 
-	public Map<String, Node> getBNodesIndex() {
+	public void addNodeToBNodesIndex(final String key, final Node bnode) {
 
-		return bnodes;
+		bnodes.put(key, bnode);
 	}
 
-	public Index<Node> getValueIndex() {
+	public void addNodeToValueIndex(final Node literal, final String key, final String value) {
 
-		return values;
+		values.add(literal, key, value);
 	}
 
 	public void addHashToStatementIndex(final long hash) {
@@ -170,12 +164,10 @@ public abstract class Neo4jProcessor {
 		tempStatementHashes.add(hash);
 	}
 
-	public LongObjectMap<String> getNodeResourceMap() {
+	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
-		return nodeResourceMap;
+		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
 	}
-
-	public abstract Index<Relationship> getStatementUUIDsIndex();
 
 	public void clearMaps() {
 
@@ -186,25 +178,31 @@ public abstract class Neo4jProcessor {
 		tempResourcesWDataModelIndex.clear();
 		tempResourceTypesIndex.clear();
 
+		LOG.debug("start clearing and closing mapdb indices");
+
 		if (!tempStatementHashesDB.isClosed()) {
 
 			tempStatementHashes.clear();
 			tempStatementHashesDB.close();
 		}
 
-		if(!statementHashesDB.isClosed()) {
+		if (!statementHashesDB.isClosed()) {
 
 			statementHashesDB.close();
 		}
+
+		LOG.debug("finished clearing and closing mapdb indices");
 	}
 
 	public void beginTx() throws DMPGraphException {
+
+		Neo4jProcessor.LOG.debug("beginning new tx");
 
 		tx = database.beginTx();
 		initIndices();
 		txIsClosed = false;
 
-		Neo4jProcessor.LOG.debug("begin new tx");
+		Neo4jProcessor.LOG.debug("new tx is ready");
 	}
 
 	public void renewTx() throws DMPGraphException {
@@ -215,23 +213,27 @@ public abstract class Neo4jProcessor {
 
 	public void failTx() {
 
-		Neo4jProcessor.LOG.error("tx failed; close tx");
+		Neo4jProcessor.LOG.error("tx failed; closing tx");
 
 		tempStatementHashesDB.close();
 		statementHashesDB.close();
 		tx.failure();
 		tx.close();
 		txIsClosed = true;
+
+		Neo4jProcessor.LOG.error("tx failed; closed tx");
 	}
 
 	public void succeedTx() {
 
-		Neo4jProcessor.LOG.debug("tx succeeded; close tx");
+		Neo4jProcessor.LOG.debug("tx succeeded; closing tx");
 
 		pumpNFlushStatementIndex();
 		tx.success();
 		tx.close();
 		txIsClosed = true;
+
+		Neo4jProcessor.LOG.debug("tx succeeded; closed tx");
 	}
 
 	public void ensureRunningTx() throws DMPGraphException {
@@ -422,8 +424,9 @@ public abstract class Neo4jProcessor {
 		final Optional<NodeType> optionalObjectNodeType = statement.getOptionalObjectNodeType();
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNode, optionalSubjectNodeType);
 		final Optional<String> optionalObjectIdentifier = statement.getOptionalObjectValue();
+		final String predicateName = statement.getOptionalPredicateURI().get();
 
-		return generateStatementHash(statement.getOptionalPredicateURI().get(), optionalSubjectNodeType, optionalObjectNodeType,
+		return generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType,
 				optionalSubjectIdentifier,
 				optionalObjectIdentifier);
 	}
@@ -442,8 +445,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String simpleHashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
-				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get();
+		final String simpleHashString = optionalSubjectNodeType.get().toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.get().toString() + ":" + optionalObjectIdentifier.get();
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
@@ -503,8 +506,6 @@ public abstract class Neo4jProcessor {
 
 	public abstract void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI);
 
-	public abstract void addStatementToIndex(final Relationship rel, final String statementUUID);
-
 	public abstract Optional<Node> getResourceNodeHits(final String resourceURI);
 
 	public Optional<Node> getNodeFromResourcesIndex(final String key) {
@@ -520,6 +521,32 @@ public abstract class Neo4jProcessor {
 	public Optional<Node> getNodeFromResourcesWDataModelIndex(final String resourceUri, final String dataModelUri) {
 
 		return getNodeFromIndex(resourceUri + dataModelUri, tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL);
+	}
+
+	public Optional<Relationship> getRelationshipFromStatementIndex(final String uuid) {
+
+		if(statementUUIDs == null) {
+
+			return Optional.absent();
+		}
+
+		final IndexHits<Relationship> hits = statementUUIDs.get(GraphStatics.UUID, uuid);
+
+		if (hits != null && hits.hasNext()) {
+
+			final Relationship rel = hits.next();
+
+			hits.close();
+
+			return Optional.of(rel);
+		}
+
+		if (hits != null) {
+
+			hits.close();
+		}
+
+		return Optional.absent();
 	}
 
 	public void addNodeToResourcesIndex(final String value, final Node node) {

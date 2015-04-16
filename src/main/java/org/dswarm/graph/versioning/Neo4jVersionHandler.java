@@ -123,7 +123,7 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 			final boolean statementExists = processor.checkStatementExists(hash);
 
-			if (statementExists) {
+			if (!statementExists) {
 
 				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
 				final Relationship rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);

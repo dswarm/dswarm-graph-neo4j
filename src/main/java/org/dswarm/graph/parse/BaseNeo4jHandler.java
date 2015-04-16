@@ -27,7 +27,14 @@ package org.dswarm.graph.parse;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.lang.NotImplementedException;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
@@ -36,15 +43,6 @@ import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * @author tgaengler
@@ -314,7 +312,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 		try {
 
-			final Relationship rel = getRelationship(uuid);
+			final Optional<Relationship> optionalRel = processor.getRelationshipFromStatementIndex(uuid);
+
+			if(!optionalRel.isPresent()) {
+
+				BaseNeo4jHandler.LOG.error("couldn't find statement with the uuid '{}' in the database", uuid);
+			}
+
+			final Relationship rel = optionalRel.get();
 
 			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getLatestVersion());
 
@@ -364,8 +369,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	}
 
 	protected abstract void init() throws DMPGraphException;
-
-	public abstract Relationship getRelationship(final String uuid);
 
 	public Optional<String> handleBNode(final Node subjectNode, final Statement statement, final Node objectNode,
 			final Optional<NodeType> optionalObjectNodeType) throws DMPGraphException {

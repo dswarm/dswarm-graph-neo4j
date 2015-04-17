@@ -148,7 +148,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					// subject is a blank node
 
 					// note: can I expect an id here?
-					processor.getBNodesIndex().put(statement.getOptionalSubjectId().get(), subjectNode);
+					processor.addNodeToBNodesIndex(statement.getOptionalSubjectId().get(), subjectNode);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
@@ -381,7 +381,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final Optional<String> optionalResourceUri;
 		// object is a blank node
 
-		processor.getBNodesIndex().put(statement.getOptionalObjectId().get(), objectNode);
+		processor.addNodeToBNodesIndex(statement.getOptionalObjectId().get(), objectNode);
 
 		final NodeType objectNodeType = optionalObjectNodeType.get();
 		objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, objectNodeType.toString());
@@ -412,7 +412,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final Node objectNode = processor.getDatabase().createNode();
 			objectNode.setProperty(GraphStatics.VALUE_PROPERTY, statement.getOptionalObjectValue().get());
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
-			processor.getValueIndex().add(objectNode, GraphStatics.VALUE, statement.getOptionalObjectValue().get());
+			processor.addNodeToValueIndex(objectNode, GraphStatics.VALUE, statement.getOptionalObjectValue().get());
 
 			final Optional<String> optionalResourceUri = addResourceProperty(subjectNode, objectNode, statement.getOptionalSubjectNodeType(),
 					statement.getOptionalSubjectURI(), statement.getOptionalResourceURI());
@@ -516,7 +516,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			case BNode:
 
-				processor.getBNodesIndex().put(optionalNodeId.get(), node);
+				processor.addNodeToBNodesIndex(optionalNodeId.get(), node);
 
 				break;
 		}

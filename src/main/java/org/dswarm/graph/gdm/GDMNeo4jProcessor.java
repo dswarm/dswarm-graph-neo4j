@@ -26,23 +26,21 @@ package org.dswarm.graph.gdm;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
+import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
 import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.StatementBuilder;
-
-import org.neo4j.graphdb.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 
 /**
  * @author tgaengler
@@ -133,7 +131,7 @@ public abstract class GDMNeo4jProcessor {
 		return statementBuilder;
 	}
 
-	public Optional<String> determineResourceUri(final org.dswarm.graph.json.Node subject, final Resource resource) {
+	public Optional<String> determineResourceUri(final org.dswarm.graph.json.Node subject, final String resourceURI) {
 
 		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(subject));
 
@@ -148,15 +146,7 @@ public abstract class GDMNeo4jProcessor {
 			optionalSubjectURI = Optional.absent();
 		}
 
-		final Optional<String> optionalResourceURI;
-
-		if (resource != null) {
-
-			optionalResourceURI = Optional.fromNullable(resource.getUri());
-		} else {
-
-			optionalResourceURI = Optional.absent();
-		}
+		final Optional<String> optionalResourceURI= Optional.fromNullable(resourceURI);
 
 		return processor.determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 	}

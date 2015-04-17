@@ -323,6 +323,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getLatestVersion());
 
+			// TODO: remove statement hash from statement hashes index
+
 			return rel;
 		} catch (final Exception e) {
 

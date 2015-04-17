@@ -81,7 +81,7 @@ public class GDMModelParser implements GDMParser {
 
 				// note: just increasing the counter probably won't work at an update ;)
 
-				gdmHandler.handleStatement(statement, resource, i);
+				gdmHandler.handleStatement(statement, resource.getUri(), i);
 			}
 		}
 	}

@@ -60,7 +60,7 @@ import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.DMPStatics;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.evaluator.EntityEvaluator;
@@ -207,7 +207,7 @@ public final class GraphDBUtil {
 					@Override
 					public Evaluation evaluate(final Path path) {
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
+						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
 
 						if (hasLeafLabel) {
 
@@ -376,7 +376,7 @@ public final class GraphDBUtil {
 					@Override
 					public Evaluation evaluate(final Path path) {
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
+						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
 
 						if (hasLeafLabel) {
 
@@ -406,7 +406,7 @@ public final class GraphDBUtil {
 					@Override
 					public Evaluation evaluate(final Path path) {
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
+						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
 
 						if (hasLeafLabel && path.endNode().getId() == leafNodeId) {
 
@@ -766,7 +766,7 @@ public final class GraphDBUtil {
 						// return Evaluation.EXCLUDE_AND_PRUNE;
 						// }
 
-						if (path.lastRelationship() == null && path.endNode().hasLabel(DMPStatics.LEAF_LABEL)) {
+						if (path.lastRelationship() == null && path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL)) {
 
 							return Evaluation.EXCLUDE_AND_PRUNE;
 						}
@@ -782,7 +782,7 @@ public final class GraphDBUtil {
 							return Evaluation.EXCLUDE_AND_PRUNE;
 						}
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(DMPStatics.LEAF_LABEL);
+						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
 
 						if (hasLeafLabel) {
 
@@ -1227,7 +1227,7 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append("__LEAF__").append("`)\nRETURN id(m) AS leaf_node");
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER).append("`)\nRETURN id(m) AS leaf_node");
 
 		return sb.toString();
 	}
@@ -1238,7 +1238,7 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append("__LEAF__").append("`)\nRETURN id(m) AS leaf_node, m.")
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER).append("`)\nRETURN id(m) AS leaf_node, m.")
 				.append(GraphStatics.URI_PROPERTY).append(" AS leaf_uri, m.").append(GraphStatics.VALUE_PROPERTY).append(" AS leaf_value");
 
 		return sb.toString();

@@ -547,7 +547,7 @@ public class GDMResource {
 			}
 
 			// write modified resources resource-wise - instead of the whole model at once.
-			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
+			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource.getUri(), existingResourceDB, newResourceDB);
 			parser.setGDMHandler(handler);
 			parser.parse();
 

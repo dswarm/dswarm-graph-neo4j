@@ -21,23 +21,22 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.Changeset;
-import org.dswarm.graph.delta.DeltaState;
-import org.dswarm.graph.delta.DeltaStatics;
-import org.dswarm.graph.delta.util.GraphDBPrintUtil;
-import org.dswarm.graph.json.Node;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.model.GraphStatics;
-
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.Changeset;
+import org.dswarm.graph.delta.DeltaState;
+import org.dswarm.graph.delta.DeltaStatics;
+import org.dswarm.graph.delta.util.GraphDBPrintUtil;
+import org.dswarm.graph.json.Node;
+import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -48,15 +47,15 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 	private GDMUpdateHandler				gdmHandler;
 	private final Changeset					changeset;
-	private final Resource					existingResource;
-	private final GraphDatabaseService		existingResourceDB;
-	private final GraphDatabaseService		newResourceDB;
+	private final String               existingResourceURI;
+	private final GraphDatabaseService existingResourceDB;
+	private final GraphDatabaseService newResourceDB;
 
-	public GDMChangesetParser(final Changeset changesetArg, final Resource existingResourceArg, final GraphDatabaseService existingResourceDBArg,
+	public GDMChangesetParser(final Changeset changesetArg, final String existingResourceURIArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg) {
 
 		changeset = changesetArg;
-		existingResource = existingResourceArg;
+		existingResourceURI = existingResourceURIArg;
 		existingResourceDB = existingResourceDBArg;
 		newResourceDB = newResourceDBArg;
 	}
@@ -178,7 +177,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 							final String subjectURI = ((ResourceNode) addedStatement.getSubject()).getUri();
 
-							if(!existingResource.getUri().equals(subjectURI)) {
+							if(!existingResourceURI.equals(subjectURI)) {
 
 								// TODO: do something, e.g., replace subject of the to-be-added statement;
 
@@ -188,7 +187,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 						final String addedStmtUUID = addedStatement.getUUID();
 
-						gdmHandler.handleStatement(addedStatement, existingResource, index);
+						gdmHandler.handleStatement(addedStatement, existingResourceURI, index);
 						alreadyAddedStatementUUIDs.add(addedStmtUUID);
 
 						// simply increase the index?
@@ -265,7 +264,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						// take subject from existing resource to append the statement on the correct position
 						finalModifiedStatement.setSubject(subject);
 
-						gdmHandler.handleStatement(finalModifiedStatement, existingResource, index);
+						gdmHandler.handleStatement(finalModifiedStatement, existingResourceURI, index);
 						alreadyModifiedNewStatementUUIDs.add(finalModifiedStatement.getUUID());
 
 						index++;
@@ -311,7 +310,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 					gdmHandler.deprecateStatement(existingStmtUUID);
 
-					gdmHandler.handleStatement(existingStmtUUID, existingResource, index, finalNewStmtOrder);
+					gdmHandler.handleStatement(existingStmtUUID, existingResourceURI, index, finalNewStmtOrder);
 				}
 
 				index++;

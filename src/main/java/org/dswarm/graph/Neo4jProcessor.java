@@ -168,6 +168,15 @@ public abstract class Neo4jProcessor {
 		tempStatementHashes.add(hash);
 	}
 
+	public void removeHashFromStatementIndex(final long hash) {
+
+		// TODO: maybe cache removals and remove them in one rush
+		if(statementHashes.contains(hash)) {
+
+			statementHashes.remove(hash);
+		}
+	}
+
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
 		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
@@ -74,9 +75,9 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 			PropertyGraphSignGDMWorker.LOG.debug("start sign GDM TX");
 
-			final Label recordClassLabel = DynamicLabel.label("__LEAF__");
+			final Label recordClassLabel = GraphProcessingStatics.LEAF_LABEL;
 
-			final ResourceIterator<Node> leafNodes = database.findNodes(recordClassLabel, "__LEAF__", true);
+			final ResourceIterator<Node> leafNodes = database.findNodes(recordClassLabel, GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
 			if (leafNodes == null) {
 

@@ -16,14 +16,16 @@
  */
 package org.dswarm.graph.gdm.parse;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.functions.Func1;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 
@@ -32,12 +34,12 @@ import org.dswarm.graph.json.Statement;
  */
 public class GDMModelParser implements GDMParser {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GDMModelParser.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMModelParser.class);
 
-	private GDMHandler			gdmHandler;
-	private final Model			model;
+	private       GDMHandler           gdmHandler;
+	private final Observable<Resource> model;
 
-	public GDMModelParser(final Model modelArg) {
+	public GDMModelParser(final Observable<Resource> modelArg) {
 
 		model = modelArg;
 	}
@@ -51,38 +53,54 @@ public class GDMModelParser implements GDMParser {
 	@Override
 	public void parse() throws DMPGraphException {
 
-		final Collection<Resource> resources = model.getResources();
-
-		if (resources == null || resources.isEmpty()) {
+		if (model == null) {
 
 			LOG.debug("there are no resources in the GDM model");
 
 			return;
 		}
 
-		for (final Resource resource : resources) {
+		final Observable<Void> parsedStatements = model.map(new Func1<Resource, Void>() {
 
-			Set<Statement> statements = resource.getStatements();
+			@Override public Void call(Resource resource) {
 
-			if (statements == null || statements.isEmpty()) {
+				Set<Statement> statements = resource.getStatements();
 
-				LOG.debug("there are no statements for resource '" + resource.getUri() + "' in the GDM model");
+				if (statements == null || statements.isEmpty()) {
 
-				continue;
+					LOG.debug("there are no statements for resource '{}' in the GDM model", resource.getUri());
+
+					return null;
+				}
+
+				long i = 0;
+
+				gdmHandler.getHandler().setResourceUri(resource.getUri());
+
+				for (final Statement statement : statements) {
+
+					i++;
+
+					// note: just increasing the counter probably won't work at an update ;)
+
+					try {
+
+						gdmHandler.handleStatement(statement, resource.getUri(), i);
+					} catch (DMPGraphException e) {
+
+						throw new RuntimeException(e);
+					}
+				}
+
+				return null;
 			}
+		});
 
-			long i = 0;
+		try {
 
-			gdmHandler.getHandler().setResourceUri(resource.getUri());
-
-			for (final Statement statement : statements) {
-
-				i++;
-
-				// note: just increasing the counter probably won't work at an update ;)
-
-				gdmHandler.handleStatement(statement, resource.getUri(), i);
-			}
+			parsedStatements.toBlocking().last();
+		} catch (RuntimeException e) {
+			throw new DMPGraphException(e.getMessage(), e.getCause());
 		}
 	}
 }

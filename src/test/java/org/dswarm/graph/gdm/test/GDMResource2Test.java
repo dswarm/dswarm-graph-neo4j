@@ -50,16 +50,16 @@ public abstract class GDMResource2Test extends BasicResourceTest {
 	@Test
 	public void writeGDMToTestDB() throws IOException {
 
-		LOG.debug("start write test for GDM resource at " + dbType + " DB");
+		LOG.debug("start write test for GDM resource at {} DB", dbType);
 
 		writeGDMToTestDBInternal();
 
-		LOG.debug("finished write test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished write test for GDM resource at {} DB", dbType);
 	}
 
 	private void writeGDMToTestDBInternal() throws IOException {
 
-		LOG.debug("start writing GDM statements for RDF resource at " + dbType + " DB");
+		LOG.debug("start writing GDM statements for RDF resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource("test-mabxml.gson");
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -69,6 +69,6 @@ public abstract class GDMResource2Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		LOG.debug("finished writing GDM statements for RDF resource at " + dbType + " DB");
+		LOG.debug("finished writing GDM statements for RDF resource at {} DB", dbType);
 	}
 }

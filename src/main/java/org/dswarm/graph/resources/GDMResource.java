@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -58,6 +59,8 @@ import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.Observer;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.model.AttributePath;
@@ -107,6 +110,7 @@ import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
@@ -173,9 +177,7 @@ public class GDMResource {
 
 		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
 		final String dataModelURI = optionalDataModelURI.get();
-
-		// TODO: maybe do this later, when everything else is checked
-		Model model = getModel(content);
+		Observable<Resource> model = getModel(content);
 
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
@@ -190,7 +192,7 @@ public class GDMResource {
 			// = new resources model, since existing, modified resources were already written to the DB
 			final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI, database, handler);
 
-			model = result.first();
+			final Model deltaModel = result.first();
 
 			final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
@@ -211,7 +213,7 @@ public class GDMResource {
 						.getVersionHandler().getLatestVersion(), processor);
 			}
 
-			if (model.size() > 0) {
+			if (deltaModel.size() > 0) {
 
 				// parse model only, when model contains some resources
 
@@ -267,32 +269,10 @@ public class GDMResource {
 			throw new DMPGraphException(message);
 		}
 
-		final ObjectMapper mapper = Util.getJSONObjectMapper();
+		final BufferedInputStream bis = new BufferedInputStream(inputStream, 1024);
 
-		Model model = null;
-		try {
-			model = mapper.readValue(inputStream, Model.class);
-		} catch (IOException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		if (model == null) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			inputStream.close();
-
-			throw new DMPGraphException(message);
-		}
-
-		LOG.debug("deserialized GDM statements that were serialised as Turtle and N3");
+		final ModelParser modelParser = new ModelParser(bis);
+		final Observable<Resource> model = modelParser.parse();
 
 		LOG.debug("try to write GDM statements into graph db");
 
@@ -306,16 +286,18 @@ public class GDMResource {
 			parser.parse();
 			handler.getHandler().closeTransaction();
 
+			bis.close();
 			inputStream.close();
 
-			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
+			LOG.debug("finished writing {} GDM statements into graph db", handler.getHandler().getCountedStatements());
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
+			bis.close();
 			inputStream.close();
 
-			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write GDM statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -477,7 +459,7 @@ public class GDMResource {
 		return Response.ok().entity(result).build();
 	}
 
-	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Model model, final Optional<ContentSchema> optionalContentSchema,
+	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Observable<Resource> model, final Optional<ContentSchema> optionalContentSchema,
 			final String dataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
@@ -486,73 +468,91 @@ public class GDMResource {
 		final Set<String> processedResources = new HashSet<>();
 
 		// calculate delta resource-wise
-		for (Resource newResource : model.getResources()) {
+		model.subscribe(new Observer<Resource>() {
 
-			final String resourceURI = newResource.getUri();
-			final String hash = UUID.randomUUID().toString();
-			final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
+			@Override public void onCompleted() {
 
-			final Resource existingResource;
-			final GDMResourceReader gdmReader;
-
-			if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
-
-				// determine legacy resource identifier via content schema
-				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
-						.getRecordIdentifierAttributePath(), newResource.getUri());
-
-				// try to retrieve existing model via legacy record identifier
-				// note: version is absent -> should make use of latest version
-				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, optionalContentSchema.get().getRecordIdentifierAttributePath(),
-						dataModelURI, Optional.<Integer>absent(), permanentDatabase);
-			} else {
-
-				// try to retrieve existing model via resource uri
-				// note: version is absent -> should make use of latest version
-				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(), permanentDatabase);
 			}
 
-			existingResource = gdmReader.read();
+			@Override public void onError(Throwable throwable) {
 
-			if (existingResource == null) {
-
-				// take new resource model, since there was no match in the data model graph for this resource identifier
-				newResourcesModel.addResource(newResource);
-
-				newResourceDB.shutdown();
-
-				// we don't need to calculate the delta, since everything is new
-				continue;
 			}
 
-			processedResources.add(existingResource.getUri());
+			@Override public void onNext(Resource newResource) {
 
-			// final Model newResourceModel = new Model();
-			// newResourceModel.addResource(resource);
+				try {
 
-			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
+					final String resourceURI = newResource.getUri();
+					final String hash = UUID.randomUUID().toString();
+					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
 
-			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
-					optionalContentSchema);
+					final Resource existingResource;
+					final GDMResourceReader gdmReader;
 
-			if (!changeset.hasChanges()) {
+					if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
-				// process changeset only, if it provides changes
+						// determine legacy resource identifier via content schema
+						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
+								.getRecordIdentifierAttributePath(), newResource.getUri());
 
-				GDMResource.LOG.debug("no changes detected for this resource");
+						// try to retrieve existing model via legacy record identifier
+						// note: version is absent -> should make use of latest version
+						gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
+								optionalContentSchema.get().getRecordIdentifierAttributePath(),
+								dataModelURI, Optional.<Integer>absent(), permanentDatabase);
+					} else {
 
-				shutDownDeltaDBs(existingResourceDB, newResourceDB);
+						// try to retrieve existing model via resource uri
+						// note: version is absent -> should make use of latest version
+						gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(), permanentDatabase);
+					}
 
-				continue;
+					existingResource = gdmReader.read();
+
+					if (existingResource == null) {
+
+						// take new resource model, since there was no match in the data model graph for this resource identifier
+						newResourcesModel.addResource(newResource);
+
+						newResourceDB.shutdown();
+
+						// we don't need to calculate the delta, since everything is new
+						return;
+					}
+
+					processedResources.add(existingResource.getUri());
+
+					// final Model newResourceModel = new Model();
+					// newResourceModel.addResource(resource);
+
+					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
+
+					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
+							optionalContentSchema);
+
+					if (!changeset.hasChanges()) {
+
+						// process changeset only, if it provides changes
+
+						GDMResource.LOG.debug("no changes detected for this resource");
+
+						shutDownDeltaDBs(existingResourceDB, newResourceDB);
+
+						return;
+					}
+
+					// write modified resources resource-wise - instead of the whole model at once.
+					final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource.getUri(), existingResourceDB, newResourceDB);
+					parser.setGDMHandler(handler);
+					parser.parse();
+
+					shutDownDeltaDBs(existingResourceDB, newResourceDB);
+				} catch (final DMPGraphException e) {
+
+					onError(e);
+				}
 			}
-
-			// write modified resources resource-wise - instead of the whole model at once.
-			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource.getUri(), existingResourceDB, newResourceDB);
-			parser.setGDMHandler(handler);
-			parser.parse();
-
-			shutDownDeltaDBs(existingResourceDB, newResourceDB);
-		}
+		});
 
 		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 
@@ -1021,34 +1021,12 @@ public class GDMResource {
 		}
 	}
 
-	private Model getModel(final InputStream content) throws DMPGraphException, IOException {
+	private Observable<Resource> getModel(final InputStream content) {
 
-		Model model;
+		final BufferedInputStream bis = new BufferedInputStream(content, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
 
-		try {
-
-			model = objectMapper.readValue(content, Model.class);
-		} catch (IOException e) {
-
-			final String message = "couldn't write GDM, could not deserialise GDM JSON";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		if (model == null) {
-
-			final String message = "couldn't write GDM, deserialised GDM JSON is null";
-
-			GDMResource.LOG.error(message);
-
-			content.close();
-
-			throw new DMPGraphException(message);
-		}
-
-		return model;
+		return modelParser.parse();
 	}
 
 	private Optional<JsonNode> getMetadataPartNode(final String property, final ObjectNode metadata, final boolean mandatory)

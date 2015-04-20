@@ -19,12 +19,19 @@ package org.dswarm.graph.batch.rdf.pnx.parse.test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import com.google.common.io.Resources;
+import de.knutwalker.ntparser.NonStrictNtParser;
+import de.knutwalker.ntparser.model.NtModelFactory;
+import de.knutwalker.ntparser.model.Statement;
+import org.junit.Test;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.batch.rdf.pnx.DataModelRDFNeo4jProcessor;
 import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
@@ -32,17 +39,6 @@ import org.dswarm.graph.batch.rdf.pnx.parse.DataModelRDFNeo4jHandler;
 import org.dswarm.graph.batch.rdf.pnx.parse.PNXParser;
 import org.dswarm.graph.batch.rdf.pnx.parse.RDFHandler;
 import org.dswarm.graph.batch.rdf.pnx.parse.RDFParser;
-import org.junit.Test;
-import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.unsafe.batchinsert.BatchInserter;
-import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Resources;
-
-import de.knutwalker.ntparser.NonStrictNtParser;
-import de.knutwalker.ntparser.Statement;
 
 /**
  * @author tgaengler
@@ -73,7 +69,7 @@ public class RDFBatchInserterTest {
 		final URL fileURL = Resources.getResource("dmpf_bsp1.nt");
 		final byte[] file = Resources.toByteArray(fileURL);
 		final InputStream stream = new ByteArrayInputStream(file);
-		final Iterator<Statement> model = NonStrictNtParser.parse(stream);
+		final Iterator<Statement> model = NonStrictNtParser.parse(stream, NtModelFactory.INSTANCE());
 
 		LOG.debug("finished loading RDF model");
 

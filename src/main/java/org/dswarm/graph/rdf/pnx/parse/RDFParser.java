@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 import org.dswarm.graph.DMPGraphException;
 
-import de.knutwalker.ntparser.Statement;
+import de.knutwalker.ntparser.model.Statement;
 
 /**
  * @author tgaengler

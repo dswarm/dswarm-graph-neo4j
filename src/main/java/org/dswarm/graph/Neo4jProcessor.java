@@ -88,15 +88,17 @@ public abstract class Neo4jProcessor {
 	public Neo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
 
 		this.database = database;
+
+		tempResourcesIndex = Maps.newHashMap();
+		tempResourcesWDataModelIndex = Maps.newHashMap();
+		tempResourceTypesIndex = Maps.newHashMap();
+
 		beginTx();
 
 		LOG.debug("start write TX");
 
 		bnodes = new HashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
-		tempResourcesIndex = Maps.newHashMap();
-		tempResourcesWDataModelIndex = Maps.newHashMap();
-		tempResourceTypesIndex = Maps.newHashMap();
 
 		try {
 

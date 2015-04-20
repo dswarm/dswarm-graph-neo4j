@@ -20,10 +20,10 @@ import org.dswarm.graph.NodeType;
 
 import com.google.common.base.Optional;
 
-import de.knutwalker.ntparser.BNode;
-import de.knutwalker.ntparser.Literal;
-import de.knutwalker.ntparser.Node;
-import de.knutwalker.ntparser.Resource;
+import de.knutwalker.ntparser.model.BNode;
+import de.knutwalker.ntparser.model.Literal;
+import de.knutwalker.ntparser.model.Node;
+import de.knutwalker.ntparser.model.Resource;
 
 /**
  * @author tgaengler

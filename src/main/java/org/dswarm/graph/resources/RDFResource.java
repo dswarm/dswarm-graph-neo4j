@@ -42,7 +42,8 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import de.knutwalker.ntparser.NonStrictNtParser;
-import de.knutwalker.ntparser.Statement;
+import de.knutwalker.ntparser.model.NtModelFactory;
+import de.knutwalker.ntparser.model.Statement;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
@@ -253,7 +254,7 @@ public class RDFResource {
 
 		final InputStream in = new BufferedInputStream(inputStream, 1024);
 
-		final Iterator<Statement> model = NonStrictNtParser.parse(in);
+		final Iterator<Statement> model = NonStrictNtParser.parse(in, NtModelFactory.INSTANCE());
 
 		if (model == null) {
 
@@ -395,7 +396,7 @@ public class RDFResource {
 
 		final String dataModelURI = dataModelURIBodyPart.getEntityAs(String.class);
 
-		final Iterator<Statement> model = NonStrictNtParser.parse(in);
+		final Iterator<Statement> model = NonStrictNtParser.parse(in, NtModelFactory.INSTANCE());
 
 		if (model == null) {
 

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
-import de.knutwalker.ntparser.Node;
+import de.knutwalker.ntparser.model.Node;
 
 /**
  * @author tgaengler

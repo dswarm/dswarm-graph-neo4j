@@ -127,6 +127,10 @@ public abstract class Neo4jProcessor {
 			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
 			// statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
+			tempResourcesIndex.clear();
+			tempResourcesWDataModelIndex.clear();
+			tempResourceTypesIndex.clear();
+
 			if (tempStatementHashes != null) {
 
 				tempStatementHashes.clear();

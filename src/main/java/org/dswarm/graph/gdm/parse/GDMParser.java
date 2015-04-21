@@ -16,6 +16,8 @@
  */
 package org.dswarm.graph.gdm.parse;
 
+import rx.Observable;
+
 import org.dswarm.graph.DMPGraphException;
 
 /**
@@ -30,5 +32,5 @@ public interface GDMParser {
 	 */
 	public void setGDMHandler(GDMHandler handler);
 
-	public void parse() throws DMPGraphException;
+	public Observable<Void> parse() throws DMPGraphException;
 }

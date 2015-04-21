@@ -16,7 +16,9 @@
  */
 package org.dswarm.graph.gdm.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
+import com.google.common.io.ByteSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -226,14 +229,16 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 	private void writeRDFToDBInternal(final String dataModelURI) throws IOException {
 
-		LOG.debug("start writing RDF statements for GDM resource at " + dbType + " DB");
+		LOG.debug("start writing RDF statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
 				new BodyPart(dataModelURI, MediaType.TEXT_PLAIN_TYPE));
 
 		// POST the request
@@ -243,15 +248,17 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing RDF statements for GDM resource at " + dbType + " DB");
+		LOG.debug("finished writing RDF statements for GDM resource at {} DB", dbType);
 	}
 
 	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {
 
-		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(fileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -261,7 +268,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
 				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
@@ -271,6 +278,6 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
 }

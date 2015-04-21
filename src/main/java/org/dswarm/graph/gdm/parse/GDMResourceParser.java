@@ -21,6 +21,7 @@ import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
 
 /**
  * @author tgaengler
@@ -44,7 +45,7 @@ public class GDMResourceParser implements GDMParser {
 	}
 
 	@Override
-	public void parse() throws DMPGraphException {
+	public Observable<Void> parse() throws DMPGraphException {
 
 		if (resource == null || resource.getStatements() == null || resource.getStatements().isEmpty()) {
 
@@ -52,7 +53,7 @@ public class GDMResourceParser implements GDMParser {
 
 			((Neo4jDeltaGDMHandler) gdmHandler).closeTransaction();
 
-			return;
+			return Observable.empty();
 		}
 
 		long i = 0;
@@ -67,5 +68,8 @@ public class GDMResourceParser implements GDMParser {
 		}
 
 		((Neo4jDeltaGDMHandler) gdmHandler).closeTransaction();
+
+		// TODO: is that correct here?
+		return Observable.empty();
 	}
 }

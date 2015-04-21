@@ -16,11 +16,14 @@
  */
 package org.dswarm.graph.gdm.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.io.ByteSource;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -62,10 +65,12 @@ public abstract class GDMResource2Test extends BasicResourceTest {
 		LOG.debug("start writing GDM statements for RDF resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource("test-mabxml.gson");
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		// POST the request
-		final ClientResponse response = target().path("/put").type(MediaType.APPLICATION_OCTET_STREAM).post(ClientResponse.class, file);
+		final ClientResponse response = target().path("/put").type(MediaType.APPLICATION_OCTET_STREAM).post(ClientResponse.class, bis);
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 

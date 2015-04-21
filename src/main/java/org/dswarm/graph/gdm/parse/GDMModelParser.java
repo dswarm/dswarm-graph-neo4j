@@ -21,8 +21,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
-import rx.Observer;
-import rx.Subscription;
 import rx.functions.Func1;
 
 import org.dswarm.graph.DMPGraphException;
@@ -51,20 +49,20 @@ public class GDMModelParser implements GDMParser {
 	}
 
 	@Override
-	public void parse() throws DMPGraphException {
+	public Observable<Void> parse() throws DMPGraphException {
 
 		if (model == null) {
 
 			LOG.debug("there are no resources in the GDM model");
 
-			return;
+			return Observable.empty();
 		}
 
-		final Observable<Void> parsedStatements = model.map(new Func1<Resource, Void>() {
+		return model.map(new Func1<Resource, Void>() {
 
-			@Override public Void call(Resource resource) {
+			@Override public Void call(final Resource resource) {
 
-				Set<Statement> statements = resource.getStatements();
+				final Set<Statement> statements = resource.getStatements();
 
 				if (statements == null || statements.isEmpty()) {
 
@@ -86,7 +84,7 @@ public class GDMModelParser implements GDMParser {
 					try {
 
 						gdmHandler.handleStatement(statement, resource.getUri(), i);
-					} catch (DMPGraphException e) {
+					} catch (final DMPGraphException e) {
 
 						throw new RuntimeException(e);
 					}
@@ -95,12 +93,5 @@ public class GDMModelParser implements GDMParser {
 				return null;
 			}
 		});
-
-		try {
-
-			parsedStatements.toBlocking().last();
-		} catch (RuntimeException e) {
-			throw new DMPGraphException(e.getMessage(), e.getCause());
-		}
 	}
 }

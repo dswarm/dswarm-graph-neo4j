@@ -303,6 +303,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return totalTriples;
 	}
 
+	@Override
 	public int getNodesAdded() {
 
 		return addedNodes;
@@ -314,6 +315,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		return addedRelationships;
 	}
 
+	@Override
 	public int getCountedLiterals() {
 
 		return literals;

@@ -16,7 +16,9 @@
  */
 package org.dswarm.graph.xml.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
@@ -26,6 +28,7 @@ import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
+import com.google.common.io.ByteSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -67,7 +70,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 	@Test
 	public void readPNXXMLFromDB() throws IOException {
 
-		LOG.debug("start read PNX XML test at " + dbType + " DB");
+		LOG.debug("start read PNX XML test at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
 		final String recordClassURI = "http://www.exlibrisgroup.com/xsd/primo/primo_nm_bib#recordType";
@@ -78,13 +81,13 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.of(recordTag), Optional.<Integer> absent(),
 				Optional.of(DMPStatics.XML_DATA_TYPE), "test-pnx.xml");
 
-		LOG.debug("finished read PNX XML test at " + dbType + " DB");
+		LOG.debug("finished read PNX XML test at {} DB", dbType);
 	}
 
 	@Test
 	public void readCSVXMLFromDB() throws IOException {
 
-		LOG.debug("start read CSV XML test at " + dbType + " DB");
+		LOG.debug("start read CSV XML test at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
 		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
@@ -94,13 +97,13 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
 				Optional.<String> absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
 
-		LOG.debug("finished read CSV XML test at " + dbType + " DB");
+		LOG.debug("finished read CSV XML test at {} DB", dbType);
 	}
 
 	@Test
 	public void readMultipleRecordsCSVXMLFromDB() throws IOException {
 
-		LOG.debug("start read multiple records CSV XML test at " + dbType + " DB");
+		LOG.debug("start read multiple records CSV XML test at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/3";
 		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
@@ -110,13 +113,13 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
 				Optional.<String> absent(), "lic_dmp_v1.csv.xml");
 
-		LOG.debug("finished read multiple records  CSV XML test at " + dbType + " DB");
+		LOG.debug("finished read multiple records  CSV XML test at {} DB", dbType);
 	}
 
 	@Test
 	public void readXMLFromDB() throws IOException {
 
-		LOG.debug("start read test XML test at " + dbType + " DB");
+		LOG.debug("start read test XML test at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data";
 		final String recordClassURI = "http://purl.org/ontology/bibo/Document";
@@ -126,13 +129,13 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
 				Optional.<String> absent(), "xml_test.xml");
 
-		LOG.debug("finished read test XML test at " + dbType + " DB");
+		LOG.debug("finished read test XML test at {} DB", dbType);
 	}
 
 	@Test
 	public void readXML2FromDB() throws IOException {
 
-		LOG.debug("start read test XML 2 test at " + dbType + " DB");
+		LOG.debug("start read test XML 2 test at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/datamodel/5fddf2c5-916b-49dc-a07d-af04020c17f7/data";
 		final String recordClassURI = "http://purl.org/ontology/bibo/Document";
@@ -142,7 +145,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
 				Optional.<String> absent(), "xml_test2.xml");
 
-		LOG.debug("finished read test XML test 2 at " + dbType + " DB");
+		LOG.debug("finished read test XML test 2 at {} DB", dbType);
 	}
 
 	private void readXMLFromDB(final String recordClassURI, final String dataModelURI, final Optional<String> optionalRootAttributePath,
@@ -202,10 +205,12 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {
 
-		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(fileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -214,7 +219,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
+		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
 				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
 
 		// POST the request
@@ -224,6 +229,6 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
 }

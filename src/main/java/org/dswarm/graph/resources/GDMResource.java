@@ -46,7 +46,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
@@ -65,8 +64,6 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
-import rx.observables.BlockingObservable;
-import rx.subjects.PublishSubject;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.model.AttributePath;
@@ -320,7 +317,26 @@ public class GDMResource {
 			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
 			final GDMParser parser = new GDMModelParser(model);
 			parser.setGDMHandler(handler);
-			parser.parse();
+			final Observable<Void> processedResources = parser.parse();
+
+			try {
+
+				final Iterator<Void> iterator = processedResources.toBlocking().getIterator();
+
+				if (!iterator.hasNext()) {
+
+					LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+				}
+
+				while (iterator.hasNext()) {
+
+					iterator.next();
+				}
+			} catch (final RuntimeException e) {
+
+				throw new DMPGraphException(e.getMessage(), e.getCause());
+			}
+
 			handler.getHandler().closeTransaction();
 
 			bis.close();

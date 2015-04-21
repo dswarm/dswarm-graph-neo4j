@@ -78,9 +78,11 @@ public class RDFBatchInserterTest {
 		// flush indices etc.
 		handler.getHandler().closeTransaction();
 
-		LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " RDF statements ('"
-				+ handler.getHandler().getRelationshipsAdded() + "' added relationships) into graph db for data model URI '" + dataModelURI
-				+ "'");
+		LOG.debug(
+				"finished writing {} RDF statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+				handler.getHandler().getCountedStatements(),
+				handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
+				dataModelURI);
 		NonStrictNtParser.close();
 
 		stream.close();

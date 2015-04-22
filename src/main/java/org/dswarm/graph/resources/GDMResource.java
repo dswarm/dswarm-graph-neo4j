@@ -402,6 +402,13 @@ public class GDMResource {
 						GDMResource.LOG
 								.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 										gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+					} else {
+
+						bos.close();
+						os.close();
+
+						GDMResource.LOG
+								.debug("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db", dataModelUri, recordClassUri, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {
 

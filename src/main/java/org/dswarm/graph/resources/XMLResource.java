@@ -174,6 +174,13 @@ public class XMLResource {
 
 						LOG.debug("finished reading '{}' XML records for data model uri = '{}' and record class uri = '{}' from graph db",
 								xmlReader.recordCount(), dataModelUri, recordClassUri);
+					} else {
+
+						bos.close();
+						os.close();
+
+						LOG.debug("couldn't find any XML records for data model uri = '{}' and record class uri = '{}' from graph db", dataModelUri,
+								recordClassUri);
 					}
 				} catch (final DMPGraphException | XMLStreamException e) {
 

@@ -45,6 +45,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 	private static final Logger		LOG					= LoggerFactory.getLogger(BaseNeo4jHandler.class);
 
+	private static final int TX_CHUNK_SIZE = 200000;
+	private static final int TX_TIME_DELTA = 30;
+
 	protected int					totalTriples		= 0;
 	protected int					addedNodes			= 0;
 	protected int					addedRelationships	= 0;
@@ -269,7 +272,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 200000 || timeDelta >= 30) { // "commit" every 200k operations or every 30 seconds
+			if (nodeDelta >= TX_CHUNK_SIZE || timeDelta >= TX_TIME_DELTA) { // "commit" every 200k operations or every 30 seconds
 
 				sinceLastCommit = totalTriples;
 				final double duration = (double) nodeDelta / timeDelta;

@@ -590,8 +590,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String simpleHashString = optionalSubjectNodeType.toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
-				+ optionalObjectNodeType.toString() + ":" + optionalObjectIdentifier.get();
+		final String simpleHashString = optionalSubjectNodeType.get().toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.get().toString() + ":" + optionalObjectIdentifier.get();
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 

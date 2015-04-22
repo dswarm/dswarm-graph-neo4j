@@ -20,10 +20,13 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.ws.rs.core.MediaType;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
@@ -43,6 +46,8 @@ import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author tgaengler
@@ -212,9 +217,29 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final org.dswarm.graph.json.Model model = objectMapper.readValue(body, org.dswarm.graph.json.Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+
+			@Override public Void call(final Resource resource) {
+
+				model.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while(iterator.hasNext()) {
+
+			iterator.next();
+		}
 
 		LOG.debug("read '{}' statements", model.size());
 
@@ -235,9 +260,29 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response2.getStatus());
 
-		final String body2 = response2.getEntity(String.class);
+		final InputStream actualResult2 = response2.getEntity(InputStream.class);
+		final BufferedInputStream bis2 = new BufferedInputStream(actualResult2, 1024);
+		final ModelParser modelParser2 = new ModelParser(bis2);
+		final org.dswarm.graph.json.Model model2 = new org.dswarm.graph.json.Model();
 
-		final org.dswarm.graph.json.Model model2 = objectMapper.readValue(body2, org.dswarm.graph.json.Model.class);
+		final Observable<Void> parseObservable2 = modelParser2.parse().map(new Func1<Resource, Void>() {
+
+			@Override public Void call(final Resource resource) {
+
+				model2.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator2 = parseObservable2.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator2.hasNext());
+
+		while(iterator2.hasNext()) {
+
+			iterator2.next();
+		}
 
 		LOG.debug("read '{}' statements", model2.size());
 

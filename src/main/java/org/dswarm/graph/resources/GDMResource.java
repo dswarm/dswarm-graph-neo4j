@@ -17,8 +17,10 @@
 package org.dswarm.graph.resources;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,9 +38,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -114,6 +120,7 @@ import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.json.stream.ModelBuilder;
 import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
@@ -377,15 +384,35 @@ public class GDMResource {
 				dataModelUri, recordClassUri, optionalVersion);
 
 		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
-		final Model model = gdmReader.read();
 
-		String result = serializeJSON(model, READ_GDM_MODEL_TYPE);
+		final StreamingOutput stream = new StreamingOutput() {
 
-		GDMResource.LOG
-				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
-						model.size(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
-		return Response.ok().entity(result).build();
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final Optional<ModelBuilder> optionalModelBuilder = gdmReader.read(bos);
+
+					if (optionalModelBuilder.isPresent()) {
+
+						final ModelBuilder modelBuilder = optionalModelBuilder.get();
+						modelBuilder.build();
+						os.close();
+
+						GDMResource.LOG
+								.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+										gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@POST

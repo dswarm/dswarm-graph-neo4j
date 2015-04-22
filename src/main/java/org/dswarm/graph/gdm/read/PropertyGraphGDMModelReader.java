@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.gdm.read;
 
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -31,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.json.stream.ModelBuilder;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
@@ -48,7 +49,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private final String            recordClassUri;
 	private       Optional<Integer> optionalAtMost;
 
-	private Model model;
+	private long size = 0;
+
+	private ModelBuilder modelBuilder;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
 			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
@@ -60,7 +63,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	}
 
 	@Override
-	public Model read() throws DMPGraphException {
+	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException {
 
 		ensureTx();
 
@@ -81,7 +84,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
 								type);
 
-				return null;
+				return Optional.absent();
 			}
 
 			if (!recordNodesIter.hasNext()) {
@@ -93,10 +96,11 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
 								type);
 
-				return null;
+				return Optional.absent();
 			}
 
-			model = new Model();
+			modelBuilder = new ModelBuilder(outputStream);
+			size = 0;
 
 			final Iterator<Node> nodeIterator;
 
@@ -144,7 +148,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					currentResource.setStatements(statements);
 				}
 
-				model.addResource(currentResource);
+				size += currentResource.size();
+				modelBuilder.addResource(currentResource);
 
 				currentResourceStatements.clear();
 			}
@@ -170,12 +175,12 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			tx.close();
 		}
 
-		return model;
+		return Optional.of(modelBuilder);
 	}
 
 	@Override
 	public long countStatements() {
 
-		return model.size();
+		return size;
 	}
 }

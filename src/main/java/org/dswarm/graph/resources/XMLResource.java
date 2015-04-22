@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -155,13 +156,16 @@ public class XMLResource {
 
 		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
 				optionalOriginalDataType, database);
+
 		final StreamingOutput stream = new StreamingOutput() {
 
 			@Override
 			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
 				try {
-					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(os);
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(bos);
 
 					if (optionalWriter.isPresent()) {
 

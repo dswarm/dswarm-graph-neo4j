@@ -16,10 +16,15 @@
  */
 package org.dswarm.graph.gdm.read;
 
+import java.io.OutputStream;
+
+import com.google.common.base.Optional;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Model;
+import org.dswarm.graph.json.stream.ModelBuilder;
 
 public interface GDMModelReader extends GDMReader {
 
-	public Model read() throws DMPGraphException;
+	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException;
 }

@@ -156,8 +156,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, Resource>	bnodes		= new HashMap<Long, Resource>();
-		final Map<String, Resource>	resources	= new HashMap<String, Resource>();
+		final Map<Long, Resource>	bnodes		= new HashMap<>();
+		final Map<String, Resource>  resources     = new HashMap<>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -182,7 +182,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 				}
 
 				final String predicate = rel.getType().name();
-						//.getProperty(GraphStatics.URI_PROPERTY, null);
+				//.getProperty(GraphStatics.URI_PROPERTY, null);
 				final Property predicateProperty = model.createProperty(predicate);
 
 				final String object;

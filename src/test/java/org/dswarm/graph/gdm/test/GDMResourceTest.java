@@ -20,11 +20,14 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
@@ -45,6 +48,8 @@ import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author tgaengler
@@ -146,7 +151,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 	@Test
 	public void readGDMFromDBThatWasWrittenAsRDF() throws IOException {
 
-		LOG.debug("start read test for GDM resource at " + dbType + " DB");
+		LOG.debug("start read test for GDM resource at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
 
@@ -157,13 +162,13 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer> absent());
 
-		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
 
 	@Test
 	public void readGDMFromDBThatWasWrittenAsGDM() throws IOException {
 
-		LOG.debug("start read test for GDM resource at " + dbType + " DB");
+		LOG.debug("start read test for GDM resource at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/1";
 
@@ -174,13 +179,13 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
 
-		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
 
 	@Test
 	public void testAtMostParameter() throws IOException {
 
-		LOG.debug("start at-most parameter test for GDM resource at " + dbType + " DB");
+		LOG.debug("start at-most parameter test for GDM resource at {} DB", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
 		final String fileName = "versioning/lic_dmp_v1.csv.gson";
@@ -192,7 +197,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.of(10));
 
-		LOG.debug("finished at-most parameter test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished at-most parameter test for GDM resource at {} DB", dbType);
 	}
 
 	private void readGDMFromDB(final String recordClassURI, final String dataModelURI, final int numberOfStatements,
@@ -218,11 +223,31 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String actualResult = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final org.dswarm.graph.json.Model model = objectMapper.readValue(actualResult, org.dswarm.graph.json.Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
 
-		LOG.debug("read '" + model.size() + "' statements");
+			@Override public Void call(final Resource resource) {
+
+				model.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while(iterator.hasNext()) {
+
+			iterator.next();
+		}
+
+		LOG.debug("read '{}' statements", model.size());
 
 		Assert.assertEquals("the number of statements should be " + numberOfStatements, numberOfStatements, model.size());
 	}

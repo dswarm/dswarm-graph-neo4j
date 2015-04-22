@@ -47,7 +47,6 @@
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.2-SNAPSHOT</dswarm.graph.model.version>
 		<dswarm.commons.version>0.0.2-SNAPSHOT</dswarm.commons.version>
-		<nxparser.version>2.0-SNAPSHOT</nxparser.version>
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
@@ -202,26 +201,6 @@
 
 	<repositories>
 		<repository>
-			<id>nxparser-repo</id>
-			<url>http://nxparser.googlecode.com/svn/repository</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>nxparser-snapshots</id>
-			<url>http://nxparser.googlecode.com/svn/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>neo4jRepo</id>
 			<url>http://m2.neo4j.org</url>
 		</repository>
@@ -312,11 +291,6 @@
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-model</artifactId>
 			<version>${dswarm.graph.model.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.semanticweb.yars</groupId>
-			<artifactId>nxparser</artifactId>
-			<version>${nxparser.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>

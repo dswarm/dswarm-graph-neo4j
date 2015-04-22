@@ -513,7 +513,7 @@ public abstract class Neo4jProcessor {
 
 	public boolean checkStatementExists(final long hash) throws DMPGraphException {
 
-		return checkLongIndex(hash, statementHashes);
+		return checkLongIndex(hash, tempStatementHashes) || checkLongIndex(hash, statementHashes);
 	}
 
 	public Map<String, Object> prepareRelationship(final String statementUUID, final Optional<Map<String, Object>> optionalQualifiedAttributes) {

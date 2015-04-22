@@ -43,8 +43,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -117,7 +115,6 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.stream.ModelBuilder;
@@ -399,6 +396,7 @@ public class GDMResource {
 
 						final ModelBuilder modelBuilder = optionalModelBuilder.get();
 						modelBuilder.build();
+						bos.close();
 						os.close();
 
 						GDMResource.LOG
@@ -487,56 +485,82 @@ public class GDMResource {
 
 		if (recordURIs == null || recordURIs.isEmpty()) {
 
-			//			final ObjectNode resultJSON = objectMapper.createObjectNode();
-			//
-			//			final String message = String.format(
-			//					"couldn't find a record for for key attribute path = '%s' and search value = '%s' in data model '%s' with and version = '%s' from graph db",
-			//					keyAPString, searchValue, dataModelUri, optionalVersion);
-			//
-			//			resultJSON.put("nok", message);
-			//
-			//			final String nokResult = serializeJSON(resultJSON, SEARCH_GDM_RECORDS_TYPE);
-
-			final Model model = new Model();
-
-			final String emptyResult = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
-
-			return Response.ok().entity(emptyResult).build();
-		}
-
-		final Model model = new Model();
-
-		for (final String recordUri : recordURIs) {
-
-			final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
-					optionalVersion, database);
-
-			try {
-
-				final Resource resource = gdmReader.read();
-
-				model.addResource(resource);
-			} catch (final DMPGraphException e) {
-
-				GDMResource.LOG.debug("couldn't retrieve record for record URI '{}'", recordUri);
-			}
-		}
-
-		String result = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
-
-		if (model.getResources() != null) {
-
 			GDMResource.LOG
-					.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
-							model.getResources().size(), model.size(), keyAPString, searchValue, dataModelUri, optionalVersion);
-		} else {
-
-			GDMResource.LOG
-					.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
 							keyAPString, searchValue, dataModelUri, optionalVersion);
+
+			final StreamingOutput stream = new StreamingOutput() {
+
+				@Override
+				public void write(final OutputStream os) throws IOException, WebApplicationException {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final ModelBuilder modelBuilder = new ModelBuilder(bos);
+
+					modelBuilder.build();
+					bos.close();
+					os.close();
+				}
+			};
+
+			return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 		}
 
-		return Response.ok().entity(result).build();
+		final StreamingOutput stream = new StreamingOutput() {
+
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
+
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final ModelBuilder modelBuilder = new ModelBuilder(bos);
+
+					int resourcesSize = 0;
+					long statementsSize = 0;
+
+					for (final String recordUri : recordURIs) {
+
+						final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
+								optionalVersion, database);
+
+						try {
+
+							final Resource resource = gdmReader.read();
+
+							modelBuilder.addResource(resource);
+
+							resourcesSize++;
+							statementsSize += resource.size();
+						} catch (final DMPGraphException e) {
+
+							GDMResource.LOG.debug("couldn't retrieve record for record URI '{}'", recordUri);
+						}
+					}
+
+					modelBuilder.build();
+					bos.close();
+					os.close();
+
+					if (resourcesSize > 0) {
+
+						GDMResource.LOG
+								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, optionalVersion);
+					} else {
+
+						GDMResource.LOG
+								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+										keyAPString, searchValue, dataModelUri, optionalVersion);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	private Tuple<Observable<Resource>, Observable<String>> calculateDeltaForDataModel(final Observable<Resource> model,

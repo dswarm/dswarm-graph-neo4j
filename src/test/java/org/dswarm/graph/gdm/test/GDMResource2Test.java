@@ -74,6 +74,9 @@ public abstract class GDMResource2Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
+		bis.close();
+		is.close();
+
 		LOG.debug("finished writing GDM statements for RDF resource at {} DB", dbType);
 	}
 }

@@ -241,6 +241,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 			iterator.next();
 		}
 
+		bis.close();
+		actualResult.close();
+
 		LOG.debug("read '{}' statements", model.size());
 
 		Assert.assertEquals("the number of statements should be " + statementCountCurrentVersion, statementCountCurrentVersion, model.size());
@@ -283,6 +286,9 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 			iterator2.next();
 		}
+
+		bis2.close();
+		actualResult2.close();
 
 		LOG.debug("read '{}' statements", model2.size());
 
@@ -330,6 +336,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
@@ -359,6 +367,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}

@@ -188,7 +188,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 		Assert.assertEquals(MediaType.APPLICATION_XML_TYPE, response.getType());
 
-		final String actualXML = response.getEntity(String.class);
+		final InputStream actualXML = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualXML, 1024);
 
 		Assert.assertNotNull(actualXML);
 
@@ -197,10 +198,13 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
 		// do comparison: check for XML similarity
-		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromString(actualXML)).ignoreWhitespace()
+		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromStream(bis)).ignoreWhitespace()
 				.checkForSimilar().build();
 
 		Assert.assertFalse(xmlDiff.hasDifferences());
+
+		actualXML.close();
+		bis.close();
 	}
 
 	private void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {

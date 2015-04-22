@@ -89,9 +89,33 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Model model = objectMapper.readValue(body, Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+
+			@Override public Void call(final Resource resource) {
+
+				model.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while (iterator.hasNext()) {
+
+			iterator.next();
+		}
+
+		bis.close();
+		actualResult.close();
+
 
 		LOG.debug("read '{}' statements", model.size());
 
@@ -392,6 +416,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
@@ -424,6 +450,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
@@ -482,6 +510,9 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 			iterator.next();
 		}
+
+		bis.close();
+		actualResult.close();
 
 		LOG.debug("read '{}' statements", model.size());
 

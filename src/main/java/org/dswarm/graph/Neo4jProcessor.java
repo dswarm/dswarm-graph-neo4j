@@ -162,7 +162,7 @@ public abstract class Neo4jProcessor {
 
 	public void addNodeToValueIndex(final Node literal, final String key, final String value) {
 
-		values.add(literal, key, value);
+		values.putIfAbsent(literal, key, value);
 	}
 
 	public void addHashToStatementIndex(final long hash) {
@@ -181,7 +181,7 @@ public abstract class Neo4jProcessor {
 
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
 
-		statementUUIDs.add(rel, GraphStatics.UUID, statementUUID);
+		statementUUIDs.putIfAbsent(rel, GraphStatics.UUID, statementUUID);
 	}
 
 	public void clearMaps() {
@@ -637,7 +637,7 @@ public abstract class Neo4jProcessor {
 		tempIndex.put(key, node);
 
 		// TODO: we probably shall do this at the end of the transaction, or?
-		index.add(node, indexProperty, key);
+		index.putIfAbsent(node, indexProperty, key);
 	}
 
 	private void pumpNFlushStatementIndex() {

@@ -49,7 +49,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private final String            recordClassUri;
 	private       Optional<Integer> optionalAtMost;
 
-	private long size = 0;
+	private long size          = 0;
 	private long readResources = 0;
 
 	private ModelBuilder modelBuilder;
@@ -76,6 +76,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
+			PropertyGraphGDMModelReader.LOG
+					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, dataModelUri,
+							version);
+
 			recordNodesIter = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
 
@@ -84,7 +88,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				tx.success();
 
 				PropertyGraphGDMModelReader.LOG
-						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
+								recordClassLabel, dataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -96,7 +101,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				tx.success();
 
 				PropertyGraphGDMModelReader.LOG
-						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
+								recordClassLabel, dataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -151,9 +157,18 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					currentResource.setStatements(statements);
 				}
 
-				size += currentResource.size();
-				modelBuilder.addResource(currentResource);
-				readResources++;
+				final int resourceStatementSize = currentResource.size();
+
+				if (resourceStatementSize > 0) {
+
+					size += resourceStatementSize;
+					modelBuilder.addResource(currentResource);
+					readResources++;
+				} else {
+
+					LOG.debug("couldn't find any statement for resource '{}' in data model '{}' with version '{}'", currentResource.getUri(),
+							dataModelUri, version);
+				}
 
 				currentResourceStatements.clear();
 			}

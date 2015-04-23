@@ -105,10 +105,10 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to process RDF statements and write them into graph db");
 
-		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
-		final InputStream rdfInputStream = bpe.getInputStream();
+		final String dataModelURI = multiPart.getBodyParts().get(0).getEntityAs(String.class);
 
-		final String dataModelURI = multiPart.getBodyParts().get(1).getEntityAs(String.class);
+		final BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(1).getEntity();
+		final InputStream rdfInputStream = bpe.getInputStream();
 
 		final Model model = ModelFactory.createDefaultModel();
 		model.read(rdfInputStream, null, "N3");
@@ -269,7 +269,16 @@ public class RDFResource {
 			throw new DMPGraphException("couldn't process RDF statements, because there are no bodyparts in the multipart payload");
 		}
 
-		final BodyPart inputSteamBodyPart = bodyParts.get(0);
+		final BodyPart dataModelURIBodyPart = bodyParts.get(0);
+
+		if (dataModelURIBodyPart == null) {
+
+			throw new DMPGraphException("couldn't process RDF statements, because there is no data model URI body part");
+		}
+
+		final String dataModelURI = dataModelURIBodyPart.getEntityAs(String.class);
+
+		final BodyPart inputSteamBodyPart = bodyParts.get(1);
 
 		if (inputSteamBodyPart == null) {
 
@@ -291,15 +300,6 @@ public class RDFResource {
 		}
 
 		final InputStream in = new BufferedInputStream(rdfInputStream, 1024);
-
-		final BodyPart dataModelURIBodyPart = bodyParts.get(1);
-
-		if (dataModelURIBodyPart == null) {
-
-			throw new DMPGraphException("couldn't process RDF statements, because there is no data model URI body part");
-		}
-
-		final String dataModelURI = dataModelURIBodyPart.getEntityAs(String.class);
 
 		final Iterator<Statement> model = NonStrictNtParser.parse(in, NtModelFactory.INSTANCE());
 

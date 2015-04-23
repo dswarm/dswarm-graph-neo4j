@@ -108,8 +108,8 @@ public abstract class RDFResourceDBwDataModelPNXTest extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(in, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE));
+		multiPart.bodyPart(new BodyPart("http://data.slub-dresden.de/resources/1", MediaType.TEXT_PLAIN_TYPE)).bodyPart(
+				new BodyPart(in, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/putpnx").type("multipart/mixed").post(ClientResponse.class, multiPart);

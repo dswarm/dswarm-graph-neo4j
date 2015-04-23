@@ -132,6 +132,9 @@ public class GDMResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GDMResource.class);
 
+	public static final int METADATA_BODY_PART = 0;
+	public static final int CONTENT_BODY_PART = 1;
+
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
@@ -180,8 +183,8 @@ public class GDMResource {
 		LOG.debug("try to process GDM statements and write them into graph db");
 
 		final List<BodyPart> bodyParts = getBodyParts(multiPart);
-		final InputStream content = getContent(bodyParts);
 		final ObjectNode metadata = getMetadata(bodyParts);
+		final InputStream content = getContent(bodyParts);
 
 		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
 		final String dataModelURI = optionalDataModelURI.get();
@@ -1101,7 +1104,7 @@ public class GDMResource {
 
 	private InputStream getContent(final List<BodyPart> bodyParts) throws DMPGraphException {
 
-		final BodyPart contentBodyPart = bodyParts.get(0);
+		final BodyPart contentBodyPart = bodyParts.get(CONTENT_BODY_PART);
 
 		if (contentBodyPart == null) {
 
@@ -1139,7 +1142,7 @@ public class GDMResource {
 
 	private ObjectNode getMetadata(final List<BodyPart> bodyParts) throws DMPGraphException {
 
-		final BodyPart metadataBodyPart = bodyParts.get(1);
+		final BodyPart metadataBodyPart = bodyParts.get(METADATA_BODY_PART);
 
 		if (metadataBodyPart == null) {
 

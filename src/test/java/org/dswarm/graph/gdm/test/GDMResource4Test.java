@@ -116,7 +116,6 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		bis.close();
 		actualResult.close();
 
-
 		LOG.debug("read '{}' statements", model.size());
 
 		Assert.assertEquals("the number of statements should be 191", 191, model.size());
@@ -407,8 +406,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -441,8 +440,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

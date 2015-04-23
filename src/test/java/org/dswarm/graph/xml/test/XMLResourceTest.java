@@ -52,12 +52,12 @@ import com.sun.jersey.multipart.MultiPart;
  */
 public abstract class XMLResourceTest extends BasicResourceTest {
 
-	private static final Logger	LOG						= LoggerFactory.getLogger(XMLResourceTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(XMLResourceTest.class);
 
 	// we need PNX gson
-	private static final String	DEFAULT_GDM_FILE_NAME	= "test-pnx.gson";
+	private static final String DEFAULT_GDM_FILE_NAME = "test-pnx.gson";
 
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper objectMapper;
 
 	public XMLResourceTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
@@ -78,7 +78,7 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.of(recordTag), Optional.<Integer> absent(),
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.of(recordTag), Optional.<Integer>absent(),
 				Optional.of(DMPStatics.XML_DATA_TYPE), "test-pnx.xml");
 
 		LOG.debug("finished read PNX XML test at {} DB", dbType);
@@ -94,8 +94,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, "versioning/Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.gson");
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String> absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.<String>absent(), Optional.<Integer>absent(),
+				Optional.<String>absent(), "Testtitel_MDunitz-US-TitleSummaryReport132968_01.csv.xml");
 
 		LOG.debug("finished read CSV XML test at {} DB", dbType);
 	}
@@ -110,8 +110,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, "versioning/lic_dmp_v1.csv.gson");
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String> absent(), "lic_dmp_v1.csv.xml");
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.<String>absent(), Optional.<Integer>absent(),
+				Optional.<String>absent(), "lic_dmp_v1.csv.xml");
 
 		LOG.debug("finished read multiple records  CSV XML test at {} DB", dbType);
 	}
@@ -126,8 +126,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, "xml_test.gson");
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String> absent(), "xml_test.xml");
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.<String>absent(), Optional.<Integer>absent(),
+				Optional.<String>absent(), "xml_test.xml");
 
 		LOG.debug("finished read test XML test at {} DB", dbType);
 	}
@@ -142,8 +142,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		writeGDMToDBInternal(dataModelURI, "xml_test2.gson");
 
-		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String> absent(), Optional.<String> absent(), Optional.<Integer> absent(),
-				Optional.<String> absent(), "xml_test2.xml");
+		readXMLFromDB(recordClassURI, dataModelURI, Optional.<String>absent(), Optional.<String>absent(), Optional.<Integer>absent(),
+				Optional.<String>absent(), "xml_test2.xml");
 
 		LOG.debug("finished read test XML test 2 at {} DB", dbType);
 	}
@@ -223,8 +223,8 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = service().path("/gdm/put").type("multipart/mixed").post(ClientResponse.class, multiPart);

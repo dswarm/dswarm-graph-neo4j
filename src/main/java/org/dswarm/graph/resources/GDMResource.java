@@ -396,6 +396,8 @@ public class GDMResource {
 
 						final ModelBuilder modelBuilder = optionalModelBuilder.get();
 						modelBuilder.build();
+						bos.flush();
+						os.flush();
 						bos.close();
 						os.close();
 
@@ -505,6 +507,8 @@ public class GDMResource {
 					final ModelBuilder modelBuilder = new ModelBuilder(bos);
 
 					modelBuilder.build();
+					bos.flush();
+					os.flush();
 					bos.close();
 					os.close();
 				}
@@ -546,6 +550,8 @@ public class GDMResource {
 					}
 
 					modelBuilder.build();
+					bos.flush();
+					os.flush();
 					bos.close();
 					os.close();
 

@@ -36,6 +36,7 @@ public class GDMModelParser implements GDMParser {
 
 	private       GDMHandler           gdmHandler;
 	private final Observable<Resource> model;
+	private long parsedResources = 0;
 
 	public GDMModelParser(final Observable<Resource> modelArg) {
 
@@ -50,6 +51,8 @@ public class GDMModelParser implements GDMParser {
 
 	@Override
 	public Observable<Void> parse() throws DMPGraphException {
+
+		parsedResources = 0;
 
 		if (model == null) {
 
@@ -90,8 +93,15 @@ public class GDMModelParser implements GDMParser {
 					}
 				}
 
+				parsedResources++;
+
 				return null;
 			}
 		});
+	}
+
+	@Override public long parsedResources() {
+
+		return parsedResources;
 	}
 }

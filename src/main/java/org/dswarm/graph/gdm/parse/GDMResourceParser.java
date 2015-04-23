@@ -32,6 +32,7 @@ public class GDMResourceParser implements GDMParser {
 
 	private GDMHandler			gdmHandler;
 	private final Resource		resource;
+	private long parsedResources = 0;
 
 	public GDMResourceParser(final Resource resourceArg) {
 
@@ -46,6 +47,8 @@ public class GDMResourceParser implements GDMParser {
 
 	@Override
 	public Observable<Void> parse() throws DMPGraphException {
+
+		parsedResources = 0;
 
 		if (resource == null || resource.getStatements() == null || resource.getStatements().isEmpty()) {
 
@@ -69,7 +72,14 @@ public class GDMResourceParser implements GDMParser {
 
 		((Neo4jDeltaGDMHandler) gdmHandler).closeTransaction();
 
+		parsedResources++;
+
 		// TODO: is that correct here?
 		return Observable.empty();
+	}
+
+	@Override public long parsedResources() {
+
+		return parsedResources;
 	}
 }

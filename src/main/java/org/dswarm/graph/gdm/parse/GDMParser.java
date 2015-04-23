@@ -33,4 +33,6 @@ public interface GDMParser {
 	public void setGDMHandler(GDMHandler handler);
 
 	public Observable<Void> parse() throws DMPGraphException;
+
+	public long parsedResources();
 }

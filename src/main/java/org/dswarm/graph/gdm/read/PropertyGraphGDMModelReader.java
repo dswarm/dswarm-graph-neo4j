@@ -50,6 +50,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private       Optional<Integer> optionalAtMost;
 
 	private long size = 0;
+	private long readResources = 0;
 
 	private ModelBuilder modelBuilder;
 
@@ -64,6 +65,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 	@Override
 	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException {
+
+		readResources = 0;
 
 		ensureTx();
 
@@ -150,6 +153,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				size += currentResource.size();
 				modelBuilder.addResource(currentResource);
+				readResources++;
 
 				currentResourceStatements.clear();
 			}
@@ -176,6 +180,11 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 		}
 
 		return Optional.of(modelBuilder);
+	}
+
+	@Override public long readResources() {
+
+		return readResources;
 	}
 
 	@Override

@@ -133,7 +133,7 @@ public class GDMResource {
 	private static final Logger LOG = LoggerFactory.getLogger(GDMResource.class);
 
 	public static final int METADATA_BODY_PART = 0;
-	public static final int CONTENT_BODY_PART = 1;
+	public static final int CONTENT_BODY_PART  = 1;
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
@@ -163,11 +163,13 @@ public class GDMResource {
 
 	/**
 	 * multipart/mixed payload contains two body parts:<br/>
-	 * - first body part is the content (i.e. the real data)<br/>
-	 * - second body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
+	 * - first body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
 	 * content):<br/>
-	 * - "data_model_URI" (mandatory) - "content_schema" (obligatory) - "deprecate_missing_records" (obligatory) -
-	 * "record_class_uri" (mandatory for "deprecate_missing_records")
+	 *     - "data_model_URI" (mandatory)<br/>
+	 *     - "content_schema" (obligatory)<br/>
+	 *     - "deprecate_missing_records" (obligatory)<br/>
+	 *     - "record_class_uri" (mandatory for "deprecate_missing_records")<br/>
+	 * - second body part is the content (i.e. the real data)
 	 *
 	 * @param multiPart
 	 * @param database
@@ -277,7 +279,11 @@ public class GDMResource {
 			bis.close();
 			content.close();
 
-			LOG.debug("finished writing {} GDM statements into graph db for data model URI '{}'", size, dataModelURI);
+			LOG.debug(
+					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+					parser.parsedResources(), handler.getHandler().getCountedStatements(),
+					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
+					dataModelURI);
 
 			return Response.ok().build();
 
@@ -349,7 +355,10 @@ public class GDMResource {
 			bis.close();
 			inputStream.close();
 
-			LOG.debug("finished writing {} GDM statements into graph db", handler.getHandler().getCountedStatements());
+			LOG.debug(
+					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db",
+					parser.parsedResources(), handler.getHandler().getCountedStatements(),
+					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals());
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
@@ -405,15 +414,17 @@ public class GDMResource {
 						os.close();
 
 						GDMResource.LOG
-								.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
-										gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+								.debug("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+										gdmReader.readResources(), gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri,
+										recordClassUri, optionalVersion);
 					} else {
 
 						bos.close();
 						os.close();
 
 						GDMResource.LOG
-								.debug("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db", dataModelUri, recordClassUri, optionalVersion);
+								.debug("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+										dataModelUri, recordClassUri, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {
 
@@ -488,7 +499,7 @@ public class GDMResource {
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 
 		GDMResource.LOG
-				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 						keyAPString, searchValue, dataModelUri, optionalVersion);
 
 		final AttributePath keyAP = AttributePathUtil.parseAttributePathString(keyAPString);
@@ -498,7 +509,7 @@ public class GDMResource {
 		if (recordURIs == null || recordURIs.isEmpty()) {
 
 			GDMResource.LOG
-					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 							keyAPString, searchValue, dataModelUri, optionalVersion);
 
 			final StreamingOutput stream = new StreamingOutput() {
@@ -561,12 +572,12 @@ public class GDMResource {
 					if (resourcesSize > 0) {
 
 						GDMResource.LOG
-								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, optionalVersion);
 					} else {
 
 						GDMResource.LOG
-								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 										keyAPString, searchValue, dataModelUri, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {

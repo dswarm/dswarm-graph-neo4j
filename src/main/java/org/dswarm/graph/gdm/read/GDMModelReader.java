@@ -27,4 +27,6 @@ import org.dswarm.graph.json.stream.ModelBuilder;
 public interface GDMModelReader extends GDMReader {
 
 	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException;
+
+	public long readResources();
 }

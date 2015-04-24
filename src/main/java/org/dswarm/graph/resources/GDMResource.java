@@ -190,6 +190,7 @@ public class GDMResource {
 
 		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
 		final String dataModelURI = optionalDataModelURI.get();
+		final Optional<Boolean> optionalEnableVersioning = getEnableVersioningFlag(metadata);
 		final Tuple<Observable<Resource>, BufferedInputStream> modelTuple = getModel(content);
 		final Observable<Resource> model = modelTuple.v1();
 		final BufferedInputStream bis = modelTuple.v2();
@@ -204,37 +205,53 @@ public class GDMResource {
 		try {
 
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
-			final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
-
-			// = new resources model, since existing, modified resources were already written to the DB
-			final Tuple<Observable<Resource>, Observable<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
-					database,
-					handler);
-
-			final Observable<Resource> deltaModel = result.v1();
-
-			final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
-
+			final Observable<Resource> newModel;
 			final Observable<Void> deprecateRecordsObservable;
 
-			if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
+			// note: versioning is enable by default
+			if (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get()) {
 
-				final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
+				LOG.info("do versioning with GDM statements for data model '{}'", dataModelURI);
 
-				if (!optionalRecordClassURI.isPresent()) {
+				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-					throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+				// = new resources model, since existing, modified resources were already written to the DB
+				final Tuple<Observable<Resource>, Observable<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
+						database,
+						handler);
+
+				final Observable<Resource> deltaModel = result.v1();
+
+				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
+
+
+				if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
+
+					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
+
+					if (!optionalRecordClassURI.isPresent()) {
+
+						throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+					}
+
+					// deprecate missing records in DB
+
+					final Observable<String> processedResources = result.v2();
+
+					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
+							((Neo4jUpdateHandler) handler.getHandler())
+									.getVersionHandler().getLatestVersion(), processor);
+				} else {
+
+					deprecateRecordsObservable = Observable.empty();
 				}
 
-				// deprecate missing records in DB
+				newModel = deltaModel;
 
-				final Observable<String> processedResources = result.v2();
-
-				deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
-						((Neo4jUpdateHandler) handler.getHandler())
-								.getVersionHandler().getLatestVersion(), processor);
+				LOG.info("finished versioning with GDM statements for data model '{}'", dataModelURI);
 			} else {
 
+				newModel = model;
 				deprecateRecordsObservable = Observable.empty();
 			}
 
@@ -242,7 +259,7 @@ public class GDMResource {
 
 			// parse model only, when model contains some resources
 
-			final GDMParser parser = new GDMModelParser(deltaModel);
+			final GDMParser parser = new GDMModelParser(newModel);
 			parser.setGDMHandler(handler);
 			final Observable<Void> newResourcesObservable = parser.parse();
 			//} else {
@@ -1287,6 +1304,13 @@ public class GDMResource {
 		}
 	}
 
+	/**
+	 * default = false
+	 *
+	 * @param metadata
+	 * @return
+	 * @throws DMPGraphException
+	 */
 	private Optional<Boolean> getDeprecateMissingRecordsFlag(final ObjectNode metadata) throws DMPGraphException {
 
 		final Optional<String> optionalDeprecateMissingRecords = getMetadataPart(DMPStatics.DEPRECATE_MISSING_RECORDS_IDENTIFIER, metadata, false);
@@ -1299,6 +1323,30 @@ public class GDMResource {
 		} else {
 
 			result = Optional.of(Boolean.FALSE);
+		}
+
+		return result;
+	}
+
+	/**
+	 * default = true
+	 *
+	 * @param metadata
+	 * @return
+	 * @throws DMPGraphException
+	 */
+	private Optional<Boolean> getEnableVersioningFlag(final ObjectNode metadata) throws DMPGraphException {
+
+		final Optional<String> optionalEnableVersioning = getMetadataPart(DMPStatics.ENABLE_VERSIONING_IDENTIFIER, metadata, false);
+
+		final Optional<Boolean> result;
+
+		if (optionalEnableVersioning.isPresent()) {
+
+			result = Optional.fromNullable(Boolean.valueOf(optionalEnableVersioning.get()));
+		} else {
+
+			result = Optional.of(Boolean.TRUE);
 		}
 
 		return result;

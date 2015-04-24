@@ -197,6 +197,8 @@ public class GDMResource {
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
 
+		LOG.info("process GDM statements and write them into graph db for data model '{}'", dataModelURI);
+
 		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, dataModelURI);
 
 		try {
@@ -279,7 +281,7 @@ public class GDMResource {
 			bis.close();
 			content.close();
 
-			LOG.debug(
+			LOG.info(
 					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
 					parser.parsedResources(), handler.getHandler().getCountedStatements(),
 					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
@@ -389,7 +391,7 @@ public class GDMResource {
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 		final Optional<Integer> optionalAtMost = getIntValue(DMPStatics.AT_MOST_IDENTIFIER, requestJSON);
 
-		GDMResource.LOG.debug("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+		GDMResource.LOG.info("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 				dataModelUri, recordClassUri, optionalVersion);
 
 		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
@@ -414,7 +416,7 @@ public class GDMResource {
 						os.close();
 
 						GDMResource.LOG
-								.debug("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+								.info("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 										gdmReader.readResources(), gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri,
 										recordClassUri, optionalVersion);
 					} else {
@@ -423,7 +425,7 @@ public class GDMResource {
 						os.close();
 
 						GDMResource.LOG
-								.debug("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+								.info("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 										dataModelUri, recordClassUri, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {

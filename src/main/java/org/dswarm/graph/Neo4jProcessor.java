@@ -97,6 +97,8 @@ public abstract class Neo4jProcessor {
 	final private Map<String, Node> tempResourcesWDataModelIndex;
 	final private Map<String, Node> tempResourceTypesIndex;
 
+	private final Map<String, Label> labelCache;
+
 	protected Transaction tx;
 
 	boolean txIsClosed = false;
@@ -110,6 +112,8 @@ public abstract class Neo4jProcessor {
 		tempResourceTypesIndex = Maps.newHashMap();
 
 		uriPrefixedURIMap = Maps.newHashMap();
+
+		labelCache = Maps.newHashMap();
 
 		beginTx();
 
@@ -269,6 +273,8 @@ public abstract class Neo4jProcessor {
 		tempResourceTypesIndex.clear();
 
 		uriPrefixedURIMap.clear();
+
+		labelCache.clear();
 
 		LOG.debug("start clearing and closing mapdb indices");
 
@@ -455,7 +461,7 @@ public abstract class Neo4jProcessor {
 
 	public void addLabel(final Node node, final String labelString) {
 
-		final Label label = DynamicLabel.label(labelString);
+		final Label label = getLabel(labelString);
 		boolean hit = false;
 		final Iterable<Label> labels = node.getLabels();
 
@@ -473,6 +479,16 @@ public abstract class Neo4jProcessor {
 			node.addLabel(label);
 			addedLabels++;
 		}
+	}
+
+	public Label getLabel(final String labelString) {
+
+		if(!labelCache.containsKey(labelString)) {
+
+			labelCache.put(labelString, DynamicLabel.label(labelString));
+		}
+
+		return labelCache.get(labelString);
 	}
 
 	public boolean checkStatementExists(final long hash) throws DMPGraphException {

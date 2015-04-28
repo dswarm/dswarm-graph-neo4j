@@ -19,6 +19,7 @@ package org.dswarm.graph.versioning;
 import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -92,11 +93,13 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
-			final Node dataModelNode = processor.getDatabase().createNode();
+			final Label dataModelLabel = processor.getLabel(NodeType.Resource.toString());
+
+			final Node dataModelNode = processor.getDatabase().createNode(dataModelLabel);
 			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
 			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
-			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+			//dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
 			processor.addNodeToResourcesWDataModelIndex(optionalDataModelURI.get(), VersioningStatics.VERSIONING_DATA_MODEL_URI, dataModelNode);
@@ -111,10 +114,13 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				dataModelTypeNode = optionaDataModelTypeNode.get();
 			} else {
 
-				dataModelTypeNode = processor.getDatabase().createNode();
+				final Label dataModelTypeResourceLabel = processor.getLabel(NodeType.Resource.toString());
+				final Label dataModelTypeResourceTypeLabel = processor.getLabel(NodeType.TypeResource.toString());
+
+				dataModelTypeNode = processor.getDatabase().createNode(dataModelTypeResourceLabel, dataModelTypeResourceTypeLabel);
 				processor.addLabel(dataModelTypeNode, processor.getRDFCLASSPrefixedURI());
 				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
-				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
+				//dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 
 				processor.addNodeToResourceTypesIndex(VersioningStatics.DATA_MODEL_TYPE, dataModelTypeNode);
 			}

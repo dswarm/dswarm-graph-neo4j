@@ -42,7 +42,15 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
 		super(database);
 
-		dataModelURI = dataModelURIArg;
+		final Optional<String> optionalPrefixedDataModelURI = optionalCreatePrefixedURI(Optional.fromNullable(dataModelURIArg));
+
+		if(optionalPrefixedDataModelURI.isPresent()) {
+
+			dataModelURI = optionalPrefixedDataModelURI.get();
+		} else {
+
+			dataModelURI = null;
+		}
 	}
 
 	public String getDataModelURI() {

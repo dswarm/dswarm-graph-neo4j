@@ -99,12 +99,16 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		try {
 
-			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(((DataModelNeo4jProcessor) processor).getDataModelURI(), VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			final String dataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
+			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(dataModelURI, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
 			if (optionalNode.isPresent()) {
 
 				final Node dataModelNode = optionalNode.get();
 				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+			} else {
+
+				setLatestVersion(Optional.of(dataModelURI));
 			}
 		} catch (final Exception e) {
 

@@ -49,9 +49,13 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected final Neo4jProcessor processor;
 
+	private final String rdfTypeURI;
+
 	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
+
+		rdfTypeURI = processor.createPrefixedURI(RDF.type.getURI());
 	}
 
 	@Override
@@ -112,20 +116,20 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 			} else {
 
 				dataModelTypeNode = processor.getDatabase().createNode();
-				processor.addLabel(dataModelTypeNode, RDFS.Class.getURI());
+				processor.addLabel(dataModelTypeNode, processor.getRDFCLASSPrefixedURI());
 				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
 				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
 
 				processor.addNodeToResourceTypesIndex(VersioningStatics.DATA_MODEL_TYPE, dataModelTypeNode);
 			}
 
-			final long hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);
+			final long hash = processor.generateStatementHash(dataModelNode, rdfTypeURI, dataModelTypeNode, NodeType.Resource, NodeType.Resource);
 
 			final boolean statementExists = processor.checkStatementExists(hash);
 
 			if (!statementExists) {
 
-				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
+				final RelationshipType relType = DynamicRelationshipType.withName(rdfTypeURI);
 				final Relationship rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
 				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);

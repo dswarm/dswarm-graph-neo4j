@@ -328,7 +328,7 @@ public class MaintainResource {
 				return;
 			}
 
-			Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
+			final Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
 
 			if (indexDefinitions == null) {
 

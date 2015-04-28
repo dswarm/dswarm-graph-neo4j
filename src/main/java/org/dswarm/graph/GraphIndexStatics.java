@@ -28,4 +28,7 @@ public final class GraphIndexStatics {
 	public static final String STATEMENT_HASHES_INDEX_NAME = "statement_hashes";
 	public static final String TEMP_STATEMENT_HASHES_INDEX_NAME = "temp_statement_hashes";
 	public static final String STATEMENT_UUIDS_INDEX_NAME = "statement_uuids";
+	public static final String NAMESPACE_PREFIXES_INDEX_NAME = "namespace_prefixes";
+	public static final String TEMP_NAMESPACE_PREFIXES_INDEX_NAME = "temp_namespace_prefixes";
+	public static final String IN_MEMORY_NAMESPACE_PREFIXES_INDEX_NAME = "in_memory_namespace_prefixes";
 }

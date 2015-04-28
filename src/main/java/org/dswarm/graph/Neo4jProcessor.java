@@ -28,6 +28,7 @@ import com.github.emboss.siphash.SipHash;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -43,11 +44,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.common.types.Tuple;
+import org.dswarm.common.web.URI;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
+import org.dswarm.graph.utils.NamespaceUtils;
 import org.dswarm.graph.versioning.VersionHandler;
 
 /**
@@ -68,18 +71,31 @@ public abstract class Neo4jProcessor {
 	protected final Map<String, Node>    bnodes;
 
 	// protected Index<Relationship> statementHashes;
-	private final Set<Long> statementHashes;
-	private final DB        statementHashesDB;
+	final private Set<Long> statementHashes;
+	final private DB        statementHashesDB;
 
-	private final Set<Long> tempStatementHashes;
-	private final DB        tempStatementHashesDB;
+	final private Set<Long> tempStatementHashes;
+	final private DB        tempStatementHashesDB;
+
+	// for caching per TX
+	final private Map<String, String> tempNamespacePrefixes;
+	final private DB        tempNamespacePrefixesDB;
+
+	// for caching over the whole process
+	final private Map<String, String> inMemoryNamespacePrefixes;
+	final private DB        inMemoryNamespacePrefixesDB;
+
+	final private Map<String, String> namespacePrefixes;
+	final private DB        namespacePrefixesDB;
+
+	private final Map<String, String> uriPrefixedURIMap;
 
 	protected final LongObjectMap<String> nodeResourceMap;
 
 	// TODO: go offheap, if maps get to big
-	private final Map<String, Node> tempResourcesIndex;
-	private final Map<String, Node> tempResourcesWDataModelIndex;
-	private final Map<String, Node> tempResourceTypesIndex;
+	final private Map<String, Node> tempResourcesIndex;
+	final private Map<String, Node> tempResourcesWDataModelIndex;
+	final private Map<String, Node> tempResourceTypesIndex;
 
 	protected Transaction tx;
 
@@ -93,23 +109,7 @@ public abstract class Neo4jProcessor {
 		tempResourcesWDataModelIndex = Maps.newHashMap();
 		tempResourceTypesIndex = Maps.newHashMap();
 
-		try {
-
-			final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
-					.createOrGetInMemoryLongIndexTreeSetNonTransactional(GraphIndexStatics.TEMP_STATEMENT_HASHES_INDEX_NAME);
-			tempStatementHashes = mapDBTuple.v1();
-			tempStatementHashesDB = mapDBTuple.v2();
-
-			final Tuple<Set<Long>, DB> mapDBTuple3 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
-			statementHashes = mapDBTuple3.v1();
-			statementHashesDB = mapDBTuple3.v2();
-
-		} catch (final IOException e) {
-
-			failTx();
-
-			throw new DMPGraphException("couldn't create or get statement hashes index");
-		}
+		uriPrefixedURIMap = Maps.newHashMap();
 
 		beginTx();
 
@@ -118,6 +118,36 @@ public abstract class Neo4jProcessor {
 		bnodes = new HashMap<>();
 		nodeResourceMap = new LongObjectOpenHashMap<>();
 
+		try {
+
+			final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
+					.createOrGetInMemoryLongIndexTreeSetNonTransactional(GraphIndexStatics.TEMP_STATEMENT_HASHES_INDEX_NAME);
+			tempStatementHashes = mapDBTuple.v1();
+			tempStatementHashesDB = mapDBTuple.v2();
+
+			final Tuple<Set<Long>, DB> mapDBTuple2 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
+			statementHashes = mapDBTuple2.v1();
+			statementHashesDB = mapDBTuple2.v2();
+
+			final Tuple<Map<String, String>, DB> mapDBTuple3 = MapDBUtils.createOrGetInMemoryStringStringIndexTreeMapNonTransactional(
+					GraphIndexStatics.TEMP_NAMESPACE_PREFIXES_INDEX_NAME);
+			tempNamespacePrefixes = mapDBTuple3.v1();
+			tempNamespacePrefixesDB = mapDBTuple3.v2();
+
+			final Tuple<Map<String, String>, DB> mapDBTuple4 = MapDBUtils.createOrGetInMemoryStringStringIndexTreeMapNonTransactional(
+					GraphIndexStatics.IN_MEMORY_NAMESPACE_PREFIXES_INDEX_NAME);
+			inMemoryNamespacePrefixes = mapDBTuple4.v1();
+			inMemoryNamespacePrefixesDB = mapDBTuple4.v2();
+
+			final Tuple<Map<String, String>, DB> mapDBTuple5 = getOrCreateStringStringIndex(GraphIndexStatics.NAMESPACE_PREFIXES_INDEX_NAME);
+			namespacePrefixes = mapDBTuple5.v1();
+			namespacePrefixesDB = mapDBTuple5.v2();
+		} catch (final IOException e) {
+
+			failTx();
+
+			throw new DMPGraphException("couldn't create or get statement hashes index");
+		}
 	}
 
 	protected void initIndices() throws DMPGraphException {
@@ -135,7 +165,15 @@ public abstract class Neo4jProcessor {
 			tempResourcesWDataModelIndex.clear();
 			tempResourceTypesIndex.clear();
 
-			tempStatementHashes.clear();
+			if (tempStatementHashes != null) {
+
+				tempStatementHashes.clear();
+			}
+
+			if(tempNamespacePrefixes != null) {
+
+				tempNamespacePrefixes.clear();
+			}
 		} catch (final Exception e) {
 
 			failTx();
@@ -169,10 +207,51 @@ public abstract class Neo4jProcessor {
 		tempStatementHashes.add(hash);
 	}
 
+	public Optional<String> optionalCreatePrefixedURI(final Optional<String> optionalFullURI) throws DMPGraphException {
+
+		if(!optionalFullURI.isPresent()) {
+
+			return Optional.absent();
+		}
+
+		return Optional.of(createPrefixedURI(optionalFullURI.get()));
+	}
+
+	public String createPrefixedURI(final String fullURI) throws DMPGraphException {
+
+		if(fullURI == null) {
+
+			throw new DMPGraphException("full URI shouldn't be null");
+		}
+
+		if(!uriPrefixedURIMap.containsKey(fullURI)) {
+
+			final Tuple<String, String> uriParts = URI.determineParts(fullURI);
+			final String namespaceURI = uriParts.v1();
+			final String localName = uriParts.v2();
+
+			final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, namespacePrefixes);
+
+			final String prefixedURI = prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
+
+			uriPrefixedURIMap.put(fullURI, prefixedURI);
+		}
+
+		return uriPrefixedURIMap.get(fullURI);
+	}
+
+	public String getRDFCLASSPrefixedURI() throws DMPGraphException {
+
+		return createPrefixedURI(RDFS.Class.getURI());
+	}
+
 	public void removeHashFromStatementIndex(final long hash) {
 
 		// TODO: maybe cache removals and remove them in one rush
-		statementHashes.remove(hash);
+		if(statementHashes.contains(hash)) {
+
+			statementHashes.remove(hash);
+		}
 	}
 
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
@@ -189,6 +268,8 @@ public abstract class Neo4jProcessor {
 		tempResourcesWDataModelIndex.clear();
 		tempResourceTypesIndex.clear();
 
+		uriPrefixedURIMap.clear();
+
 		LOG.debug("start clearing and closing mapdb indices");
 
 		if (!tempStatementHashesDB.isClosed()) {
@@ -200,6 +281,24 @@ public abstract class Neo4jProcessor {
 		if (!statementHashesDB.isClosed()) {
 
 			statementHashesDB.close();
+		}
+
+		if(!tempNamespacePrefixesDB.isClosed()) {
+
+			tempNamespacePrefixes.clear();
+			tempNamespacePrefixesDB.close();
+		}
+
+		if(!inMemoryNamespacePrefixesDB.isClosed()) {
+
+			inMemoryNamespacePrefixes.clear();
+			inMemoryNamespacePrefixesDB.close();
+		}
+
+		if(!namespacePrefixesDB.isClosed()) {
+
+			namespacePrefixesDB.commit();
+			namespacePrefixesDB.close();
 		}
 
 		LOG.debug("finished clearing and closing mapdb indices");
@@ -226,16 +325,13 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.error("tx failed; closing tx");
 
-		if (tempStatementHashesDB != null) {
-			tempStatementHashesDB.close();
-		}
-		if (statementHashesDB != null) {
-			statementHashesDB.close();
-		}
-		if (tx != null) {
-			tx.failure();
-			tx.close();
-		}
+		tempStatementHashesDB.close();
+		statementHashesDB.close();
+		tempNamespacePrefixesDB.close();
+		inMemoryNamespacePrefixesDB.close();
+		namespacePrefixesDB.close();
+		tx.failure();
+		tx.close();
 		txIsClosed = true;
 
 		Neo4jProcessor.LOG.error("tx failed; closed tx");
@@ -246,6 +342,7 @@ public abstract class Neo4jProcessor {
 		Neo4jProcessor.LOG.debug("tx succeeded; closing tx");
 
 		pumpNFlushStatementIndex();
+		pumpNFlushNamespacePrefixIndex();
 		tx.success();
 		tx.close();
 		txIsClosed = true;
@@ -274,13 +371,13 @@ public abstract class Neo4jProcessor {
 			return Optional.absent();
 		}
 
-		if (NodeType.Resource == optionalResourceNodeType.get() || NodeType.TypeResource == optionalResourceNodeType.get()) {
+		if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 			// resource node
 
 			final Optional<Node> optionalNode;
 
-			if (NodeType.TypeResource != optionalResourceNodeType.get()) {
+			if (!NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 				if (!optionalDataModelURI.isPresent()) {
 
@@ -297,7 +394,7 @@ public abstract class Neo4jProcessor {
 			return optionalNode;
 		}
 
-		if (NodeType.Literal == optionalResourceNodeType.get()) {
+		if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
 
 			// literal node - should never be the case
 
@@ -340,7 +437,7 @@ public abstract class Neo4jProcessor {
 		final Optional<String> optionalResourceUri;
 
 		if (optionalSubjectNodeType.isPresent()
-				&& (NodeType.Resource == optionalSubjectNodeType.get() || NodeType.TypeResource == optionalSubjectNodeType.get())) {
+				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
 
 			optionalResourceUri = optionalSubjectURI;
 		} else if (optionalResourceURI.isPresent()) {
@@ -380,7 +477,8 @@ public abstract class Neo4jProcessor {
 
 	public boolean checkStatementExists(final long hash) throws DMPGraphException {
 
-		return tempStatementHashes.contains(hash) || statementHashes.contains(hash);
+		return !(statementHashes == null && tempStatementHashes == null) && (tempStatementHashes != null && tempStatementHashes.contains(hash)
+				|| statementHashes != null && statementHashes.contains(hash));
 
 	}
 
@@ -434,13 +532,13 @@ public abstract class Neo4jProcessor {
 				optionalObjectIdentifier);
 	}
 
-	public long generateStatementHash(final Node subjectNode, final Statement statement) throws DMPGraphException {
+	public long generateStatementHash(final Node subjectNode, final Statement statement, final Optional<String> optionalPrefixedPredicateURI) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = statement.getOptionalSubjectNodeType();
 		final Optional<NodeType> optionalObjectNodeType = statement.getOptionalObjectNodeType();
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNode, optionalSubjectNodeType);
 		final Optional<String> optionalObjectIdentifier = statement.getOptionalObjectValue();
-		final String predicateName = statement.getOptionalPredicateURI().get();
+		final String predicateName = optionalPrefixedPredicateURI.get();
 
 		return generateStatementHash(predicateName, optionalSubjectNodeType, optionalObjectNodeType,
 				optionalSubjectIdentifier,
@@ -461,8 +559,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String simpleHashString = optionalSubjectNodeType.get() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
-				+ optionalObjectNodeType.get() + ":" + optionalObjectIdentifier.get();
+		final String simpleHashString = optionalSubjectNodeType.get().toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.get().toString() + ":" + optionalObjectIdentifier.get();
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
@@ -498,7 +596,7 @@ public abstract class Neo4jProcessor {
 			case BNode:
 			case TypeBNode:
 
-				identifier = String.valueOf(node.getId());
+				identifier = "" + node.getId();
 
 				break;
 			case Literal:
@@ -548,15 +646,18 @@ public abstract class Neo4jProcessor {
 
 		final IndexHits<Relationship> hits = statementUUIDs.get(GraphStatics.UUID, uuid);
 
+		if (hits != null && hits.hasNext()) {
+
+			final Relationship rel = hits.next();
+
+			hits.close();
+
+			return Optional.of(rel);
+		}
+
 		if (hits != null) {
 
-			try {
-
-				return Optional.fromNullable(hits.getSingle());
-			} finally {
-
-				hits.close();
-			}
+			hits.close();
 		}
 
 		return Optional.absent();
@@ -625,8 +726,14 @@ public abstract class Neo4jProcessor {
 
 		final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
 
-		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
+	}
+
+	protected Tuple<Map<String, String>, DB> getOrCreateStringStringIndex(final String name) throws IOException {
+
+		final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
+
+		return MapDBUtils.createOrGetPersistentStringStringIndexTreeMapGlobalTransactional(storeDir + File.separator + name, name);
 	}
 
 	private void addNodeToIndex(final String indexProperty, final String key, final Node node, final Map<String, Node> tempIndex,
@@ -656,5 +763,30 @@ public abstract class Neo4jProcessor {
 		//statementHashesDB.close();
 
 		LOG.debug("finished flushing statement index");
+	}
+
+	private void pumpNFlushNamespacePrefixIndex() {
+
+		LOG.debug("start pump'n'flushing namespace prefix index; size = '{}'", tempNamespacePrefixes.size());
+
+		for (final Map.Entry<String, String> entry : tempNamespacePrefixes.entrySet()) {
+
+			final String namespace = entry.getKey();
+			final String prefix = entry.getValue();
+
+			inMemoryNamespacePrefixes.put(namespace, prefix);
+			namespacePrefixes.put(namespace, prefix);
+		}
+
+		LOG.debug("finished pumping namespace prefix index");
+
+		tempNamespacePrefixesDB.commit();
+		//tempStatementHashes.clear();
+		//tempStatementHashesDB.close();
+		inMemoryNamespacePrefixesDB.commit();
+		namespacePrefixesDB.commit();
+		//statementHashesDB.close();
+
+		LOG.debug("finished flushing namespace prefix index");
 	}
 }

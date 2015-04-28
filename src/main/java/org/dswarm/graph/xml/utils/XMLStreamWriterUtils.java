@@ -139,7 +139,7 @@ public final class XMLStreamWriterUtils {
 
 	public static String determineBaseURI(final URI uri) {
 
-		if (uri.getNamespaceURI() != null && !uri.getNamespaceURI().isEmpty() && uri.getNamespaceURI().endsWith(URI.HASH)) {
+		if (uri.hasNamespaceURI() && uri.getNamespaceURI().endsWith(URI.HASH)) {
 
 			return uri.getNamespaceURI().substring(0, uri.getNamespaceURI().length() - 1);
 		}

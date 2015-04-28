@@ -30,27 +30,27 @@ public enum NodeType {
 	/**
 	 * Type for resources.
 	 */
-	Resource("__RESOURCE__"),
+	Resource("R"),
 
 	/**
 	 * Type for bnodes.
 	 */
-	BNode("__BNODE__"),
+	BNode("B"),
 
 	/**
 	 * Type for resources that are types/classes.
 	 */
-	TypeResource("__TYPE_RESOURCE__"),
+	TypeResource("TR"),
 
 	/**
 	 * Type for bnodes that are types/classes.
 	 */
-	TypeBNode("__TYPE_BNODE__"),
+	TypeBNode("TB"),
 
 	/**
 	 * Type for literals.
 	 */
-	Literal("__LITERAL__");
+	Literal("L");
 
 	/**
 	 * The name of the node type.

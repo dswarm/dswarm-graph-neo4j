@@ -254,7 +254,7 @@ public abstract class Neo4jProcessor {
 		}
 	}
 
-	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
+	public void addStatementToIndex(final Relationship rel, final long statementUUID) {
 
 		statementUUIDs.putIfAbsent(rel, GraphStatics.UUID, statementUUID);
 	}
@@ -482,7 +482,7 @@ public abstract class Neo4jProcessor {
 
 	}
 
-	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final String statementUUID,
+	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final long statementUUID,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes, final VersionHandler versionHandler) {
 
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);

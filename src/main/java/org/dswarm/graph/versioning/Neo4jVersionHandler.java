@@ -16,13 +16,8 @@
  */
 package org.dswarm.graph.versioning;
 
-import java.util.UUID;
-
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.model.GraphStatics;
-
+import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -30,9 +25,10 @@ import org.neo4j.graphdb.RelationshipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -134,12 +130,12 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
 				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-				final String uuid = UUID.randomUUID().toString();
+				//final String uuid = UUID.randomUUID().toString();
 
-				rel.setProperty(GraphStatics.UUID_PROPERTY, uuid);
+				rel.setProperty(GraphStatics.UUID_PROPERTY, hash);
 
 				processor.addHashToStatementIndex(hash);
-				processor.addStatementToIndex(rel, uuid);
+				processor.addStatementToIndex(rel, hash);
 			}
 
 			latestVersionInitialized = true;

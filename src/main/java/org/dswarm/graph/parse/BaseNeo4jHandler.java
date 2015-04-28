@@ -464,21 +464,21 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
-		final String finalStatementUUID;
+//		final String finalStatementUUID;
+//
+//		if (optionalStatementUUID.isPresent()) {
+//
+//			finalStatementUUID = optionalStatementUUID.get();
+//		} else {
+//
+//			finalStatementUUID = UUID.randomUUID().toString();
+//		}
 
-		if (optionalStatementUUID.isPresent()) {
-
-			finalStatementUUID = optionalStatementUUID.get();
-		} else {
-
-			finalStatementUUID = UUID.randomUUID().toString();
-		}
-
-		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, finalStatementUUID,
+		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, hash,
 				optionalQualifiedAttributes, versionHandler);
 
 		processor.addHashToStatementIndex(hash);
-		processor.addStatementToIndex(rel, finalStatementUUID);
+		processor.addStatementToIndex(rel, hash);
 
 		addedRelationships++;
 

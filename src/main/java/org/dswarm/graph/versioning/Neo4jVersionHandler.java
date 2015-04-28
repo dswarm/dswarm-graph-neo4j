@@ -46,13 +46,9 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected final Neo4jProcessor processor;
 
-	private final String rdfTypeURI;
-
 	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
-
-		rdfTypeURI = processor.createPrefixedURI(RDF.type.getURI());
 	}
 
 	@Override
@@ -93,56 +89,15 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
-			final Label dataModelLabel = processor.getLabel(NodeType.Resource.toString());
+			final Label dataModelLabel = processor.getLabel(VersioningStatics.DATA_MODEL_TYPE);
+			final Label dataModelResourceLabel = processor.getLabel(NodeType.Resource.toString());
 
-			final Node dataModelNode = processor.getDatabase().createNode(dataModelLabel);
-			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
+			final Node dataModelNode = processor.getDatabase().createNode(dataModelLabel, dataModelResourceLabel);
 			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
-			//dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
 			processor.addNodeToResourcesWDataModelIndex(optionalDataModelURI.get(), VersioningStatics.VERSIONING_DATA_MODEL_URI, dataModelNode);
-
-			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.of(
-					VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
-
-			final Node dataModelTypeNode;
-
-			if (optionaDataModelTypeNode.isPresent()) {
-
-				dataModelTypeNode = optionaDataModelTypeNode.get();
-			} else {
-
-				final Label dataModelTypeResourceLabel = processor.getLabel(NodeType.Resource.toString());
-				final Label dataModelTypeResourceTypeLabel = processor.getLabel(NodeType.TypeResource.toString());
-
-				dataModelTypeNode = processor.getDatabase().createNode(dataModelTypeResourceLabel, dataModelTypeResourceTypeLabel);
-				processor.addLabel(dataModelTypeNode, processor.getRDFCLASSPrefixedURI());
-				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
-				//dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-
-				processor.addNodeToResourceTypesIndex(VersioningStatics.DATA_MODEL_TYPE, dataModelTypeNode);
-			}
-
-			final long hash = processor.generateStatementHash(dataModelNode, rdfTypeURI, dataModelTypeNode, NodeType.Resource, NodeType.Resource);
-
-			final boolean statementExists = processor.checkStatementExists(hash);
-
-			if (!statementExists) {
-
-				final RelationshipType relType = DynamicRelationshipType.withName(rdfTypeURI);
-				final Relationship rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
-				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
-				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
-
-				//final String uuid = UUID.randomUUID().toString();
-
-				rel.setProperty(GraphStatics.UUID_PROPERTY, hash);
-
-				processor.addHashToStatementIndex(hash);
-				processor.addStatementToIndex(rel, hash);
-			}
 
 			latestVersionInitialized = true;
 		}

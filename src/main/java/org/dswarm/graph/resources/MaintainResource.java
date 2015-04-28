@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Result;
@@ -48,7 +50,10 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.index.SchemaIndexUtils;
+import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
 
 /**
@@ -113,7 +118,7 @@ public class MaintainResource {
 		MaintainResource.LOG.debug("finished cleaning up the db");
 
 		final StringWriter out = new StringWriter();
-		JsonGenerator generator = jsonFactory.createGenerator(out);
+		final JsonGenerator generator = jsonFactory.createGenerator(out);
 
 		generator.writeStartObject();
 		generator.writeNumberField("deleted", deleted);
@@ -121,7 +126,35 @@ public class MaintainResource {
 		generator.flush();
 		generator.close();
 
-		return Response.ok(out.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		final String result = out.toString();
+
+		out.flush();
+		out.close();
+
+		return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+	}
+
+	@POST
+	@Path("/schemaindices")
+	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		getOrCreateIndex(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateIndex(Neo4jProcessor.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateIndex(Neo4jProcessor.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
+
+		return Response.ok().build();
+	}
+
+	private void getOrCreateIndex(final Label label, final String property, final GraphDatabaseService database) throws DMPGraphException {
+
+		final IndexDefinition indexDefinition = SchemaIndexUtils.getOrCreateIndex(label, property, database);
+
+		if (indexDefinition == null) {
+
+			throw new DMPGraphException(
+					String.format("something went wrong while index determination/creation for label '%s' and property '%s'", label.name(),
+							property));
+		}
 	}
 
 	private long deleteSomeStatements(final GraphDatabaseService database) throws DMPGraphException {
@@ -148,6 +181,7 @@ public class MaintainResource {
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
 
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -158,6 +192,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -170,6 +205,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -182,6 +218,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -194,6 +231,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -204,6 +242,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -226,6 +265,7 @@ public class MaintainResource {
 
 				result.close();
 				tx.success();
+				tx.close();
 			} catch (final Exception e) {
 
 				final String message = "couldn't finish delete-all-entities TX successfully";
@@ -275,7 +315,7 @@ public class MaintainResource {
 
 			final DB mapDB = statementHashesMapDBIndexTuple.v2();
 
-			if(mapDB.exists(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME)) {
+			if (mapDB.exists(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME)) {
 
 				MaintainResource.LOG.debug("delete {} mapdb index", GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
@@ -299,6 +339,7 @@ public class MaintainResource {
 			}
 
 			itx.success();
+			itx.close();
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish delete legacy indices TX successfully";
@@ -324,6 +365,7 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("no schema available");
 
 				itx.success();
+				itx.close();
 
 				return;
 			}
@@ -335,18 +377,21 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("no schema indices available");
 
 				itx.success();
+				itx.close();
 
 				return;
 			}
 
 			for (final IndexDefinition indexDefinition : indexDefinitions) {
 
-				MaintainResource.LOG.debug("drop '{}' : '{}' schema index", indexDefinition.getLabel().name(), indexDefinition.getPropertyKeys().iterator().next());
+				MaintainResource.LOG.debug("drop '{}' : '{}' schema index", indexDefinition.getLabel().name(),
+						indexDefinition.getPropertyKeys().iterator().next());
 
 				indexDefinition.drop();
 			}
 
 			itx.success();
+			itx.close();
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish delete schema indices TX successfully";

@@ -52,6 +52,7 @@ public abstract class Neo4jTest {
 	public void prepare() throws IOException {
 
 		neo4jDBWrapper.startServer();
+		initIndices();
 	}
 
 	protected WebResource service() {
@@ -88,6 +89,18 @@ public abstract class Neo4jTest {
 			Assert.assertEquals("expected 200", 200, response.getStatus());
 
 			neo4jDBWrapper.stopServer();
+		}
+	}
+
+	private void initIndices() {
+
+		if (neo4jDBWrapper.checkServer()) {
+
+			LOG.debug("init indices before everything can be tested");
+
+			final ClientResponse response = service().path("/maintain/schemaindices").post(ClientResponse.class, "");
+
+			Assert.assertEquals("expected 200", 200, response.getStatus());
 		}
 	}
 }

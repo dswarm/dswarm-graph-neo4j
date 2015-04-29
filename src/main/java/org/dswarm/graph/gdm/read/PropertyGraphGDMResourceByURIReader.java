@@ -16,15 +16,14 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.model.GraphStatics;
-
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -46,24 +45,8 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	@Override
 	protected Node getResourceNode()  throws DMPGraphException {
 
-		final Index<Node> resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
-		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + dataModelUri);
+		final long resourceUriDataModelUriHash = HashUtils.generateHash(recordUri + dataModelUri);
 
-		if (hits == null) {
-
-			return null;
-		}
-		if (!hits.hasNext()) {
-
-			hits.close();
-
-			return null;
-		}
-
-		final Node node = hits.next();
-
-		hits.close();
-
-		return node;
+		return database.findNode(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
 }

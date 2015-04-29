@@ -59,6 +59,7 @@ import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.delta.DeltaState;
@@ -71,6 +72,7 @@ import org.dswarm.graph.delta.match.model.KeyEntity;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
@@ -148,30 +150,9 @@ public final class GraphDBUtil {
 	 */
 	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
 
-		final Index<Node> resources = graphDB.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
+		final long resourceUriDataModelUriHash = HashUtils.generateHash(resourceURI + dataModelURI);
 
-		if (resources == null) {
-
-			return null;
-		}
-
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI_W_DATA_MODEL, resourceURI + dataModelURI);
-
-		if (hits == null || !hits.hasNext()) {
-
-			if (hits != null) {
-
-				hits.close();
-			}
-
-			return null;
-		}
-
-		final Node node = hits.next();
-
-		hits.close();
-
-		return node;
+		return graphDB.findNode(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
 
 	static String getLabels(final Node node) {

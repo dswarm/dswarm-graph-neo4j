@@ -16,7 +16,9 @@
  */
 package org.dswarm.graph.hash;
 
+import com.github.emboss.siphash.SipHash;
 import com.github.emboss.siphash.SipKey;
+import com.google.common.base.Charsets;
 
 /**
  *
@@ -30,6 +32,11 @@ public final class HashUtils {
 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f));
 
 	private HashUtils() {
+	}
+
+	public static long generateHash(final String hashString) {
+
+		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
 	public static byte[] bytesOf(final Integer... bytes) {

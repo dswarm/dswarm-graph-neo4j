@@ -139,6 +139,7 @@ public class MaintainResource {
 	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
 
 		getOrCreateIndex(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateIndex(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, database);
 		getOrCreateIndex(Neo4jProcessor.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
 		getOrCreateIndex(Neo4jProcessor.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
 

@@ -18,10 +18,9 @@ package org.dswarm.graph.versioning.utils;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 
-import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersioningStatics;
 
@@ -41,23 +40,18 @@ public final class GraphVersionUtils {
 
 		int latestVersion = 1;
 
-		final Index<Node> resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelUri);
+		final long resourceUriDataModelUriHash = HashUtils.generateHash(dataModelUri + VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-		if (hits != null && hits.iterator().hasNext()) {
+		final Node dataModelNode = database.findNode(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 
-			final Node dataModelNode = hits.iterator().next();
+		if (dataModelNode != null) {
+
 			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
 
 			if (latestVersionFromDB != null) {
 
 				latestVersion = latestVersionFromDB;
 			}
-		}
-
-		if (hits != null) {
-
-			hits.close();
 		}
 
 		return latestVersion;

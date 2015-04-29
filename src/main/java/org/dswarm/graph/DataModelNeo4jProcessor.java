@@ -18,6 +18,8 @@ package org.dswarm.graph;
 
 import java.util.Map;
 
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -25,6 +27,7 @@ import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
@@ -61,45 +64,45 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	@Override
 	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI) {
 
-		if (!optionalDataModelURI.isPresent()) {
+		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+		final long resourceUriDataModelUriHash = generateResourceHash(URI, Optional.of(finalDataModelURI));
 
-			addNodeToResourcesWDataModelIndex(URI, this.dataModelURI, node);
-		} else {
-
-			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
-		}
+		addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
 	}
 
 	@Override
 	public void handleObjectDataModel(final Node node, final Optional<String> optionalDataModelURI) {
 
-		if (!optionalDataModelURI.isPresent()) {
+		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-		} else {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
-		}
+		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalDataModelURI);
 	}
 
 	@Override
 	public void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI) {
 
-		if (!optionalDataModelURI.isPresent()) {
+		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+		final long resourceUriDataModelUriHash = generateResourceHash(URI, Optional.of(finalDataModelURI));
 
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, this.dataModelURI);
-			addNodeToResourcesWDataModelIndex(URI, this.dataModelURI, node);
-		} else {
-
-			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
-			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
-		}
+		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalDataModelURI);
+		addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
 	}
 
 	@Override
 	public Optional<Node> getResourceNodeHits(final String resourceURI) {
 
-		return getNodeFromResourcesWDataModelIndex(resourceURI, dataModelURI);
+		final long resourceUriDataModelUriHash = generateResourceHash(resourceURI, Optional.of(dataModelURI));
+
+		return getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
+	}
+
+	@Override public long generateResourceHash(final String resourceURI, final Optional<String> optionalDataModelURI) {
+
+		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+
+		final String hashString = resourceURI + finalDataModelURI;
+
+		return HashUtils.generateHash(hashString);
 	}
 
 	@Override protected String putSaltToStatementHash(final String hash) {
@@ -119,5 +122,15 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getRange().to());
 
 		return rel;
+	}
+
+	private String getDataModelURI(final Optional<String> optionalDataModelURI) {
+
+		if(optionalDataModelURI.isPresent()) {
+
+			return optionalDataModelURI.get();
+		}
+
+		return dataModelURI;
 	}
 }

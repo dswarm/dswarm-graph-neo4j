@@ -124,8 +124,20 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final Optional<String> optionalPrefixedSubjectDataModelURI = processor
 					.optionalCreatePrefixedURI(statement.getOptionalSubjectDataModelURI());
 
+			final Optional<Long> optionalResourceUriDataModelUriHash;
+
+			if (optionalPrefixedSubjectURI.isPresent()) {
+
+				optionalResourceUriDataModelUriHash = Optional
+						.of(processor.generateResourceHash(optionalPrefixedSubjectURI.get(), optionalPrefixedSubjectDataModelURI));
+			} else {
+
+				optionalResourceUriDataModelUriHash = Optional.absent();
+			}
+
 			final Optional<Node> optionalSubjectNode = processor.determineNode(statement.getOptionalSubjectNodeType(),
-					statement.getOptionalSubjectId(), optionalPrefixedSubjectURI, optionalPrefixedSubjectDataModelURI);
+					statement.getOptionalSubjectId(), optionalPrefixedSubjectURI, optionalPrefixedSubjectDataModelURI,
+					optionalResourceUriDataModelUriHash);
 			final Node subjectNode;
 
 			if (optionalSubjectNode.isPresent()) {
@@ -148,6 +160,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					final String subjectURI = optionalPrefixedSubjectURI.get();
 
 					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
+					subjectNode.setProperty(GraphStatics.HASH, optionalResourceUriDataModelUriHash.get());
 
 					if (resourceUri != null && resourceUri.equals(subjectURI)) {
 
@@ -185,9 +198,20 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 							.optionalCreatePrefixedURI(statement.getOptionalObjectDataModelURI());
 					final Optional<NodeType> finalOptionalObjectNodeType = Optional.of(objectNodeType);
 
+					final Optional<Long> optionalObjectResourceUriDataModelUriHash;
+
+					if (optionalPrefixedObjectURI.isPresent()) {
+
+						// because type resources doesn't belong to any data model
+						optionalObjectResourceUriDataModelUriHash = Optional.of(HashUtils.generateHash(optionalPrefixedObjectURI.get()));
+					} else {
+
+						optionalObjectResourceUriDataModelUriHash = Optional.absent();
+					}
+
 					// Check index for object
 					final Optional<Node> optionalObjectNode = processor.determineNode(finalOptionalObjectNodeType, statement.getOptionalObjectId(),
-							optionalPrefixedObjectURI, optionalPrefixedObjectDataModelURI);
+							optionalPrefixedObjectURI, optionalPrefixedObjectDataModelURI, optionalObjectResourceUriDataModelUriHash);
 					final Node objectNode;
 					final Optional<String> optionalResourceUri;
 
@@ -208,6 +232,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 							final String objectURI = optionalPrefixedObjectURI.get();
 
 							objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
+							objectNode.setProperty(GraphStatics.HASH, optionalObjectResourceUriDataModelUriHash.get());
 
 							switch (objectNodeType) {
 
@@ -447,7 +472,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
-
 
 		final String finalStatementUUID;
 

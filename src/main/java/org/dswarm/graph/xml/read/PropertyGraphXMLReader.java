@@ -34,13 +34,16 @@ import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.NodeType;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
+import org.dswarm.graph.versioning.utils.GraphVersionUtils;
 import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
 
 import org.neo4j.graphdb.Direction;
@@ -139,7 +142,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			try {
 
-				version = getLatestVersion();
+				version = GraphVersionUtils.getLatestVersion(dataModelUri, database);
 			} catch (final Exception e) {
 
 				final String message = "couldn't retrieve latest version successfully";
@@ -629,32 +632,6 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// ??? - log these occurrences?
 			}
 		}
-	}
-
-	private int getLatestVersion() {
-
-		int latestVersion = 1;
-
-		final Index<Node> resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, dataModelUri);
-
-		if (hits != null && hits.iterator().hasNext()) {
-
-			final Node dataModelNode = hits.iterator().next();
-			final Integer latestVersionFromDB = (Integer) dataModelNode.getProperty(VersioningStatics.LATEST_VERSION_PROPERTY, null);
-
-			if (latestVersionFromDB != null) {
-
-				latestVersion = latestVersionFromDB;
-			}
-		}
-
-		if (hits != null) {
-
-			hits.close();
-		}
-
-		return latestVersion;
 	}
 
 	private Tuple<Predicate, URI> getPredicate(final String predicateString) {

@@ -75,8 +75,11 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
+			final String dataModelURI = optionalDataModelURI.get();
+			final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+
 			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(),
-					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI), Optional.of(resourceUriDataModelUriHash));
 
 			if (optionalDataModelNode.isPresent()) {
 
@@ -89,11 +92,12 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 			final Label dataModelResourceLabel = processor.getLabel(NodeType.Resource.toString());
 
 			final Node dataModelNode = processor.getDatabase().createNode(dataModelLabel, dataModelResourceLabel);
-			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.HASH, resourceUriDataModelUriHash);
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			processor.addNodeToResourcesWDataModelIndex(optionalDataModelURI.get(), VersioningStatics.VERSIONING_DATA_MODEL_URI, dataModelNode);
+			processor.addNodeToResourcesWDataModelIndex(dataModelURI, resourceUriDataModelUriHash, dataModelNode);
 
 			latestVersionInitialized = true;
 		}

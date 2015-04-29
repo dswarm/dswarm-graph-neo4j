@@ -17,12 +17,8 @@
 package org.dswarm.graph.versioning;
 
 import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

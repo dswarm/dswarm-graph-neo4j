@@ -27,6 +27,8 @@ package org.dswarm.graph.parse;
 import java.util.Map;
 import java.util.UUID;
 
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.versioning.VersionHandler;
@@ -445,21 +448,24 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
-		//		final String finalStatementUUID;
-		//
-		//		if (optionalStatementUUID.isPresent()) {
-		//
-		//			finalStatementUUID = optionalStatementUUID.get();
-		//		} else {
-		//
-		//			finalStatementUUID = UUID.randomUUID().toString();
-		//		}
 
-		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, hash,
+		final String finalStatementUUID;
+
+		if (optionalStatementUUID.isPresent()) {
+
+			finalStatementUUID = optionalStatementUUID.get();
+		} else {
+
+			finalStatementUUID = UUID.randomUUID().toString();
+		}
+
+		final long statementUUIDHash = SipHash.digest(HashUtils.SPEC_KEY, finalStatementUUID.getBytes(Charsets.UTF_8));
+
+		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUIDHash,
 				optionalQualifiedAttributes, versionHandler);
 
 		processor.addHashToStatementIndex(hash);
-		processor.addStatementToIndex(rel, hash);
+		processor.addStatementToIndex(rel, statementUUIDHash);
 
 		addedRelationships++;
 

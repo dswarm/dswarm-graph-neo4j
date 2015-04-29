@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.index;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -53,20 +54,51 @@ public class SchemaIndexUtils {
 				notFound = true;
 			} else {
 
-				indexDefinition = indices.iterator().next();
+				for (final IndexDefinition index : indices) {
 
-				if (indexDefinition == null) {
+					notFound = false;
 
-					tx.success();
-					tx.close();
+					indexDefinition = index;
 
-					notFound = true;
+					if (indexDefinition == null) {
+
+						tx.success();
+						tx.close();
+
+						notFound = true;
+
+						break;
+					}
+
+					final Iterable<String> propIter = indexDefinition.getPropertyKeys();
+
+					boolean propFound = false;
+
+					for(final String prop : propIter) {
+
+						if(prop.equals(property)) {
+
+							propFound = true;
+
+							break;
+						}
+					}
+
+					if(!propFound) {
+
+						notFound = true;
+					}
+
+					if(!notFound) {
+
+						break;
+					}
 				}
 			}
 
 			if (!notFound) {
 
-				LOG.debug("found existing index for label = '}' and property = '{}'", label.name(), property);
+				LOG.debug("found existing index for label = '{}' and property = '{}'", label.name(), property);
 
 				tx.success();
 				tx.close();

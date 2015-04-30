@@ -28,6 +28,7 @@ import com.github.emboss.siphash.SipHash;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -236,6 +237,11 @@ public abstract class Neo4jProcessor {
 		}
 
 		return uriPrefixedURIMap.get(fullURI);
+	}
+
+	public String getRDFCLASSPrefixedURI() throws DMPGraphException {
+
+		return createPrefixedURI(RDFS.Class.getURI());
 	}
 
 	public void removeHashFromStatementIndex(final long hash) {

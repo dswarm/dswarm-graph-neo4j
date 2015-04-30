@@ -192,78 +192,117 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 				final Optional<String> optionalPrefixedObjectURI = processor.optionalCreatePrefixedURI(statement.getOptionalObjectURI());
 
-				if (!statement.getOptionalPredicateURI().get().equals(RDF.type.getURI())) {
+				boolean isType = false;
 
-					final Optional<String> optionalPrefixedObjectDataModelURI = processor
-							.optionalCreatePrefixedURI(statement.getOptionalObjectDataModelURI());
-					final Optional<NodeType> finalOptionalObjectNodeType = Optional.of(objectNodeType);
+				// add Label to subject node, if object is a type entry
+				if (statement.getOptionalPredicateURI().get().equals(RDF.type.getURI())) {
 
-					final Optional<Long> optionalObjectResourceUriDataModelUriHash;
+					processor.addLabel(subjectNode, optionalPrefixedObjectURI.get());
 
-					if (optionalPrefixedObjectURI.isPresent()) {
+					isType = true;
+				}
 
-						// because type resources doesn't belong to any data model
-						optionalObjectResourceUriDataModelUriHash = Optional.of(HashUtils.generateHash(optionalPrefixedObjectURI.get()));
-					} else {
+				final NodeType finalObjectNodeType;
 
-						optionalObjectResourceUriDataModelUriHash = Optional.absent();
+				if (!isType) {
+
+					finalObjectNodeType = objectNodeType;
+				} else {
+
+					// correct/enhance node type
+
+					switch (objectNodeType) {
+
+						case Resource:
+
+							finalObjectNodeType = NodeType.TypeResource;
+
+							break;
+						case BNode:
+
+							finalObjectNodeType = NodeType.TypeBNode;
+
+							break;
+						default:
+
+							finalObjectNodeType = objectNodeType;
 					}
+				}
 
-					// Check index for object
-					final Optional<Node> optionalObjectNode = processor.determineNode(finalOptionalObjectNodeType, statement.getOptionalObjectId(),
-							optionalPrefixedObjectURI, optionalPrefixedObjectDataModelURI, optionalObjectResourceUriDataModelUriHash);
-					final Node objectNode;
-					final Optional<String> optionalResourceUri;
+				final Optional<String> optionalPrefixedObjectDataModelURI = processor
+						.optionalCreatePrefixedURI(statement.getOptionalObjectDataModelURI());
+				final Optional<NodeType> finalOptionalObjectNodeType = Optional.of(finalObjectNodeType);
 
-					if (optionalObjectNode.isPresent()) {
+				final Optional<Long> optionalObjectResourceUriDataModelUriHash;
 
-						objectNode = optionalObjectNode.get();
+				if (optionalPrefixedObjectURI.isPresent()) {
+
+					// because type resources doesn't belong to any data model
+					optionalObjectResourceUriDataModelUriHash = Optional.of(HashUtils.generateHash(optionalPrefixedObjectURI.get()));
+				} else {
+
+					optionalObjectResourceUriDataModelUriHash = Optional.absent();
+				}
+
+				// Check index for object
+				final Optional<Node> optionalObjectNode = processor.determineNode(finalOptionalObjectNodeType, statement.getOptionalObjectId(),
+						optionalPrefixedObjectURI, optionalPrefixedObjectDataModelURI, optionalObjectResourceUriDataModelUriHash);
+				final Node objectNode;
+				final Optional<String> optionalResourceUri;
+
+				if (optionalObjectNode.isPresent()) {
+
+					objectNode = optionalObjectNode.get();
+					optionalResourceUri = Optional.absent();
+				} else {
+
+					final Label objectLabel = processor.getLabel(finalObjectNodeType.toString());
+
+					objectNode = processor.getDatabase().createNode(objectLabel);
+
+					if (NodeType.Resource.equals(finalObjectNodeType) || NodeType.TypeResource.equals(finalObjectNodeType)) {
+
+						// object is a resource node
+
+						final String objectURI = optionalPrefixedObjectURI.get();
+
+						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
+						objectNode.setProperty(GraphStatics.HASH, optionalObjectResourceUriDataModelUriHash.get());
+
+						switch (finalObjectNodeType) {
+
+							case Resource:
+
+								processor.handleObjectDataModel(objectNode, optionalPrefixedObjectDataModelURI);
+
+								break;
+							case TypeResource:
+
+								processor.addLabel(objectNode, processor.getRDFCLASSPrefixedURI());
+								processor.addLabel(objectNode, NodeType.Resource.toString());
+
+								processor.addNodeToResourceTypesIndex(objectURI, objectNode);
+
+								break;
+						}
+
+						processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, optionalPrefixedObjectDataModelURI);
 						optionalResourceUri = Optional.absent();
 					} else {
 
-						final Label objectLabel = processor.getLabel(objectNodeType.toString());
-
-						objectNode = processor.getDatabase().createNode(objectLabel);
-
-						if (NodeType.Resource.equals(objectNodeType) || NodeType.TypeResource.equals(objectNodeType)) {
-
-							// object is a resource node
-
-							final String objectURI = optionalPrefixedObjectURI.get();
-
-							objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
-							objectNode.setProperty(GraphStatics.HASH, optionalObjectResourceUriDataModelUriHash.get());
-
-							switch (objectNodeType) {
-
-								case Resource:
-
-									processor.handleObjectDataModel(objectNode, optionalPrefixedObjectDataModelURI);
-
-									break;
-								case TypeResource:
-
-									processor.addLabel(objectNode, NodeType.Resource.toString());
-
-									processor.addNodeToResourceTypesIndex(objectURI, objectNode);
-
-									break;
-							}
-
-							processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, optionalPrefixedObjectDataModelURI);
-							optionalResourceUri = Optional.absent();
-						} else {
-
-							optionalResourceUri = handleBNode(subjectNode, statement, objectNode, finalOptionalObjectNodeType,
-									optionalPrefixedSubjectURI,
-									optionalPrefixedResourceURI);
-						}
-
-						addedNodes++;
+						optionalResourceUri = handleBNode(subjectNode, statement, objectNode, finalOptionalObjectNodeType,
+								optionalPrefixedSubjectURI,
+								optionalPrefixedResourceURI);
 					}
 
+					addedNodes++;
+				}
+
+				// leave out, rdf:type statements for now (enable, them if footprint is not too high)
+				if (!isType) {
+
 					final long hash = processor.generateStatementHash(subjectNode, optionalPrefixedPredicateURI.get(), objectNode,
-							subjectNodeType, objectNodeType);
+							subjectNodeType, finalObjectNodeType);
 
 					final boolean statementExists = processor.checkStatementExists(hash);
 
@@ -283,9 +322,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 								optionalPrefixedSubjectURI, statement.getOptionalStatementUUID(), finalOptionalResourceUri,
 								statement.getOptionalQualifiedAttributes(), hash);
 					}
-				} else {
-
-					processor.addLabel(subjectNode, optionalPrefixedObjectURI.get());
 				}
 			}
 
@@ -408,7 +444,6 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		processor.addNodeToBNodesIndex(statement.getOptionalObjectId().get(), objectNode);
 
 		final NodeType objectNodeType = optionalObjectNodeType.get();
-		//objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, objectNodeType.toString());
 
 		if (!NodeType.TypeBNode.equals(objectNodeType)) {
 
@@ -416,7 +451,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					optionalPrefixedSubjectURI, optionalPrefixedResourceURI);
 		} else {
 
-			//processor.addLabel(objectNode, processor.getRDFCLASSPrefixedURI());
+			processor.addLabel(objectNode, processor.getRDFCLASSPrefixedURI());
 			processor.addLabel(objectNode, NodeType.BNode.toString());
 			optionalResourceUri = Optional.absent();
 		}

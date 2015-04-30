@@ -93,13 +93,6 @@ public abstract class Neo4jProcessor {
 		tempResourcesWDataModelIndex = Maps.newHashMap();
 		tempResourceTypesIndex = Maps.newHashMap();
 
-		beginTx();
-
-		LOG.debug("start write TX");
-
-		bnodes = new HashMap<>();
-		nodeResourceMap = new LongObjectOpenHashMap<>();
-
 		try {
 
 			final Tuple<Set<Long>, DB> mapDBTuple = MapDBUtils
@@ -110,12 +103,21 @@ public abstract class Neo4jProcessor {
 			final Tuple<Set<Long>, DB> mapDBTuple3 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 			statementHashes = mapDBTuple3.v1();
 			statementHashesDB = mapDBTuple3.v2();
+
 		} catch (final IOException e) {
 
 			failTx();
 
 			throw new DMPGraphException("couldn't create or get statement hashes index");
 		}
+
+		beginTx();
+
+		LOG.debug("start write TX");
+
+		bnodes = new HashMap<>();
+		nodeResourceMap = new LongObjectOpenHashMap<>();
+
 	}
 
 	protected void initIndices() throws DMPGraphException {
@@ -224,10 +226,16 @@ public abstract class Neo4jProcessor {
 
 		Neo4jProcessor.LOG.error("tx failed; closing tx");
 
-		tempStatementHashesDB.close();
-		statementHashesDB.close();
-		tx.failure();
-		tx.close();
+		if (tempStatementHashesDB != null) {
+			tempStatementHashesDB.close();
+		}
+		if (statementHashesDB != null) {
+			statementHashesDB.close();
+		}
+		if (tx != null) {
+			tx.failure();
+			tx.close();
+		}
 		txIsClosed = true;
 
 		Neo4jProcessor.LOG.error("tx failed; closed tx");

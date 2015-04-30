@@ -18,25 +18,23 @@ package org.dswarm.graph.gdm.parse;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
-import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.parse.BaseNeo4jHandler;
 import org.dswarm.graph.parse.Neo4jHandler;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
 
 /**
  * @author tgaengler
@@ -63,7 +61,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final Resource r, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final String resourceURI, final long index) throws DMPGraphException {
 
 		final StatementBuilder sb = new StatementBuilder();
 
@@ -84,7 +82,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		final Optional<String> optionalStatementUUID = Optional.fromNullable(st.getUUID());
 		sb.setOptionalStatementUUID(optionalStatementUUID);
 
-		final Optional<String> optionalResourceUri = processor.determineResourceUri(subject, r);
+		final Optional<String> optionalResourceUri = processor.determineResourceUri(subject, resourceURI);
 		sb.setOptionalResourceURI(optionalResourceUri);
 
 		final Map<String, Object> qualifiedAttributes = processor.getQualifiedAttributes(st);
@@ -100,19 +98,27 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	 * TODO: refactor this to BaseNeo4jHandler
 	 *
 	 * @param stmtUUID
-	 * @param resource
+	 * @param resourceURI
 	 * @param index
 	 * @param order
 	 * @throws DMPGraphException
 	 */
 	@Override
-	public void handleStatement(final String stmtUUID, final Resource resource, final long index, final long order) throws DMPGraphException {
+	public void handleStatement(final String stmtUUID, final String resourceURI, final long index, final long order) throws DMPGraphException {
 
 		handler.getProcessor().ensureRunningTx();
 
 		try {
 
-			final Relationship rel = handler.getRelationship(stmtUUID);
+			final Optional<Relationship> optionalRel = handler.getProcessor().getRelationshipFromStatementIndex(stmtUUID);
+
+			if(!optionalRel.isPresent()) {
+
+				GDMNeo4jHandler.LOG.error("couldn't find statement with the uuid '{}' in the database", stmtUUID);
+			}
+
+			final Relationship rel = optionalRel.get();
+
 			final Node subject = rel.getStartNode();
 			final Node object = rel.getEndNode();
 			final Statement stmt = propertyGraphGDMReaderHelper.readStatement(rel);
@@ -128,7 +134,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			// TODO: shall we include some more qualified attributes into hash generation, e.g., index, valid from, or will the
 			// index
 			// be update with the new stmt (?)
-			final String hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
+			final long hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
 			final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(stmt.getSubject()));
 			final Optional<String> optionalSubjectURI;
 
@@ -140,7 +146,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 				optionalSubjectURI = Optional.absent();
 			}
 
-			final Optional<String> optionalResourceUri = processor.determineResourceUri(stmt.getSubject(), resource);
+			final Optional<String> optionalResourceUri = processor.determineResourceUri(stmt.getSubject(), resourceURI);
 			final Map<String, Object> qualifiedAttributes = processor.getQualifiedAttributes(stmt);
 			qualifiedAttributes.put(GraphStatics.INDEX_PROPERTY, index);
 			qualifiedAttributes.put(GraphStatics.ORDER_PROPERTY, order);

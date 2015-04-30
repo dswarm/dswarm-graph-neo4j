@@ -16,17 +16,23 @@
  */
 package org.dswarm.graph.gdm.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.ws.rs.core.MediaType;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
 import com.google.common.base.Optional;
+import com.google.common.io.ByteSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -40,6 +46,8 @@ import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author tgaengler
@@ -189,7 +197,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 			final String resourcePathV2, final String dataModelURI, final String recordClassURI, final long statementCountCurrentVersion,
 			final long statementCountV1, final boolean deprecateMissingRecords, final Optional<String> optionalRecordClassUri) throws IOException {
 
-		LOG.debug("start read test for GDM resource at " + dbType + " DB");
+		LOG.debug("start read test for GDM resource at {} DB", dbType);
 
 		writeGDMToDBInternal(resourcePathV1, dataModelURI);
 		writeGDMToDBInternalWithContentSchema(resourcePathV2, dataModelURI, optionalContentSchemaRequestJSON, deprecateMissingRecords, optionalRecordClassUri);
@@ -209,11 +217,34 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final org.dswarm.graph.json.Model model = objectMapper.readValue(body, org.dswarm.graph.json.Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
 
-		LOG.debug("read '" + model.size() + "' statements");
+			@Override public Void call(final Resource resource) {
+
+				model.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while(iterator.hasNext()) {
+
+			iterator.next();
+		}
+
+		bis.close();
+		actualResult.close();
+
+		LOG.debug("read '{}' statements", model.size());
 
 		Assert.assertEquals("the number of statements should be " + statementCountCurrentVersion, statementCountCurrentVersion, model.size());
 
@@ -232,25 +263,50 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response2.getStatus());
 
-		final String body2 = response2.getEntity(String.class);
+		final InputStream actualResult2 = response2.getEntity(InputStream.class);
+		final BufferedInputStream bis2 = new BufferedInputStream(actualResult2, 1024);
+		final ModelParser modelParser2 = new ModelParser(bis2);
+		final org.dswarm.graph.json.Model model2 = new org.dswarm.graph.json.Model();
 
-		final org.dswarm.graph.json.Model model2 = objectMapper.readValue(body2, org.dswarm.graph.json.Model.class);
+		final Observable<Void> parseObservable2 = modelParser2.parse().map(new Func1<Resource, Void>() {
 
-		LOG.debug("read '" + model2.size() + "' statements");
+			@Override public Void call(final Resource resource) {
+
+				model2.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator2 = parseObservable2.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator2.hasNext());
+
+		while(iterator2.hasNext()) {
+
+			iterator2.next();
+		}
+
+		bis2.close();
+		actualResult2.close();
+
+		LOG.debug("read '{}' statements", model2.size());
 
 		Assert.assertEquals("the number of statements should be " + statementCountV1, statementCountV1, model2.size());
 
-		LOG.debug("finished read test for GDM resource at " + dbType + " DB");
+		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
 
 	private void writeGDMToDBInternalWithContentSchema(final String dataResourceFileName, final String dataModelURI,
 			final Optional<ObjectNode> optionalContentSchemaRequestJSON, final boolean deprecateMissingRecords, final Optional<String> optionalRecordClassUri)
 			throws IOException {
 
-		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(dataResourceFileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -271,8 +327,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -280,16 +336,20 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
-		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
 
 	private void writeGDMToDBInternal(final String dataResourceFileName, final String dataModelURI) throws IOException {
 
-		LOG.debug("start writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(dataResourceFileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -298,8 +358,8 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -307,8 +367,10 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
-		LOG.debug("finished writing GDM statements for GDM resource at " + dbType + " DB");
+		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
 
 	private ObjectNode getMABXMLContentSchema() {

@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.gdm.read;
 
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -31,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.json.stream.ModelBuilder;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
@@ -48,7 +49,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private final String            recordClassUri;
 	private       Optional<Integer> optionalAtMost;
 
-	private Model model;
+	private long size          = 0;
+	private long readResources = 0;
+
+	private ModelBuilder modelBuilder;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
 			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
@@ -60,7 +64,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	}
 
 	@Override
-	public Model read() throws DMPGraphException {
+	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException {
+
+		readResources = 0;
 
 		ensureTx();
 
@@ -70,6 +76,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
+			PropertyGraphGDMModelReader.LOG
+					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, dataModelUri,
+							version);
+
 			recordNodesIter = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
 					dataModelUri);
 
@@ -78,10 +88,11 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				tx.success();
 
 				PropertyGraphGDMModelReader.LOG
-						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
+								recordClassLabel, dataModelUri, version,
 								type);
 
-				return null;
+				return Optional.absent();
 			}
 
 			if (!recordNodesIter.hasNext()) {
@@ -90,13 +101,15 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				tx.success();
 
 				PropertyGraphGDMModelReader.LOG
-						.debug("there are no root nodes for '{}' in data model '{}' finished read {} TX successfully", recordClassLabel, dataModelUri,
+						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
+								recordClassLabel, dataModelUri, version,
 								type);
 
-				return null;
+				return Optional.absent();
 			}
 
-			model = new Model();
+			modelBuilder = new ModelBuilder(outputStream);
+			size = 0;
 
 			final Iterator<Node> nodeIterator;
 
@@ -144,7 +157,18 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					currentResource.setStatements(statements);
 				}
 
-				model.addResource(currentResource);
+				final int resourceStatementSize = currentResource.size();
+
+				if (resourceStatementSize > 0) {
+
+					size += resourceStatementSize;
+					modelBuilder.addResource(currentResource);
+					readResources++;
+				} else {
+
+					LOG.debug("couldn't find any statement for resource '{}' in data model '{}' with version '{}'", currentResource.getUri(),
+							dataModelUri, version);
+				}
 
 				currentResourceStatements.clear();
 			}
@@ -170,12 +194,17 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			tx.close();
 		}
 
-		return model;
+		return Optional.of(modelBuilder);
+	}
+
+	@Override public long readResources() {
+
+		return readResources;
 	}
 
 	@Override
 	public long countStatements() {
 
-		return model.size();
+		return size;
 	}
 }

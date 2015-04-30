@@ -20,7 +20,7 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.batch.parse.BaseNeo4jHandler;
 import org.dswarm.graph.batch.rdf.pnx.RDFNeo4jProcessor;
-import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
+import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.parse.Neo4jHandler;
 import org.slf4j.Logger;
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
-import de.knutwalker.ntparser.Node;
-import de.knutwalker.ntparser.Resource;
-import de.knutwalker.ntparser.Statement;
+import de.knutwalker.ntparser.model.Node;
+import de.knutwalker.ntparser.model.Resource;
+import de.knutwalker.ntparser.model.Statement;
 
 /**
  * @author tgaengler

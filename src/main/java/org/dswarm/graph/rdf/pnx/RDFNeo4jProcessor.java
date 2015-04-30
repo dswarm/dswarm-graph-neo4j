@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx;
+package org.dswarm.graph.rdf.pnx;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.StatementBuilder;
-import org.dswarm.graph.rdf.nx.utils.NodeTypeUtils;
+import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 
-import org.semanticweb.yars.nx.BNode;
-import org.semanticweb.yars.nx.Literal;
-import org.semanticweb.yars.nx.Node;
-import org.semanticweb.yars.nx.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+
+import de.knutwalker.ntparser.model.Node;
 
 /**
  * @author tgaengler
@@ -68,7 +66,7 @@ public abstract class RDFNeo4jProcessor {
 
 					// only bnodes have ids in Jena
 
-					optionalResourceId = Optional.fromNullable(resource.getLabel());
+					optionalResourceId = Optional.fromNullable(resource.toString());
 				} else {
 
 					optionalResourceId = Optional.absent();
@@ -76,13 +74,12 @@ public abstract class RDFNeo4jProcessor {
 
 				if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
-					optionalResourceUri = Optional.fromNullable(resource.getLabel());
+					optionalResourceUri = Optional.fromNullable(resource.toString());
 					optionalDataModelUri = Optional.absent();
 					optionalResourceValue = Optional.absent();
 				} else if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
 
-					// TODO: we could extract and set the datatype of the literal as well
-					optionalResourceValue = Optional.fromNullable(resource.getLabel());
+					optionalResourceValue = Optional.fromNullable(resource.toString());
 					optionalResourceUri = Optional.absent();
 					optionalDataModelUri = Optional.absent();
 				} else {

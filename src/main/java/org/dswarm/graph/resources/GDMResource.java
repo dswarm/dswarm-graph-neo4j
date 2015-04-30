@@ -16,11 +16,16 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,15 +38,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
@@ -54,15 +62,18 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Func1;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.common.model.util.AttributePathUtil;
+import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
@@ -104,9 +115,10 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.json.stream.ModelBuilder;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
@@ -119,6 +131,9 @@ import org.dswarm.graph.versioning.VersioningStatics;
 public class GDMResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GDMResource.class);
+
+	public static final int METADATA_BODY_PART = 0;
+	public static final int CONTENT_BODY_PART  = 1;
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
@@ -148,11 +163,13 @@ public class GDMResource {
 
 	/**
 	 * multipart/mixed payload contains two body parts:<br/>
-	 * - first body part is the content (i.e. the real data)<br/>
-	 * - second body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
+	 * - first body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
 	 * content):<br/>
-	 * - "data_model_URI" (mandatory) - "content_schema" (obligatory) - "deprecate_missing_records" (obligatory) -
-	 * "record_class_uri" (mandatory for "deprecate_missing_records")
+	 *     - "data_model_URI" (mandatory)<br/>
+	 *     - "content_schema" (obligatory)<br/>
+	 *     - "deprecate_missing_records" (obligatory)<br/>
+	 *     - "record_class_uri" (mandatory for "deprecate_missing_records")<br/>
+	 * - second body part is the content (i.e. the real data)
 	 *
 	 * @param multiPart
 	 * @param database
@@ -168,59 +185,104 @@ public class GDMResource {
 		LOG.debug("try to process GDM statements and write them into graph db");
 
 		final List<BodyPart> bodyParts = getBodyParts(multiPart);
-		final InputStream content = getContent(bodyParts);
 		final ObjectNode metadata = getMetadata(bodyParts);
+		final InputStream content = getContent(bodyParts);
 
 		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
 		final String dataModelURI = optionalDataModelURI.get();
-
-		// TODO: maybe do this later, when everything else is checked
-		Model model = getModel(content);
+		final Optional<Boolean> optionalEnableVersioning = getEnableVersioningFlag(metadata);
+		final Tuple<Observable<Resource>, BufferedInputStream> modelTuple = getModel(content);
+		final Observable<Resource> model = modelTuple.v1();
+		final BufferedInputStream bis = modelTuple.v2();
 
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
+
+		LOG.info("process GDM statements and write them into graph db for data model '{}'", dataModelURI);
 
 		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, dataModelURI);
 
 		try {
 
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
-			final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
+			final Observable<Resource> newModel;
+			final Observable<Void> deprecateRecordsObservable;
 
-			// = new resources model, since existing, modified resources were already written to the DB
-			final Pair<Model, Set<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI, database, handler);
+			// note: versioning is enable by default
+			if (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get()) {
 
-			model = result.first();
+				LOG.info("do versioning with GDM statements for data model '{}'", dataModelURI);
 
-			final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
+				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-			if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
+				// = new resources model, since existing, modified resources were already written to the DB
+				final Tuple<Observable<Resource>, Observable<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
+						database,
+						handler);
 
-				final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
+				final Observable<Resource> deltaModel = result.v1();
 
-				if (!optionalRecordClassURI.isPresent()) {
+				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
-					throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+
+				if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
+
+					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
+
+					if (!optionalRecordClassURI.isPresent()) {
+
+						throw new DMPGraphException("could not deprecate missing records, because no record class uri is given");
+					}
+
+					// deprecate missing records in DB
+
+					final Observable<String> processedResources = result.v2();
+
+					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
+							((Neo4jUpdateHandler) handler.getHandler())
+									.getVersionHandler().getLatestVersion(), processor);
+				} else {
+
+					deprecateRecordsObservable = Observable.empty();
 				}
 
-				// deprecate missing records in DB
+				newModel = deltaModel;
 
-				final Set<String> processedResources = result.other();
-
-				deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI, ((Neo4jUpdateHandler) handler.getHandler())
-						.getVersionHandler().getLatestVersion(), processor);
-			}
-
-			if (model.size() > 0) {
-
-				// parse model only, when model contains some resources
-
-				final GDMParser parser = new GDMModelParser(model);
-				parser.setGDMHandler(handler);
-				parser.parse();
+				LOG.info("finished versioning with GDM statements for data model '{}'", dataModelURI);
 			} else {
 
-				GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+				newModel = model;
+				deprecateRecordsObservable = Observable.empty();
+			}
+
+			//if (deltaModel.size() > 0) {
+
+			// parse model only, when model contains some resources
+
+			final GDMParser parser = new GDMModelParser(newModel);
+			parser.setGDMHandler(handler);
+			final Observable<Void> newResourcesObservable = parser.parse();
+			//} else {
+
+			//GDMResource.LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+			//}
+
+			try {
+
+				final Iterator<Void> iterator = deprecateRecordsObservable.concatWith(newResourcesObservable).toBlocking().getIterator();
+
+				if (!iterator.hasNext()) {
+
+					LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+				}
+
+				while (iterator.hasNext()) {
+
+					iterator.next();
+				}
+			} catch (final RuntimeException e) {
+
+				throw new DMPGraphException(e.getMessage(), e.getCause());
 			}
 
 			final Long size = handler.getHandler().getCountedStatements();
@@ -233,9 +295,14 @@ public class GDMResource {
 
 			handler.getHandler().closeTransaction();
 
+			bis.close();
 			content.close();
 
-			LOG.debug("finished writing {} GDM statements into graph db for data model URI '{}'", size, dataModelURI);
+			LOG.info(
+					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+					parser.parsedResources(), handler.getHandler().getCountedStatements(),
+					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
+					dataModelURI);
 
 			return Response.ok().build();
 
@@ -243,9 +310,10 @@ public class GDMResource {
 
 			processor.getProcessor().failTx();
 
+			bis.close();
 			content.close();
 
-			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write GDM statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -267,32 +335,10 @@ public class GDMResource {
 			throw new DMPGraphException(message);
 		}
 
-		final ObjectMapper mapper = Util.getJSONObjectMapper();
+		final BufferedInputStream bis = new BufferedInputStream(inputStream, 1024);
 
-		Model model = null;
-		try {
-			model = mapper.readValue(inputStream, Model.class);
-		} catch (IOException e) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		if (model == null) {
-
-			final String message = "could not deserialise GDM JSON for write to graph DB request";
-
-			GDMResource.LOG.error(message);
-
-			inputStream.close();
-
-			throw new DMPGraphException(message);
-		}
-
-		LOG.debug("deserialized GDM statements that were serialised as Turtle and N3");
+		final ModelParser modelParser = new ModelParser(bis);
+		final Observable<Resource> model = modelParser.parse();
 
 		LOG.debug("try to write GDM statements into graph db");
 
@@ -303,19 +349,43 @@ public class GDMResource {
 			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
 			final GDMParser parser = new GDMModelParser(model);
 			parser.setGDMHandler(handler);
-			parser.parse();
+			final Observable<Void> processedResources = parser.parse();
+
+			try {
+
+				final Iterator<Void> iterator = processedResources.toBlocking().getIterator();
+
+				if (!iterator.hasNext()) {
+
+					LOG.debug("model contains no resources, i.e., nothing needs to be written to the DB");
+				}
+
+				while (iterator.hasNext()) {
+
+					iterator.next();
+				}
+			} catch (final RuntimeException e) {
+
+				throw new DMPGraphException(e.getMessage(), e.getCause());
+			}
+
 			handler.getHandler().closeTransaction();
 
+			bis.close();
 			inputStream.close();
 
-			LOG.debug("finished writing " + handler.getHandler().getCountedStatements() + " GDM statements into graph db");
+			LOG.debug(
+					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db",
+					parser.parsedResources(), handler.getHandler().getCountedStatements(),
+					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals());
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
 
+			bis.close();
 			inputStream.close();
 
-			LOG.error("couldn't write GDM statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write GDM statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -338,19 +408,51 @@ public class GDMResource {
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 		final Optional<Integer> optionalAtMost = getIntValue(DMPStatics.AT_MOST_IDENTIFIER, requestJSON);
 
-		GDMResource.LOG.debug("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+		GDMResource.LOG.info("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
 				dataModelUri, recordClassUri, optionalVersion);
 
 		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
-		final Model model = gdmReader.read();
 
-		String result = serializeJSON(model, READ_GDM_MODEL_TYPE);
+		final StreamingOutput stream = new StreamingOutput() {
 
-		GDMResource.LOG
-				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
-						model.size(), gdmReader.countStatements(), dataModelUri, recordClassUri, optionalVersion);
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
-		return Response.ok().entity(result).build();
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final Optional<ModelBuilder> optionalModelBuilder = gdmReader.read(bos);
+
+					if (optionalModelBuilder.isPresent()) {
+
+						final ModelBuilder modelBuilder = optionalModelBuilder.get();
+						modelBuilder.build();
+						bos.flush();
+						os.flush();
+						bos.close();
+						os.close();
+
+						GDMResource.LOG
+								.info("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+										gdmReader.readResources(), gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri,
+										recordClassUri, optionalVersion);
+					} else {
+
+						bos.close();
+						os.close();
+
+						GDMResource.LOG
+								.info("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+										dataModelUri, recordClassUri, optionalVersion);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@POST
@@ -416,7 +518,7 @@ public class GDMResource {
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 
 		GDMResource.LOG
-				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 						keyAPString, searchValue, dataModelUri, optionalVersion);
 
 		final AttributePath keyAP = AttributePathUtil.parseAttributePathString(keyAPString);
@@ -425,139 +527,194 @@ public class GDMResource {
 
 		if (recordURIs == null || recordURIs.isEmpty()) {
 
-//			final ObjectNode resultJSON = objectMapper.createObjectNode();
-//
-//			final String message = String.format(
-//					"couldn't find a record for for key attribute path = '%s' and search value = '%s' in data model '%s' with and version = '%s' from graph db",
-//					keyAPString, searchValue, dataModelUri, optionalVersion);
-//
-//			resultJSON.put("nok", message);
-//
-//			final String nokResult = serializeJSON(resultJSON, SEARCH_GDM_RECORDS_TYPE);
-
-			final Model model = new Model();
-
-			final String emptyResult = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
-
-			return Response.ok().entity(emptyResult).build();
-		}
-
-		final Model model = new Model();
-
-		for (final String recordUri : recordURIs) {
-
-			final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
-					optionalVersion, database);
-
-			try {
-
-				final Resource resource = gdmReader.read();
-
-				model.addResource(resource);
-			} catch (final DMPGraphException e) {
-
-				GDMResource.LOG.debug("couldn't retrieve record for record URI '{}'", recordUri);
-			}
-		}
-
-		String result = serializeJSON(model, SEARCH_GDM_RECORDS_TYPE);
-
-		if (model.getResources() != null) {
-
 			GDMResource.LOG
-					.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
-							model.getResources().size(), model.size(), keyAPString, searchValue, dataModelUri, optionalVersion);
-		} else {
-
-			GDMResource.LOG
-					.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with and version = '{}' from graph db",
+					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
 							keyAPString, searchValue, dataModelUri, optionalVersion);
+
+			final StreamingOutput stream = new StreamingOutput() {
+
+				@Override
+				public void write(final OutputStream os) throws IOException, WebApplicationException {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final ModelBuilder modelBuilder = new ModelBuilder(bos);
+
+					modelBuilder.build();
+					bos.flush();
+					os.flush();
+					bos.close();
+					os.close();
+				}
+			};
+
+			return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 		}
 
-		return Response.ok().entity(result).build();
+		final StreamingOutput stream = new StreamingOutput() {
+
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
+
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final ModelBuilder modelBuilder = new ModelBuilder(bos);
+
+					int resourcesSize = 0;
+					long statementsSize = 0;
+
+					for (final String recordUri : recordURIs) {
+
+						final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
+								optionalVersion, database);
+
+						try {
+
+							final Resource resource = gdmReader.read();
+
+							modelBuilder.addResource(resource);
+
+							resourcesSize++;
+							statementsSize += resource.size();
+						} catch (final DMPGraphException e) {
+
+							GDMResource.LOG.debug("couldn't retrieve record for record URI '{}'", recordUri);
+						}
+					}
+
+					modelBuilder.build();
+					bos.flush();
+					os.flush();
+					bos.close();
+					os.close();
+
+					if (resourcesSize > 0) {
+
+						GDMResource.LOG
+								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
+										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, optionalVersion);
+					} else {
+
+						GDMResource.LOG
+								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
+										keyAPString, searchValue, dataModelUri, optionalVersion);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
-	private Pair<Model, Set<String>> calculateDeltaForDataModel(final Model model, final Optional<ContentSchema> optionalContentSchema,
+	private Tuple<Observable<Resource>, Observable<String>> calculateDeltaForDataModel(final Observable<Resource> model,
+			final Optional<ContentSchema> optionalContentSchema,
 			final String dataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
-		final Model newResourcesModel = new Model();
 		final Set<String> processedResources = new HashSet<>();
 
 		// calculate delta resource-wise
-		for (Resource newResource : model.getResources()) {
+		final Observable<Resource> newResources = model.flatMap(new Func1<Resource, Observable<Resource>>() {
 
-			final String resourceURI = newResource.getUri();
-			final String hash = UUID.randomUUID().toString();
-			final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
+			@Override public Observable<Resource> call(final Resource newResource) {
 
-			final Resource existingResource;
-			final GDMResourceReader gdmReader;
+				try {
 
-			if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
+					final String resourceURI = newResource.getUri();
+					final String hash = UUID.randomUUID().toString();
+					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
 
-				// determine legacy resource identifier via content schema
-				final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
-						.getRecordIdentifierAttributePath(), newResource.getUri());
+					final Resource existingResource;
+					final GDMResourceReader gdmReader;
 
-				// try to retrieve existing model via legacy record identifier
-				// note: version is absent -> should make use of latest version
-				gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier, optionalContentSchema.get().getRecordIdentifierAttributePath(),
-						dataModelURI, Optional.<Integer>absent(), permanentDatabase);
-			} else {
+					if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
-				// try to retrieve existing model via resource uri
-				// note: version is absent -> should make use of latest version
-				gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(), permanentDatabase);
+						// determine legacy resource identifier via content schema
+						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
+								.getRecordIdentifierAttributePath(), newResource.getUri());
+
+						// try to retrieve existing model via legacy record identifier
+						// note: version is absent -> should make use of latest version
+						gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
+								optionalContentSchema.get().getRecordIdentifierAttributePath(),
+								dataModelURI, Optional.<Integer>absent(), permanentDatabase);
+					} else {
+
+						// try to retrieve existing model via resource uri
+						// note: version is absent -> should make use of latest version
+						gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(),
+								permanentDatabase);
+					}
+
+					existingResource = gdmReader.read();
+
+					if (existingResource == null) {
+
+						// we don't need to calculate the delta, since everything is new
+
+						shutDownDeltaDB(newResourceDB);
+
+						// take new resource model, since there was no match in the data model graph for this resource identifier
+						return Observable.just(newResource);
+					}
+
+					processedResources.add(existingResource.getUri());
+
+					// final Model newResourceModel = new Model();
+					// newResourceModel.addResource(resource);
+
+					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
+
+					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
+							optionalContentSchema);
+
+					if (!changeset.hasChanges()) {
+
+						// process changeset only, if it provides changes
+
+						GDMResource.LOG.debug("no changes detected for this resource");
+
+						shutDownDeltaDBs(existingResourceDB, newResourceDB);
+
+						return Observable.empty();
+					}
+
+					// write modified resources resource-wise - instead of the whole model at once.
+					final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource.getUri(), existingResourceDB,
+							newResourceDB);
+					parser.setGDMHandler(handler);
+					parser.parse();
+
+					shutDownDeltaDBs(existingResourceDB, newResourceDB);
+
+					return Observable.empty();
+				} catch (final DMPGraphException e) {
+
+					throw new RuntimeException(e);
+				}
 			}
+		});
 
-			existingResource = gdmReader.read();
+		final Iterable<Resource> newResourcesIterable = newResources.doOnCompleted(new Action0() {
 
-			if (existingResource == null) {
+			@Override public void call() {
 
-				// take new resource model, since there was no match in the data model graph for this resource identifier
-				newResourcesModel.addResource(newResource);
-
-				newResourceDB.shutdown();
-
-				// we don't need to calculate the delta, since everything is new
-				continue;
+				GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 			}
+		}).toBlocking().toIterable();
 
-			processedResources.add(existingResource.getUri());
+		final List<Resource> newResourcesList = new ArrayList<>();
+		Iterables.addAll(newResourcesList, newResourcesIterable);
+		final Observable<Resource> completedNewResources = Observable.from(newResourcesList);
 
-			// final Model newResourceModel = new Model();
-			// newResourceModel.addResource(resource);
-
-			final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
-
-			final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
-					optionalContentSchema);
-
-			if (!changeset.hasChanges()) {
-
-				// process changeset only, if it provides changes
-
-				GDMResource.LOG.debug("no changes detected for this resource");
-
-				shutDownDeltaDBs(existingResourceDB, newResourceDB);
-
-				continue;
-			}
-
-			// write modified resources resource-wise - instead of the whole model at once.
-			final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource, existingResourceDB, newResourceDB);
-			parser.setGDMHandler(handler);
-			parser.parse();
-
-			shutDownDeltaDBs(existingResourceDB, newResourceDB);
-		}
-
-		GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
+		final Observable<String> processedResourcesObservable = Observable.from(processedResources);
 
 		// return only model with new, non-existing resources
-		return Pair.of(newResourcesModel, processedResources);
+		return Tuple.tuple(completedNewResources, processedResourcesObservable);
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
@@ -812,7 +969,7 @@ public class GDMResource {
 		GDMResource.LOG.debug("start shutting down working graph data model DBs for resources");
 
 		// should probably be delegated to a background worker thread, since it looks like that shutting down the working graph
-		// DBs take some (for whatever reason)
+		// DBs take some time (for whatever reason)
 		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 		service.submit(new Callable<Void>() {
 
@@ -828,88 +985,117 @@ public class GDMResource {
 		GDMResource.LOG.debug("finished shutting down working graph data model DBs for resources");
 	}
 
-	private void deprecateMissingRecords(final Set<String> processedResources, final String recordClassUri, final String dataModelUri,
+	private void shutDownDeltaDB(final GraphDatabaseService resourceDB) {
+
+		GDMResource.LOG.debug("start shutting down working graph data model DB for resource");
+
+		// should probably be delegated to a background worker thread, since it looks like that shutting down the working graph
+		// DBs take some time (for whatever reason)
+		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
+		service.submit(new Callable<Void>() {
+
+			public Void call() {
+
+				resourceDB.shutdown();
+
+				return null;
+			}
+		});
+
+		GDMResource.LOG.debug("finished shutting down working graph data model DB for resource");
+	}
+
+	private Observable<Void> deprecateMissingRecords(final Observable<String> processedResources, final String recordClassUri,
+			final String dataModelUri,
 			final int latestVersion, final GDMNeo4jProcessor processor) throws DMPGraphException {
 
-		// determine all record URIs of the data model
-		// how? - via record class?
+		return processedResources.toList().map(new Func1<List<String>, Void>() {
 
-		processor.getProcessor().ensureRunningTx();
+			@Override public Void call(final List<String> processedResourcesSet) {
 
-		try {
+				// determine all record URIs of the data model
+				// how? - via record class?
 
-			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
+				try {
 
-			final ResourceIterator<Node> recordNodes = processor.getProcessor().getDatabase()
-					.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY, dataModelUri);
+					processor.getProcessor().ensureRunningTx();
 
-			if (recordNodes == null) {
+					final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
-				GDMResource.LOG.debug("finished read data model record nodes TX successfully");
+					final ResourceIterator<Node> recordNodes = processor.getProcessor().getDatabase()
+							.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY, dataModelUri);
 
-				return;
-			}
+					if (recordNodes == null) {
 
-			final Set<Node> notProcessedResources = new HashSet<>();
+						GDMResource.LOG.debug("finished read data model record nodes TX successfully");
 
-			while (recordNodes.hasNext()) {
-
-				final Node recordNode = recordNodes.next();
-
-				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
-
-				if (resourceUri == null) {
-
-					LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
-
-					continue;
-				}
-
-				if (!processedResources.contains(resourceUri)) {
-
-					notProcessedResources.add(recordNode);
-
-					// TODO: do also need to deprecate the record nodes themselves?
-				}
-			}
-
-			for (final Node notProcessedResource : notProcessedResources) {
-
-				final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getProcessor()
-						.getDatabase(), notProcessedResource);
-
-				if (notProcessedResourcePaths == null) {
-
-					continue;
-				}
-
-				for (final org.neo4j.graphdb.Path notProcessedResourcePath : notProcessedResourcePaths) {
-
-					final Iterable<Relationship> rels = notProcessedResourcePath.relationships();
-
-					if (rels == null) {
-
-						continue;
+						return null;
 					}
 
-					for (final Relationship rel : rels) {
+					final Set<Node> notProcessedResources = new HashSet<>();
 
-						rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
+					while (recordNodes.hasNext()) {
+
+						final Node recordNode = recordNodes.next();
+
+						final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+
+						if (resourceUri == null) {
+
+							LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
+
+							continue;
+						}
+
+						if (!processedResourcesSet.contains(resourceUri)) {
+
+							notProcessedResources.add(recordNode);
+
+							// TODO: do also need to deprecate the record nodes themselves?
+						}
 					}
+
+					for (final Node notProcessedResource : notProcessedResources) {
+
+						final Iterable<org.neo4j.graphdb.Path> notProcessedResourcePaths = GraphDBUtil.getResourcePaths(processor.getProcessor()
+								.getDatabase(), notProcessedResource);
+
+						if (notProcessedResourcePaths == null) {
+
+							continue;
+						}
+
+						for (final org.neo4j.graphdb.Path notProcessedResourcePath : notProcessedResourcePaths) {
+
+							final Iterable<Relationship> rels = notProcessedResourcePath.relationships();
+
+							if (rels == null) {
+
+								continue;
+							}
+
+							for (final Relationship rel : rels) {
+
+								rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, latestVersion);
+							}
+						}
+					}
+
+					recordNodes.close();
+
+					return null;
+				} catch (final Exception e) {
+
+					final String message = "couldn't determine record URIs of the data model successfully";
+
+					processor.getProcessor().failTx();
+
+					GDMResource.LOG.error(message, e);
+
+					throw new RuntimeException(message, e);
 				}
 			}
-
-			recordNodes.close();
-		} catch (final Exception e) {
-
-			final String message = "couldn't determine record URIs of the data model successfully";
-
-			processor.getProcessor().failTx();
-
-			GDMResource.LOG.error(message, e);
-
-			throw new DMPGraphException(message);
-		}
+		});
 	}
 
 	private List<BodyPart> getBodyParts(final MultiPart multiPart) throws DMPGraphException {
@@ -948,7 +1134,7 @@ public class GDMResource {
 
 	private InputStream getContent(final List<BodyPart> bodyParts) throws DMPGraphException {
 
-		final BodyPart contentBodyPart = bodyParts.get(0);
+		final BodyPart contentBodyPart = bodyParts.get(CONTENT_BODY_PART);
 
 		if (contentBodyPart == null) {
 
@@ -986,7 +1172,7 @@ public class GDMResource {
 
 	private ObjectNode getMetadata(final List<BodyPart> bodyParts) throws DMPGraphException {
 
-		final BodyPart metadataBodyPart = bodyParts.get(1);
+		final BodyPart metadataBodyPart = bodyParts.get(METADATA_BODY_PART);
 
 		if (metadataBodyPart == null) {
 
@@ -1021,34 +1207,12 @@ public class GDMResource {
 		}
 	}
 
-	private Model getModel(final InputStream content) throws DMPGraphException, IOException {
+	private Tuple<Observable<Resource>, BufferedInputStream> getModel(final InputStream content) {
 
-		Model model;
+		final BufferedInputStream bis = new BufferedInputStream(content, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
 
-		try {
-
-			model = objectMapper.readValue(content, Model.class);
-		} catch (IOException e) {
-
-			final String message = "couldn't write GDM, could not deserialise GDM JSON";
-
-			GDMResource.LOG.error(message);
-
-			throw new DMPGraphException(message, e);
-		}
-
-		if (model == null) {
-
-			final String message = "couldn't write GDM, deserialised GDM JSON is null";
-
-			GDMResource.LOG.error(message);
-
-			content.close();
-
-			throw new DMPGraphException(message);
-		}
-
-		return model;
+		return Tuple.tuple(modelParser.parse(), bis);
 	}
 
 	private Optional<JsonNode> getMetadataPartNode(final String property, final ObjectNode metadata, final boolean mandatory)
@@ -1140,6 +1304,13 @@ public class GDMResource {
 		}
 	}
 
+	/**
+	 * default = false
+	 *
+	 * @param metadata
+	 * @return
+	 * @throws DMPGraphException
+	 */
 	private Optional<Boolean> getDeprecateMissingRecordsFlag(final ObjectNode metadata) throws DMPGraphException {
 
 		final Optional<String> optionalDeprecateMissingRecords = getMetadataPart(DMPStatics.DEPRECATE_MISSING_RECORDS_IDENTIFIER, metadata, false);
@@ -1152,6 +1323,30 @@ public class GDMResource {
 		} else {
 
 			result = Optional.of(Boolean.FALSE);
+		}
+
+		return result;
+	}
+
+	/**
+	 * default = true
+	 *
+	 * @param metadata
+	 * @return
+	 * @throws DMPGraphException
+	 */
+	private Optional<Boolean> getEnableVersioningFlag(final ObjectNode metadata) throws DMPGraphException {
+
+		final Optional<String> optionalEnableVersioning = getMetadataPart(DMPStatics.ENABLE_VERSIONING_IDENTIFIER, metadata, false);
+
+		final Optional<Boolean> result;
+
+		if (optionalEnableVersioning.isPresent()) {
+
+			result = Optional.fromNullable(Boolean.valueOf(optionalEnableVersioning.get()));
+		} else {
+
+			result = Optional.of(Boolean.TRUE);
 		}
 
 		return result;

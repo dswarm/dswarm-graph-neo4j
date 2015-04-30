@@ -14,17 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx.test;
+package org.dswarm.graph.rdf.pnx.parse;
 
-import org.dswarm.graph.test.Neo4jRunningDBWrapper;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.parse.SimpleNeo4jHandler;
+import org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
+ * 
  * @author tgaengler
  */
-public class RDFResourceOnRunningDBNxTest extends RDFResourceDBNxTest {
+public class SimpleRDFNeo4jHandler extends RDFNeo4jHandler {
 
-	public RDFResourceOnRunningDBNxTest() {
+	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleRDFNeo4jHandler.class);
 
-		super(new Neo4jRunningDBWrapper(), "running");
+	public SimpleRDFNeo4jHandler(final RDFNeo4jProcessor processorArg) throws DMPGraphException {
+
+		super(new SimpleNeo4jHandler(processorArg.getProcessor()), processorArg);
 	}
 }

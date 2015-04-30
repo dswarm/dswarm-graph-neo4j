@@ -18,6 +18,7 @@ package org.dswarm.graph.test;
 
 import java.io.IOException;
 
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -26,6 +27,8 @@ import com.sun.jersey.api.client.WebResource;
  *
  */
 public interface Neo4jDBWrapper {
+
+	Client client();
 
 	WebResource service();
 

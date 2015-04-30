@@ -16,12 +16,21 @@
  */
 package org.dswarm.graph.hash;
 
+import com.github.emboss.siphash.SipKey;
+
 /**
  *
  */
 public final class HashUtils {
 
-	private HashUtils() {}
+	// Values from Appendix A of https://131002.net/siphash/siphash.pdf
+	// as well as http://git.io/siphash-spec-key-ref#L12
+	public static final SipKey	SPEC_KEY	= new SipKey(HashUtils.bytesOf(
+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f));
+
+	private HashUtils() {
+	}
 
 	public static byte[] bytesOf(final Integer... bytes) {
 
@@ -47,4 +56,3 @@ public final class HashUtils {
 		return ret;
 	}
 }
-

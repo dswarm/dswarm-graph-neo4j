@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx.test;
+package org.dswarm.graph.rdf.pnx.parse;
 
-import org.dswarm.graph.test.Neo4jRunningDBWrapper;
+import java.util.Iterator;
+
+import org.dswarm.graph.DMPGraphException;
+
+import de.knutwalker.ntparser.model.Statement;
 
 /**
  * @author tgaengler
  */
-public class RDFResourceOnRunningDBwDataModelNxTest extends RDFResourceDBwDataModelNxTest {
+public interface RDFParser {
 
-	public RDFResourceOnRunningDBwDataModelNxTest() {
-
-		super(new Neo4jRunningDBWrapper(), "running");
-	}
+	public void parse(final Iterator<Statement> model) throws DMPGraphException;
 }

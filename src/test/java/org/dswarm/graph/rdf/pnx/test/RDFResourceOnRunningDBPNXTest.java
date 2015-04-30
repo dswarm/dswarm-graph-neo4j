@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx.parse;
+package org.dswarm.graph.rdf.pnx.test;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.parse.Handler;
-import org.semanticweb.yars.nx.Node;
+import org.dswarm.graph.test.Neo4jRunningDBWrapper;
 
 /**
  * @author tgaengler
  */
-public interface RDFHandler extends Handler {
+public class RDFResourceOnRunningDBPNXTest extends RDFResourceDBPNXTest {
 
-	public void handleStatement(Node[] st) throws DMPGraphException;
+	public RDFResourceOnRunningDBPNXTest() {
+
+		super(new Neo4jRunningDBWrapper(), "running");
+	}
 }

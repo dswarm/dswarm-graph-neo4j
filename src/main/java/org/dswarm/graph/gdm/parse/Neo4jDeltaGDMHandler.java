@@ -24,17 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.DMPStatics;
-import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.ResourceNode;
-import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.parse.Neo4jHandler;
-
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -48,8 +39,15 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.json.LiteralNode;
+import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.parse.Neo4jHandler;
 
 /**
  * TODO: re-factor usage of CommonHandler
@@ -111,7 +109,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final Resource r, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final String resourceURI, final long index) throws DMPGraphException {
 
 		// utilise r for the resource property
 
@@ -164,17 +162,17 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				final LiteralNode literal = (LiteralNode) object;
 				final String value = literal.getValue();
-				final Node objectNode = database.createNode(DMPStatics.LEAF_LABEL);
+				final Node objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL);
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
 				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
-				objectNode.setProperty("__LEAF__", true);
+				objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 				values.add(objectNode, GraphStatics.VALUE, value);
 
-				final String resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
+				final String resourceUri = addResourceProperty(subjectNode, subject, objectNode, resourceURI);
 
 				addedNodes++;
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(),
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, resourceURI, statementUUID, order, index, subject.getType(),
 						object.getType());
 			} else { // must be Resource
 						// Make sure object exists
@@ -199,8 +197,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 						// object is a resource node
 
-						objectNode = database.createNode(DMPStatics.LEAF_LABEL);
-						objectNode.setProperty("__LEAF__", true);
+						objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL);
+						objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
 						final String objectURI = ((ResourceNode) object).getUri();
 
@@ -229,7 +227,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 						if (!isType) {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-							resourceUri = addResourceProperty(subjectNode, subject, objectNode, r);
+							resourceUri = addResourceProperty(subjectNode, subject, objectNode, resourceURI);
 						} else {
 
 							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
@@ -240,7 +238,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, r, statementUUID, order, index, subject.getType(),
+				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, resourceURI, statementUUID, order, index, subject.getType(),
 						object.getType());
 			}
 
@@ -336,7 +334,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final org.dswarm.graph.json.Node subject, final Resource resource, final String statementUUID, final Long order, final long index,
+			final org.dswarm.graph.json.Node subject, final String resourceURI, final String statementUUID, final Long order, final long index,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
 		final StringBuffer sb = new StringBuffer();
@@ -391,7 +389,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			addedRelationships++;
 
-			addResourceProperty(subjectNode, subject, rel, resourceUri, resource);
+			addResourceProperty(subjectNode, subject, rel, resourceUri, resourceURI);
 		} else {
 
 			rel = hits.next();
@@ -457,9 +455,9 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	private String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Node objectNode,
-			final Resource resource) {
+			final String resourceURI) {
 
-		final String resourceUri = determineResourceUri(subjectNode, subject, resource);
+		final String resourceUri = determineResourceUri(subjectNode, subject, resourceURI);
 
 		if (resourceUri == null) {
 
@@ -472,7 +470,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	private String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Relationship rel,
-			final String resourceUri, final Resource resource) {
+			final String resourceUri, final String resourceURI) {
 
 		final String finalResourceUri;
 
@@ -481,7 +479,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 			finalResourceUri = resourceUri;
 		} else {
 
-			finalResourceUri = determineResourceUri(subjectNode, subject, resource);
+			finalResourceUri = determineResourceUri(subjectNode, subject, resourceURI);
 		}
 
 		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
@@ -489,7 +487,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		return finalResourceUri;
 	}
 
-	private String determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Resource resource) {
+	private String determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final String resourceURI) {
 
 		final Long nodeId = subjectNode.getId();
 
@@ -505,7 +503,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 				resourceUri = ((ResourceNode) subject).getUri();
 			} else {
 
-				resourceUri = resource.getUri();
+				resourceUri = resourceURI;
 			}
 
 			nodeResourceMap.put(nodeId, resourceUri);

@@ -33,4 +33,8 @@ public interface Neo4jHandler {
 	public long getCountedStatements();
 
 	public int getRelationshipsAdded();
+
+	public int getNodesAdded();
+
+	public int getCountedLiterals();
 }

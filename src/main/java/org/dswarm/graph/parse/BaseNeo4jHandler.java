@@ -14,12 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
+ * graph extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dswarm.graph.parse;
 
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.lang.NotImplementedException;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
@@ -29,21 +44,15 @@ import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
 
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
-
 /**
  * @author tgaengler
  */
 public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandler {
 
 	private static final Logger		LOG					= LoggerFactory.getLogger(BaseNeo4jHandler.class);
+
+	private static final int TX_CHUNK_SIZE = 50000;
+	private static final int TX_TIME_DELTA = 30;
 
 	protected int					totalTriples		= 0;
 	protected int					addedNodes			= 0;
@@ -142,7 +151,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					// subject is a blank node
 
 					// note: can I expect an id here?
-					processor.getBNodesIndex().put(statement.getOptionalSubjectId().get(), subjectNode);
+					processor.addNodeToBNodesIndex(statement.getOptionalSubjectId().get(), subjectNode);
 					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
@@ -243,12 +252,12 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					addedNodes++;
 				}
 
-				final String hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), objectNode,
+				final long hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), objectNode,
 						subjectNodeType, finalObjectNodeType);
 
-				final Relationship rel = processor.getStatement(hash);
+				final boolean statementExists = processor.checkStatementExists(hash);
 
-				if (rel == null) {
+				if (!statementExists) {
 
 					final Optional<String> finalOptionalResourceUri;
 
@@ -271,13 +280,15 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 50000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
+			if (nodeDelta >= TX_CHUNK_SIZE || timeDelta >= TX_TIME_DELTA) { // Commit every 50k operations or every 30 seconds
 
 				processor.renewTx();
 
 				sinceLastCommit = totalTriples;
 
-				LOG.debug(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+				final double duration = (double) nodeDelta / timeDelta;
+
+				LOG.debug("{} triples @ ~{} triples/second.", totalTriples, duration);
 
 				tick = System.currentTimeMillis();
 			}
@@ -306,9 +317,18 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 		try {
 
-			final Relationship rel = getRelationship(uuid);
+			final Optional<Relationship> optionalRel = processor.getRelationshipFromStatementIndex(uuid);
+
+			if(!optionalRel.isPresent()) {
+
+				BaseNeo4jHandler.LOG.error("couldn't find statement with the uuid '{}' in the database", uuid);
+			}
+
+			final Relationship rel = optionalRel.get();
 
 			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getLatestVersion());
+
+			// TODO: remove statement hash from statement hashes index
 
 			return rel;
 		} catch (final Exception e) {
@@ -339,6 +359,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		return totalTriples;
 	}
 
+	@Override
 	public int getNodesAdded() {
 
 		return addedNodes;
@@ -350,14 +371,13 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		return addedRelationships;
 	}
 
+	@Override
 	public int getCountedLiterals() {
 
 		return literals;
 	}
 
 	protected abstract void init() throws DMPGraphException;
-
-	public abstract Relationship getRelationship(final String uuid);
 
 	public Optional<String> handleBNode(final Node subjectNode, final Statement statement, final Node objectNode,
 			final Optional<NodeType> optionalObjectNodeType) throws DMPGraphException {
@@ -370,7 +390,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final Optional<String> optionalResourceUri;
 		// object is a blank node
 
-		processor.getBNodesIndex().put(statement.getOptionalObjectId().get(), objectNode);
+		processor.addNodeToBNodesIndex(statement.getOptionalObjectId().get(), objectNode);
 
 		final NodeType objectNodeType = optionalObjectNodeType.get();
 		objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, objectNodeType.toString());
@@ -390,19 +410,18 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 	public void handleLiteral(final Node subjectNode, final Statement statement) throws DMPGraphException {
 
-		final String hash = processor.generateStatementHash(subjectNode, statement.getOptionalPredicateURI().get(), statement
-				.getOptionalObjectValue().get(), statement.getOptionalSubjectNodeType().get(), statement.getOptionalObjectNodeType().get());
+		final long hash = processor.generateStatementHash(subjectNode, statement);
 
-		final Relationship rel = processor.getStatement(hash);
+		final boolean statementExists = processor.checkStatementExists(hash);
 
-		if (rel == null) {
+		if (!statementExists) {
 
 			literals++;
 
 			final Node objectNode = processor.getDatabase().createNode();
 			objectNode.setProperty(GraphStatics.VALUE_PROPERTY, statement.getOptionalObjectValue().get());
 			objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
-			processor.getValueIndex().add(objectNode, GraphStatics.VALUE, statement.getOptionalObjectValue().get());
+			processor.addNodeToValueIndex(objectNode, GraphStatics.VALUE, statement.getOptionalObjectValue().get());
 
 			final Optional<String> optionalResourceUri = addResourceProperty(subjectNode, objectNode, statement.getOptionalSubjectNodeType(),
 					statement.getOptionalSubjectURI(), statement.getOptionalResourceURI());
@@ -433,7 +452,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	public Relationship addRelationship(final Node subjectNode, final String predicateURI, final Node objectNode,
 			final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceUri,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final String hash) throws DMPGraphException {
+			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
@@ -448,7 +467,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, finalStatementUUID,
 				optionalQualifiedAttributes, versionHandler);
 
-		processor.getStatementIndex().add(rel, GraphStatics.HASH, hash);
+		processor.addHashToStatementIndex(hash);
 		processor.addStatementToIndex(rel, finalStatementUUID);
 
 		addedRelationships++;
@@ -487,7 +506,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			finalOptionalResourceUri = processor.determineResourceUri(subjectNode, optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
 		}
 
-		if(finalOptionalResourceUri.isPresent()) {
+		if (finalOptionalResourceUri.isPresent()) {
 
 			rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceUri.get());
 		}
@@ -506,7 +525,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			case BNode:
 
-				processor.getBNodesIndex().put(optionalNodeId.get(), node);
+				processor.addNodeToBNodesIndex(optionalNodeId.get(), node);
 
 				break;
 		}

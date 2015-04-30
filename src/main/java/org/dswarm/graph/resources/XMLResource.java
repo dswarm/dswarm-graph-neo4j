@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -59,12 +60,12 @@ import com.google.common.base.Optional;
 @Path("/xml")
 public class XMLResource {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(XMLResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(XMLResource.class);
 
 	/**
 	 * The object mapper that can be utilised to de-/serialise JSON nodes.
 	 */
-	private final ObjectMapper	objectMapper;
+	private final ObjectMapper objectMapper;
 
 	public XMLResource() {
 
@@ -84,7 +85,7 @@ public class XMLResource {
 	@Path("/get")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_XML)
-	public Response readRDF(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response readXML(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
 
 		XMLResource.LOG.debug("try to read XML records from graph db");
 
@@ -151,25 +152,35 @@ public class XMLResource {
 			optionalOriginalDataType = Optional.absent();
 		}
 
-		LOG.debug("try to read XML records for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' from graph db");
+		LOG.debug("try to read XML records for data model uri = '{}' and record class uri = '{}' from graph db", dataModelUri, recordClassUri);
 
 		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
 				optionalOriginalDataType, database);
+
 		final StreamingOutput stream = new StreamingOutput() {
 
 			@Override
 			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
 				try {
-					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(os);
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+					final Optional<XMLStreamWriter> optionalWriter = xmlReader.read(bos);
 
 					if (optionalWriter.isPresent()) {
 
 						optionalWriter.get().flush();
 						optionalWriter.get().close();
 
-						LOG.debug("finished reading '" + xmlReader.recordCount() + "' XML records for data model uri = '" + dataModelUri
-								+ "' and record class uri = '" + recordClassUri + "' from graph db");
+						LOG.debug("finished reading '{}' XML records for data model uri = '{}' and record class uri = '{}' from graph db",
+								xmlReader.recordCount(), dataModelUri, recordClassUri);
+					} else {
+
+						bos.close();
+						os.close();
+
+						LOG.debug("couldn't find any XML records for data model uri = '{}' and record class uri = '{}' from graph db", dataModelUri,
+								recordClassUri);
 					}
 				} catch (final DMPGraphException | XMLStreamException e) {
 

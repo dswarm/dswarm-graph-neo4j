@@ -16,8 +16,11 @@
  */
 package org.dswarm.graph.gdm.test;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.ws.rs.core.MediaType;
 
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -33,10 +37,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.functions.Func1;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
@@ -82,9 +89,32 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Model model = objectMapper.readValue(body, Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+
+			@Override public Void call(final Resource resource) {
+
+				model.addResource(resource);
+
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while (iterator.hasNext()) {
+
+			iterator.next();
+		}
+
+		bis.close();
+		actualResult.close();
 
 		LOG.debug("read '{}' statements", model.size());
 
@@ -354,7 +384,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		final Model actualModel2 = searchGDMRecords(requestJson, 0);
 
-		Assert.assertNull(actualModel2);
+		Assert.assertNotNull(actualModel2);
+		Assert.assertEquals(0, actualModel2.size());
 
 		LOG.debug("finished search GDM records test 4 for GDM resource at {} DB", dbType);
 	}
@@ -364,7 +395,9 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(sourceFileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -373,8 +406,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -382,16 +415,21 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
 
-	private void writeGDMToDBInternalWDeprecation(final String dataModelURI, final String sourceFileName, final String recordClassURI) throws IOException {
+	private void writeGDMToDBInternalWDeprecation(final String dataModelURI, final String sourceFileName, final String recordClassURI)
+			throws IOException {
 
 		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(sourceFileName);
-		final byte[] file = Resources.toByteArray(fileURL);
+		final ByteSource byteSource = Resources.asByteSource(fileURL);
+		final InputStream is = byteSource.openStream();
+		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
 		final ObjectNode metadata = objectMapper.createObjectNode();
 		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
@@ -402,8 +440,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		// Construct a MultiPart with two body parts
 		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)).bodyPart(
-				new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE));
+		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
+				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
 		// POST the request
 		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
@@ -411,6 +449,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		multiPart.close();
+		bis.close();
+		is.close();
 
 		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
 	}
@@ -446,16 +486,36 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream actualResult = response.getEntity(InputStream.class);
+		final BufferedInputStream bis = new BufferedInputStream(actualResult, 1024);
+		final ModelParser modelParser = new ModelParser(bis);
+		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Model model = objectMapper.readValue(body, Model.class);
+		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
 
-		if(model != null) {
+			@Override public Void call(final Resource resource) {
 
-			LOG.debug("read '{}' statements", model.size());
+				model.addResource(resource);
 
-			Assert.assertEquals("the number of statements should be " + expectedNumberOfStatements, expectedNumberOfStatements, model.size());
+				return null;
+			}
+		});
+
+		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
+
+		Assert.assertTrue(iterator.hasNext());
+
+		while (iterator.hasNext()) {
+
+			iterator.next();
 		}
+
+		bis.close();
+		actualResult.close();
+
+		LOG.debug("read '{}' statements", model.size());
+
+		Assert.assertEquals("the number of statements should be " + expectedNumberOfStatements, expectedNumberOfStatements, model.size());
 
 		return model;
 	}

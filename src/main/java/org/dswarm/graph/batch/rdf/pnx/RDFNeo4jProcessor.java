@@ -19,14 +19,14 @@ package org.dswarm.graph.batch.rdf.pnx;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.batch.Neo4jProcessor;
-import org.dswarm.graph.batch.rdf.pnx.utils.NodeTypeUtils;
+import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
-import de.knutwalker.ntparser.Node;
+import de.knutwalker.ntparser.model.Node;
 
 /**
  * @author tgaengler

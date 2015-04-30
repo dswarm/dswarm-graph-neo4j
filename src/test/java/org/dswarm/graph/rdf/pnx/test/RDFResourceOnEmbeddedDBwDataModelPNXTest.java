@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx.test;
+package org.dswarm.graph.rdf.pnx.test;
 
 import org.dswarm.graph.test.Neo4jEmbeddedDBWrapper;
 
 /**
  * @author tgaengler
  */
-public class RDFResourceOnEmbeddedDBNxTest extends RDFResourceDBNxTest {
+public class RDFResourceOnEmbeddedDBwDataModelPNXTest extends RDFResourceDBwDataModelPNXTest {
 
-	public RDFResourceOnEmbeddedDBNxTest() {
+	public RDFResourceOnEmbeddedDBwDataModelPNXTest() {
 
 		super(new Neo4jEmbeddedDBWrapper("/ext"), "embedded");
 	}

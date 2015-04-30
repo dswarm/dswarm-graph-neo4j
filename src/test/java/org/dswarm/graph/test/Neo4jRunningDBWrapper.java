@@ -20,16 +20,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.junit.Assert;
-
-import org.junit.After;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.junit.After;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,9 +36,9 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(Neo4jRunningDBWrapper.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Neo4jRunningDBWrapper.class);
 
-	protected final String		graphEndpoint;
+	protected final String graphEndpoint;
 
 	public Neo4jRunningDBWrapper() {
 
@@ -72,23 +70,29 @@ public class Neo4jRunningDBWrapper implements Neo4jDBWrapper {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 	}
 
+	@Override public Client client() {
+
+		final Client c = Client.create();
+		c.setChunkedEncodingSize(1024);
+
+		return c;
+	}
+
 	@Override
 	public WebResource service() {
 
-		final Client c = Client.create();
-		final WebResource service = c.resource(graphEndpoint);
+		final Client c = client();
 
-		return service;
+		return c.resource(graphEndpoint);
 	}
 
 	@Override public WebResource base() {
 
-		final String baseURI = graphEndpoint.substring(0,graphEndpoint.lastIndexOf("/"));
+		final String baseURI = graphEndpoint.substring(0, graphEndpoint.lastIndexOf("/"));
 
-		final Client c = Client.create();
-		final WebResource service = c.resource(baseURI);
+		final Client c = client();
 
-		return service;
+		return c.resource(baseURI);
 	}
 
 	@Override

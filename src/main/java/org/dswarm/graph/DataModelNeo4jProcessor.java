@@ -18,60 +18,31 @@ package org.dswarm.graph;
 
 import java.util.Map;
 
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.VersionHandler;
-import org.dswarm.graph.versioning.VersioningStatics;
-
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.index.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.versioning.VersionHandler;
+import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
  * @author tgaengler
  */
 public class DataModelNeo4jProcessor extends Neo4jProcessor {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
-	private Index<Relationship>	statementUUIDsWDataModel;
-
-	private final String				dataModelURI;
+	private final String dataModelURI;
 
 	public DataModelNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
 		super(database);
 
 		dataModelURI = dataModelURIArg;
-	}
-
-	@Override protected void initIndices() throws DMPGraphException {
-
-		super.initIndices();
-
-		try {
-
-			statementUUIDsWDataModel = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_W_DATA_MODEL_INDEX_NAME);
-		} catch (final Exception e) {
-
-			failTx();
-
-			final String message = "couldn't load indices successfully";
-
-			DataModelNeo4jProcessor.LOG.error(message, e);
-			DataModelNeo4jProcessor.LOG.debug("couldn't finish write TX successfully");
-
-			throw new DMPGraphException(message);
-		}
-	}
-
-	public Index<Relationship> getStatementWDataModelIndex() {
-
-		return statementUUIDsWDataModel;
 	}
 
 	public String getDataModelURI() {
@@ -118,15 +89,14 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 	}
 
 	@Override
-	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
-
-		statementUUIDsWDataModel.add(rel, GraphStatics.UUID_W_DATA_MODEL, dataModelURI + "." + statementUUID);
-	}
-
-	@Override
 	public Optional<Node> getResourceNodeHits(final String resourceURI) {
 
 		return getNodeFromResourcesWDataModelIndex(resourceURI, dataModelURI);
+	}
+
+	@Override protected String putSaltToStatementHash(final String hash) {
+
+		return hash + " " + this.dataModelURI;
 	}
 
 	@Override

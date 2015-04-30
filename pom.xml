@@ -32,28 +32,34 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.7</java.source.version>
 		<java.target.version>1.7</java.target.version>
-		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
-		<maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
-		<maven-resources-plugin.version>2.6</maven-resources-plugin.version>
-		<maven-install-plugin.version>2.5.1</maven-install-plugin.version>
-		<maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
-		<maven-clean-plugin.version>2.5</maven-clean-plugin.version>
-		<maven-release-plugin.version>2.5</maven-release-plugin.version>
+		<maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>2.5.3</maven-assembly-plugin.version>
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+		<maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
+		<maven-release-plugin.version>2.5.1</maven-release-plugin.version>
 		<maven-version-plugin.version>2.1</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>2.12.0</jena.version>
+		<jena.version>2.13.0</jena.version>
 		<jersey.version>1.18.1</jersey.version>
-		<junit.version>4.11</junit.version>
-		<dswarm.graph.json.version>0.0.3-SNAPSHOT</dswarm.graph.json.version>
+		<junit.version>4.12</junit.version>
+		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.2-SNAPSHOT</dswarm.graph.model.version>
 		<dswarm.commons.version>0.0.2-SNAPSHOT</dswarm.commons.version>
-		<nxparser.version>2.0-SNAPSHOT</nxparser.version>
-		<hppc.version>0.6.0</hppc.version>
-		<ntparser.version>0.1.0</ntparser.version>
+		<hppc.version>0.6.1</hppc.version>
+		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
-		<fasterxml.version>0.9.9</fasterxml.version>
+		<aalto-xml.version>0.9.11</aalto-xml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
+		<chronicle-map.version>2.1.4</chronicle-map.version>
+		<mapdb.version>1.0.7</mapdb.version>
+		<rxjava.version>1.0.9</rxjava.version>
 	</properties>
+
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>
 
 	<build>
 		<plugins>
@@ -97,11 +103,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>-server -d64 -Xms4G -Xmx4G -XX:NewRatio=5
+					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=5
 						-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4
 						-XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode
 						-XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10
-						-XX:CMSFullGCsBeforeCompaction=1
+						-XX:CMSFullGCsBeforeCompaction=1 -XX:+CMSClassUnloadingEnabled
+						-XX:-OmitStackTraceInFastThrow -XX:hashCode=5
 					</argLine>
 				</configuration>
 				<executions>
@@ -193,26 +200,6 @@
 	</reporting>
 
 	<repositories>
-		<repository>
-			<id>nxparser-repo</id>
-			<url>http://nxparser.googlecode.com/svn/repository</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>nxparser-snapshots</id>
-			<url>http://nxparser.googlecode.com/svn/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 		<repository>
 			<id>neo4jRepo</id>
 			<url>http://m2.neo4j.org</url>
@@ -306,11 +293,6 @@
 			<version>${dswarm.graph.model.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.yars</groupId>
-			<artifactId>nxparser</artifactId>
-			<version>${nxparser.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>common</artifactId>
 			<version>${dswarm.commons.version}</version>
@@ -360,6 +342,11 @@
 			<version>${ntparser.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>de.knutwalker</groupId>
+			<artifactId>ntparser-model_2.10</artifactId>
+			<version>${ntparser.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.emboss</groupId>
 			<artifactId>siphash-java</artifactId>
 			<version>${siphash.version}</version>
@@ -367,13 +354,23 @@
 		<dependency>
 			<groupId>com.fasterxml</groupId>
 			<artifactId>aalto-xml</artifactId>
-			<version>${fasterxml.version}</version>
+			<version>${aalto-xml.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xmlunit</groupId>
 			<artifactId>xmlunit-core</artifactId>
 			<version>${xmlunit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>${mapdb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>${rxjava.version}</version>
 		</dependency>
 	</dependencies>
 

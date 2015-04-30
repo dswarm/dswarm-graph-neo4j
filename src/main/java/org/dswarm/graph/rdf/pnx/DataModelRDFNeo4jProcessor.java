@@ -14,32 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.parse;
+package org.dswarm.graph.rdf.pnx;
 
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.DataModelNeo4jProcessor;
+
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.versioning.SimpleNeo4jVersionHandler;
-
 /**
- * TODO: maybe we should add a general type for (bibliographic) resources (to easily identify the boundaries of the resources)
- *
  * @author tgaengler
  */
-public class SimpleNeo4jHandler extends BaseNeo4jHandler {
+public class DataModelRDFNeo4jProcessor extends RDFNeo4jProcessor {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleNeo4jHandler.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelRDFNeo4jProcessor.class);
 
-	public SimpleNeo4jHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelRDFNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
 
-		super(processorArg);
-	}
-
-	@Override
-	protected void init() throws DMPGraphException {
-
-		versionHandler = new SimpleNeo4jVersionHandler(processor);
+		super(new DataModelNeo4jProcessor(database, dataModelURIArg));
 	}
 }

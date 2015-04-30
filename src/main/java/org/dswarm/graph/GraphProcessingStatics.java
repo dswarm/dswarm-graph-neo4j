@@ -14,23 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx;
+package org.dswarm.graph;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.SimpleNeo4jProcessor;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 
 /**
+ * Holds references for static fields.
+ * 
  * @author tgaengler
  */
-public class SimpleRDFNeo4jProcessor extends RDFNeo4jProcessor {
+public interface GraphProcessingStatics {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleRDFNeo4jProcessor.class);
-
-	public SimpleRDFNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
-
-		super(new SimpleNeo4jProcessor(database));
-	}
+	public static final String LEAF_IDENTIFIER = "__LEAF__";
+	public static final Label LEAF_LABEL = DynamicLabel.label(LEAF_IDENTIFIER);
 }

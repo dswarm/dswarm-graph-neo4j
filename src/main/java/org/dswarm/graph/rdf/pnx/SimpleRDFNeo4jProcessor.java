@@ -14,21 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.rdf.nx.parse;
+package org.dswarm.graph.rdf.pnx;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.SimpleNeo4jProcessor;
+
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author tgaengler
- *
  */
-public interface RDFParser {
+public class SimpleRDFNeo4jProcessor extends RDFNeo4jProcessor {
 
-	/**
-	 * Sets the RDFHandler that will handle the parsed RDF data.
-	 */
-	public void setRDFHandler(RDFHandler handler);
+	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleRDFNeo4jProcessor.class);
 
-	public void parse() throws DMPGraphException;
+	public SimpleRDFNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
+
+		super(new SimpleNeo4jProcessor(database));
+	}
 }

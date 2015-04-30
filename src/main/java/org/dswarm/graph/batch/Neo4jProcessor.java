@@ -762,6 +762,6 @@ public abstract class Neo4jProcessor {
 
 	private static boolean checkLongIndex(final long key, final Set<Long> index) {
 
-		return index.contains(key);
+		return index != null && index.contains(key);
 	}
 }

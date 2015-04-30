@@ -426,13 +426,13 @@ public abstract class Neo4jProcessor {
 			return Optional.absent();
 		}
 
-		if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
+		if (NodeType.Resource == optionalResourceNodeType.get() || NodeType.TypeResource == optionalResourceNodeType.get()) {
 
 			// resource node
 
 			final Optional<Long> optionalNodeId;
 
-			if (!NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
+			if (NodeType.TypeResource != optionalResourceNodeType.get()) {
 
 				if (!optionalDataModelURI.isPresent()) {
 
@@ -449,7 +449,7 @@ public abstract class Neo4jProcessor {
 			return optionalNodeId;
 		}
 
-		if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
+		if (NodeType.Literal == optionalResourceNodeType.get()) {
 
 			// literal node - should never be the case
 
@@ -488,7 +488,7 @@ public abstract class Neo4jProcessor {
 		final Optional<String> optionalResourceUri;
 
 		if (optionalSubjectNodeType.isPresent()
-				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
+				&& (NodeType.Resource == optionalSubjectNodeType.get() || NodeType.TypeResource == optionalSubjectNodeType.get())) {
 
 			optionalResourceUri = optionalSubjectURI;
 		} else if (optionalResourceURI.isPresent()) {
@@ -590,8 +590,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String simpleHashString = optionalSubjectNodeType.get().toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
-				+ optionalObjectNodeType.get().toString() + ":" + optionalObjectIdentifier.get();
+		final String simpleHashString = optionalSubjectNodeType.get() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.get() + ":" + optionalObjectIdentifier.get();
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
@@ -627,7 +627,7 @@ public abstract class Neo4jProcessor {
 			case BNode:
 			case TypeBNode:
 
-				identifier = "" + nodeId;
+				identifier = String.valueOf(nodeId);
 
 				break;
 			case Literal:
@@ -705,14 +705,9 @@ public abstract class Neo4jProcessor {
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
 	}
 
-	private Object getProperty(final String key, final Map<String, Object> properties) {
+	private static Object getProperty(final String key, final Map<String, Object> properties) {
 
-		if (properties == null || properties.isEmpty()) {
-
-			return null;
-		}
-
-		if (!properties.containsKey(key)) {
+		if (properties == null) {
 
 			return null;
 		}
@@ -765,8 +760,8 @@ public abstract class Neo4jProcessor {
 		return Optional.absent();
 	}
 
-	private boolean checkLongIndex(final long key, final Set<Long> index) {
+	private static boolean checkLongIndex(final long key, final Set<Long> index) {
 
-		return index != null && index.contains(key);
+		return index.contains(key);
 	}
 }

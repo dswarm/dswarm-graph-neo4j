@@ -68,18 +68,18 @@ public abstract class Neo4jProcessor {
 	protected final Map<String, Node>    bnodes;
 
 	// protected Index<Relationship> statementHashes;
-	final private Set<Long> statementHashes;
-	final private DB        statementHashesDB;
+	private final Set<Long> statementHashes;
+	private final DB        statementHashesDB;
 
-	final private Set<Long> tempStatementHashes;
-	final private DB        tempStatementHashesDB;
+	private final Set<Long> tempStatementHashes;
+	private final DB        tempStatementHashesDB;
 
 	protected final LongObjectMap<String> nodeResourceMap;
 
 	// TODO: go offheap, if maps get to big
-	final private Map<String, Node> tempResourcesIndex;
-	final private Map<String, Node> tempResourcesWDataModelIndex;
-	final private Map<String, Node> tempResourceTypesIndex;
+	private final Map<String, Node> tempResourcesIndex;
+	private final Map<String, Node> tempResourcesWDataModelIndex;
+	private final Map<String, Node> tempResourceTypesIndex;
 
 	protected Transaction tx;
 
@@ -133,10 +133,7 @@ public abstract class Neo4jProcessor {
 			tempResourcesWDataModelIndex.clear();
 			tempResourceTypesIndex.clear();
 
-			if (tempStatementHashes != null) {
-
-				tempStatementHashes.clear();
-			}
+			tempStatementHashes.clear();
 		} catch (final Exception e) {
 
 			failTx();
@@ -173,10 +170,7 @@ public abstract class Neo4jProcessor {
 	public void removeHashFromStatementIndex(final long hash) {
 
 		// TODO: maybe cache removals and remove them in one rush
-		if(statementHashes.contains(hash)) {
-
-			statementHashes.remove(hash);
-		}
+		statementHashes.remove(hash);
 	}
 
 	public void addStatementToIndex(final Relationship rel, final String statementUUID) {
@@ -272,13 +266,13 @@ public abstract class Neo4jProcessor {
 			return Optional.absent();
 		}
 
-		if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
+		if (NodeType.Resource == optionalResourceNodeType.get() || NodeType.TypeResource == optionalResourceNodeType.get()) {
 
 			// resource node
 
 			final Optional<Node> optionalNode;
 
-			if (!NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
+			if (NodeType.TypeResource != optionalResourceNodeType.get()) {
 
 				if (!optionalDataModelURI.isPresent()) {
 
@@ -295,7 +289,7 @@ public abstract class Neo4jProcessor {
 			return optionalNode;
 		}
 
-		if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
+		if (NodeType.Literal == optionalResourceNodeType.get()) {
 
 			// literal node - should never be the case
 
@@ -338,7 +332,7 @@ public abstract class Neo4jProcessor {
 		final Optional<String> optionalResourceUri;
 
 		if (optionalSubjectNodeType.isPresent()
-				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
+				&& (NodeType.Resource == optionalSubjectNodeType.get() || NodeType.TypeResource == optionalSubjectNodeType.get())) {
 
 			optionalResourceUri = optionalSubjectURI;
 		} else if (optionalResourceURI.isPresent()) {
@@ -378,8 +372,7 @@ public abstract class Neo4jProcessor {
 
 	public boolean checkStatementExists(final long hash) throws DMPGraphException {
 
-		return !(statementHashes == null && tempStatementHashes == null) && (tempStatementHashes != null && tempStatementHashes.contains(hash)
-				|| statementHashes != null && statementHashes.contains(hash));
+		return tempStatementHashes.contains(hash) || statementHashes.contains(hash);
 
 	}
 
@@ -460,8 +453,8 @@ public abstract class Neo4jProcessor {
 			throw new DMPGraphException(message);
 		}
 
-		final String simpleHashString = optionalSubjectNodeType.get().toString() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
-				+ optionalObjectNodeType.get().toString() + ":" + optionalObjectIdentifier.get();
+		final String simpleHashString = optionalSubjectNodeType.get() + ":" + optionalSubjectIdentifier.get() + " " + predicateName + " "
+				+ optionalObjectNodeType.get() + ":" + optionalObjectIdentifier.get();
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
@@ -497,7 +490,7 @@ public abstract class Neo4jProcessor {
 			case BNode:
 			case TypeBNode:
 
-				identifier = "" + node.getId();
+				identifier = String.valueOf(node.getId());
 
 				break;
 			case Literal:
@@ -547,18 +540,15 @@ public abstract class Neo4jProcessor {
 
 		final IndexHits<Relationship> hits = statementUUIDs.get(GraphStatics.UUID, uuid);
 
-		if (hits != null && hits.hasNext()) {
-
-			final Relationship rel = hits.next();
-
-			hits.close();
-
-			return Optional.of(rel);
-		}
-
 		if (hits != null) {
 
-			hits.close();
+			try {
+
+				return Optional.fromNullable(hits.getSingle());
+			} finally {
+
+				hits.close();
+			}
 		}
 
 		return Optional.absent();

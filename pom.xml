@@ -363,11 +363,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.openhft</groupId>
-			<artifactId>chronicle-map</artifactId>
-			<version>${chronicle-map.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mapdb</groupId>
 			<artifactId>mapdb</artifactId>
 			<version>${mapdb.version}</version>

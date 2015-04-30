@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -43,19 +44,19 @@ import org.dswarm.graph.model.GraphStatics;
  */
 public class GDMChangesetParser implements GDMUpdateParser {
 
-	private static final Logger				LOG						= LoggerFactory.getLogger(GDMChangesetParser.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMChangesetParser.class);
 
-	private GDMUpdateHandler				gdmHandler;
-	private final Changeset					changeset;
-	private final String               existingResourceURI;
+	private       GDMUpdateHandler     gdmHandler;
+	private final Changeset            changeset;
+	private final long                 existingResourceHash;
 	private final GraphDatabaseService existingResourceDB;
 	private final GraphDatabaseService newResourceDB;
 
-	public GDMChangesetParser(final Changeset changesetArg, final String existingResourceURIArg, final GraphDatabaseService existingResourceDBArg,
+	public GDMChangesetParser(final Changeset changesetArg, final long existingResourceHashArg, final GraphDatabaseService existingResourceDBArg,
 			final GraphDatabaseService newResourceDBArg) {
 
 		changeset = changesetArg;
-		existingResourceURI = existingResourceURIArg;
+		existingResourceHash = existingResourceHashArg;
 		existingResourceDB = existingResourceDBArg;
 		newResourceDB = newResourceDBArg;
 	}
@@ -108,7 +109,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 				final Long indexFromDB;
 
-				if(existingRelationship != null) {
+				if (existingRelationship != null) {
 
 					indexFromDB = (Long) existingRelationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
 				} else if (newRelationship != null) {
@@ -138,12 +139,12 @@ public class GDMChangesetParser implements GDMUpdateParser {
 				final DeltaState finalDeltaState;
 				boolean increaseExistingRelationship = true;
 
-				if(existingRelDeltaState == null || DeltaState.ExactMatch.equals(existingRelDeltaState)) {
+				if (existingRelDeltaState == null || DeltaState.ExactMatch.equals(existingRelDeltaState)) {
 
 					newRelationship = getNewRel(newRelationshipsIter, alreadyAddedStatementUUIDs, alreadyDeletedStatementUUIDs,
 							alreadyModifiedNewStatementUUIDs);
 
-					if(newRelationship == null) {
+					if (newRelationship == null) {
 
 						break;
 					}
@@ -152,9 +153,10 @@ public class GDMChangesetParser implements GDMUpdateParser {
 				} else {
 
 					finalDeltaState = existingRelDeltaState;
-					final boolean stmtAlreadyProcessed = checkStmt(existingRelationship, finalDeltaState, alreadyAddedStatementUUIDs, alreadyDeletedStatementUUIDs, alreadyModifiedExistingStatementUUIDs);
+					final boolean stmtAlreadyProcessed = checkStmt(existingRelationship, finalDeltaState, alreadyAddedStatementUUIDs,
+							alreadyDeletedStatementUUIDs, alreadyModifiedExistingStatementUUIDs);
 
-					if(stmtAlreadyProcessed) {
+					if (stmtAlreadyProcessed) {
 
 						// skip already processed existing stmt
 
@@ -173,11 +175,25 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 						// retrieve start node via subject identifier (?) - start node must be a resource node (i.e., we could probably verify this requirement)
 						// retrieve the resource identifier from the existing resource and replace the subject of the to-be-added statement
-						if(ResourceNode.class.isInstance(addedStatement.getSubject())) {
+						if (ResourceNode.class.isInstance(addedStatement.getSubject())) {
 
-							final String subjectURI = ((ResourceNode) addedStatement.getSubject()).getUri();
+							final ResourceNode subject = (ResourceNode) addedStatement.getSubject();
+							final String subjectURI = subject.getUri();
+							final String prefixedSubjectURI = gdmHandler.getHandler().getProcessor().createPrefixedURI(subjectURI);
+							final Optional<String> optionalDataModelURI;
 
-							if(!existingResourceURI.equals(subjectURI)) {
+							if (subject.getDataModel() != null) {
+
+								optionalDataModelURI = Optional
+										.fromNullable(gdmHandler.getHandler().getProcessor().createPrefixedURI(subject.getDataModel()));
+							} else {
+
+								optionalDataModelURI = Optional.absent();
+							}
+
+							final long subjectHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedSubjectURI, optionalDataModelURI);
+
+							if (existingResourceHash != subjectHash) {
 
 								// TODO: do something, e.g., replace subject of the to-be-added statement;
 
@@ -187,7 +203,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 						final String addedStmtUUID = addedStatement.getUUID();
 
-						gdmHandler.handleStatement(addedStatement, existingResourceURI, 0, index);
+						gdmHandler.handleStatement(addedStatement, existingResourceHash, index);
 						alreadyAddedStatementUUIDs.add(addedStmtUUID);
 
 						// simply increase the index?
@@ -215,7 +231,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						final Statement finalModifiedStatement;
 						final String existingModifiedStmtUUID;
 
-						if(modifiedStatement != null) {
+						if (modifiedStatement != null) {
 
 							finalModifiedStatement = modifiedStatement;
 							existingModifiedStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
@@ -227,30 +243,30 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 							Long existingModifiedNodeId = null;
 
-							for(final Map.Entry<Long, Long> modificationsEntry : changeset.getModifications().entrySet()) {
+							for (final Map.Entry<Long, Long> modificationsEntry : changeset.getModifications().entrySet()) {
 
-								if(modificationsEntry.getValue().equals(newModifiedNodeId)) {
+								if (modificationsEntry.getValue().equals(newModifiedNodeId)) {
 
 									existingModifiedNodeId = modificationsEntry.getKey();
 
 									break;
 								}
 							}
-							
-							if(existingModifiedNodeId == null) {
-								
+
+							if (existingModifiedNodeId == null) {
+
 								// TODO: do something, e.g., throw an exception
-								
+
 								break;
 							}
-							
+
 							final Statement existingModifiedStatement = changeset.getExistingModifiedStatements().get(existingModifiedNodeId);
 							existingModifiedStmtUUID = existingModifiedStatement.getUUID();
 
 							increaseExistingRelationship = false;
 						}
 
-						if(finalModifiedStatement == null) {
+						if (finalModifiedStatement == null) {
 
 							// TODO: do something, e.g., throw an exception
 
@@ -264,7 +280,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						// take subject from existing resource to append the statement on the correct position
 						finalModifiedStatement.setSubject(subject);
 
-						gdmHandler.handleStatement(finalModifiedStatement, existingResourceURI, 0, index);
+						gdmHandler.handleStatement(finalModifiedStatement, existingResourceHash, index);
 						alreadyModifiedNewStatementUUIDs.add(finalModifiedStatement.getUUID());
 
 						index++;
@@ -274,7 +290,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 				if (!finalDeltaState.equals(DeltaState.ExactMatch)) {
 
-					if(increaseExistingRelationship) {
+					if (increaseExistingRelationship) {
 
 						existingRelationship = increaseRelationship(existingRelationshipsIter);
 					}
@@ -282,7 +298,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 					continue;
 				}
 
-				if(newRelationship == null) {
+				if (newRelationship == null) {
 
 					newRelationship = increaseRelationship(newRelationshipsIter);
 				}
@@ -300,7 +316,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 					final long finalNewStmtOrder;
 
-					if(newStmtOrder != null) {
+					if (newStmtOrder != null) {
 
 						finalNewStmtOrder = newStmtOrder;
 					} else {
@@ -310,7 +326,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 					gdmHandler.deprecateStatement(existingStmtUUID);
 
-					gdmHandler.handleStatement(existingStmtUUID, existingResourceURI, index, finalNewStmtOrder);
+					gdmHandler.handleStatement(existingStmtUUID, existingResourceHash, index, finalNewStmtOrder);
 				}
 
 				index++;

@@ -25,7 +25,5 @@ import org.dswarm.graph.parse.Handler;
  */
 public interface GDMHandler extends Handler {
 
-	// TODO: refactor this to resource hash only, i.e., reomve resource uri parameter
-	public void handleStatement(final Statement st, final String resourceURI, final long resourceHash, final long index) throws DMPGraphException;
-
+	void handleStatement(final Statement st, final long resourceHash, final long index) throws DMPGraphException;
 }

@@ -28,7 +28,7 @@ public interface GDMUpdateParser {
 	/**
 	 * Sets the GDMUpdateHandler that will handle the parsed GDM data.
 	 */
-	public void setGDMHandler(GDMUpdateHandler handler);
+	void setGDMHandler(GDMUpdateHandler handler);
 
-	public void parse() throws DMPGraphException;
+	void parse() throws DMPGraphException;
 }

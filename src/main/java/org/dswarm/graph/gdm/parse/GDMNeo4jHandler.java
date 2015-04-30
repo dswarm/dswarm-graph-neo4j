@@ -62,7 +62,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final String resourceURI, final long resourceHash, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final long resourceHash, final long index) throws DMPGraphException {
 
 		final StatementBuilder sb = new StatementBuilder();
 
@@ -98,13 +98,13 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	 * TODO: refactor this to BaseNeo4jHandler
 	 *
 	 * @param stmtUUID
-	 * @param resourceURI
+	 * @param resourceHash
 	 * @param index
 	 * @param order
 	 * @throws DMPGraphException
 	 */
 	@Override
-	public void handleStatement(final String stmtUUID, final String resourceURI, final long index, final long order) throws DMPGraphException {
+	public void handleStatement(final String stmtUUID, final long resourceHash, final long index, final long order) throws DMPGraphException {
 
 		((TransactionalNeo4jProcessor) handler.getProcessor()).ensureRunningTx();
 
@@ -153,11 +153,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 				optionalSubjectHash = Optional.absent();
 			}
 
-			// TODO: move this to somewhere else (?)
-			final long resourceUriDataModelUriHash = processor.getProcessor().generateResourceHash(
-					processor.getProcessor().createPrefixedURI(resourceURI), Optional.<String>absent());
-
-			final Optional<Long> optionalResourceHash = processor.determineResourceHash(stmt.getSubject(), resourceUriDataModelUriHash);
+			final Optional<Long> optionalResourceHash = processor.determineResourceHash(stmt.getSubject(), resourceHash);
 			final Map<String, Object> qualifiedAttributes = processor.getQualifiedAttributes(stmt);
 			qualifiedAttributes.put(GraphStatics.INDEX_PROPERTY, index);
 			qualifiedAttributes.put(GraphStatics.ORDER_PROPERTY, order);

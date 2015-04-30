@@ -216,14 +216,13 @@ public class GDMResource {
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
 				// = new resources model, since existing, modified resources were already written to the DB
-				final Tuple<Observable<Resource>, Observable<String>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
+				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
 						database,
 						handler);
 
 				final Observable<Resource> deltaModel = result.v1();
 
 				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
-
 
 				if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
 
@@ -236,7 +235,7 @@ public class GDMResource {
 
 					// deprecate missing records in DB
 
-					final Observable<String> processedResources = result.v2();
+					final Observable<Long> processedResources = result.v2();
 
 					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
 							((Neo4jUpdateHandler) handler.getHandler())
@@ -609,13 +608,13 @@ public class GDMResource {
 		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
-	private Tuple<Observable<Resource>, Observable<String>> calculateDeltaForDataModel(final Observable<Resource> model,
+	private Tuple<Observable<Resource>, Observable<Long>> calculateDeltaForDataModel(final Observable<Resource> model,
 			final Optional<ContentSchema> optionalContentSchema,
 			final String dataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
-		final Set<String> processedResources = new HashSet<>();
+		final Set<Long> processedResources = new HashSet<>();
 
 		// calculate delta resource-wise
 		final Observable<Resource> newResources = model.flatMap(new Func1<Resource, Observable<Resource>>() {
@@ -662,7 +661,11 @@ public class GDMResource {
 						return Observable.just(newResource);
 					}
 
-					processedResources.add(existingResource.getUri());
+					final String existingResourceURI = existingResource.getUri();
+					final String prefixedExistingResourceURI = handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
+					final long existingResourceHash = handler.getHandler().getProcessor().generateResourceHash(prefixedExistingResourceURI,
+							Optional.<String>absent());
+					processedResources.add(existingResourceHash);
 
 					// final Model newResourceModel = new Model();
 					// newResourceModel.addResource(resource);
@@ -684,7 +687,7 @@ public class GDMResource {
 					}
 
 					// write modified resources resource-wise - instead of the whole model at once.
-					final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResource.getUri(), existingResourceDB,
+					final GDMUpdateParser parser = new GDMChangesetParser(changeset, existingResourceHash, existingResourceDB,
 							newResourceDB);
 					parser.setGDMHandler(handler);
 					parser.parse();
@@ -711,7 +714,7 @@ public class GDMResource {
 		Iterables.addAll(newResourcesList, newResourcesIterable);
 		final Observable<Resource> completedNewResources = Observable.from(newResourcesList);
 
-		final Observable<String> processedResourcesObservable = Observable.from(processedResources);
+		final Observable<Long> processedResourcesObservable = Observable.from(processedResources);
 
 		// return only model with new, non-existing resources
 		return Tuple.tuple(completedNewResources, processedResourcesObservable);
@@ -1005,13 +1008,13 @@ public class GDMResource {
 		GDMResource.LOG.debug("finished shutting down working graph data model DB for resource");
 	}
 
-	private Observable<Void> deprecateMissingRecords(final Observable<String> processedResources, final String recordClassUri,
+	private Observable<Void> deprecateMissingRecords(final Observable<Long> processedResources, final String recordClassUri,
 			final String dataModelUri,
 			final int latestVersion, final GDMNeo4jProcessor processor) throws DMPGraphException {
 
-		return processedResources.toList().map(new Func1<List<String>, Void>() {
+		return processedResources.toList().map(new Func1<List<Long>, Void>() {
 
-			@Override public Void call(final List<String> processedResourcesSet) {
+			@Override public Void call(final List<Long> processedResourcesSet) {
 
 				// determine all record URIs of the data model
 				// how? - via record class?
@@ -1038,20 +1041,20 @@ public class GDMResource {
 
 						final Node recordNode = recordNodes.next();
 
-						final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+						final Long resourceHash = (Long) recordNode.getProperty(GraphStatics.HASH, null);
 
-						if (resourceUri == null) {
+						if (resourceHash == null) {
 
-							LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
+							LOG.debug("there is no resource hash at record node '{}'", recordNode.getId());
 
 							continue;
 						}
 
-						if (!processedResourcesSet.contains(resourceUri)) {
+						if (!processedResourcesSet.contains(resourceHash)) {
 
 							notProcessedResources.add(recordNode);
 
-							// TODO: do also need to deprecate the record nodes themselves?
+							// TODO: do we also need to deprecate the record nodes themselves?
 						}
 					}
 

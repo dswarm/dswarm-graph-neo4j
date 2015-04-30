@@ -18,18 +18,21 @@ package org.dswarm.graph.batch;
 
 import java.util.Map;
 
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
  */
-public class SimpleNeo4jProcessor extends Neo4jProcessor {
+public class SimpleNeo4jProcessor extends BatchNeo4jProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
@@ -70,6 +73,13 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	public Optional<Long> getResourceNodeHits(final String resourceURI) {
 
 		return getNodeIdFromResourcesIndex(resourceURI);
+	}
+
+	@Override public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
+
+		final String hashString = resourceURI;
+
+		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
 	}
 
 	@Override protected String putSaltToStatementHash(final String hash) {

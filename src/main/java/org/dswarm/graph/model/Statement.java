@@ -38,14 +38,14 @@ public final class Statement {
 	private final Optional<String>				optionalObjectId;
 	private final Optional<String>				optionalObjectDataModelURI;
 	private final Optional<String>				optionalStatementUUID;
-	private final Optional<String>				optionalResourceURI;
-	private final Optional<Map<String, Object>>	optionalQualifiedAttributes;
+	private final Optional<Long>              optionalResourceHash;
+	private final Optional<Map<String, Object>> optionalQualifiedAttributes;
 
 	public Statement(final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
 			final Optional<String> optionalSubjectId, final Optional<String> optionalSubjectDataModelURI,
 			final Optional<String> optionalPredicateURI, final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalObjectURI,
 			final Optional<String> optionalObjectValue, final Optional<String> optionalObjectId, final Optional<String> optionalObjectDataModelURI,
-			final Optional<String> optionalStatementUUID, final Optional<String> optionalResourceURI,
+			final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceHash,
 			final Optional<Map<String, Object>> optionalQualifiedAttributes) {
 
 		this.optionalSubjectNodeType = optionalSubjectNodeType;
@@ -59,7 +59,7 @@ public final class Statement {
 		this.optionalObjectId = optionalObjectId;
 		this.optionalObjectDataModelURI = optionalObjectDataModelURI;
 		this.optionalStatementUUID = optionalStatementUUID;
-		this.optionalResourceURI = optionalResourceURI;
+		this.optionalResourceHash = optionalResourceHash;
 		this.optionalQualifiedAttributes = optionalQualifiedAttributes;
 	}
 
@@ -107,8 +107,8 @@ public final class Statement {
 		return optionalStatementUUID;
 	}
 
-	public Optional<String> getOptionalResourceURI() {
-		return optionalResourceURI;
+	public Optional<Long> getOptionalResourceHash() {
+		return optionalResourceHash;
 	}
 
 	public Optional<Map<String, Object>> getOptionalQualifiedAttributes() {

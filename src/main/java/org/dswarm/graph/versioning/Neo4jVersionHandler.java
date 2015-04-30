@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.GraphStatics;
 
@@ -40,9 +40,9 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	private Range range;
 
-	protected final Neo4jProcessor processor;
+	protected final BasicNeo4jProcessor processor;
 
-	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public Neo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 	}
@@ -76,7 +76,8 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 			}
 
 			final String dataModelURI = optionalDataModelURI.get();
-			final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+			final long resourceUriDataModelUriHash = processor
+					.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
 
 			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(),
 					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI), Optional.of(resourceUriDataModelUriHash));

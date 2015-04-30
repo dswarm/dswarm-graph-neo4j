@@ -17,14 +17,14 @@
 package org.dswarm.graph.versioning;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 
 /**
  * @author tgaengler
  */
 public class SimpleNeo4jVersionHandler extends Neo4jVersionHandler {
 
-	public SimpleNeo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public SimpleNeo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
 
 		super(processorArg);
 	}

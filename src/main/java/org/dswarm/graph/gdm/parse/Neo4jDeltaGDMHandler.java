@@ -109,7 +109,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final String resourceURI, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final String resourceURI, final long resourceHash, final long index) throws DMPGraphException {
 
 		// utilise r for the resource property
 

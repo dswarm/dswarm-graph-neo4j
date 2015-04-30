@@ -18,8 +18,6 @@ package org.dswarm.graph;
 
 import java.util.Map;
 
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -35,7 +33,7 @@ import org.dswarm.graph.versioning.VersioningStatics;
 /**
  * @author tgaengler
  */
-public class DataModelNeo4jProcessor extends Neo4jProcessor {
+public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 

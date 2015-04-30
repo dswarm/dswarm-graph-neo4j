@@ -14,30 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.dswarm.graph.parse;
+package org.dswarm.graph;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.BasicNeo4jProcessor;
-import org.dswarm.graph.versioning.DataModelNeo4jVersionHandler;
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.Relationship;
 
 /**
  * @author tgaengler
  */
-public class DataModelNeo4jHandler extends BaseNeo4jHandler {
+public interface TransactionalNeo4jProcessor extends Neo4jProcessor {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jHandler.class);
+	void ensureRunningTx() throws DMPGraphException;
 
-	public DataModelNeo4jHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	void failTx();
 
-		super(processorArg);
-	}
+	void succeedTx();
 
-	@Override
-	protected void init() throws DMPGraphException {
-
-		versionHandler = new DataModelNeo4jVersionHandler(processor);
-	}
+	// TODO: statement uuid is now hashed, i.e., it's a long value
+	Optional<Relationship> getRelationshipFromStatementIndex(final String stmtUUID);
 }

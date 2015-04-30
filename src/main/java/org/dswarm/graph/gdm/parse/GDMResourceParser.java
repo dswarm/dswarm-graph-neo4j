@@ -67,7 +67,7 @@ public class GDMResourceParser implements GDMParser {
 
 			// note: just increasing the counter probably won't work at an update ;)
 
-			gdmHandler.handleStatement(statement, resource.getUri(), i);
+			gdmHandler.handleStatement(statement, resource.getUri(), 0, i);
 		}
 
 		((Neo4jDeltaGDMHandler) gdmHandler).closeTransaction();

@@ -187,7 +187,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 						final String addedStmtUUID = addedStatement.getUUID();
 
-						gdmHandler.handleStatement(addedStatement, existingResourceURI, index);
+						gdmHandler.handleStatement(addedStatement, existingResourceURI, 0, index);
 						alreadyAddedStatementUUIDs.add(addedStmtUUID);
 
 						// simply increase the index?
@@ -264,7 +264,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						// take subject from existing resource to append the statement on the correct position
 						finalModifiedStatement.setSubject(subject);
 
-						gdmHandler.handleStatement(finalModifiedStatement, existingResourceURI, index);
+						gdmHandler.handleStatement(finalModifiedStatement, existingResourceURI, 0, index);
 						alreadyModifiedNewStatementUUIDs.add(finalModifiedStatement.getUUID());
 
 						index++;

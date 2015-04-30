@@ -24,12 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
  */
-public class DataModelNeo4jProcessor extends Neo4jProcessor {
+public class DataModelNeo4jProcessor extends BatchNeo4jProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
@@ -90,6 +91,15 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		return getNodeIdFromResourcesWDataModelIndex(resourceURI + dataModelURI);
 	}
 
+	@Override public long generateResourceHash(final String resourceURI, final Optional<String> optionalDataModelURI) {
+
+		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+
+		final String hashString = resourceURI + finalDataModelURI;
+
+		return HashUtils.generateHash(hashString);
+	}
+
 	@Override protected String putSaltToStatementHash(final String hash) {
 
 		return hash + " " + this.dataModelURI;
@@ -103,5 +113,15 @@ public class DataModelNeo4jProcessor extends Neo4jProcessor {
 		relProperties.put(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 
 		return relProperties;
+	}
+
+	private String getDataModelURI(final Optional<String> optionalDataModelURI) {
+
+		if(optionalDataModelURI.isPresent()) {
+
+			return optionalDataModelURI.get();
+		}
+
+		return dataModelURI;
 	}
 }

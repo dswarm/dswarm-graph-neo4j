@@ -59,7 +59,7 @@ import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.delta.DeltaState;
@@ -152,7 +152,7 @@ public final class GraphDBUtil {
 
 		final long resourceUriDataModelUriHash = HashUtils.generateHash(resourceURI + dataModelURI);
 
-		return graphDB.findNode(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
+		return graphDB.findNode(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
 
 	static String getLabels(final Node node) {

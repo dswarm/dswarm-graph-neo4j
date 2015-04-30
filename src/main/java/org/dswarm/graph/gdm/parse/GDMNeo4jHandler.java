@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.TransactionalNeo4jProcessor;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
@@ -61,7 +62,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final String resourceURI, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final String resourceURI, final long resourceHash, final long index) throws DMPGraphException {
 
 		final StatementBuilder sb = new StatementBuilder();
 
@@ -82,8 +83,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		final Optional<String> optionalStatementUUID = Optional.fromNullable(st.getUUID());
 		sb.setOptionalStatementUUID(optionalStatementUUID);
 
-		final Optional<String> optionalResourceUri = processor.determineResourceUri(subject, resourceURI);
-		sb.setOptionalResourceURI(optionalResourceUri);
+		sb.setOptionalResourceHash(Optional.of(resourceHash));
 
 		final Map<String, Object> qualifiedAttributes = processor.getQualifiedAttributes(st);
 		qualifiedAttributes.put(GraphStatics.INDEX_PROPERTY, index);
@@ -106,11 +106,12 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	@Override
 	public void handleStatement(final String stmtUUID, final String resourceURI, final long index, final long order) throws DMPGraphException {
 
-		handler.getProcessor().ensureRunningTx();
+		((TransactionalNeo4jProcessor) handler.getProcessor()).ensureRunningTx();
 
 		try {
 
-			final Optional<Relationship> optionalRel = handler.getProcessor().getRelationshipFromStatementIndex(stmtUUID);
+			final Optional<Relationship> optionalRel = ((TransactionalNeo4jProcessor) handler.getProcessor()).getRelationshipFromStatementIndex(
+					stmtUUID);
 
 			if(!optionalRel.isPresent()) {
 
@@ -136,24 +137,34 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			// be update with the new stmt (?)
 			final long hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
 			final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(stmt.getSubject()));
-			final Optional<String> optionalSubjectURI;
+			final Optional<Long> optionalSubjectHash;
 
 			if (stmt.getSubject().getType().equals(org.dswarm.graph.json.NodeType.Resource)) {
 
-				optionalSubjectURI = Optional.fromNullable(((ResourceNode) stmt.getSubject()).getUri());
+				final ResourceNode subjectNode = (ResourceNode) stmt.getSubject();
+				final String subjectURI = processor.getProcessor().createPrefixedURI(subjectNode.getUri());
+				final String dataModelURI = processor.getProcessor().createPrefixedURI(subjectNode.getDataModel());
+
+				final long resourceUriDataModelUriHash = processor.getProcessor().generateResourceHash(subjectURI, Optional.fromNullable(dataModelURI));
+
+				optionalSubjectHash = Optional.of(resourceUriDataModelUriHash);
 			} else {
 
-				optionalSubjectURI = Optional.absent();
+				optionalSubjectHash = Optional.absent();
 			}
 
-			final Optional<String> optionalResourceUri = processor.determineResourceUri(stmt.getSubject(), resourceURI);
+			// TODO: move this to somewhere else (?)
+			final long resourceUriDataModelUriHash = processor.getProcessor().generateResourceHash(
+					processor.getProcessor().createPrefixedURI(resourceURI), Optional.<String>absent());
+
+			final Optional<Long> optionalResourceHash = processor.determineResourceHash(stmt.getSubject(), resourceUriDataModelUriHash);
 			final Map<String, Object> qualifiedAttributes = processor.getQualifiedAttributes(stmt);
 			qualifiedAttributes.put(GraphStatics.INDEX_PROPERTY, index);
 			qualifiedAttributes.put(GraphStatics.ORDER_PROPERTY, order);
 			final Optional<Map<String, Object>> optionalQualifiedAttributes = Optional.of(qualifiedAttributes);
 
-			handler.addRelationship(subject, predicate, object, optionalSubjectNodeType, optionalSubjectURI, Optional.<String> absent(),
-					optionalResourceUri, optionalQualifiedAttributes, hash);
+			handler.addRelationship(subject, predicate, object, optionalSubjectNodeType, optionalSubjectHash, Optional.<String> absent(),
+					optionalResourceHash, optionalQualifiedAttributes, hash);
 		} catch (final DMPGraphException e) {
 
 			throw e;
@@ -161,7 +172,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 			final String message = "couldn't handle statement successfully";
 
-			handler.getProcessor().failTx();
+			((TransactionalNeo4jProcessor) handler.getProcessor()).failTx();
 
 			GDMNeo4jHandler.LOG.error(message, e);
 			GDMNeo4jHandler.LOG.debug("couldn't finish write TX successfully");
@@ -173,7 +184,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	@Override
 	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
 
-		handler.getProcessor().ensureRunningTx();
+		((TransactionalNeo4jProcessor) handler.getProcessor()).ensureRunningTx();
 
 		try {
 
@@ -193,7 +204,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 			final String message = "couldn't deprecate statement successfully";
 
-			handler.getProcessor().failTx();
+			((TransactionalNeo4jProcessor) handler.getProcessor()).failTx();
 
 			GDMNeo4jHandler.LOG.error(message, e);
 			GDMNeo4jHandler.LOG.debug("couldn't finish write TX successfully");

@@ -18,7 +18,7 @@ package org.dswarm.graph.batch.rdf.pnx;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.batch.Neo4jProcessor;
+import org.dswarm.graph.batch.BatchNeo4jProcessor;
 import org.dswarm.graph.pnx.utils.NodeTypeUtils;
 import org.dswarm.graph.model.StatementBuilder;
 import org.slf4j.Logger;
@@ -35,14 +35,14 @@ public abstract class RDFNeo4jProcessor {
 
 	private static final Logger		LOG	= LoggerFactory.getLogger(RDFNeo4jProcessor.class);
 
-	protected final Neo4jProcessor	processor;
+	protected final BatchNeo4jProcessor processor;
 
-	public RDFNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public RDFNeo4jProcessor(final BatchNeo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 	}
 
-	public Neo4jProcessor getProcessor() {
+	public BatchNeo4jProcessor getProcessor() {
 
 		return processor;
 	}

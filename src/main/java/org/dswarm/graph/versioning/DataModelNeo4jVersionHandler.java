@@ -18,7 +18,7 @@ package org.dswarm.graph.versioning;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jVersionHandler.class);
 
-	public DataModelNeo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelNeo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
 
 		super(processorArg);
 

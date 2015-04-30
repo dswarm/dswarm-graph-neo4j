@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.model.GraphStatics;
@@ -138,10 +138,10 @@ public class MaintainResource {
 	@Path("/schemaindices")
 	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
 
-		getOrCreateIndex(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateIndex(Neo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, database);
-		getOrCreateIndex(Neo4jProcessor.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateIndex(Neo4jProcessor.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
+		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, database);
+		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateIndex(BasicNeo4jProcessor.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
 
 		return Response.ok().build();
 	}

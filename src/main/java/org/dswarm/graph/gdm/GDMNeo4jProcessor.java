@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
 import org.dswarm.graph.json.LiteralNode;
@@ -39,21 +39,22 @@ import org.dswarm.graph.model.StatementBuilder;
  */
 public abstract class GDMNeo4jProcessor {
 
-	private static final Logger		LOG	= LoggerFactory.getLogger(GDMNeo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMNeo4jProcessor.class);
 
-	protected final Neo4jProcessor	processor;
+	protected final BasicNeo4jProcessor processor;
 
-	public GDMNeo4jProcessor(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public GDMNeo4jProcessor(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
 
 		processor = processorArg;
 	}
 
-	public Neo4jProcessor getProcessor() {
+	public BasicNeo4jProcessor getProcessor() {
 
 		return processor;
 	}
 
-	public StatementBuilder determineNode(final org.dswarm.graph.json.Node resource, final StatementBuilder statementBuilder, final boolean forSubject) {
+	public StatementBuilder determineNode(final org.dswarm.graph.json.Node resource, final StatementBuilder statementBuilder,
+			final boolean forSubject) {
 
 		final Optional<org.dswarm.graph.json.Node> optionalResource = Optional.fromNullable(resource);
 		final Optional<NodeType> optionalResourceNodeType = NodeTypeUtils.getNodeType(optionalResource);
@@ -123,24 +124,39 @@ public abstract class GDMNeo4jProcessor {
 		return statementBuilder;
 	}
 
-	public Optional<String> determineResourceUri(final org.dswarm.graph.json.Node subject, final String resourceURI) {
+	public Optional<Long> determineResourceHash(final org.dswarm.graph.json.Node subject, final long resourceHash) throws DMPGraphException {
 
 		final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(subject));
 
-		final Optional<String> optionalSubjectURI;
+		final Optional<Long> optionalSubjectHash;
 
 		if (optionalSubjectNodeType.isPresent()
 				&& (NodeType.Resource.equals(optionalSubjectNodeType.get()) || NodeType.TypeResource.equals(optionalSubjectNodeType.get()))) {
 
-			optionalSubjectURI = Optional.fromNullable(((ResourceNode) subject).getUri());
+			final ResourceNode subjectNode = (ResourceNode) subject;
+			final String subjectUri = processor.createPrefixedURI(subjectNode.getUri());
+
+			final Optional<String> optionalDataModelURI;
+
+			if(subjectNode.getDataModel() != null) {
+
+				final String dataModelUri = processor.createPrefixedURI(subjectNode.getDataModel());
+				optionalDataModelURI = Optional.of(dataModelUri);
+			} else {
+
+				optionalDataModelURI = Optional.absent();
+			}
+
+			final long subjectUriDataModelUriHash = processor.generateResourceHash(subjectUri, optionalDataModelURI);
+			optionalSubjectHash = Optional.fromNullable(subjectUriDataModelUriHash);
 		} else {
 
-			optionalSubjectURI = Optional.absent();
+			optionalSubjectHash = Optional.absent();
 		}
 
-		final Optional<String> optionalResourceURI= Optional.fromNullable(resourceURI);
+		final Optional<Long> optionalResourceHash = Optional.fromNullable(resourceHash);
 
-		return processor.determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
+		return processor.determineResourceHash(optionalSubjectNodeType, optionalSubjectHash, optionalResourceHash);
 	}
 
 	public long generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode,
@@ -187,8 +203,5 @@ public abstract class GDMNeo4jProcessor {
 		}
 
 		return qualifiedAttributes;
-
-		// return processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID,
-		// Optional.of(qualifiedAttributes), versionHandler);
 	}
 }

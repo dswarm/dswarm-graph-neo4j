@@ -30,7 +30,7 @@ import org.dswarm.graph.model.GraphStatics;
 /**
  * @author tgaengler
  */
-public class SimpleNeo4jProcessor extends Neo4jProcessor {
+public class SimpleNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 

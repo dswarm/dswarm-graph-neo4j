@@ -26,6 +26,16 @@ import org.neo4j.graphdb.Label;
  */
 public interface GraphProcessingStatics {
 
-	public static final String LEAF_IDENTIFIER = "__LEAF__";
-	public static final Label LEAF_LABEL = DynamicLabel.label(LEAF_IDENTIFIER);
+	String LEAF_IDENTIFIER = "__LEAF__";
+	Label LEAF_LABEL = DynamicLabel.label(LEAF_IDENTIFIER);
+
+	String PREFIX_PROPERTY = "prefix";
+	String PREFIX_IDENTIFIER = "PREFIX";
+	Label PREFIX_LABEL = DynamicLabel.label(PREFIX_IDENTIFIER);
+
+	Label RESOURCE_LABEL      = DynamicLabel.label(NodeType.Resource.toString());
+	Label RESOURCE_TYPE_LABEL = DynamicLabel.label(NodeType.TypeResource.toString());
+	Label LITERAL_LABEL       = DynamicLabel.label(NodeType.Literal.toString());
+	Label BNODE_LABEL       = DynamicLabel.label(NodeType.BNode.toString());
+	Label BNODE_TYPE_LABEL       = DynamicLabel.label(NodeType.TypeBNode.toString());
 }

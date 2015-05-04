@@ -19,7 +19,7 @@ package org.dswarm.graph.versioning.utils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
-import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.versioning.VersioningStatics;
@@ -42,7 +42,7 @@ public final class GraphVersionUtils {
 
 		final long resourceUriDataModelUriHash = HashUtils.generateHash(dataModelUri + VersioningStatics.VERSIONING_DATA_MODEL_URI);
 
-		final Node dataModelNode = database.findNode(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
+		final Node dataModelNode = database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 
 		if (dataModelNode != null) {
 

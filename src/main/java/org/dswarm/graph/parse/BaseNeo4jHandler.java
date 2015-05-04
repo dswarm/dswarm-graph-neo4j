@@ -295,7 +295,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 								break;
 							case TypeResource:
 
-								processor.addLabel(objectNode, processor.getRDFCLASSPrefixedURI());
+								processor.addLabel(objectNode, processor.getNamespaceIndex().getRDFCLASSPrefixedURI());
 								processor.addLabel(objectNode, NodeType.Resource.toString());
 
 								processor.addNodeToResourceTypesIndex(objectURI, objectNode);
@@ -468,7 +468,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					optionalSubjectHash, optionalResourceHash);
 		} else {
 
-			processor.addLabel(objectNode, processor.getRDFCLASSPrefixedURI());
+			processor.addLabel(objectNode, processor.getNamespaceIndex().getRDFCLASSPrefixedURI());
 			processor.addLabel(objectNode, NodeType.BNode.toString());
 			finalOptionalResourceHash = Optional.absent();
 		}

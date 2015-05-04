@@ -21,5 +21,5 @@ import org.dswarm.graph.json.Resource;
 
 public interface GDMResourceReader extends GDMReader {
 
-	public Resource read() throws DMPGraphException;
+	Resource read() throws DMPGraphException;
 }

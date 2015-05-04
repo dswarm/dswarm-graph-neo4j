@@ -16,7 +16,6 @@
  */
 package org.dswarm.graph.index;
 
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -27,12 +26,39 @@ import org.neo4j.graphdb.schema.IndexDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.model.GraphStatics;
+
 /**
  * @author tgaengler
  */
 public class SchemaIndexUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SchemaIndexUtils.class);
+
+	public static void createSchemaIndices(final GraphDatabaseService database) throws DMPGraphException {
+
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, database);
+	}
+
+	private static void getOrCreateSchemaIndex(final Label label, final String property, final GraphDatabaseService database) throws DMPGraphException {
+
+		final IndexDefinition indexDefinition = SchemaIndexUtils.getOrCreateIndex(label, property, database);
+
+		if (indexDefinition == null) {
+
+			throw new DMPGraphException(
+					String.format("something went wrong while index determination/creation for label '%s' and property '%s'", label.name(),
+							property));
+		}
+	}
+
 
 	public static IndexDefinition getOrCreateIndex(final Label label, final String property, final GraphDatabaseService database) {
 

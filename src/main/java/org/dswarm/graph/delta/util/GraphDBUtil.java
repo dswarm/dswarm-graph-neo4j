@@ -152,7 +152,7 @@ public final class GraphDBUtil {
 
 		final long resourceUriDataModelUriHash = HashUtils.generateHash(resourceURI + dataModelURI);
 
-		return graphDB.findNode(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
+		return graphDB.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
 
 	static String getLabels(final Node node) {

@@ -18,5 +18,5 @@ package org.dswarm.graph.gdm.read;
 
 public interface GDMReader {
 
-	public long countStatements();
+	long countStatements();
 }

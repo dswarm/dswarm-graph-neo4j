@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.model.GraphStatics;
@@ -138,24 +138,9 @@ public class MaintainResource {
 	@Path("/schemaindices")
 	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
 
-		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, database);
-		getOrCreateIndex(BasicNeo4jProcessor.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateIndex(BasicNeo4jProcessor.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
+		SchemaIndexUtils.createSchemaIndices(database);
 
 		return Response.ok().build();
-	}
-
-	private void getOrCreateIndex(final Label label, final String property, final GraphDatabaseService database) throws DMPGraphException {
-
-		final IndexDefinition indexDefinition = SchemaIndexUtils.getOrCreateIndex(label, property, database);
-
-		if (indexDefinition == null) {
-
-			throw new DMPGraphException(
-					String.format("something went wrong while index determination/creation for label '%s' and property '%s'", label.name(),
-							property));
-		}
 	}
 
 	private long deleteSomeStatements(final GraphDatabaseService database) throws DMPGraphException {

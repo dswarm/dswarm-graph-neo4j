@@ -17,7 +17,10 @@
 package org.dswarm.graph;
 
 import com.google.common.base.Optional;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+
+import org.dswarm.graph.index.NamespaceIndex;
 
 /**
  * @author tgaengler
@@ -32,4 +35,8 @@ public interface TransactionalNeo4jProcessor extends Neo4jProcessor {
 
 	// TODO: statement uuid is now hashed, i.e., it's a long value
 	Optional<Relationship> getRelationshipFromStatementIndex(final String stmtUUID);
+
+	GraphDatabaseService getDatabase();
+
+	NamespaceIndex getNamespaceIndex();
 }

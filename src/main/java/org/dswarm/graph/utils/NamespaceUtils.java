@@ -19,7 +19,15 @@ package org.dswarm.graph.utils;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+
+import org.dswarm.common.types.Tuple;
+import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -28,10 +36,35 @@ public class NamespaceUtils {
 
 	private static final AtomicInteger counter               = new AtomicInteger(0);
 	private static final String        NAMESPACE_PREFIX_BASE = "ns";
-	public static final char PREFIX_DELIMITER = ':';
+	public static final  char          PREFIX_DELIMITER      = ':';
+
+	public static String createPrefixedURI(final String fullURI, final Map<String, String> uriPrefixedURIMap,
+			final Map<String, String> tempNamespacePrefixes, final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database)
+			throws DMPGraphException {
+
+		if (fullURI == null) {
+
+			throw new DMPGraphException("full URI shouldn't be null");
+		}
+
+		if (uriPrefixedURIMap != null) {
+
+			if (!uriPrefixedURIMap.containsKey(fullURI)) {
+
+				final String prefixedURI = determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+
+				uriPrefixedURIMap.put(fullURI, prefixedURI);
+			}
+
+			return uriPrefixedURIMap.get(fullURI);
+		} else {
+
+			return determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+		}
+	}
 
 	public static String getPrefix(final String namespace, final Map<String, String> tempNamespacesPrefixesMap,
-			final Map<String, String> inMemoryNamespacesPrefixesMap, final Map<String, String> permanentNamespacesPrefixesMap)
+			final Map<String, String> inMemoryNamespacesPrefixesMap, final GraphDatabaseService database)
 			throws DMPGraphException {
 
 		if (namespace == null || namespace.trim().isEmpty()) {
@@ -39,29 +72,51 @@ public class NamespaceUtils {
 			throw new DMPGraphException("namespace shouldn't be null or empty");
 		}
 
-		if (tempNamespacesPrefixesMap.containsKey(namespace)) {
+		if (tempNamespacesPrefixesMap != null && tempNamespacesPrefixesMap.containsKey(namespace)) {
 
 			return tempNamespacesPrefixesMap.get(namespace);
 		}
 
-		if (inMemoryNamespacesPrefixesMap.containsKey(namespace)) {
+		if (inMemoryNamespacesPrefixesMap != null && inMemoryNamespacesPrefixesMap.containsKey(namespace)) {
 
 			return inMemoryNamespacesPrefixesMap.get(namespace);
 		}
 
-		if (permanentNamespacesPrefixesMap.containsKey(namespace)) {
+		final Optional<Node> optionalNode = Optional
+				.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
 
-			final String prefix = permanentNamespacesPrefixesMap.get(namespace);
+		if (optionalNode.isPresent()) {
 
-			// cache in-memory
-			inMemoryNamespacesPrefixesMap.put(namespace, prefix);
+			final String prefix = (String) optionalNode.get().getProperty(GraphProcessingStatics.PREFIX_PROPERTY);
+
+			if (inMemoryNamespacesPrefixesMap != null) {
+
+				// cache in-memory
+				inMemoryNamespacesPrefixesMap.put(namespace, prefix);
+			}
 
 			return prefix;
 		}
 
 		final String prefix = NAMESPACE_PREFIX_BASE + counter.incrementAndGet();
-		tempNamespacesPrefixesMap.put(namespace, prefix);
+
+		if (tempNamespacesPrefixesMap != null) {
+
+			tempNamespacesPrefixesMap.put(namespace, prefix);
+		}
 
 		return prefix;
+	}
+
+	public static String determinePrefixedURI(final String fullURI, final Map<String, String> tempNamespacePrefixes,
+			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database) throws DMPGraphException {
+
+		final Tuple<String, String> uriParts = URI.determineParts(fullURI);
+		final String namespaceURI = uriParts.v1();
+		final String localName = uriParts.v2();
+
+		final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+
+		return prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
 	}
 }

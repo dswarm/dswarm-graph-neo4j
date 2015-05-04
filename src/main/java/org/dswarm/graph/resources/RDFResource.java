@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.rdf.DataModelRDFNeo4jProcessor;
 import org.dswarm.graph.rdf.RDFNeo4jProcessor;
 import org.dswarm.graph.rdf.SimpleRDFNeo4jProcessor;
@@ -117,7 +118,8 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, dataModelURI);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, namespaceIndex, dataModelURI);
 
 		try {
 
@@ -165,7 +167,8 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database, namespaceIndex);
 
 		try {
 
@@ -223,7 +226,8 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database, namespaceIndex);
 
 		try {
 
@@ -317,7 +321,8 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, dataModelURI);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, namespaceIndex, dataModelURI);
 
 		try {
 

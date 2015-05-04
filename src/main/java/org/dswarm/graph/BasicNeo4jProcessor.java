@@ -26,7 +26,6 @@ import com.carrotsearch.hppc.LongLongMap;
 import com.carrotsearch.hppc.LongLongOpenHashMap;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -42,13 +41,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.common.types.Tuple;
-import org.dswarm.common.web.URI;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
-import org.dswarm.graph.utils.NamespaceUtils;
 import org.dswarm.graph.versioning.VersionHandler;
 
 /**
@@ -71,18 +69,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 	final private Set<Long> tempStatementHashes;
 	final private DB        tempStatementHashesDB;
 
-	// for caching per TX
-	final private Map<String, String> tempNamespacePrefixes;
-	final private DB                  tempNamespacePrefixesDB;
-
-	// for caching over the whole process
-	final private Map<String, String> inMemoryNamespacePrefixes;
-	final private DB                  inMemoryNamespacePrefixesDB;
-
-	final private Map<String, String> namespacePrefixes;
-	final private DB                  namespacePrefixesDB;
-
-	private final Map<String, String> uriPrefixedURIMap;
+	private final NamespaceIndex namespaceIndex;
 
 	protected final LongLongMap nodeResourceMap;
 
@@ -97,19 +84,14 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 	boolean txIsClosed = false;
 
-	public static final Label RESOURCE_LABEL      = DynamicLabel.label(NodeType.Resource.toString());
-	public static final Label RESOURCE_TYPE_LABEL = DynamicLabel.label(NodeType.TypeResource.toString());
-	public static final Label LITERAL_LABEL       = DynamicLabel.label(NodeType.Literal.toString());
-
-	public BasicNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
+	public BasicNeo4jProcessor(final GraphDatabaseService database, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		this.database = database;
+		namespaceIndex = namespaceIndexArg;
 
 		tempResourcesIndex = Maps.newHashMap();
 		tempResourcesWDataModelIndex = Maps.newHashMap();
 		tempResourceTypesIndex = Maps.newHashMap();
-
-		uriPrefixedURIMap = Maps.newHashMap();
 
 		labelCache = Maps.newHashMap();
 
@@ -130,20 +112,6 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 			final Tuple<Set<Long>, DB> mapDBTuple2 = getOrCreateLongIndex(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 			statementHashes = mapDBTuple2.v1();
 			statementHashesDB = mapDBTuple2.v2();
-
-			final Tuple<Map<String, String>, DB> mapDBTuple3 = MapDBUtils.createOrGetInMemoryStringStringIndexTreeMapNonTransactional(
-					GraphIndexStatics.TEMP_NAMESPACE_PREFIXES_INDEX_NAME);
-			tempNamespacePrefixes = mapDBTuple3.v1();
-			tempNamespacePrefixesDB = mapDBTuple3.v2();
-
-			final Tuple<Map<String, String>, DB> mapDBTuple4 = MapDBUtils.createOrGetInMemoryStringStringIndexTreeMapNonTransactional(
-					GraphIndexStatics.IN_MEMORY_NAMESPACE_PREFIXES_INDEX_NAME);
-			inMemoryNamespacePrefixes = mapDBTuple4.v1();
-			inMemoryNamespacePrefixesDB = mapDBTuple4.v2();
-
-			final Tuple<Map<String, String>, DB> mapDBTuple5 = getOrCreateStringStringIndex(GraphIndexStatics.NAMESPACE_PREFIXES_INDEX_NAME);
-			namespacePrefixes = mapDBTuple5.v1();
-			namespacePrefixesDB = mapDBTuple5.v2();
 		} catch (final IOException e) {
 
 			failTx();
@@ -167,10 +135,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 				tempStatementHashes.clear();
 			}
 
-			if (tempNamespacePrefixes != null) {
-
-				tempNamespacePrefixes.clear();
-			}
+			namespaceIndex.resetTXNamespaces();
 		} catch (final Exception e) {
 
 			failTx();
@@ -184,9 +149,15 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		}
 	}
 
+	@Override
 	public GraphDatabaseService getDatabase() {
 
 		return database;
+	}
+
+	@Override public NamespaceIndex getNamespaceIndex() {
+
+		return namespaceIndex;
 	}
 
 	public void addNodeToBNodesIndex(final String key, final Node bnode) {
@@ -217,30 +188,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 	@Override
 	public String createPrefixedURI(final String fullURI) throws DMPGraphException {
 
-		if (fullURI == null) {
-
-			throw new DMPGraphException("full URI shouldn't be null");
-		}
-
-		if (!uriPrefixedURIMap.containsKey(fullURI)) {
-
-			final Tuple<String, String> uriParts = URI.determineParts(fullURI);
-			final String namespaceURI = uriParts.v1();
-			final String localName = uriParts.v2();
-
-			final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, namespacePrefixes);
-
-			final String prefixedURI = prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
-
-			uriPrefixedURIMap.put(fullURI, prefixedURI);
-		}
-
-		return uriPrefixedURIMap.get(fullURI);
-	}
-
-	public String getRDFCLASSPrefixedURI() throws DMPGraphException {
-
-		return createPrefixedURI(RDFS.Class.getURI());
+		return namespaceIndex.createPrefixedURI(fullURI);
 	}
 
 	public void removeHashFromStatementIndex(final long hash) {
@@ -266,8 +214,6 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		tempResourcesWDataModelIndex.clear();
 		tempResourceTypesIndex.clear();
 
-		uriPrefixedURIMap.clear();
-
 		labelCache.clear();
 
 		LOG.debug("start clearing and closing mapdb indices");
@@ -283,23 +229,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 			statementHashesDB.close();
 		}
 
-		if (!tempNamespacePrefixesDB.isClosed()) {
-
-			tempNamespacePrefixes.clear();
-			tempNamespacePrefixesDB.close();
-		}
-
-		if (!inMemoryNamespacePrefixesDB.isClosed()) {
-
-			inMemoryNamespacePrefixes.clear();
-			inMemoryNamespacePrefixesDB.close();
-		}
-
-		if (!namespacePrefixesDB.isClosed()) {
-
-			namespacePrefixesDB.commit();
-			namespacePrefixesDB.close();
-		}
+		namespaceIndex.clearMaps();
 
 		LOG.debug("finished clearing and closing mapdb indices");
 	}
@@ -327,9 +257,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		closeMapDBIndex(tempStatementHashesDB);
 		closeMapDBIndex(statementHashesDB);
-		closeMapDBIndex(tempNamespacePrefixesDB);
-		closeMapDBIndex(inMemoryNamespacePrefixesDB);
-		closeMapDBIndex(namespacePrefixesDB);
+		namespaceIndex.closeMapDBIndices();
 		tx.failure();
 		tx.close();
 		txIsClosed = true;
@@ -342,7 +270,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		BasicNeo4jProcessor.LOG.debug("tx succeeded; closing tx");
 
 		pumpNFlushStatementIndex();
-		pumpNFlushNamespacePrefixIndex();
+		namespaceIndex.pumpNFlushNamespacePrefixIndex();
 		tx.success();
 		tx.close();
 		txIsClosed = true;
@@ -364,7 +292,8 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 	}
 
 	public Optional<Node> determineNode(final Optional<NodeType> optionalResourceNodeType, final Optional<String> optionalResourceId,
-			final Optional<String> optionalResourceURI, final Optional<String> optionalDataModelURI, final Optional<Long> optionalResourceUriDataModelUriHash) {
+			final Optional<String> optionalResourceURI, final Optional<String> optionalDataModelURI,
+			final Optional<Long> optionalResourceUriDataModelUriHash) {
 
 		if (!optionalResourceNodeType.isPresent()) {
 
@@ -637,17 +566,18 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 	public Optional<Node> getNodeFromResourcesIndex(final String key) {
 
-		return getNodeFromSchemaIndex(key, tempResourcesIndex, RESOURCE_LABEL, GraphStatics.URI_PROPERTY);
+		return getNodeFromSchemaIndex(key, tempResourcesIndex, GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY);
 	}
 
 	public Optional<Node> getNodeFromResourceTypesIndex(final String key) {
 
-		return getNodeFromSchemaIndex(key, tempResourceTypesIndex, RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY);
+		return getNodeFromSchemaIndex(key, tempResourceTypesIndex, GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY);
 	}
 
 	public Optional<Node> getNodeFromResourcesWDataModelIndex(final long resourceUriAndDataModelUriHash) {
 
-		return getNodeFromLongSchemaIndex(resourceUriAndDataModelUriHash, tempResourcesWDataModelIndex, RESOURCE_LABEL, GraphStatics.HASH);
+		return getNodeFromLongSchemaIndex(resourceUriAndDataModelUriHash, tempResourcesWDataModelIndex, GraphProcessingStatics.RESOURCE_LABEL,
+				GraphStatics.HASH);
 	}
 
 	public Optional<Relationship> getRelationshipFromStatementIndex(final String uuid) {
@@ -770,28 +700,6 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		statementHashesDB.commit();
 
 		LOG.debug("finished flushing statement index");
-	}
-
-	private void pumpNFlushNamespacePrefixIndex() {
-
-		LOG.debug("start pump'n'flushing namespace prefix index; size = '{}'", tempNamespacePrefixes.size());
-
-		for (final Map.Entry<String, String> entry : tempNamespacePrefixes.entrySet()) {
-
-			final String namespace = entry.getKey();
-			final String prefix = entry.getValue();
-
-			inMemoryNamespacePrefixes.put(namespace, prefix);
-			namespacePrefixes.put(namespace, prefix);
-		}
-
-		LOG.debug("finished pumping namespace prefix index");
-
-		tempNamespacePrefixesDB.commit();
-		inMemoryNamespacePrefixesDB.commit();
-		namespacePrefixesDB.commit();
-
-		LOG.debug("finished flushing namespace prefix index");
 	}
 
 	private void closeMapDBIndex(final DB mapDBIndex) {

@@ -18,12 +18,20 @@ package org.dswarm.graph.gdm.parse;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.parse.Handler;
+import org.dswarm.graph.parse.TransactionalHandler;
 
 /**
  * @author tgaengler
  */
-public interface GDMHandler extends Handler {
+public interface GDMHandler extends TransactionalHandler {
 
 	void handleStatement(final Statement st, final long resourceHash, final long index) throws DMPGraphException;
+
+	long getCountedStatements();
+
+	int getRelationshipsAdded();
+
+	int getNodesAdded();
+
+	int getCountedLiterals();
 }

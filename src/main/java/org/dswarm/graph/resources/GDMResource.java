@@ -115,6 +115,8 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.stream.ModelBuilder;
@@ -122,6 +124,7 @@ import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
+import org.dswarm.graph.utils.NamespaceUtils;
 import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
@@ -200,10 +203,12 @@ public class GDMResource {
 
 		LOG.info("process GDM statements and write them into graph db for data model '{}'", dataModelURI);
 
-		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, dataModelURI);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, namespaceIndex, dataModelURI);
 
 		try {
 
+			final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
 			final Observable<Resource> newModel;
 			final Observable<Void> deprecateRecordsObservable;
@@ -216,9 +221,10 @@ public class GDMResource {
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
 				// = new resources model, since existing, modified resources were already written to the DB
-				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema, dataModelURI,
+				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+						prefixedDataModelURI,
 						database,
-						handler);
+						handler, namespaceIndex);
 
 				final Observable<Resource> deltaModel = result.v1();
 
@@ -341,7 +347,8 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
+		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database, namespaceIndex);
 
 		try {
 
@@ -610,7 +617,8 @@ public class GDMResource {
 
 	private Tuple<Observable<Resource>, Observable<Long>> calculateDeltaForDataModel(final Observable<Resource> model,
 			final Optional<ContentSchema> optionalContentSchema,
-			final String dataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler) throws DMPGraphException {
+			final String prefixedDataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler,
+			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");
 
@@ -624,8 +632,10 @@ public class GDMResource {
 				try {
 
 					final String resourceURI = newResource.getUri();
+					final String prefixedResourceURI = namespaceIndex.createPrefixedURI(resourceURI);
 					final String hash = UUID.randomUUID().toString();
-					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2");
+					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2",
+							namespaceIndex);
 
 					final Resource existingResource;
 					final GDMResourceReader gdmReader;
@@ -634,18 +644,18 @@ public class GDMResource {
 
 						// determine legacy resource identifier via content schema
 						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
-								.getRecordIdentifierAttributePath(), newResource.getUri());
+								.getRecordIdentifierAttributePath(), prefixedResourceURI);
 
 						// try to retrieve existing model via legacy record identifier
 						// note: version is absent -> should make use of latest version
 						gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
 								optionalContentSchema.get().getRecordIdentifierAttributePath(),
-								dataModelURI, Optional.<Integer>absent(), permanentDatabase);
+								prefixedDataModelURI, Optional.<Integer>absent(), permanentDatabase);
 					} else {
 
 						// try to retrieve existing model via resource uri
 						// note: version is absent -> should make use of latest version
-						gdmReader = new PropertyGraphGDMResourceByURIReader(resourceURI, dataModelURI, Optional.<Integer>absent(),
+						gdmReader = new PropertyGraphGDMResourceByURIReader(prefixedResourceURI, prefixedDataModelURI, Optional.<Integer>absent(),
 								permanentDatabase);
 					}
 
@@ -670,7 +680,8 @@ public class GDMResource {
 					// final Model newResourceModel = new Model();
 					// newResourceModel.addResource(resource);
 
-					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1");
+					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1",
+							namespaceIndex);
 
 					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
 							optionalContentSchema);
@@ -702,22 +713,37 @@ public class GDMResource {
 			}
 		});
 
-		final Iterable<Resource> newResourcesIterable = newResources.doOnCompleted(new Action0() {
+		try {
 
-			@Override public void call() {
+			final Iterable<Resource> newResourcesIterable = newResources.doOnCompleted(new Action0() {
 
-				GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
+				@Override public void call() {
+
+					GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
+				}
+			}).toBlocking().toIterable();
+
+			final List<Resource> newResourcesList = new ArrayList<>();
+
+			final Observable<Resource> completedNewResources;
+
+			if (newResourcesIterable.iterator() != null && newResourcesIterable.iterator().hasNext()) {
+
+				Iterables.addAll(newResourcesList, newResourcesIterable);
+				completedNewResources = Observable.from(newResourcesList);
+			} else {
+
+				completedNewResources = Observable.empty();
 			}
-		}).toBlocking().toIterable();
 
-		final List<Resource> newResourcesList = new ArrayList<>();
-		Iterables.addAll(newResourcesList, newResourcesIterable);
-		final Observable<Resource> completedNewResources = Observable.from(newResourcesList);
+			final Observable<Long> processedResourcesObservable = Observable.from(processedResources);
 
-		final Observable<Long> processedResourcesObservable = Observable.from(processedResources);
+			// return only model with new, non-existing resources
+			return Tuple.tuple(completedNewResources, processedResourcesObservable);
+		} catch (final RuntimeException e) {
 
-		// return only model with new, non-existing resources
-		return Tuple.tuple(completedNewResources, processedResourcesObservable);
+			throw new DMPGraphException(e.getMessage(), e.getCause());
+		}
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
@@ -945,18 +971,25 @@ public class GDMResource {
 				preparedNewModifiedStatements);
 	}
 
-	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir) throws DMPGraphException {
+	private GraphDatabaseService loadResource(final Resource resource, final String impermanentGraphDatabaseDir, final NamespaceIndex namespaceIndex)
+			throws DMPGraphException {
 
 		// TODO: find proper graph database settings to hold everything in-memory only
 		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)
 				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
 
+		SchemaIndexUtils.createSchemaIndices(impermanentDB);
+
 		// TODO: implement handler that enriches the GDM resource with useful information for changeset detection
-		final GDMHandler handler = new Neo4jDeltaGDMHandler(impermanentDB);
+		final GDMHandler handler = new Neo4jDeltaGDMHandler(impermanentDB, namespaceIndex);
 
 		final GDMParser parser = new GDMResourceParser(resource);
 		parser.setGDMHandler(handler);
 		parser.parse();
+
+		LOG.debug("added '{}' statements ('{}' relationships; '{}' nodes; '{}' literals) to impermanent delta graph DB '{}'",
+				handler.getCountedStatements(), handler.getRelationshipsAdded(), handler.getNodesAdded(), handler.getCountedLiterals(),
+				impermanentGraphDatabaseDir);
 
 		return impermanentDB;
 	}

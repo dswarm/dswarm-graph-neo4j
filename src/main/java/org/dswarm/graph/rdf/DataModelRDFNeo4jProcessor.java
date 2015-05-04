@@ -18,6 +18,8 @@ package org.dswarm.graph.rdf;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
+import org.dswarm.graph.index.NamespaceIndex;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +31,8 @@ public class DataModelRDFNeo4jProcessor extends RDFNeo4jProcessor {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelRDFNeo4jProcessor.class);
 
-	public DataModelRDFNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelRDFNeo4jProcessor(final GraphDatabaseService database, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
 
-		super(new DataModelNeo4jProcessor(database, dataModelURIArg));
+		super(new DataModelNeo4jProcessor(database, namespaceIndex, dataModelURIArg));
 	}
 }

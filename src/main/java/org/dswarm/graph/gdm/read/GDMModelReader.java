@@ -21,12 +21,11 @@ import java.io.OutputStream;
 import com.google.common.base.Optional;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.stream.ModelBuilder;
 
 public interface GDMModelReader extends GDMReader {
 
-	public Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException;
+	Optional<ModelBuilder> read(final OutputStream outputStream) throws DMPGraphException;
 
-	public long readResources();
+	long readResources();
 }

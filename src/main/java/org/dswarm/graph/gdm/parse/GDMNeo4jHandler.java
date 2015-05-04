@@ -19,6 +19,7 @@ package org.dswarm.graph.gdm.parse;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
@@ -30,12 +31,14 @@ import org.dswarm.graph.TransactionalNeo4jProcessor;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.gdm.utils.NodeTypeUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.parse.BaseNeo4jHandler;
 import org.dswarm.graph.parse.Neo4jHandler;
+import org.dswarm.graph.parse.TransactionalNeo4jHandler;
 
 /**
  * @author tgaengler
@@ -59,6 +62,11 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	public Neo4jHandler getHandler() {
 
 		return handler;
+	}
+
+	@Override public GraphDatabaseService getDatabase() {
+
+		return ((TransactionalNeo4jHandler) handler).getDatabase();
 	}
 
 	@Override
@@ -92,6 +100,27 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		final org.dswarm.graph.model.Statement statement = sb.build();
 
 		handler.handleStatement(statement);
+	}
+
+	@Override public long getCountedStatements() {
+		return handler.getCountedStatements();
+	}
+
+	@Override public int getRelationshipsAdded() {
+		return handler.getRelationshipsAdded();
+	}
+
+	@Override public int getNodesAdded() {
+		return handler.getNodesAdded();
+	}
+
+	@Override public int getCountedLiterals() {
+		return handler.getCountedLiterals();
+	}
+
+	@Override public NamespaceIndex getNamespaceIndex() {
+
+		return processor.getProcessor().getNamespaceIndex();
 	}
 
 	/**

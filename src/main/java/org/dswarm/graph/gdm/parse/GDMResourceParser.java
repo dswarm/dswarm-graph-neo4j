@@ -16,14 +16,15 @@
  */
 package org.dswarm.graph.gdm.parse;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.Statement;
-
-import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
  * @author tgaengler
@@ -63,9 +64,8 @@ public class GDMResourceParser implements GDMParser {
 
 		long i = 0;
 
-		final String prefixedResourceUri = gdmHandler.getHandler().getProcessor().createPrefixedURI(resource.getUri());
-		final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional
-				.<String>absent());
+		final String prefixedResourceUri = gdmHandler.getNamespaceIndex().createPrefixedURI(resource.getUri());
+		final long resourceHash = HashUtils.generateHash(prefixedResourceUri);
 
 		for (final Statement statement : resource.getStatements()) {
 

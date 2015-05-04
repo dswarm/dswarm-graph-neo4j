@@ -21,7 +21,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.model.GraphStatics;
 
@@ -47,6 +47,6 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 
 		final long resourceUriDataModelUriHash = HashUtils.generateHash(recordUri + dataModelUri);
 
-		return database.findNode(BasicNeo4jProcessor.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
+		return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
 }

@@ -21,7 +21,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +48,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
@@ -124,7 +122,6 @@ import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
-import org.dswarm.graph.utils.NamespaceUtils;
 import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
@@ -715,26 +712,17 @@ public class GDMResource {
 
 		try {
 
-			final Iterable<Resource> newResourcesIterable = newResources.doOnCompleted(new Action0() {
+			final Observable<Resource> completedNewResources = newResources.doOnCompleted(new Action0() {
 
-				@Override public void call() {
+				@Override
+				public void call() {
 
 					GDMResource.LOG.debug("finished calculating delta for model and writing changes to graph DB");
 				}
-			}).toBlocking().toIterable();
+			}).cache();
 
-			final List<Resource> newResourcesList = new ArrayList<>();
-
-			final Observable<Resource> completedNewResources;
-
-			if (newResourcesIterable.iterator() != null && newResourcesIterable.iterator().hasNext()) {
-
-				Iterables.addAll(newResourcesList, newResourcesIterable);
-				completedNewResources = Observable.from(newResourcesList);
-			} else {
-
-				completedNewResources = Observable.empty();
-			}
+			@SuppressWarnings("unused") final Resource runNewResources =
+					completedNewResources.toBlocking().lastOrDefault(null);
 
 			final Observable<Long> processedResourcesObservable = Observable.from(processedResources);
 

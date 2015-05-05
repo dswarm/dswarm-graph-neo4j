@@ -17,6 +17,7 @@
 package org.dswarm.graph.gdm.parse;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class GDMModelParser implements GDMParser {
 					return null;
 				}
 
-				long i = 0;
+				AtomicLong counter = new AtomicLong(0);
 
 				try {
 
@@ -87,7 +88,7 @@ public class GDMModelParser implements GDMParser {
 
 					for (final Statement statement : statements) {
 
-						i++;
+						final long i = counter.incrementAndGet();
 
 						// note: just increasing the counter probably won't work at an update ;)
 

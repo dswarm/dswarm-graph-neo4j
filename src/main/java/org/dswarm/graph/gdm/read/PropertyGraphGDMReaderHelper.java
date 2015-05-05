@@ -138,7 +138,7 @@ public class PropertyGraphGDMReaderHelper {
 		final org.dswarm.graph.json.Node subject = readObject(rel.getStartNode());
 		final Predicate predicate = getPredicate(rel.getType().name());
 		final org.dswarm.graph.json.Node object = readObject(rel.getEndNode());
-		final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+		final Long uuid = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 		final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 		final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
 		final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
@@ -148,7 +148,7 @@ public class PropertyGraphGDMReaderHelper {
 
 		if(uuid != null) {
 
-			statement.setUUID(uuid);
+			statement.setUUID(uuid.toString());
 		}
 
 		if(confidence != null) {

@@ -33,6 +33,8 @@ public interface Neo4jHandler {
 
 	void setResourceHash(final long resourceHash);
 
+	void resetResourceIndexCounter();
+
 	void closeTransaction() throws DMPGraphException;
 
 	long getCountedStatements();

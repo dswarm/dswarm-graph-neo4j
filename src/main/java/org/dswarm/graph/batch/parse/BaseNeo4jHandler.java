@@ -87,6 +87,11 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		resourceHash = resourceHashArg;
 	}
 
+	@Override public void resetResourceIndexCounter() {
+
+		// TODO
+	}
+
 	@Override
 	public void handleStatement(final Statement statement) throws DMPGraphException {
 

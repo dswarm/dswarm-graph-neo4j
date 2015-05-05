@@ -112,9 +112,9 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 	@Override
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final long statementUUID,
-			final Optional<Map<String, Object>> qualifiedAttributes, final VersionHandler versionHandler) {
+			final Optional<Map<String, Object>> qualifiedAttributes, final Optional<Long> optionalIndex, final VersionHandler versionHandler) {
 
-		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, versionHandler);
+		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, optionalIndex, versionHandler);
 
 		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
 

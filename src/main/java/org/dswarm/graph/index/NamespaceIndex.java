@@ -112,9 +112,7 @@ public class NamespaceIndex {
 
 				tx.ensureRunningTx();
 
-				final Node prefixNode = database.createNode(GraphProcessingStatics.PREFIX_LABEL);
-				prefixNode.setProperty(GraphStatics.URI_PROPERTY, namespace);
-				prefixNode.setProperty(GraphProcessingStatics.PREFIX_PROPERTY, prefix);
+				addPrefix(namespace, prefix);
 			} catch (final Exception e) {
 
 				tx.failTx();
@@ -133,6 +131,13 @@ public class NamespaceIndex {
 		inMemoryNamespacePrefixesDB.commit();
 
 		LOG.debug("finished flushing namespace prefix index");
+	}
+
+	public void addPrefix(final String namespace, final String prefix) {
+
+		final Node prefixNode = database.createNode(GraphProcessingStatics.PREFIX_LABEL);
+		prefixNode.setProperty(GraphStatics.URI_PROPERTY, namespace);
+		prefixNode.setProperty(GraphProcessingStatics.PREFIX_PROPERTY, prefix);
 	}
 
 	public void clearMaps() {

@@ -408,7 +408,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 	}
 
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final long statementUUID,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final VersionHandler versionHandler) {
+			final Optional<Map<String, Object>> optionalQualifiedAttributes, final Optional<Long> optionalIndex, final VersionHandler versionHandler) {
 
 		final RelationshipType relType = DynamicRelationshipType.withName(predicateURI);
 		final Relationship rel = subjectNode.createRelationshipTo(objectNode, relType);
@@ -424,7 +424,10 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 				rel.setProperty(GraphStatics.ORDER_PROPERTY, qualifiedAttributes.get(GraphStatics.ORDER_PROPERTY));
 			}
 
-			if (qualifiedAttributes.containsKey(GraphStatics.INDEX_PROPERTY)) {
+			if(optionalIndex.isPresent()) {
+
+				rel.setProperty(GraphStatics.INDEX_PROPERTY, optionalIndex.get());
+			} else if (qualifiedAttributes.containsKey(GraphStatics.INDEX_PROPERTY)) {
 
 				rel.setProperty(GraphStatics.INDEX_PROPERTY, qualifiedAttributes.get(GraphStatics.INDEX_PROPERTY));
 			}

@@ -26,6 +26,7 @@ package org.dswarm.graph.parse;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.github.emboss.siphash.SipHash;
 import com.google.common.base.Charsets;
@@ -70,6 +71,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	protected String resourceUri;
 	protected long resourceHash;
 
+	protected AtomicLong resourceIndexCounter = new AtomicLong(0);
+
 	// TODO: init
 	protected VersionHandler versionHandler = null;
 
@@ -98,6 +101,11 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	public void setResourceHash(final long resourceHashArg) {
 
 		resourceHash = resourceHashArg;
+	}
+
+	@Override public void resetResourceIndexCounter() {
+
+		resourceIndexCounter = new AtomicLong(0);
 	}
 
 	@Override
@@ -538,7 +546,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		final long statementUUIDHash = SipHash.digest(HashUtils.SPEC_KEY, finalStatementUUID.getBytes(Charsets.UTF_8));
 
 		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUIDHash,
-				optionalQualifiedAttributes, versionHandler);
+				optionalQualifiedAttributes, Optional.of(resourceIndexCounter.incrementAndGet()), versionHandler);
 
 		processor.addHashToStatementIndex(hash);
 		processor.addStatementToIndex(rel, statementUUIDHash);

@@ -85,6 +85,7 @@ public class GDMModelParser implements GDMParser {
 
 					gdmHandler.getHandler().setResourceUri(prefixedResourceUri);
 					gdmHandler.getHandler().setResourceHash(resourceHash);
+					gdmHandler.getHandler().resetResourceIndexCounter();
 
 					for (final Statement statement : statements) {
 

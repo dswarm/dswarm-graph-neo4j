@@ -19,6 +19,8 @@ package org.dswarm.graph.resources;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,6 +36,10 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -52,6 +58,7 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
@@ -71,7 +78,8 @@ public class MaintainResource {
 	// TODO: maybe divide this into 2 queries and without OPTIONAL
 	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
-	private static final JsonFactory jsonFactory = new JsonFactory();
+	private static final JsonFactory  jsonFactory  = new JsonFactory();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	public MaintainResource() {
 
@@ -402,10 +410,40 @@ public class MaintainResource {
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
 	}
 
-	private void initPrefixes(final GraphDatabaseService database) {
+	private void initPrefixes(final GraphDatabaseService database) throws DMPGraphException {
 
 		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
 		tx.ensureRunningTx();
+
+		try {
+
+			final URL prefixesFileURL = Resources.getResource("prefixes.json");
+			final String prefixesJSONString = Resources.toString(prefixesFileURL, Charsets.UTF_8);
+			final Map<String, String> prefixesNamespacesMap = objectMapper
+					.readValue(prefixesJSONString, new TypeReference<HashMap<String, String>>() {
+
+					});
+
+			for (final Map.Entry<String, String> entry : prefixesNamespacesMap.entrySet()) {
+
+				final String prefix = entry.getKey();
+				final String namespace = entry.getValue();
+
+				namespaceIndex.addPrefix(namespace, prefix);
+			}
+
+			tx.succeedTx();
+		} catch (final Exception e) {
+
+			tx.failTx();
+
+			final String message = "couldn't initialize prefixes successfully";
+
+			LOG.error(message);
+
+			throw new DMPGraphException(message, e);
+		}
 	}
 }

@@ -175,7 +175,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
 
 		final String recordClassURI = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType";
-		final int numberOfStatements = 191;
+		final int numberOfStatements = 152;
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
 

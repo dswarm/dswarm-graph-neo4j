@@ -54,6 +54,8 @@ import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
 
 /**
@@ -139,6 +141,8 @@ public class MaintainResource {
 	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
 
 		SchemaIndexUtils.createSchemaIndices(database);
+
+		initPrefixes(database);
 
 		return Response.ok().build();
 	}
@@ -396,5 +400,12 @@ public class MaintainResource {
 
 		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
+	}
+
+	private void initPrefixes(final GraphDatabaseService database) {
+
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+
+		tx.ensureRunningTx();
 	}
 }

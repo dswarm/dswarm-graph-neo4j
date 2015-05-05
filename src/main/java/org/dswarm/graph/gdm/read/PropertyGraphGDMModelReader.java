@@ -143,21 +143,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				if (!currentResourceStatements.isEmpty()) {
 
-					// note, this is just an integer number (i.e. NOT long)
-					final int mapSize = currentResourceStatements.size();
-
-					long i = 0;
-
 					final Set<Statement> statements = new LinkedHashSet<>();
-
-					while (i < mapSize) {
-
-						i++;
-
-						final Statement statement = currentResourceStatements.get(i);
-
-						statements.add(statement);
-					}
+					statements.addAll(currentResourceStatements.values());
 
 					currentResource.setStatements(statements);
 				}

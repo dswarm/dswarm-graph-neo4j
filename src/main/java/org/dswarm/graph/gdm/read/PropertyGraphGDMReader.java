@@ -18,6 +18,7 @@ package org.dswarm.graph.gdm.read;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.Direction;
@@ -58,7 +59,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final NamespaceIndex       namespaceIndex;
 
 	protected Resource currentResource;
-	protected final Map<Long, Statement> currentResourceStatements = new HashMap<>();
+	protected final Map<Long, Statement> currentResourceStatements = new TreeMap<>();
 
 	protected final TransactionHandler tx;
 

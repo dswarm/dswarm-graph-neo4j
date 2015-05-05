@@ -103,7 +103,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
 		writeGDMToDBInternal("http://data.slub-dresden.de/resources/2", DEFAULT_GDM_FILE_NAME);
 
-		final String typeQuery = "MATCH (n) WHERE n.__NODETYPE__ = \"__TYPE_RESOURCE__\" RETURN id(n) AS node_id, n.__URI__ AS node_uri;";
+		final String typeQuery = "MATCH (n:TYPE_RESOURCE) RETURN id(n) AS node_id, n.uri AS node_uri;";
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 

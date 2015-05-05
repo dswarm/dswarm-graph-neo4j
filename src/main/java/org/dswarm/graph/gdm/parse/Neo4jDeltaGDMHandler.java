@@ -123,7 +123,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			final org.dswarm.graph.json.Node object = st.getObject();
 
-			final String statementUUID = st.getUUID();
+			final Long statementUUID = getUUID(st.getUUID());
 			final Long order = st.getOrder();
 
 			// Check index for subject
@@ -344,7 +344,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode,
 			final Optional<Long> optionalResourceHash,
-			final org.dswarm.graph.json.Node subject, final long resourceHash, final String statementUUID, final Long order, final long index,
+			final org.dswarm.graph.json.Node subject, final long resourceHash, final Long statementUUID, final Long order, final long index,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
 		final StringBuilder sb = new StringBuilder();
@@ -366,11 +366,11 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
 
-			final String finalStatementUUID;
+			final Long finalStatementUUID;
 
 			if (statementUUID == null) {
 
-				finalStatementUUID = UUID.randomUUID().toString();
+				finalStatementUUID = HashUtils.generateHash(UUID.randomUUID().toString());
 			} else {
 
 				finalStatementUUID = statementUUID;
@@ -523,5 +523,21 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 
 		return identifier;
+	}
+
+	private Long getUUID(final String uuid) {
+
+		if(uuid == null) {
+
+			return null;
+		}
+
+		try {
+
+			return Long.valueOf(uuid);
+		} catch (final NumberFormatException e) {
+
+			return HashUtils.generateHash(uuid);
+		}
 	}
 }

@@ -50,12 +50,14 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	protected final BaseNeo4jHandler		handler;
 	protected final GDMNeo4jProcessor		processor;
 
-	protected final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
+	protected final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper;
 
 	public GDMNeo4jHandler(final BaseNeo4jHandler handlerArg, final GDMNeo4jProcessor processorArg) throws DMPGraphException {
 
 		handler = handlerArg;
 		processor = processorArg;
+
+		propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper(processor.getProcessor().getNamespaceIndex());
 	}
 
 	@Override

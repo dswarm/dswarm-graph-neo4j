@@ -32,10 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.stream.ModelBuilder;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -55,9 +57,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private ModelBuilder modelBuilder;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
-			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
+			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg)
+			throws DMPGraphException {
 
-		super(dataModelUriArg, optionalVersionArg, databaseArg, TYPE);
+		super(dataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, TYPE);
 
 		recordClassUri = recordClassUriArg;
 		optionalAtMost = optionalAtMostArg;
@@ -68,7 +71,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 		readResources = 0;
 
-		ensureTx();
+		tx.ensureRunningTx();
 
 		ResourceIterator<Node> recordNodesIter = null;
 
@@ -85,7 +88,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 			if (recordNodesIter == null) {
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
@@ -98,7 +101,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			if (!recordNodesIter.hasNext()) {
 
 				recordNodesIter.close();
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
@@ -133,7 +136,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					continue;
 				}
 
-				currentResource = new Resource(resourceUri);
+				final String fullResourceURI = namespaceIndex.createFullURI(resourceUri);
+
+				currentResource = new Resource(fullResourceURI);
 				startNodeHandler.handleNode(recordNode);
 
 				if (!currentResourceStatements.isEmpty()) {
@@ -166,15 +171,15 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					readResources++;
 				} else {
 
-					LOG.debug("couldn't find any statement for resource '{}' in data model '{}' with version '{}'", currentResource.getUri(),
-							dataModelUri, version);
+					LOG.debug("couldn't find any statement for resource '{}' ('{}') in data model '{}' with version '{}'", currentResource.getUri(),
+							resourceUri, dataModelUri, version);
 				}
 
 				currentResourceStatements.clear();
 			}
 
 			recordNodesIter.close();
-			tx.success();
+			tx.succeedTx();
 
 			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX successfully", type);
 		} catch (final Exception e) {
@@ -186,12 +191,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				recordNodesIter.close();
 			}
 
-			tx.failure();
-		} finally {
-
-			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX finally", type);
-
-			tx.close();
+			tx.failTx();
 		}
 
 		return Optional.of(modelBuilder);

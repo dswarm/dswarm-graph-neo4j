@@ -25,24 +25,12 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import ch.lambdaj.Lambda;
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.codehaus.stax2.XMLOutputFactory2;
-
-import org.dswarm.common.DMPStatics;
-import org.dswarm.common.model.Attribute;
-import org.dswarm.common.model.AttributePath;
-import org.dswarm.common.types.Tuple;
-import org.dswarm.common.web.URI;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
-import org.dswarm.graph.json.LiteralNode;
-import org.dswarm.graph.json.NodeType;
-import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.versioning.Range;
-import org.dswarm.graph.versioning.VersioningStatics;
-import org.dswarm.graph.versioning.utils.GraphVersionUtils;
-import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
-
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -51,29 +39,39 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.lambdaj.Lambda;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.Attribute;
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.common.types.Tuple;
+import org.dswarm.common.web.URI;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.json.LiteralNode;
+import org.dswarm.graph.json.NodeType;
+import org.dswarm.graph.json.Predicate;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
+import org.dswarm.graph.versioning.utils.GraphVersionUtils;
+import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
 
 /**
  * @author tgaengler
  */
 public class PropertyGraphXMLReader implements XMLReader {
 
-	private static final Logger							LOG						= LoggerFactory.getLogger(PropertyGraphXMLReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphXMLReader.class);
 
 	/**
 	 * TODO: shall we produce XML 1.0 or XML 1.1?
 	 */
-	private static final String							XML_VERSION				= "1.0";
-	private static final XMLOutputFactory2				xmlOutputFactory;
+	private static final String XML_VERSION = "1.0";
+	private static final XMLOutputFactory2 xmlOutputFactory;
 
 	static {
 
@@ -83,10 +81,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 		xmlOutputFactory.configureForSpeed();
 	}
 
-	private final String								dataModelUri;
-	private final String								recordClassURIString;
-	private final URI									recordClassURI;
-	private final URI									recordTagURI;
+	private final String                  dataModelUri;
+	private final String                  recordClassURIString;
+	private final URI                     recordClassURI;
+	private final URI                     recordTagURI;
 	private final Optional<AttributePath> optionalRootAttributePath;
 
 	private final Map<String, Tuple<Predicate, URI>> predicates            = new HashMap<>();
@@ -94,6 +92,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 	private final Map<String, String>                nameMap               = new HashMap<>();
 
 	private final GraphDatabaseService database;
+	private final NamespaceIndex       namespaceIndex;
 
 	private long recordCount = 0;
 
@@ -103,11 +102,11 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private boolean isElementOpen = false;
 
-	private Transaction tx = null;
+	private final TransactionHandler tx;
 
 	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
 			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<String> optionalOriginalDataType,
-			final GraphDatabaseService databaseArg) throws DMPGraphException {
+			final GraphDatabaseService databaseArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		optionalRootAttributePath = optionalRootAttributePathArg;
 		recordClassURIString = recordClassUriArg;
@@ -125,13 +124,15 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
+		tx = txArg;
+		namespaceIndex = namespaceIndexArg;
 
 		if (versionArg != null) {
 
 			version = versionArg;
 		} else {
 
-			tx = database.beginTx();
+			tx.ensureRunningTx();
 
 			PropertyGraphXMLReader.LOG.debug("start read XML TX");
 
@@ -145,8 +146,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				PropertyGraphXMLReader.LOG.error(message, e);
 				PropertyGraphXMLReader.LOG.debug("couldn't finish read XML TX successfully");
 
-				tx.failure();
-				tx.close();
+				tx.failTx();
 
 				throw new DMPGraphException(message);
 			}
@@ -158,22 +158,19 @@ public class PropertyGraphXMLReader implements XMLReader {
 	@Override
 	public Optional<XMLStreamWriter> read(final OutputStream outputStream) throws DMPGraphException, XMLStreamException {
 
-		if (tx == null) {
+		try {
 
-			try {
+			PropertyGraphXMLReader.LOG.debug("start read XML TX");
 
-				PropertyGraphXMLReader.LOG.debug("start read XML TX");
+			tx.ensureRunningTx();
+		} catch (final Exception e) {
 
-				tx = database.beginTx();
-			} catch (final Exception e) {
+			final String message = "couldn't acquire tx successfully";
 
-				final String message = "couldn't acquire tx successfully";
+			PropertyGraphXMLReader.LOG.error(message, e);
+			PropertyGraphXMLReader.LOG.debug("couldn't finish read XML TX successfully");
 
-				PropertyGraphXMLReader.LOG.error(message, e);
-				PropertyGraphXMLReader.LOG.debug("couldn't finish read XML TX successfully");
-
-				throw new DMPGraphException(message);
-			}
+			throw new DMPGraphException(message);
 		}
 
 		ResourceIterator<Node> recordNodesIter = null;
@@ -188,7 +185,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			if (recordNodes == null) {
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
@@ -202,7 +199,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			if (recordNodesIter == null) {
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
@@ -213,7 +210,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 			if (!recordNodesIter.hasNext()) {
 
 				recordNodesIter.close();
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
 						+ "'finished read XML TX successfully");
@@ -300,7 +297,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 			}
 
 			recordNodesIter.close();
-			tx.success();
+			tx.succeedTx();
 
 			PropertyGraphXMLReader.LOG.debug("finished read XML TX successfully");
 
@@ -331,12 +328,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				recordNodesIter.close();
 			}
 
-			tx.failure();
-		} finally {
-
-			PropertyGraphXMLReader.LOG.debug("finished read GDM TX finally");
-
-			tx.close();
+			tx.failTx();
 		}
 
 		return Optional.absent();
@@ -408,7 +400,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private class CBDNodeHandler implements XMLNodeHandler {
 
-		private final XMLRelationshipHandler	relationshipHandler;
+		private final XMLRelationshipHandler relationshipHandler;
 
 		protected CBDNodeHandler(final XMLRelationshipHandler relationshipHandlerArg) {
 
@@ -459,7 +451,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private class CBDStartNodeHandler implements XMLNodeHandler {
 
-		private final XMLRelationshipHandler	relationshipHandler;
+		private final XMLRelationshipHandler relationshipHandler;
 
 		protected CBDStartNodeHandler(final XMLRelationshipHandler relationshipHandlerArg) {
 
@@ -512,7 +504,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 	 */
 	protected class CBDRelationshipHandler implements XMLRelationshipHandler {
 
-		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper(namespaceIndex);
 
 		protected final XMLStreamWriter writer;
 		private         XMLNodeHandler  nodeHandler;
@@ -536,8 +528,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				// subject => start element (???)
 
-				final Node subjectNode = rel.getStartNode();
-				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReaderHelper.readSubject(subjectNode);
+				//				final Node subjectNode = rel.getStartNode();
+				//				final org.dswarm.graph.json.Node subjectGDMNode = propertyGraphGDMReaderHelper.readSubject(subjectNode);
 				// => TODO, we need to compare the node, with the previous node, to write the content
 				// (key(predicate)/value(object)) into the current element or another of this tag
 				// TODO: how to determine, when we should close a tag (or parent tag etc.) => we need to keep a stack, of open

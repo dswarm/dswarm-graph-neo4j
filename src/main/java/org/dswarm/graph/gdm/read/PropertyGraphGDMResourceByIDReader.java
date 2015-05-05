@@ -16,33 +16,36 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import org.dswarm.common.model.AttributePath;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.util.GraphDBUtil;
-
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.tx.TransactionHandler;
+
 /**
  * @author tgaengler
  */
 public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResourceReader {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(PropertyGraphGDMResourceByIDReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMResourceByIDReader.class);
 
 	private static final String TYPE = "GDM record by ID";
 
-	private final String		recordId;
-	private String recordURI;
-	private final AttributePath	recordIdentifierAP;
+	private final String        recordId;
+	private       String        recordURI;
+	private final AttributePath recordIdentifierAP;
 
-	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri, final Optional<Integer> optionalVersionArg,
-			final GraphDatabaseService database) throws DMPGraphException {
+	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri,
+			final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, TYPE);
+		super(dataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
 		recordId = recordIdArg;
 		recordIdentifierAP = recordIdentifierAPArg;
@@ -59,7 +62,8 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 			return null;
 		}
 
-		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, dataModelUri, Optional.of(version), database);
+		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, dataModelUri, Optional.of(version),
+				database, tx, namespaceIndex);
 
 		return uriReader.getResourceNode();
 	}

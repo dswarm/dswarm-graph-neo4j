@@ -71,6 +71,8 @@ import org.dswarm.graph.rdf.parse.SimpleRDFNeo4jHandler;
 import org.dswarm.graph.rdf.pnx.parse.PNXParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -118,8 +120,9 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, namespaceIndex, dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, tx, namespaceIndex, dataModelURI);
 
 		try {
 
@@ -167,8 +170,9 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database, namespaceIndex);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database, tx, namespaceIndex);
 
 		try {
 
@@ -226,8 +230,9 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database, namespaceIndex);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database, tx, namespaceIndex);
 
 		try {
 
@@ -321,8 +326,9 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, namespaceIndex, dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, tx, namespaceIndex, dataModelURI);
 
 		try {
 

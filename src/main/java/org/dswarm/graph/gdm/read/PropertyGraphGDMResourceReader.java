@@ -22,14 +22,15 @@ import java.util.Set;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * retrieves the CBD for the given resource URI + data model URI
@@ -38,18 +39,19 @@ import org.dswarm.graph.model.GraphStatics;
  */
 public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMReader implements GDMResourceReader {
 
-	private static final Logger			LOG							= LoggerFactory.getLogger(PropertyGraphGDMResourceReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMResourceReader.class);
 
-	public PropertyGraphGDMResourceReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg, final String type)
+	public PropertyGraphGDMResourceReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg, final String type)
 			throws DMPGraphException {
 
-		super(dataModelUriArg, optionalVersionArg, databaseArg, type);
+		super(dataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, type);
 	}
 
 	@Override
 	public Resource read() throws DMPGraphException {
 
-		ensureTx();
+		tx.ensureRunningTx();
 
 		try {
 
@@ -61,7 +63,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 				LOG.debug("couldn't find a resource node to start traversal");
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 
@@ -74,7 +76,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 				LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 
@@ -105,23 +107,18 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 				currentResource.setStatements(statements);
 			}
 
-			tx.success();
+			tx.succeedTx();
 
 			PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX successfully", type);
 		} catch (final Exception e) {
 
-			tx.failure();
+			tx.failTx();
 
 			final String message = String.format("couldn't finished read %s TX successfully", type);
 
 			PropertyGraphGDMResourceReader.LOG.error(message, e);
 
 			throw new DMPGraphException(message);
-		}  finally {
-
-			PropertyGraphGDMResourceReader.LOG.debug("finished read {} TX finally", type);
-
-			tx.close();
 		}
 
 		return currentResource;

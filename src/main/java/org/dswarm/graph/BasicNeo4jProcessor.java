@@ -34,7 +34,6 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.slf4j.Logger;
@@ -46,6 +45,7 @@ import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
 import org.dswarm.graph.versioning.VersionHandler;
 
@@ -80,13 +80,12 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 	private final Map<String, Label> labelCache;
 
-	protected Transaction tx;
+	protected final TransactionHandler tx;
 
-	boolean txIsClosed = false;
-
-	public BasicNeo4jProcessor(final GraphDatabaseService database, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
+	public BasicNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		this.database = database;
+		tx = txArg;
 		namespaceIndex = namespaceIndexArg;
 
 		tempResourcesIndex = Maps.newHashMap();
@@ -238,9 +237,8 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		BasicNeo4jProcessor.LOG.debug("beginning new tx");
 
-		tx = database.beginTx();
+		tx.ensureRunningTx();
 		initIndices();
-		txIsClosed = false;
 
 		BasicNeo4jProcessor.LOG.debug("new tx is ready");
 	}
@@ -258,37 +256,25 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		closeMapDBIndex(tempStatementHashesDB);
 		closeMapDBIndex(statementHashesDB);
 		namespaceIndex.closeMapDBIndices();
-		tx.failure();
-		tx.close();
-		txIsClosed = true;
+		tx.failTx();
 
 		BasicNeo4jProcessor.LOG.error("tx failed; closed tx");
 	}
 
-	public void succeedTx() {
+	public void succeedTx() throws DMPGraphException {
 
 		BasicNeo4jProcessor.LOG.debug("tx succeeded; closing tx");
 
 		pumpNFlushStatementIndex();
 		namespaceIndex.pumpNFlushNamespacePrefixIndex();
-		tx.success();
-		tx.close();
-		txIsClosed = true;
+		tx.succeedTx();
 
 		BasicNeo4jProcessor.LOG.debug("tx succeeded; closed tx");
 	}
 
 	public void ensureRunningTx() throws DMPGraphException {
 
-		if (txIsClosed()) {
-
-			beginTx();
-		}
-	}
-
-	public boolean txIsClosed() {
-
-		return txIsClosed;
+		tx.ensureRunningTx();
 	}
 
 	public Optional<Node> determineNode(final Optional<NodeType> optionalResourceNodeType, final Optional<String> optionalResourceId,

@@ -22,24 +22,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
  */
 public class NamespaceUtils {
 
-	private static final AtomicInteger counter               = new AtomicInteger(0);
-	private static final String        NAMESPACE_PREFIX_BASE = "ns";
-	public static final  char          PREFIX_DELIMITER      = ':';
+	private static final Logger LOG = LoggerFactory.getLogger(NamespaceUtils.class);
+
+	private static final AtomicInteger counter                = new AtomicInteger(0);
+	private static final String        NAMESPACE_PREFIX_BASE  = "ns";
+	public static final  char          PREFIX_DELIMITER       = ':';
+	public static final  String        PREFIX_DELIMTER_STRING = String.valueOf(PREFIX_DELIMITER);
 
 	public static String createPrefixedURI(final String fullURI, final Map<String, String> uriPrefixedURIMap,
-			final Map<String, String> tempNamespacePrefixes, final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database)
+			final Map<String, String> tempNamespacePrefixes, final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database,
+			final TransactionHandler tx)
 			throws DMPGraphException {
 
 		if (fullURI == null) {
@@ -51,7 +58,7 @@ public class NamespaceUtils {
 
 			if (!uriPrefixedURIMap.containsKey(fullURI)) {
 
-				final String prefixedURI = determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+				final String prefixedURI = determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
 
 				uriPrefixedURIMap.put(fullURI, prefixedURI);
 			}
@@ -59,12 +66,36 @@ public class NamespaceUtils {
 			return uriPrefixedURIMap.get(fullURI);
 		} else {
 
-			return determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+			return determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+		}
+	}
+
+	public static String createFullURI(final String prefixedURI, final Map<String, String> prefixedURIURIMap, final GraphDatabaseService database,
+			final TransactionHandler tx) throws DMPGraphException {
+
+		if (prefixedURI == null) {
+
+			throw new DMPGraphException("prefixed URI shouldn't be null");
+		}
+
+		if (prefixedURIURIMap != null) {
+
+			if (!prefixedURIURIMap.containsKey(prefixedURI)) {
+
+				final String fullURI = determineFullURI(prefixedURI, database, tx);
+
+				prefixedURIURIMap.put(prefixedURI, fullURI);
+			}
+
+			return prefixedURIURIMap.get(prefixedURI);
+		} else {
+
+			return determineFullURI(prefixedURI, database, tx);
 		}
 	}
 
 	public static String getPrefix(final String namespace, final Map<String, String> tempNamespacesPrefixesMap,
-			final Map<String, String> inMemoryNamespacesPrefixesMap, final GraphDatabaseService database)
+			final Map<String, String> inMemoryNamespacesPrefixesMap, final GraphDatabaseService database, final TransactionHandler tx)
 			throws DMPGraphException {
 
 		if (namespace == null || namespace.trim().isEmpty()) {
@@ -82,41 +113,107 @@ public class NamespaceUtils {
 			return inMemoryNamespacesPrefixesMap.get(namespace);
 		}
 
-		final Optional<Node> optionalNode = Optional
-				.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
+		try {
 
-		if (optionalNode.isPresent()) {
+			tx.ensureRunningTx();
 
-			final String prefix = (String) optionalNode.get().getProperty(GraphProcessingStatics.PREFIX_PROPERTY);
+			final Optional<Node> optionalNode = Optional
+					.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
 
-			if (inMemoryNamespacesPrefixesMap != null) {
+			if (optionalNode.isPresent()) {
 
-				// cache in-memory
-				inMemoryNamespacesPrefixesMap.put(namespace, prefix);
+				final String prefix = (String) optionalNode.get().getProperty(GraphProcessingStatics.PREFIX_PROPERTY);
+
+				if (inMemoryNamespacesPrefixesMap != null) {
+
+					// cache in-memory
+					inMemoryNamespacesPrefixesMap.put(namespace, prefix);
+				}
+
+				return prefix;
+			}
+
+			final String prefix = NAMESPACE_PREFIX_BASE + counter.incrementAndGet();
+
+			if (tempNamespacesPrefixesMap != null) {
+
+				tempNamespacesPrefixesMap.put(namespace, prefix);
 			}
 
 			return prefix;
+		} catch (final Exception e) {
+
+			tx.failTx();
+
+			final String message = "couldn't retrieve prefix successfully";
+
+			LOG.error(message);
+
+			throw new DMPGraphException(message, e);
+		}
+	}
+
+	public static String getNamespace(final String prefix, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
+
+		if (prefix == null || prefix.trim().isEmpty()) {
+
+			throw new DMPGraphException("prefix shouldn't be null or empty");
 		}
 
-		final String prefix = NAMESPACE_PREFIX_BASE + counter.incrementAndGet();
+		Optional<Node> optionalNode = null;
 
-		if (tempNamespacesPrefixesMap != null) {
+		try {
 
-			tempNamespacesPrefixesMap.put(namespace, prefix);
+			tx.ensureRunningTx();
+
+			optionalNode = Optional.fromNullable(
+					database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, prefix));
+		} catch (final Exception e) {
+
+			tx.failTx();
+
+			final String message = "couldn't retrieve namespace successfully";
+
+			LOG.error(message);
+
+			throw new DMPGraphException(message, e);
 		}
 
-		return prefix;
+		if (optionalNode == null || !optionalNode.isPresent()) {
+
+			throw new DMPGraphException(String.format("couldn't find a namespace for prefix '%s'", prefix));
+		}
+
+		final Node node = optionalNode.get();
+		return (String) node.getProperty(GraphStatics.URI_PROPERTY);
 	}
 
 	public static String determinePrefixedURI(final String fullURI, final Map<String, String> tempNamespacePrefixes,
-			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database) throws DMPGraphException {
+			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
 
 		final Tuple<String, String> uriParts = URI.determineParts(fullURI);
 		final String namespaceURI = uriParts.v1();
 		final String localName = uriParts.v2();
 
-		final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+		final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
 
 		return prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
+	}
+
+	public static String determineFullURI(final String prefixedURI, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
+
+		final String[] splittedPrefixedURI = prefixedURI.split(PREFIX_DELIMTER_STRING);
+
+		if (splittedPrefixedURI.length != 2) {
+
+			throw new DMPGraphException(String.format("couldn't split prefixed URI '%s' into two parts", prefixedURI));
+		}
+
+		final String prefix = splittedPrefixedURI[0];
+		final String localName = splittedPrefixedURI[1];
+
+		final String namespace = getNamespace(prefix, database, tx);
+
+		return namespace + localName;
 	}
 }

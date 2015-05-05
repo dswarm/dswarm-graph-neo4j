@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -35,9 +36,9 @@ public class SimpleNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
-	public SimpleNeo4jProcessor(final GraphDatabaseService database, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+	public SimpleNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		super(database, namespaceIndex);
+		super(database, txArg, namespaceIndex);
 	}
 
 	@Override

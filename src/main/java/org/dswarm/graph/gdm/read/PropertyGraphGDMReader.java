@@ -19,26 +19,26 @@ package org.dswarm.graph.gdm.read;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 import org.dswarm.graph.versioning.utils.GraphVersionUtils;
-
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
 
 /**
  * @author tgaengler
@@ -55,19 +55,25 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected       Integer version;
 
 	protected final GraphDatabaseService database;
+	protected final NamespaceIndex       namespaceIndex;
 
 	protected Resource currentResource;
 	protected final Map<Long, Statement> currentResourceStatements = new HashMap<>();
 
-	protected Transaction tx = null;
+	protected final TransactionHandler tx;
 
 	protected final String type;
 
 	public PropertyGraphGDMReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg,
+			final
+			TransactionHandler txArg,
+			final NamespaceIndex namespaceIndexArg,
 			final String typeArg) throws DMPGraphException {
 
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
+		tx = txArg;
+		namespaceIndex = namespaceIndexArg;
 		type = typeArg;
 
 		if (optionalVersionArg.isPresent()) {
@@ -75,7 +81,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 			version = optionalVersionArg.get();
 		} else {
 
-			tx = database.beginTx();
+			tx.ensureRunningTx();
 
 			PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
 
@@ -89,8 +95,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 				PropertyGraphGDMReader.LOG.error(message, e);
 				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
 
-				tx.failure();
-				tx.close();
+				tx.failTx();
 
 				throw new DMPGraphException(message);
 			}
@@ -169,7 +174,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper(namespaceIndex);
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -188,7 +193,8 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 				// predicate
 
 				final String predicate = rel.getType().name();
-				final Predicate predicateProperty = new Predicate(predicate);
+				final String fullPredicateURI = namespaceIndex.createFullURI(predicate);
+				final Predicate predicateProperty = new Predicate(fullPredicateURI);
 
 				// object
 
@@ -197,7 +203,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				// qualified properties at relationship (statement)
 
-				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+				final Long uuid = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 				final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
 				final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
@@ -212,7 +218,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				if (uuid != null) {
 
-					statement.setUUID(uuid);
+					statement.setUUID(uuid.toString());
 				}
 
 				if (confidence != null) {
@@ -243,27 +249,6 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 					// continue traversal with object node
 					nodeHandler.handleNode(rel.getEndNode());
 				}
-			}
-		}
-	}
-
-	protected void ensureTx() throws DMPGraphException {
-
-		if (tx == null) {
-
-			try {
-
-				PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
-
-				tx = database.beginTx();
-			} catch (final Exception e) {
-
-				final String message = "couldn't acquire tx successfully";
-
-				PropertyGraphGDMReader.LOG.error(message, e);
-				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
-
-				throw new DMPGraphException(message);
 			}
 		}
 	}

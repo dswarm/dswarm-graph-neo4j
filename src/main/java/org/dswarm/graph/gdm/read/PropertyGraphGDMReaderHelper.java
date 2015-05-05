@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.ResourceNode;
@@ -39,9 +40,16 @@ public class PropertyGraphGDMReaderHelper {
 
 	private static final Logger					LOG				= LoggerFactory.getLogger(PropertyGraphGDMReaderHelper.class);
 
-	final Map<Long, org.dswarm.graph.json.Node> bnodes        = new HashMap<>();
-	final Map<String, ResourceNode>             resourceNodes = new HashMap<>();
-	final Map<String, Predicate>                predicates    = new HashMap<>();
+	private final Map<Long, org.dswarm.graph.json.Node> bnodes        = new HashMap<>();
+	private final Map<String, ResourceNode>             resourceNodes = new HashMap<>();
+	private final Map<String, Predicate>                predicates    = new HashMap<>();
+
+	private final NamespaceIndex namespaceIndex;
+
+	public PropertyGraphGDMReaderHelper(final NamespaceIndex namespaceIndexArg) {
+
+		namespaceIndex = namespaceIndexArg;
+	}
 
 	public org.dswarm.graph.json.Node readSubject(final Node subjectNode) throws DMPGraphException {
 
@@ -180,16 +188,20 @@ public class PropertyGraphGDMReaderHelper {
 			throw new DMPGraphException(message);
 		}
 
+		final String fullResourceURI = namespaceIndex.createFullURI(resourceURI);
+
 		final String dataModelURI = (String) node.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
 		final ResourceNode resourceNode;
 
 		if (dataModelURI == null) {
 
-			resourceNode = createResourceFromURI(node.getId(), resourceURI);
+			resourceNode = createResourceFromURI(node.getId(), resourceURI, fullResourceURI);
 		} else {
 
-			resourceNode = createResourceFromURIAndDataModel(node.getId(), resourceURI, dataModelURI);
+			final String fullDataModelURI = namespaceIndex.createFullURI(dataModelURI);
+
+			resourceNode = createResourceFromURIAndDataModel(node.getId(), resourceURI, fullResourceURI, dataModelURI, fullDataModelURI);
 		}
 
 		return resourceNode;
@@ -205,21 +217,21 @@ public class PropertyGraphGDMReaderHelper {
 		return bnodes.get(bnodeId);
 	}
 
-	private ResourceNode createResourceFromURI(final long id, final String uri) {
+	private ResourceNode createResourceFromURI(final long id, final String uri, final String fullURI) {
 
 		if (!resourceNodes.containsKey(uri)) {
 
-			resourceNodes.put(uri, new ResourceNode(id, uri));
+			resourceNodes.put(uri, new ResourceNode(id, fullURI));
 		}
 
 		return resourceNodes.get(uri);
 	}
 
-	private ResourceNode createResourceFromURIAndDataModel(final long id, final String uri, final String dataModel) {
+	private ResourceNode createResourceFromURIAndDataModel(final long id, final String uri, final String fullURI, final String dataModel, final String fullDataModelURI) {
 
 		if (!resourceNodes.containsKey(uri + dataModel)) {
 
-			resourceNodes.put(uri + dataModel, new ResourceNode(id, uri, dataModel));
+			resourceNodes.put(uri + dataModel, new ResourceNode(id, fullURI, fullDataModelURI));
 		}
 
 		return resourceNodes.get(uri + dataModel);

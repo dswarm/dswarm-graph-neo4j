@@ -15,6 +15,7 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
@@ -33,14 +34,18 @@ public class NamespaceIndex {
 	final private DB                  inMemoryNamespacePrefixesDB;
 
 	private final Map<String, String> uriPrefixedURIMap;
+	private final Map<String, String> prefixedURIURIMap;
 
 	private final GraphDatabaseService database;
+	private final TransactionHandler tx;
 
-	public NamespaceIndex(final GraphDatabaseService databaseArg) {
+	public NamespaceIndex(final GraphDatabaseService databaseArg, final TransactionHandler txArg) {
 
 		database = databaseArg;
+		tx = txArg;
 
 		uriPrefixedURIMap = Maps.newHashMap();
+		prefixedURIURIMap = Maps.newHashMap();
 
 		final Tuple<Map<String, String>, DB> mapDBTuple3 = MapDBUtils.createOrGetInMemoryStringStringIndexTreeMapNonTransactional(
 				GraphIndexStatics.TEMP_NAMESPACE_PREFIXES_INDEX_NAME);
@@ -63,7 +68,12 @@ public class NamespaceIndex {
 
 	public String createPrefixedURI(final String fullURI) throws DMPGraphException {
 
-		return NamespaceUtils.createPrefixedURI(fullURI, uriPrefixedURIMap, tempNamespacePrefixes, inMemoryNamespacePrefixes, database);
+		return NamespaceUtils.createPrefixedURI(fullURI, uriPrefixedURIMap, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+	}
+
+	public String createFullURI(final String prefixedURI) throws DMPGraphException {
+
+		return NamespaceUtils.createFullURI(prefixedURI, prefixedURIURIMap, database, tx);
 	}
 
 	public String getRDFCLASSPrefixedURI() throws DMPGraphException {
@@ -71,7 +81,7 @@ public class NamespaceIndex {
 		return createPrefixedURI(RDFS.Class.getURI());
 	}
 
-	public void pumpNFlushNamespacePrefixIndex() {
+	public void pumpNFlushNamespacePrefixIndex() throws DMPGraphException {
 
 		LOG.debug("start pump'n'flushing namespace prefix index; size = '{}'", tempNamespacePrefixes.size());
 
@@ -82,9 +92,23 @@ public class NamespaceIndex {
 
 			inMemoryNamespacePrefixes.put(namespace, prefix);
 
-			final Node prefixNode = database.createNode(GraphProcessingStatics.PREFIX_LABEL);
-			prefixNode.setProperty(GraphStatics.URI_PROPERTY, namespace);
-			prefixNode.setProperty(GraphProcessingStatics.PREFIX_PROPERTY, prefix);
+			try {
+
+				tx.ensureRunningTx();
+
+				final Node prefixNode = database.createNode(GraphProcessingStatics.PREFIX_LABEL);
+				prefixNode.setProperty(GraphStatics.URI_PROPERTY, namespace);
+				prefixNode.setProperty(GraphProcessingStatics.PREFIX_PROPERTY, prefix);
+			} catch (final Exception e) {
+
+				tx.failTx();
+
+				final String msg = "couldn't pump'n'flush namespace prefix index successfully";
+
+				LOG.error(msg);
+
+				throw new DMPGraphException(msg, e);
+			}
 		}
 
 		LOG.debug("finished pumping namespace prefix index");
@@ -98,6 +122,7 @@ public class NamespaceIndex {
 	public void clearMaps() {
 
 		uriPrefixedURIMap.clear();
+		prefixedURIURIMap.clear();
 
 		if (!tempNamespacePrefixesDB.isClosed()) {
 

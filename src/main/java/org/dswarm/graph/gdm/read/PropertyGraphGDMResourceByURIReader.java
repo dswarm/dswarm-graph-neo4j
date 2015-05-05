@@ -23,7 +23,9 @@ import org.neo4j.graphdb.Node;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -32,18 +34,19 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 
 	private static final String TYPE = "GDM record by URI";
 
-	private final String	recordUri;
+	private final String recordUri;
 
-	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final Optional<Integer> optionalVersionArg, final GraphDatabaseService database)
+	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, TYPE);
+		super(dataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
 		recordUri = recordUriArg;
 	}
 
 	@Override
-	protected Node getResourceNode()  throws DMPGraphException {
+	protected Node getResourceNode() throws DMPGraphException {
 
 		final long resourceUriDataModelUriHash = HashUtils.generateHash(recordUri + dataModelUri);
 

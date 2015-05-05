@@ -122,6 +122,8 @@ import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.parse.Neo4jUpdateHandler;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
 
 /**
@@ -198,14 +200,16 @@ public class GDMResource {
 		LOG.debug("deserialized GDM statements that were serialised as JSON");
 		LOG.debug("try to write GDM statements into graph db");
 
-		LOG.info("process GDM statements and write them into graph db for data model '{}'", dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, tx, namespaceIndex, dataModelURI);
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, namespaceIndex, dataModelURI);
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
+
+		LOG.info("process GDM statements and write them into graph db for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
 		try {
 
-			final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
 			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
 			final Observable<Resource> newModel;
 			final Observable<Void> deprecateRecordsObservable;
@@ -213,7 +217,7 @@ public class GDMResource {
 			// note: versioning is enable by default
 			if (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get()) {
 
-				LOG.info("do versioning with GDM statements for data model '{}'", dataModelURI);
+				LOG.info("do versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
@@ -250,7 +254,7 @@ public class GDMResource {
 
 				newModel = deltaModel;
 
-				LOG.info("finished versioning with GDM statements for data model '{}'", dataModelURI);
+				LOG.info("finished versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 			} else {
 
 				newModel = model;
@@ -301,10 +305,10 @@ public class GDMResource {
 			content.close();
 
 			LOG.info(
-					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+					"finished writing {} resources with {} GDM statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}' ('{}')",
 					parser.parsedResources(), handler.getHandler().getCountedStatements(),
 					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
-					dataModelURI);
+					dataModelURI, prefixedDataModelURI);
 
 			return Response.ok().build();
 
@@ -344,8 +348,9 @@ public class GDMResource {
 
 		LOG.debug("try to write GDM statements into graph db");
 
-		final NamespaceIndex namespaceIndex = new NamespaceIndex(database);
-		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database, namespaceIndex);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final GDMNeo4jProcessor processor = new SimpleGDMNeo4jProcessor(database, tx, namespaceIndex);
 
 		try {
 
@@ -411,10 +416,17 @@ public class GDMResource {
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 		final Optional<Integer> optionalAtMost = getIntValue(DMPStatics.AT_MOST_IDENTIFIER, requestJSON);
 
-		GDMResource.LOG.info("try to read GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
-				dataModelUri, recordClassUri, optionalVersion);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final String prefixedRecordClassURI = namespaceIndex.createPrefixedURI(recordClassUri);
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelUri);
 
-		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(recordClassUri, dataModelUri, optionalVersion, optionalAtMost, database);
+		GDMResource.LOG
+				.info("try to read GDM statements for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') and version = '{}' from graph db",
+						dataModelUri, prefixedDataModelURI, recordClassUri, prefixedRecordClassURI, optionalVersion);
+
+		final GDMModelReader gdmReader = new PropertyGraphGDMModelReader(prefixedRecordClassURI, prefixedDataModelURI, optionalVersion,
+				optionalAtMost, database, tx, namespaceIndex);
 
 		final StreamingOutput stream = new StreamingOutput() {
 
@@ -436,17 +448,18 @@ public class GDMResource {
 						os.close();
 
 						GDMResource.LOG
-								.info("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
+								.info("finished reading '{}' resources with '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') and version = '{}' from graph db",
 										gdmReader.readResources(), gdmReader.countStatements(), gdmReader.countStatements(), dataModelUri,
-										recordClassUri, optionalVersion);
+										prefixedDataModelURI,
+										recordClassUri, prefixedRecordClassURI, optionalVersion);
 					} else {
 
 						bos.close();
 						os.close();
 
 						GDMResource.LOG
-								.info("couldn't find any GDM statements for data model uri = '{}' and record class uri = '{}' and version = '{}' from graph db",
-										dataModelUri, recordClassUri, optionalVersion);
+								.info("couldn't find any GDM statements for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') and version = '{}' from graph db",
+										dataModelUri, prefixedDataModelURI, recordClassUri, prefixedRecordClassURI, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {
 
@@ -477,17 +490,20 @@ public class GDMResource {
 		GDMResource.LOG.debug("try to read GDM record for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
 				dataModelUri, optionalRecordUri, optionalVersion);
 
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
 		final GDMResourceReader gdmReader;
 
 		if (optionalRecordUri.isPresent()) {
 
-			gdmReader = new PropertyGraphGDMResourceByURIReader(optionalRecordUri.get(), dataModelUri, optionalVersion, database);
+			gdmReader = new PropertyGraphGDMResourceByURIReader(optionalRecordUri.get(), dataModelUri, optionalVersion, database, tx, namespaceIndex);
 		} else if (optionalLegacyRecordIdentifierAP.isPresent() && optionalRecordId.isPresent()) {
 
 			final AttributePath legacyRecordIdentifierAP = AttributePathUtil.parseAttributePathString(optionalLegacyRecordIdentifierAP.get());
 
 			gdmReader = new PropertyGraphGDMResourceByIDReader(optionalRecordId.get(), legacyRecordIdentifierAP, dataModelUri, optionalVersion,
-					database);
+					database, tx, namespaceIndex);
 		} else {
 
 			throw new DMPGraphException(
@@ -566,10 +582,13 @@ public class GDMResource {
 					int resourcesSize = 0;
 					long statementsSize = 0;
 
+					final TransactionHandler tx = new Neo4jTransactionHandler(database);
+					final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
 					for (final String recordUri : recordURIs) {
 
 						final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
-								optionalVersion, database);
+								optionalVersion, database, tx, namespaceIndex);
 
 						try {
 
@@ -637,6 +656,8 @@ public class GDMResource {
 					final Resource existingResource;
 					final GDMResourceReader gdmReader;
 
+					final TransactionHandler tx = new Neo4jTransactionHandler(permanentDatabase);
+
 					if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
 						// determine legacy resource identifier via content schema
@@ -647,13 +668,13 @@ public class GDMResource {
 						// note: version is absent -> should make use of latest version
 						gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
 								optionalContentSchema.get().getRecordIdentifierAttributePath(),
-								prefixedDataModelURI, Optional.<Integer>absent(), permanentDatabase);
+								prefixedDataModelURI, Optional.<Integer>absent(), permanentDatabase, tx, namespaceIndex);
 					} else {
 
 						// try to retrieve existing model via resource uri
 						// note: version is absent -> should make use of latest version
 						gdmReader = new PropertyGraphGDMResourceByURIReader(prefixedResourceURI, prefixedDataModelURI, Optional.<Integer>absent(),
-								permanentDatabase);
+								permanentDatabase, tx, namespaceIndex);
 					}
 
 					existingResource = gdmReader.read();

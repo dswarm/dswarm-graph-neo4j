@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.VersionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
 
@@ -40,9 +41,9 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private final String dataModelURI;
 
-	public DataModelNeo4jProcessor(final GraphDatabaseService database, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
 
-		super(database, namespaceIndex);
+		super(database, txArg, namespaceIndex);
 
 		final Optional<String> optionalPrefixedDataModelURI = optionalCreatePrefixedURI(Optional.fromNullable(dataModelURIArg));
 

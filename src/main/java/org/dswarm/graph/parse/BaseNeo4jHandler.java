@@ -412,7 +412,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	}
 
 	@Override
-	public void closeTransaction() {
+	public void closeTransaction() throws DMPGraphException {
 
 		LOG.debug("close write TX finally");
 

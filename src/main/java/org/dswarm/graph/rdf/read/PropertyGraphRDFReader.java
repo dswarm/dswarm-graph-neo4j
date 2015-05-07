@@ -53,29 +53,24 @@ public class PropertyGraphRDFReader implements RDFReader {
 	private final RelationshipHandler relationshipHandler;
 
 	private final String recordClassUri;
-	private final String dataModelUri;
 	private final String prefixedDataModelUri;
 
 	private final GraphDatabaseService database;
 	private final TransactionHandler tx;
 	private final NamespaceIndex namespaceIndex;
 
-	private final Map<String, String> namespacesPrefixesMap = new HashMap<>();
-	private final Map<String, String> nameMap = new HashMap<>();
-
 	private Model model;
 
 	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
-		dataModelUri = dataModelUriArg;
 		database = databaseArg;
 		tx = txArg;
 		namespaceIndex = namespaceIndexArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
-		prefixedDataModelUri = namespaceIndex.createPrefixedURI(dataModelUri);
+		prefixedDataModelUri = namespaceIndex.createPrefixedURI(dataModelUriArg);
 	}
 
 	@Override

@@ -134,7 +134,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	private void readAllRDFFromDBinternal(final String requestedExportLanguage, final int expectedHTTPResponseCode, final Lang expectedExportLanguage,
 			final String expectedFileEnding) throws IOException {
 
-		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB using a single rdf file");
+		FullRDFExportSingleGraphTest.LOG.debug("start export all RDF statements test for RDF resource at {} DB using a single rdf file", dbType);
 
 		final String dataModelURI = "http://data.slub-dresden.de/resources/2";
 
@@ -173,7 +173,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 		final long statementsInExportedRDFModel = RDFUtils.determineDatasetSize(dataset);
 
-		FullRDFExportSingleGraphTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
+		FullRDFExportSingleGraphTest.LOG.debug("exported '{}' statements", statementsInExportedRDFModel);
 
 		final URL fileURL = Resources.getResource(FullRDFExportSingleGraphTest.RDF_N3_FILE);
 		final ByteSource byteSource = Resources.asByteSource(fileURL);
@@ -199,8 +199,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",
 				actualModel.isIsomorphicWith(modelFromOriginalRDFile));
 
-		FullRDFExportSingleGraphTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType
-				+ " DB using a single rdf file");
+		FullRDFExportSingleGraphTest.LOG.debug("finished export all RDF statements test for RDF resource at {} DB using a single rdf file", dbType);
 	}
 
 }

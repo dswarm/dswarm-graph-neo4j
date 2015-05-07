@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.junit.Assert;
 
 import org.apache.jena.riot.Lang;
@@ -49,7 +50,7 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
-	static private final Logger	LOG			= LoggerFactory.getLogger(FullRDFExportMultipleGraphsTest.class);
+	private static final Logger	LOG			= LoggerFactory.getLogger(FullRDFExportMultipleGraphsTest.class);
 	private static final String	RDF_N3_FILE	= "dmpf_bsp1.n3";
 
 	public FullRDFExportMultipleGraphsTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
@@ -60,7 +61,7 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 	@Test
 	public void readAllRDFFromDB() throws IOException {
 
-		FullRDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at " + dbType + " DB");
+		FullRDFExportMultipleGraphsTest.LOG.debug("start export all RDF statements test for RDF resource at {} DB", dbType);
 
 		final String dataModelURI1 = "http://data.slub-dresden.de/resources/2";
 		final String dataModelURI2 = "http://data.slub-dresden.de/resources/3";
@@ -74,13 +75,13 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
 		//check Content-Disposition header for correct file ending
 		ExportUtils.checkContentDispositionHeader(response, ".nq");
-		
-		
+
+
 		final String body = response.getEntity(String.class);
 
 		Assert.assertNotNull("response body (n-quads) shouldn't be null", body);
 
-		FullRDFExportMultipleGraphsTest.LOG.trace("Response body : " + body);
+		FullRDFExportMultipleGraphsTest.LOG.trace("Response body : {}", body);
 
 		final InputStream stream = new ByteArrayInputStream(body.getBytes("UTF-8"));
 
@@ -93,7 +94,7 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
 		final long statementsInExportedRDFModel = RDFUtils.determineDatasetSize(dataset);
 
-		FullRDFExportMultipleGraphsTest.LOG.debug("exported '" + statementsInExportedRDFModel + "' statements");
+		FullRDFExportMultipleGraphsTest.LOG.debug("exported '{}' statements", statementsInExportedRDFModel);
 
 		final URL fileURL = Resources.getResource(FullRDFExportMultipleGraphsTest.RDF_N3_FILE);
 		final ByteSource byteSource = Resources.asByteSource(fileURL);
@@ -101,11 +102,13 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
 		modelFromOriginalRDFile.read(inputStream, null, "TURTLE");
+		modelFromOriginalRDFile.removeAll(null, RDF.type, null);
 		inputStream.close();
 
 		final InputStream inputStream2 = byteSource.openStream();
 		final Model modelFromOriginalRDFile2 = ModelFactory.createDefaultModel();
 		modelFromOriginalRDFile2.read(inputStream2, null, "TURTLE");
+		modelFromOriginalRDFile2.removeAll(null, RDF.type, null);
 		inputStream2.close();
 
 		final long statementsInOriginalRDFFileAfter2ndRead = modelFromOriginalRDFile.size() + modelFromOriginalRDFile2.size();
@@ -140,7 +143,7 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 				+ " that read 2 times the original RDF file (" + statementsInOriginalRDFFileAfter2ndRead + ")",
 				statementsInOriginalRDFFileAfter2ndRead, statementsInExportedRDFModel);
 
-		FullRDFExportMultipleGraphsTest.LOG.debug("finished export all RDF statements test for RDF resource at " + dbType + " DB");
+		FullRDFExportMultipleGraphsTest.LOG.debug("finished export all RDF statements test for RDF resource at {} DB", dbType);
 	}
 
 }

@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import javax.ws.rs.core.MediaType;
 
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.junit.Assert;
 
 import org.apache.http.HttpStatus;
@@ -102,7 +103,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 	/**
 	 * Export the graph identified by {@code dataModelURI4} to TRIG
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -113,7 +114,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 	/**
 	 * Export the graph identified by {@code dataModelURI4} to TURTLE
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -125,7 +126,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	/**
 	 * Export the graph identified by {@code dataModelURI4} to the default format that is chosen in case no format is
 	 * requested (i.e. empty accept parameter)
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -137,7 +138,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	/**
 	 * Export the graph identified by {@code dataModelURI4} to text/plain format. This format is not supported, a HTTP
 	 * 406 (not acceptable) response is expected.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -149,7 +150,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	/**
 	 * Export the graph identified by {@code dataModelURI4} to a not existing format by sending some "random" accept
 	 * header value. A HTTP 406 (not acceptable) response is expected.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -163,7 +164,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 	 * model in slices. This test makes sure the slicing works. <br />
 	 * Additionally, the test does a self-test and fails if the resource file's model contains less statements than one cypher
 	 * query returns.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -187,7 +188,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 	/**
 	 * TODO: add doc
-	 * 
+	 *
 	 * @param requestedExportLanguage the serialization format neo4j should export the data to. (this value is used as accept
 	 *            header arg to query neo4j)
 	 * @param dataModelURI identifier of the graph to export
@@ -206,7 +207,7 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 			final int expectedHTTPResponseCode, final Lang expectedExportLanguage, final String expectedModelFile, final String expectedFileEnding)
 			throws IOException {
 
-		PartialRDFExportTest.LOG.trace("requesting export language: \"" + requestedExportLanguage + "\"");
+		PartialRDFExportTest.LOG.trace("requesting export language: \"{}\"", requestedExportLanguage);
 
 		// request export from neo4j
 		final ClientResponse response = service().path("/rdf/export").queryParam("data_model_uri", dataModelURI).accept(requestedExportLanguage)
@@ -228,22 +229,21 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 
 		Assert.assertNotNull("response body shouldn't be null", body);
 
-		PartialRDFExportTest.LOG.trace("Response body:\n" + body);
+		PartialRDFExportTest.LOG.trace("Response body:\n{}", body);
 
 		final InputStream inputStream = new ByteArrayInputStream(body.getBytes("UTF-8"));
-
-		Assert.assertNotNull("input stream (from body) shouldn't be null", inputStream);
 
 		// read actual model from response body
 		final Model actualModel = ModelFactory.createDefaultModel();
 		RDFDataMgr.read(actualModel, inputStream, expectedExportLanguage);
 
 		Assert.assertNotNull("actual model shouldn't be null", actualModel);
-		PartialRDFExportTest.LOG.debug("exported '" + actualModel.size() + "' statements");
+		PartialRDFExportTest.LOG.debug("exported '{}' statements", actualModel.size());
 
 		// read expected model from file
 		final Model expectedModel = RDFDataMgr.loadModel(expectedModelFile);
 		Assert.assertNotNull("expected model shouldn't be null", expectedModel);
+		expectedModel.removeAll(null, RDF.type, null);
 
 		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)
 		Assert.assertTrue("the RDF from the property graph is not isomorphic to the RDF in the original file ",

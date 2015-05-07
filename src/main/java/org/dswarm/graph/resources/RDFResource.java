@@ -469,12 +469,21 @@ public class RDFResource {
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
 		RDFResource.LOG.debug("Exporting rdf data to {}", formatType);
 
-		final String result = exportAllRDFInternal(database, exportLanguage);
+		final Optional<String> result = exportAllRDFInternal(database, exportLanguage);
 
-		RDFResource.LOG.debug("End processing request to export all rdf data to format \"{}\"", exportFormat);
+		if (result.isPresent()) {
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+			RDFResource.LOG.debug("End processing request to export all rdf data to format \"{}\"", exportFormat);
+
+			return Response.ok(result.get()).type(formatType.toString())
+					.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+
+		} else {
+
+			RDFResource.LOG.debug("Could not find any data");
+
+			return Response.status(404).build();
+		}
 	}
 
 	/**
@@ -512,12 +521,20 @@ public class RDFResource {
 		RDFResource.LOG.debug("Interpreting requested format \"{}\" as \"{}\"", exportFormat, formatType);
 
 		// export and serialize data
-		final String result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
+		final Optional<String> result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
 
-		RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
+		if (result.isPresent()) {
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+			RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
+
+			return Response.ok(result.get()).type(formatType.toString())
+					.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+		} else {
+
+			RDFResource.LOG.debug("Could not find data model for uri \"{}\"", dataModelURI);
+
+			return Response.status(404).build();
+		}
 	}
 
 	/**
@@ -526,26 +543,33 @@ public class RDFResource {
 	 * @param dataModelURI db internal identifier of the data model
 	 * @return a single data model, serialized in exportLanguage
 	 */
-	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
+	private Optional<String> exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
 			throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"{}\" from graph db to format \"{}\"", dataModelURI, exportLanguage.getLabel());
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI);
-		final Dataset dataset = rdfExporter.export();
-		final Model exportedModel = dataset.getNamedModel(dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI, tx, namespaceIndex);
+		final Optional<Dataset> dataset = rdfExporter.export();
 
-		// serialize (export) model to exportLanguage
-		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, exportedModel, exportLanguage);
-		final String result = writer.toString();
+		if (dataset.isPresent()) {
 
-		RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
+			final Model exportedModel = dataset.get().getNamedModel(dataModelURI);
 
-		// LOG.debug("exported result:\n" + result);
+			// serialize (export) model to exportLanguage
+			final StringWriter writer = new StringWriter();
+			RDFDataMgr.write(writer, exportedModel, exportLanguage);
+			final String result = writer.toString();
 
-		return result;
+			RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
+
+			// LOG.debug("exported result:\n" + result);
+
+			return Optional.of(result);
+		}
+		return Optional.absent();
 	}
 
 	/**
@@ -553,22 +577,29 @@ public class RDFResource {
 	 * @param exportLanguage the language all data should be serialized in
 	 * @return all data models serialized in exportLanguage
 	 */
-	private String exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) throws DMPGraphException {
+	private Optional<String> exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new GraphRDFExporter(database);
-		final Dataset dataset = rdfExporter.export();
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFExporter rdfExporter = new GraphRDFExporter(database, tx, namespaceIndex);
+		final Optional<Dataset> dataset = rdfExporter.export();
 
-		// serialize (export) model to exportLanguage
-		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, dataset, exportLanguage);
-		final String result = writer.toString();
+		if (dataset.isPresent()) {
 
-		RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
+			// serialize (export) model to exportLanguage
+			final StringWriter writer = new StringWriter();
+			RDFDataMgr.write(writer, dataset.get(), exportLanguage);
+			final String result = writer.toString();
 
-		return result;
+			RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
+
+			return Optional.of(result);
+		}
+
+		return Optional.absent();
 	}
 
 }

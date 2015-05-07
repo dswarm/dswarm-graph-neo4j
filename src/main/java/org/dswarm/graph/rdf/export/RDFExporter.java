@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.rdf.export;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.query.Dataset;
 
 import org.dswarm.graph.DMPGraphException;
@@ -25,7 +26,7 @@ import org.dswarm.graph.DMPGraphException;
  */
 public interface RDFExporter {
 
-	public Dataset export() throws DMPGraphException;
+	public Optional<Dataset> export() throws DMPGraphException;
 
 	public long countStatements();
 

@@ -19,17 +19,19 @@ package org.dswarm.graph.rdf.export;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Result;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 public class DataModelRDFExporter extends BaseRDFExporter {
 
@@ -38,11 +40,14 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 	public static final int CYPHER_LIMIT = 1000;
 
 	private final String dataModelURI;
+	private final String prefixedDataModelURI;
+	private final TransactionHandler tx;
 
-	public DataModelRDFExporter(final GraphDatabaseService databaseArg, final String dataModelURIArg) {
-		super(databaseArg);
+	public DataModelRDFExporter(final GraphDatabaseService databaseArg, final String dataModelURIArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+		super(databaseArg, namespaceIndex);
 		dataModelURI = dataModelURIArg;
-
+		tx = txArg;
+		prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURIArg);
 	}
 
 	/**
@@ -51,11 +56,13 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 	 * @return a data model identified by dataModelURI
 	 */
 	@Override
-	public Dataset export() throws DMPGraphException {
+	public Optional<Dataset> export() throws DMPGraphException {
 
-		DataModelRDFExporter.LOG.debug("start exporting data for dataModelURI \"" + dataModelURI + "\"");
+		DataModelRDFExporter.LOG.debug("start exporting data for dataModelURI \"{}\"", dataModelURI);
 
-		try (final Transaction tx = database.beginTx()) {
+		tx.ensureRunningTx();
+
+		try {
 
 			dataset = DatasetFactory.createMem();
 
@@ -65,7 +72,7 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 			while (requestResults) {
 
 				final Result result = database.execute("MATCH (n)-[r]->(m) WHERE r." + GraphStatics.DATA_MODEL_PROPERTY + " = \""
-						+ dataModelURI + "\" RETURN DISTINCT r ORDER BY id(r) SKIP " + start + " LIMIT " + DataModelRDFExporter.CYPHER_LIMIT);
+						+ prefixedDataModelURI + "\" RETURN DISTINCT r ORDER BY id(r) SKIP " + start + " LIMIT " + DataModelRDFExporter.CYPHER_LIMIT);
 
 				if(result == null) {
 
@@ -125,7 +132,6 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				result.close();
 			}
 
-			tx.success();
 		}  catch (final Exception e) {
 
 			final String mesage = "couldn't finish read RDF TX successfully";
@@ -133,9 +139,12 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 			DataModelRDFExporter.LOG.error(mesage, e);
 
 			throw new DMPGraphException(mesage);
+		} finally {
+
+			tx.succeedTx();
 		}
 
-		return dataset;
+		return Optional.fromNullable(dataset);
 	}
 
 }

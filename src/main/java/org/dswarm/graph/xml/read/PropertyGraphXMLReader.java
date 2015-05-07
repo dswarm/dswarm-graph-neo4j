@@ -17,7 +17,11 @@
 package org.dswarm.graph.xml.read;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +29,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import ch.lambdaj.Lambda;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.codehaus.stax2.XMLOutputFactory2;
 import org.neo4j.graphdb.Direction;
@@ -36,8 +39,8 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.ResourceIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,14 @@ import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
  */
 public class PropertyGraphXMLReader implements XMLReader {
 
+	private static final Comparator<Relationship> BY_INDEX_PROPERTY = new Comparator<Relationship>() {
+		@Override
+		public int compare(final Relationship o1, final Relationship o2) {
+			final Long o1Index = (Long) o1.getProperty(GraphStatics.INDEX_PROPERTY);
+			final Long o2Index = (Long) o2.getProperty(GraphStatics.INDEX_PROPERTY);
+			return o1Index.compareTo(o2Index);
+		}
+	};
 	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphXMLReader.class);
 
 	/**
@@ -93,10 +104,11 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private final GraphDatabaseService database;
 	private final NamespaceIndex       namespaceIndex;
+	private final String               prefixedDataModel;
 
 	private long recordCount = 0;
 
-	private Integer version;
+	private final Integer version;
 
 	private final boolean originalDataTypeIsXML;
 
@@ -153,6 +165,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 		}
 
 		originalDataTypeIsXML = optionalOriginalDataType.isPresent() && DMPStatics.XML_DATA_TYPE.equals(optionalOriginalDataType.get());
+		prefixedDataModel = namespaceIndex.createPrefixedURI(dataModelUri);
 	}
 
 	@Override
@@ -177,32 +190,20 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		try {
 
-			final Label recordClassLabel = DynamicLabel.label(recordClassURIString);
+			final String prefixedURI = namespaceIndex.createPrefixedURI(recordClassURIString);
+			final Label recordClassLabel = DynamicLabel.label(prefixedURI);
 
 			// TODO: refactor this to #findNodes + something else, then counting over the iterator
-			final ResourceIterable<Node> recordNodes = database.findNodesByLabelAndProperty(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-					dataModelUri);
-
-			if (recordNodes == null) {
-
-				tx.succeedTx();
-
-				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read XML TX successfully");
-
-				return Optional.absent();
-			}
-
-			final int recordsSize = Iterables.size(recordNodes);
-
-			recordNodesIter = recordNodes.iterator();
+			recordNodesIter = database.findNodes(
+					recordClassLabel,
+					GraphStatics.DATA_MODEL_PROPERTY,
+					prefixedDataModel);
 
 			if (recordNodesIter == null) {
 
 				tx.succeedTx();
 
-				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read XML TX successfully");
+				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '{}' in data model '{}'finished read XML TX successfully", recordClassLabel, dataModelUri);
 
 				return Optional.absent();
 			}
@@ -212,11 +213,14 @@ public class PropertyGraphXMLReader implements XMLReader {
 				recordNodesIter.close();
 				tx.succeedTx();
 
-				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '" + recordClassLabel + "' in data model '" + dataModelUri
-						+ "'finished read XML TX successfully");
+				PropertyGraphXMLReader.LOG.debug("there are no root nodes for '{}' in data model '{}'finished read XML TX successfully", recordClassLabel, dataModelUri);
 
 				return Optional.absent();
 			}
+
+			final Node firstRecord = recordNodesIter.next();
+			final Iterator<Node> nodeIterator = Iterators.concat(Iterators.forArray(firstRecord), recordNodesIter);
+			final boolean hasAtLeasTwoRecords = recordNodesIter.hasNext();
 
 			// (XMLStreamWriter2)
 			final XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
@@ -245,10 +249,10 @@ public class PropertyGraphXMLReader implements XMLReader {
 					XMLStreamWriterUtils.writeXMLElementTag(writer, attributeURI, namespacesPrefixesMap, nameMap, isElementOpen);
 					isElementOpen = true;
 				}
-			} else if (recordsSize > 1) {
+			} else if (hasAtLeasTwoRecords) {
 
 				// write default root
-				final URI defaultRootURI = new URI(recordTagURI.toString() + "s");
+				final URI defaultRootURI = new URI(recordTagURI + "s");
 
 				determineAndWriteXMLElementAndNamespace(defaultRootURI, writer);
 			}
@@ -270,18 +274,19 @@ public class PropertyGraphXMLReader implements XMLReader {
 			}
 
 			// note: relationship handler knows this node handler
-			new CBDNodeHandler(relationshipHandler);
+			//noinspection unused
+			final CBDNodeHandler connectRelsAndNodeHandler = new CBDNodeHandler(relationshipHandler);
 			final XMLNodeHandler startNodeHandler = new CBDStartNodeHandler(relationshipHandler);
 
 			// iterate over the records
-			while (recordNodesIter.hasNext()) {
+			while (nodeIterator.hasNext()) {
 
-				final Node recordNode = recordNodesIter.next();
+				final Node recordNode = nodeIterator.next();
 				final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
 				if (resourceUri == null) {
 
-					LOG.debug("there is no resource URI at record node '" + recordNode.getId() + "'");
+					LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
 
 					continue;
 				}
@@ -309,7 +314,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 					writer.writeEndElement();
 				}
-			} else if (recordsSize > 1) {
+			} else if (hasAtLeasTwoRecords) {
 
 				// close default root
 				writer.writeEndElement();
@@ -398,6 +403,40 @@ public class PropertyGraphXMLReader implements XMLReader {
 		return recordCount;
 	}
 
+	private static boolean hasValidVersion(final Integer version, final PropertyContainer relationship) {
+
+		final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
+
+		// TODO: require non null later, when every stmt is versioned
+		if (validFrom == null) {
+			return true;
+		}
+
+		final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
+
+		return validTo == null || Range.range(validFrom, validTo).contains(version);
+	}
+
+	private static Iterable<Relationship> getSortedOutgoings(final Node node) {
+
+		final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
+
+		if (relationships == null) {
+
+			return Collections.emptyList();
+		}
+
+		final Iterator<Relationship> relationshipIterator = relationships.iterator();
+		final List<Relationship> sortedRels = new ArrayList<>();
+		Iterators.addAll(sortedRels, relationshipIterator);
+
+		// sort rels by index value
+		// TODO: what should we do, if index is null (currently, the case for import via RDF)
+		Collections.sort(sortedRels, BY_INDEX_PROPERTY);
+
+		return sortedRels;
+	}
+
 	private class CBDNodeHandler implements XMLNodeHandler {
 
 		private final XMLRelationshipHandler relationshipHandler;
@@ -416,32 +455,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 			// => maybe we should find an appropriated cypher query as replacement for this processing
 			if (!node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
+				for (final Relationship relationship : getSortedOutgoings(node)) {
 
-				if (relationships == null || !relationships.iterator().hasNext()) {
-
-					return;
-				}
-
-				// sort rels by index value
-				// TODO: what should we do, if index is null (currently, the case for import via RDF)
-				final List<Relationship> sortedRels = Lambda.sort(relationships,
-						Lambda.on(Relationship.class).getProperty(GraphStatics.INDEX_PROPERTY));
-
-				for (final Relationship relationship : sortedRels) {
-
-					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
-					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
-
-					if (validFrom != null && validTo != null) {
-
-						if (Range.range(validFrom, validTo).contains(version)) {
-
-							relationshipHandler.handleRelationship(relationship);
-						}
-					} else {
-
-						// TODO: remove this later, when every stmt is versioned
+					if (hasValidVersion(version, relationship)) {
 						relationshipHandler.handleRelationship(relationship);
 					}
 				}
@@ -466,32 +482,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 			// node that holds the uri of the resource (record)
 			if (node.hasProperty(GraphStatics.URI_PROPERTY)) {
 
-				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
+				for (final Relationship relationship : getSortedOutgoings(node)) {
 
-				if (relationships == null || !relationships.iterator().hasNext()) {
-
-					return;
-				}
-
-				// sort rels by index value
-				// TODO: what should we do, if index is null (currently, the case for import via RDF)
-				final List<Relationship> sortedRels = Lambda.sort(relationships,
-						Lambda.on(Relationship.class).getProperty(GraphStatics.INDEX_PROPERTY));
-
-				for (final Relationship relationship : sortedRels) {
-
-					final Integer validFrom = (Integer) relationship.getProperty(VersioningStatics.VALID_FROM_PROPERTY, null);
-					final Integer validTo = (Integer) relationship.getProperty(VersioningStatics.VALID_TO_PROPERTY, null);
-
-					if (validFrom != null && validTo != null) {
-
-						if (Range.range(validFrom, validTo).contains(version)) {
-
-							relationshipHandler.handleRelationship(relationship);
-						}
-					} else {
-
-						// TODO: remove this later, when every stmt is versioned
+					if (hasValidVersion(version, relationship)) {
 						relationshipHandler.handleRelationship(relationship);
 					}
 				}
@@ -524,7 +517,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			// note: we can also optionally check for the "resource property at the relationship (this property will only be
 			// written right now for model that came as GDM JSON)
-			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(prefixedDataModel)) {
 
 				// subject => start element (???)
 
@@ -534,10 +527,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// (key(predicate)/value(object)) into the current element or another of this tag
 				// TODO: how to determine, when we should close a tag (or parent tag etc.) => we need to keep a stack, of open
 				// elements
-
 				// predicate => XML element or XML attribute
 
-				final String predicateString = rel.getType().name();
+				final String predicateString = namespaceIndex.createFullURI(rel.getType().name());
 				final Tuple<Predicate, URI> predicateTuple = getPredicate(predicateString);
 				final URI predicateURI = predicateTuple.v2();
 
@@ -551,7 +543,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 				// note: we can only iterate deeper into one direction, i.e., we need to cut the stream, when the object is
 				// another resource => i.e. we iterate only when object are bnodes
 				// TODO: what should we do with objects that are resources?
-				if (objectGDMNode.getType().equals(NodeType.BNode)) {
+				if (objectGDMNode.getType() == NodeType.BNode) {
 
 					// open tag
 					XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap, isElementOpen);
@@ -570,7 +562,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 		protected void writeKeyValue(final URI predicateURI, final org.dswarm.graph.json.Node objectGDMNode) throws XMLStreamException {
 
 			// default handling: don't export RDF types and write literal objects as XML elements
-			if (!RDF.type.getURI().equals(predicateURI.toString()) && NodeType.Literal.equals(objectGDMNode.getType())) {
+			if (!RDF.type.getURI().equals(predicateURI.toString()) && NodeType.Literal == objectGDMNode.getType()) {
 
 				// open tag
 				XMLStreamWriterUtils.writeXMLElementTag(writer, predicateURI, namespacesPrefixesMap, nameMap, isElementOpen);
@@ -602,13 +594,13 @@ public class PropertyGraphXMLReader implements XMLReader {
 		protected void writeKeyValue(final URI predicateURI, final org.dswarm.graph.json.Node objectGDMNode) throws XMLStreamException {
 
 			if (!(RDF.type.getURI().equals(predicateURI.toString()) || RDF.value.getURI().equals(predicateURI.toString()))
-					&& NodeType.Literal.equals(objectGDMNode.getType())) {
+					&& NodeType.Literal == objectGDMNode.getType()) {
 
 				// predicate is an XML Attribute => write XML Attribute to this XML Element
 
 				XMLStreamWriterUtils
 						.writeXMLAttribute(writer, predicateURI, ((LiteralNode) objectGDMNode).getValue(), namespacesPrefixesMap, nameMap);
-			} else if (RDF.value.getURI().equals(predicateURI.toString()) && NodeType.Literal.equals(objectGDMNode.getType())) {
+			} else if (RDF.value.getURI().equals(predicateURI.toString()) && NodeType.Literal == objectGDMNode.getType()) {
 
 				// predicate is an XML Element
 

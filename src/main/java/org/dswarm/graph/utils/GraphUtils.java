@@ -16,9 +16,6 @@
  */
 package org.dswarm.graph.utils;
 
-import java.util.Set;
-
-import com.google.common.collect.Sets;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -30,9 +27,12 @@ import org.dswarm.graph.NodeType;
 /**
  * @author tgaengler
  */
-public class GraphUtils {
+public final class GraphUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GraphUtils.class);
+
+	private GraphUtils() { // utils class
+	}
 
 	public static NodeType determineNodeType(final Node node) throws DMPGraphException {
 
@@ -43,43 +43,36 @@ public class GraphUtils {
 			throw new DMPGraphException(String.format("couldn't determine node type; there are no labels at node '%d'", node.getId()));
 		}
 
-		final Set<String> labels = Sets.newHashSet();
-
 		for (final Label label : nodeLabels) {
 
-			labels.add(label.name());
+			final String labelName = label.name();
+
+			if (labelName.equals(NodeType.TypeResource.getName())) {
+
+				return NodeType.TypeResource;
+			}
+
+			if (labelName.equals(NodeType.TypeBNode.getName())) {
+
+				return NodeType.TypeBNode;
+			}
+
+			if (labelName.equals(NodeType.Resource.getName())) {
+
+				return NodeType.Resource;
+			}
+
+			if (labelName.equals(NodeType.BNode.getName())) {
+
+				return NodeType.BNode;
+			}
+
+			if (labelName.equals(NodeType.Literal.getName())) {
+
+				return NodeType.Literal;
+			}
 		}
 
-		if (labels.isEmpty()) {
-
-			throw new DMPGraphException(String.format("couldn't determine node type; there are no labels at node '%d'", node.getId()));
-		}
-
-		if (labels.contains(NodeType.TypeResource.getName())) {
-
-			return NodeType.TypeResource;
-		}
-
-		if (labels.contains(NodeType.TypeBNode.getName())) {
-
-			return NodeType.TypeBNode;
-		}
-
-		if (labels.contains(NodeType.Resource.getName())) {
-
-			return NodeType.Resource;
-		}
-
-		if (labels.contains(NodeType.BNode.getName())) {
-
-			return NodeType.BNode;
-		}
-
-		if (labels.contains(NodeType.Literal.getName())) {
-
-			return NodeType.Literal;
-		}
-
-		throw new DMPGraphException(String.format("couldn't determine node type; there only other labels at node '%d'", node.getId()));
+		throw new DMPGraphException(String.format("couldn't determine node type due to missing type labels at node '%d'", node.getId()));
 	}
 }

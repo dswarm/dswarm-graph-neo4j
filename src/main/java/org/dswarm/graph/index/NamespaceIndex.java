@@ -42,12 +42,12 @@ public class NamespaceIndex {
 	private static final Logger LOG = LoggerFactory.getLogger(NamespaceIndex.class);
 
 	// for caching per TX
-	final private Map<String, String> tempNamespacePrefixes;
-	final private DB                  tempNamespacePrefixesDB;
+	private final Map<String, String> tempNamespacePrefixes;
+	private final DB                  tempNamespacePrefixesDB;
 
 	// for caching over the whole process
-	final private Map<String, String> inMemoryNamespacePrefixes;
-	final private DB                  inMemoryNamespacePrefixesDB;
+	private final Map<String, String> inMemoryNamespacePrefixes;
+	private final DB                  inMemoryNamespacePrefixesDB;
 
 	private final Map<String, String> uriPrefixedURIMap;
 	private final Map<String, String> prefixedURIURIMap;

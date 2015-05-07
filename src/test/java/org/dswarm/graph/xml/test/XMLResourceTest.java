@@ -46,6 +46,7 @@ import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import org.xmlunit.diff.Difference;
 
 /**
  * @author tgaengler
@@ -188,22 +189,32 @@ public abstract class XMLResourceTest extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 		Assert.assertEquals(MediaType.APPLICATION_XML_TYPE, response.getType());
 
-		final InputStream actualXML = response.getEntity(InputStream.class);
-		final BufferedInputStream bis = new BufferedInputStream(actualXML, 1024);
-
-		Assert.assertNotNull(actualXML);
+		final InputStream actualXMLStream = response.getEntity(InputStream.class);
+		Assert.assertNotNull(actualXMLStream);
 
 		// compare result with expected result
 		final URL expectedFileURL = Resources.getResource(expectedFileName);
 		final String expectedXML = Resources.toString(expectedFileURL, Charsets.UTF_8);
 
+		final BufferedInputStream bis = new BufferedInputStream(actualXMLStream, 1024);
+
 		// do comparison: check for XML similarity
-		final Diff xmlDiff = DiffBuilder.compare(Input.fromString(expectedXML)).withTest(Input.fromStream(bis)).ignoreWhitespace()
-				.checkForSimilar().build();
+		final Diff xmlDiff = DiffBuilder
+				.compare(Input.fromString(expectedXML))
+				.withTest(Input.fromStream(bis))
+				.ignoreWhitespace()
+				.checkForSimilar()
+				.build();
 
-		Assert.assertFalse(xmlDiff.hasDifferences());
+		if (xmlDiff.hasDifferences()) {
+			final StringBuilder sb = new StringBuilder("Oi chap, there seem to ba a mishap!");
+			for (final Difference difference : xmlDiff.getDifferences()) {
+				sb.append('\n').append(difference);
+			}
+			Assert.fail(sb.toString());
+		}
 
-		actualXML.close();
+		actualXMLStream.close();
 		bis.close();
 	}
 

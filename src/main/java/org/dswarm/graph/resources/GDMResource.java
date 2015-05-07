@@ -690,7 +690,7 @@ public class GDMResource {
 					}
 
 					final String existingResourceURI = existingResource.getUri();
-					final String prefixedExistingResourceURI = handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
+					final String prefixedExistingResourceURI = existingResourceURI; // handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
 					final long existingResourceHash = handler.getHandler().getProcessor().generateResourceHash(prefixedExistingResourceURI,
 							Optional.<String>absent());
 					processedResources.add(existingResourceHash);

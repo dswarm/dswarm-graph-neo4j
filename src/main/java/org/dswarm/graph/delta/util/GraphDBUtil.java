@@ -18,6 +18,7 @@ package org.dswarm.graph.delta.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import ch.lambdaj.Lambda;
@@ -188,7 +190,8 @@ public final class GraphDBUtil {
 					@Override
 					public Evaluation evaluate(final Path path) {
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
+						final boolean hasLeafLabel = path.endNode() != null &&
+								path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
 
 						if (hasLeafLabel) {
 
@@ -915,12 +918,15 @@ public final class GraphDBUtil {
 
 			GraphDBUtil.LOG.error(message, e);
 
-			throw new DMPGraphException(message);
+			throw new DMPGraphException(message, e);
 		}
 	}
 
 	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) {
 
+		if (node == null) {
+			return Collections.emptyList();
+		}
 		// determine flat values
 		final Iterable<Path> paths = graphDB.traversalDescription().breadthFirst().evaluator(new StatementEvaluator(node.getId())).traverse(node);
 

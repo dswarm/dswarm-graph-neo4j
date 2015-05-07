@@ -64,7 +64,7 @@ public class GDMResourceParser implements GDMParser {
 
 		long i = 0;
 
-		final String prefixedResourceUri = gdmHandler.getNamespaceIndex().createPrefixedURI(resource.getUri());
+		final String prefixedResourceUri = resource.getUri(); // gdmHandler.getNamespaceIndex().createPrefixedURI(resource.getUri());
 		final long resourceHash = HashUtils.generateHash(prefixedResourceUri);
 
 		for (final Statement statement : resource.getStatements()) {

@@ -55,7 +55,7 @@ public final class GraphDBMarkUtil {
 
 			GraphDBMarkUtil.LOG.error(message, e);
 
-			throw new DMPGraphException(message);
+			throw new DMPGraphException(message, e);
 		}
 	}
 

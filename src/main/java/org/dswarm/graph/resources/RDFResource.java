@@ -17,8 +17,10 @@
 package org.dswarm.graph.resources;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -31,10 +33,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -148,7 +153,7 @@ public class RDFResource {
 				rdfInputStream.close();
 			}
 
-			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -197,7 +202,7 @@ public class RDFResource {
 				inputStream.close();
 			}
 
-			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -385,22 +390,51 @@ public class RDFResource {
 		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
 		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 
-		LOG.debug("try to read RDF statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+		LOG.debug("try to read RDF statements for data model uri = '{}' and record class uri = '{}' from graph db",
+				dataModelUri, recordClassUri);
 
-		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, dataModelUri, database);
-		final Model model = rdfReader.read();
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
-		// model.write(System.out, "N-TRIPLE");
+		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, dataModelUri, database, tx, namespaceIndex);
 
-		final StringWriter writer = new StringWriter();
-		model.write(writer, "N-TRIPLE");
-		final String result = writer.toString();
+		final StreamingOutput stream = new StreamingOutput() {
 
-		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
-				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' from graph db");
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
 
-		return Response.ok().entity(result).build();
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+
+					final Optional<Model> optionalModel = rdfReader.read();
+
+					if (optionalModel.isPresent()) {
+
+
+						final Model model = optionalModel.get();
+
+						LOG.debug("finished reading '{}' RDF statements ('{}' via RDF reader) for data model uri = '{}' and record class uri = '{}' from graph db",
+								model.size(), rdfReader.countStatements(), dataModelUri, recordClassUri);
+
+						model.write(bos, "N-TRIPLE");
+
+					} else {
+
+						bos.close();
+						os.close();
+
+						LOG.debug("couldn't find any RDF records for data model uri = '{}' and record class uri = '{}' from graph db",
+								dataModelUri, recordClassUri);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, "application/n-triples").build();
 	}
 
 	/**
@@ -420,25 +454,24 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
-		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"" + exportFormat + "\"");
+		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"{}\"", exportFormat);
 
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
-		} catch (IllegalArgumentException wrongFormat) {
-			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
-					+ wrongFormat.getLocalizedMessage());
+		} catch (final IllegalArgumentException wrongFormat) {
+			RDFResource.LOG.debug("Requested format \"{}\" can not be used to create a MediaType. See exception: {}", exportFormat, wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 
 		// determine export language and file extension
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
+		RDFResource.LOG.debug("Exporting rdf data to {}", formatType);
 
 		final String result = exportAllRDFInternal(database, exportLanguage);
 
-		RDFResource.LOG.debug("End processing request to export all rdf data to format \"" + exportFormat + "\"");
+		RDFResource.LOG.debug("End processing request to export all rdf data to format \"{}\"", exportFormat);
 
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
@@ -463,28 +496,25 @@ public class RDFResource {
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
 			@QueryParam("data_model_uri") final String dataModelURI) throws DMPGraphException {
 
-		RDFResource.LOG.debug("Start processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
-				+ "\"");
+		RDFResource.LOG.debug("Start processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
 
 		// determine export language and file extension
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
-		} catch (IllegalArgumentException wrongFormat) {
+		} catch (final IllegalArgumentException wrongFormat) {
 			// SR TODO remove log (antipattern log+throw)
-			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
-					+ wrongFormat.getLocalizedMessage());
+			RDFResource.LOG.debug("Requested format \"{}\" can not be used to create a MediaType. See exception: {}", exportFormat, wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-		RDFResource.LOG.debug("Interpreting requested format \"" + exportFormat + "\" as \"" + formatType.toString() + "\"");
+		RDFResource.LOG.debug("Interpreting requested format \"{}\" as \"{}\"", exportFormat, formatType);
 
 		// export and serialize data
 		final String result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
 
-		RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
-				+ "\"");
+		RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
 
 		return Response.ok(result).type(formatType.toString())
 				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
@@ -499,8 +529,7 @@ public class RDFResource {
 	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
 			throws DMPGraphException {
 
-		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"" + dataModelURI + "\" from graph db to format \""
-				+ exportLanguage.getLabel() + "\"");
+		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"{}\" from graph db to format \"{}\"", dataModelURI, exportLanguage.getLabel());
 
 		// get data from neo4j
 		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI);
@@ -512,9 +541,7 @@ public class RDFResource {
 		RDFDataMgr.write(writer, exportedModel, exportLanguage);
 		final String result = writer.toString();
 
-		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
-				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
-				+ "'))");
+		RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
 
 		// LOG.debug("exported result:\n" + result);
 
@@ -539,9 +566,7 @@ public class RDFResource {
 		RDFDataMgr.write(writer, dataset, exportLanguage);
 		final String result = writer.toString();
 
-		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
-				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
-				+ "'))");
+		RDFResource.LOG.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))", rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
 
 		return result;
 	}

@@ -19,6 +19,7 @@ package org.dswarm.graph.rdf.read;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -30,14 +31,15 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -46,57 +48,69 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFReader.class);
 
-	private final NodeHandler			nodeHandler;
-	private final NodeHandler			startNodeHandler;
-	private final RelationshipHandler	relationshipHandler;
+	private final NodeHandler nodeHandler;
+	private final NodeHandler startNodeHandler;
+	private final RelationshipHandler relationshipHandler;
 
-	private final String				recordClassUri;
+	private final String recordClassUri;
 	private final String dataModelUri;
+	private final String prefixedDataModelUri;
 
 	private final GraphDatabaseService database;
+	private final TransactionHandler tx;
+	private final NamespaceIndex namespaceIndex;
+
+	private final Map<String, String> namespacesPrefixesMap = new HashMap<>();
+	private final Map<String, String> nameMap = new HashMap<>();
 
 	private Model model;
 
-	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		recordClassUri = recordClassUriArg;
 		dataModelUri = dataModelUriArg;
 		database = databaseArg;
+		tx = txArg;
+		namespaceIndex = namespaceIndexArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
+		prefixedDataModelUri = namespaceIndex.createPrefixedURI(dataModelUri);
 	}
 
 	@Override
-	public Model read() throws DMPGraphException {
+	public Optional<Model> read() throws DMPGraphException {
 
-		try (final Transaction tx = database.beginTx()) {
+		tx.ensureRunningTx();
+		ResourceIterator<Node> recordNodes = null;
+
+		try {
 
 			LOG.debug("start read RDF TX");
 
-			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
+			final String prefixedURI = namespaceIndex.createPrefixedURI(recordClassUri);
+			final Label recordClassLabel = DynamicLabel.label(prefixedURI);
 
-			final ResourceIterator<Node> recordNodes = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-					dataModelUri);
+			recordNodes = database.findNodes(
+					recordClassLabel,
+					GraphStatics.DATA_MODEL_PROPERTY,
+					prefixedDataModelUri);
 
 			if (recordNodes == null) {
 
-				tx.success();
-
-				return null;
+				return Optional.absent();
 			}
 
 			model = ModelFactory.createDefaultModel();
 
-			while(recordNodes.hasNext()) {
+			while (recordNodes.hasNext()) {
 
 				final Node recordNode = recordNodes.next();
-
 				startNodeHandler.handleNode(recordNode);
 			}
 
 			recordNodes.close();
-			tx.success();
+
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish read RDF TX successfully";
@@ -104,9 +118,16 @@ public class PropertyGraphRDFReader implements RDFReader {
 			LOG.error(message, e);
 
 			throw new DMPGraphException(message);
+
+		} finally {
+
+			if (recordNodes != null) {
+				recordNodes.close();
+			}
+			tx.succeedTx();
 		}
 
-		return model;
+		return Optional.of(model);
 	}
 
 	@Override
@@ -162,7 +183,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
-			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(prefixedDataModelUri)) {
 
 				// TODO: utilise __NODETYPE__ property for switch
 
@@ -178,10 +199,12 @@ public class PropertyGraphRDFReader implements RDFReader {
 					subjectResource = createResourceFromBNode(subjectId);
 				} else {
 
-					subjectResource = createResourceFromURI(subject);
+					final String fullObjectUri = namespaceIndex.createFullURI(subject);
+					subjectResource = createResourceFromURI(fullObjectUri);
 				}
 
-				final String predicate = rel.getType().name();
+				final String prefixedPredicate = rel.getType().name();
+				final String predicate = namespaceIndex.createFullURI(prefixedPredicate);
 				//.getProperty(GraphStatics.URI_PROPERTY, null);
 				final Property predicateProperty = model.createProperty(predicate);
 
@@ -197,8 +220,8 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 					// object is a resource
 
-					object = objectURI;
-					objectResource = createResourceFromURI(object);
+					final String fullResourceUri = namespaceIndex.createFullURI(objectURI);
+					objectResource = createResourceFromURI(fullResourceUri);
 				} else {
 
 					// check, whether object is a bnode
@@ -242,7 +265,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		private Resource createResourceFromURI(final String uri) {
 
-			if (!resources.containsKey(uri)) {
+			if (!resources.containsKey(uri)) { // TODO: name space prefixing
 
 				resources.put(uri, model.createResource(uri));
 			}

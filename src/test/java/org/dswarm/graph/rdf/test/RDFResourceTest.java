@@ -16,13 +16,15 @@
  */
 package org.dswarm.graph.rdf.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.io.CharSource;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.junit.Assert;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -56,17 +58,17 @@ public abstract class RDFResourceTest extends BasicResourceTest {
 	@Test
 	public void writeRDFToDB() throws IOException {
 
-		LOG.debug("start write test for RDF resource at " + dbType + " DB");
+		LOG.debug("start write test for RDF resource at {} DB", dbType);
 
 		writeRDFToDBInternal();
 
-		LOG.debug("finished write test for RDF resource at " + dbType + " DB");
+		LOG.debug("finished write test for RDF resource at {} DB", dbType);
 	}
 
 	@Test
 	public void readRDFFromDB() throws IOException {
 
-		LOG.debug("start read test for RDF resource at " + dbType + " DB");
+		LOG.debug("start read test for RDF resource at {} DB", dbType);
 
 		writeRDFToDBInternal();
 
@@ -84,22 +86,21 @@ public abstract class RDFResourceTest extends BasicResourceTest {
 
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
-		final String body = response.getEntity(String.class);
+		final InputStream body = response.getEntityInputStream();
 
-		final InputStream stream = new ByteArrayInputStream(body.getBytes("UTF-8"));
 		final Model model = ModelFactory.createDefaultModel();
-		model.read(stream, null, "N-TRIPLE");
+		model.read(body, null, "N-TRIPLE");
 
-		LOG.debug("read '" + model.size() + "' statements");
+		LOG.debug("read '{}' statements", model.size());
 
-		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
+		Assert.assertEquals("the number of statements should be 1935", 1935, model.size());
 
-		LOG.debug("finished read test for RDF resource at " + dbType + " DB");
+		LOG.debug("finished read test for RDF resource at {} DB", dbType);
 	}
 
 	private void writeRDFToDBInternal() throws IOException {
 
-		LOG.debug("start writing RDF statements for RDF resource at " + dbType + " DB");
+		LOG.debug("start writing RDF statements for RDF resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
 		final byte[] file = Resources.toByteArray(fileURL);
@@ -116,6 +117,19 @@ public abstract class RDFResourceTest extends BasicResourceTest {
 
 		multiPart.close();
 
-		LOG.debug("finished writing RDF statements for RDF resource at " + dbType + " DB");
+		LOG.debug("finished writing RDF statements for RDF resource at {} DB", dbType);
+	}
+
+	@SuppressWarnings("unused")
+	private static long countExpectedSize() throws IOException {
+
+		final URL fileURL = Resources.getResource("dmpf_bsp1.n3");
+		final CharSource charSource = Resources.asCharSource(fileURL, StandardCharsets.UTF_8);
+
+		final Model model = ModelFactory.createDefaultModel();
+		model.read(charSource.openBufferedStream(), null, "N3");
+		model.removeAll(null, RDF.type, null);
+
+		return model.size(); // 1935
 	}
 }

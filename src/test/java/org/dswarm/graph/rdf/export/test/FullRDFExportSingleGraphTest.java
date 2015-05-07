@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.junit.Assert;
 
 import org.apache.http.HttpStatus;
@@ -61,7 +62,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 	/**
 	 * request to export all data in n-quads format
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -72,7 +73,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 	/**
 	 * request to export all data in trig format
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -83,7 +84,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 
 	/**
 	 * Test the fallback to default format n-quads in case the accept header is empty
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -97,7 +98,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	/**
 	 * request to export all data in rdf+xml format. This format is not supported, a HTTP 406 (not acceptable) response is
 	 * expected.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -109,7 +110,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 	/**
 	 * request to export all data in a not existing format by sending some "random" accept header value. A HTTP 406 (not
 	 * acceptable) response is expected.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -181,6 +182,7 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
 		modelFromOriginalRDFile.read(inputStream, null, "TURTLE");
 		inputStream.close();
+		modelFromOriginalRDFile.removeAll(null, RDF.type, null);
 
 		final long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();
 

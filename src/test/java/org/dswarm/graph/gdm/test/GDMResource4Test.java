@@ -148,7 +148,6 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 	}
 
 	@Test
-	@Ignore // TODO: unignore
 	public void readGDMRecordByIDFromDBThatWasWrittenAsGDM() throws IOException {
 
 		LOG.debug("start read GDM record by ID test for GDM resource at {} DB", dbType);

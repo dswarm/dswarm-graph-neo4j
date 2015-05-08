@@ -215,23 +215,28 @@ public class GDMResource {
 			final Observable<Void> deprecateRecordsObservable;
 
 			// note: versioning is enable by default
-			if (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get()) {
+			// FIXME DD-809 and subtasks: skip delta calculation for now
+			//noinspection PointlessBooleanExpression,ConstantConditions
+			if (false && (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get())) {
 
 				LOG.info("do versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-				// = new resources model, since existing, modified resources were already written to the DB
-				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
-						prefixedDataModelURI,
-						database,
-						handler, namespaceIndex);
-
-				final Observable<Resource> deltaModel = result.v1();
+				// FIXME DD-809 and subtasks: skip delta calculation for now
+//				// = new resources model, since existing, modified resources were already written to the DB
+//				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+//						prefixedDataModelURI,
+//						database,
+//						handler, namespaceIndex);
+//				final Observable<Resource> deltaModel = result.v1();
+				final Observable<Resource> deltaModel = model;
 
 				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
-				if (optionalDeprecateMissingRecords.isPresent() && Boolean.TRUE.equals(optionalDeprecateMissingRecords.get())) {
+				// FIXME DD-809 and subtasks: skip delta calculation for now
+				//noinspection PointlessBooleanExpression,ConstantConditions
+				if (false && optionalDeprecateMissingRecords.or(false)) {
 
 					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
 
@@ -242,7 +247,9 @@ public class GDMResource {
 
 					// deprecate missing records in DB
 
-					final Observable<Long> processedResources = result.v2();
+					// FIXME DD-809 and subtasks: skip delta calculation for now
+//					final Observable<Long> processedResources = result.v2();
+					final Observable<Long> processedResources = Observable.empty();
 
 					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
 							((Neo4jUpdateHandler) handler.getHandler())
@@ -631,9 +638,12 @@ public class GDMResource {
 		return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
-	private Tuple<Observable<Resource>, Observable<Long>> calculateDeltaForDataModel(final Observable<Resource> model,
+	private Tuple<Observable<Resource>, Observable<Long>> calculateDeltaForDataModel(
+			final Observable<Resource> model,
 			final Optional<ContentSchema> optionalContentSchema,
-			final String prefixedDataModelURI, final GraphDatabaseService permanentDatabase, final GDMUpdateHandler handler,
+			final String prefixedDataModelURI,
+			final GraphDatabaseService permanentDatabase,
+			final GDMUpdateHandler handler,
 			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
 		GDMResource.LOG.debug("start calculating delta for model");

@@ -110,6 +110,8 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 	private final Integer version;
 
+	private final boolean allVersions;
+
 	private final boolean originalDataTypeIsXML;
 
 	private boolean isElementOpen = false;
@@ -117,7 +119,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 	private final TransactionHandler tx;
 
 	public PropertyGraphXMLReader(final Optional<AttributePath> optionalRootAttributePathArg, final Optional<String> optionalRecordTagArg,
-			final String recordClassUriArg, final String dataModelUriArg, final Integer versionArg, final Optional<String> optionalOriginalDataType,
+			final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final Optional<Boolean> optionalAllVersions, final Optional<String> optionalOriginalDataType,
 			final GraphDatabaseService databaseArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		optionalRootAttributePath = optionalRootAttributePathArg;
@@ -139,10 +141,17 @@ public class PropertyGraphXMLReader implements XMLReader {
 		tx = txArg;
 		namespaceIndex = namespaceIndexArg;
 
-		if (versionArg != null) {
+		if(optionalAllVersions.isPresent()) {
 
-			version = versionArg;
+			version = -1;
+			allVersions = true;
+		} else if (optionalVersionArg.isPresent()) {
+
+			version = optionalVersionArg.get();
+			allVersions  = false;
 		} else {
+
+			allVersions = false;
 
 			tx.ensureRunningTx();
 
@@ -457,7 +466,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				for (final Relationship relationship : getSortedOutgoings(node)) {
 
-					if (hasValidVersion(version, relationship)) {
+					if (allVersions || hasValidVersion(version, relationship)) {
 						relationshipHandler.handleRelationship(relationship);
 					}
 				}
@@ -484,7 +493,7 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 				for (final Relationship relationship : getSortedOutgoings(node)) {
 
-					if (hasValidVersion(version, relationship)) {
+					if (allVersions || hasValidVersion(version, relationship)) {
 						relationshipHandler.handleRelationship(relationship);
 					}
 				}

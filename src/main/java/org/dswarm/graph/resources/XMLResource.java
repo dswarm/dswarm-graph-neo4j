@@ -124,14 +124,25 @@ public class XMLResource {
 		}
 
 		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
-		final Integer version;
+		final Optional<Integer> optionalVersion;
 
 		if (versionNode != null) {
 
-			version = versionNode.asInt();
+			optionalVersion = Optional.fromNullable(versionNode.asInt());
 		} else {
 
-			version = null;
+			optionalVersion = null;
+		}
+
+		final JsonNode allVersionsNode = json.get(DMPStatics.ALL_VERSIONS_IDENTIFIER);
+		final Optional<Boolean> optionalAllversion;
+
+		if (allVersionsNode != null) {
+
+			optionalAllversion = Optional.fromNullable(allVersionsNode.asBoolean());
+		} else {
+
+			optionalAllversion = Optional.absent();
 		}
 
 		final Optional<JsonNode> optionalOriginalDataTypeNode = Optional.fromNullable(json.get(DMPStatics.ORIGINAL_DATA_TYPE_IDENTIFIER));
@@ -159,7 +170,7 @@ public class XMLResource {
 		final TransactionHandler tx = new Neo4jTransactionHandler(database);
 		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
-		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
+		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, optionalVersion, optionalAllversion,
 				optionalOriginalDataType, database, tx, namespaceIndex);
 
 		final StreamingOutput stream = new StreamingOutput() {

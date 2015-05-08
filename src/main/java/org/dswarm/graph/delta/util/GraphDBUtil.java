@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import ch.lambdaj.Lambda;
@@ -61,9 +60,8 @@ import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.BasicNeo4jProcessor;
-import org.dswarm.graph.NodeType;
 import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.evaluator.EntityEvaluator;
@@ -75,6 +73,7 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 
 /**
@@ -304,7 +303,7 @@ public final class GraphDBUtil {
 			return result;
 		} catch (final Exception e) {
 
-			final String message = "couldn't complete the graph matching completeness check for graph DB '" + graphDB.toString() + "'";
+			final String message = "couldn't complete the graph matching completeness check for graph DB '" + graphDB + "'";
 
 			GraphDBUtil.LOG.error(message, e);
 
@@ -316,14 +315,14 @@ public final class GraphDBUtil {
 
 		if (matchedState == null) {
 
-			GraphDBUtil.LOG.error(type + " '" + id + "' couldn't be matched, i.e., there was no match state available");
+			GraphDBUtil.LOG.error("{} '{}' couldn't be matched, i.e., there was no match state available", type, id);
 
 			return false;
 		}
 
 		if (!matchedState) {
 
-			GraphDBUtil.LOG.error(type + " '" + id + "' couldn't be matched, i.e., there was no match state was 'false'");
+			GraphDBUtil.LOG.error("{} '{}' couldn't be matched, i.e., there was no match state was 'false'", type, id);
 
 			return false;
 		}
@@ -598,7 +597,7 @@ public final class GraphDBUtil {
 			for (final Relationship typeRel : typeRels) {
 
 				// TODO: could be removed later
-				GraphDBUtil.LOG.debug("fetch entity type rel: '" + typeRel.getId() + "'");
+				GraphDBUtil.LOG.debug("fetch entity type rel: '{}'", typeRel.getId());
 
 				GraphDBUtil.addNodeId(pathEndNodeIds, typeRel.getEndNode().getId());
 			}
@@ -616,7 +615,7 @@ public final class GraphDBUtil {
 	public static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
 			final Set<Long> pathEndNodeIds, final long nodeId) throws DMPGraphException {
 
-		if (deltaState.equals(DeltaState.ADDITION) || deltaState.equals(DeltaState.DELETION)) {
+		if (deltaState == DeltaState.ADDITION || deltaState == DeltaState.DELETION) {
 
 			final Iterable<Path> nonMatchedSubGraphPaths = getNonMatchedSubGraphPaths(nodeId, graphDB);
 
@@ -842,7 +841,7 @@ public final class GraphDBUtil {
 					}
 
 					// TODO: remove this later, it'S just for debugging purpose right now
-					if (predicate.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+					if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
 
 						final long relId = nonMatchedRel.getId();
 						final String value = (String) nonMatchedRel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
@@ -885,10 +884,9 @@ public final class GraphDBUtil {
 	}
 
 	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String dataModelUri,
-			final GraphDatabaseService graphDB) throws DMPGraphException {
+			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, dataModelUri);
-
+		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, dataModelUri, namespaceIndex);
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
@@ -990,7 +988,7 @@ public final class GraphDBUtil {
 				finalValueOrder = valueOrder;
 			} else {
 
-				finalValueOrder = (long) 1;
+				finalValueOrder = 1;
 			}
 
 			final GDMValueEntity valueEntity = new GDMValueEntity(valueNodeId, value, finalValueOrder, valueNodeType);
@@ -1018,7 +1016,7 @@ public final class GraphDBUtil {
 	}
 
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
-			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node[] csEntityNodesArray) {
+			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
 		for (final AttributePath keyAttributePath : contentSchema.getKeyAttributePaths()) {
 
@@ -1040,7 +1038,7 @@ public final class GraphDBUtil {
 	}
 
 	private static void determineValueEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
-			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node[] csEntityNodesArray) {
+			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
 		final LinkedList<Attribute> relativeValueAttributePath = determineRelativeAttributePath(contentSchema.getValueAttributePath(),
 				commonAttributePath);
@@ -1106,7 +1104,7 @@ public final class GraphDBUtil {
 
 			for (final CSEntity csEntity : csEntityKeyGroup.findAll()) {
 
-				csEntity.setEntityOrder((long) i);
+				csEntity.setEntityOrder(i);
 				i++;
 			}
 		}
@@ -1145,36 +1143,46 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUriQuery(final String recordId, final AttributePath recordIdentifierAP, final String dataModelUri) {
+	private static String buildGetRecordUriQuery(
+			final String recordId,
+			final AttributePath recordIdentifierAP,
+			final String dataModelUri,
+			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		// START n=node:values(__VALUE__="a1280f78-5f96-4fe6-b916-5e38e5d620d3")
-		// MATCH (n)-[r:`http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id`]->(o)
-		// WHERE n.__NODETYPE__ = "__RESOURCE__" AND
-		// o.__NODETYPE__ = "__LITERAL__"
-		// RETURN o.__URI__ AS record_uri;
+			// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
+		  // USING INDEX o:LITERAL(value)
+			// WHERE
+			//  n.datamodel = "ns1:2222" AND
+			//  n.value = "7890"
+			// RETURN
+			//  n.uri as record_uri
 
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder("MATCH ");
 
-		sb.append("START o=node:").append(GraphIndexStatics.VALUES_INDEX_NAME).append("(").append(GraphStatics.VALUE).append("=\"").append(recordId)
-				.append("\")\nMATCH (n)");
+		sb.append("(n:").append(NodeType.Resource).append(")");
 
-		int i = 1;
-		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {
+		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
+		int i = attributes.size();
+		for (final Attribute attribute : attributes) {
 
-			sb.append("-[:`").append(attribute.getUri()).append("`]->");
+			final String fullUri = attribute.getUri();
+			final String prefixedURI = namespaceIndex.createPrefixedURI(fullUri);
 
-			if (i < recordIdentifierAP.getAttributes().size()) {
+			sb.append("-[:`").append(prefixedURI).append("`]-");
 
+			if (--i > 0) {
 				sb.append("()");
 			}
-
-			i++;
 		}
 
-		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")
-				.append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(dataModelUri).append("\" AND\no.")
-				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN n.")
-				.append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+		sb.append("(o:").append(NodeType.Literal).append(")\n")
+				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
+				.append("WHERE ")
+				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(dataModelUri).append('"')
+				.append(" AND ")
+				.append("o.").append(GraphStatics.VALUE_PROPERTY).append(" = \"").append(recordId).append('"').append('\n')
+				.append("RETURN ")
+				.append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
 
 		return sb.toString();
 	}
@@ -1246,7 +1254,7 @@ public final class GraphDBUtil {
 
 					final Map<String, Object> row = result.next();
 
-					Set<Map.Entry<String, Object>> entrySet = row.entrySet();
+					final Set<Map.Entry<String, Object>> entrySet = row.entrySet();
 
 					final Iterator<Map.Entry<String, Object>> iter = entrySet.iterator();
 

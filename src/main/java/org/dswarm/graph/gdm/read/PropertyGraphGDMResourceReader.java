@@ -83,7 +83,8 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 				return null;
 			}
 
-			currentResource = new Resource(resourceUri);
+			final String fullResourceUri = namespaceIndex.createFullURI(resourceUri);
+			currentResource = new Resource(fullResourceUri);
 			startNodeHandler.handleNode(recordNode);
 
 			if (!currentResourceStatements.isEmpty()) {
@@ -118,7 +119,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 			PropertyGraphGDMResourceReader.LOG.error(message, e);
 
-			throw new DMPGraphException(message);
+			throw new DMPGraphException(message, e);
 		}
 
 		return currentResource;

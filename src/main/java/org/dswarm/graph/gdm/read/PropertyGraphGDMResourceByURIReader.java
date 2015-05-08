@@ -48,8 +48,8 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	@Override
 	protected Node getResourceNode() throws DMPGraphException {
 
-		final long resourceUriDataModelUriHash = HashUtils.generateHash(recordUri + dataModelUri);
+		final long resourceUriDataModelUriHash1 = HashUtils.generateHash(recordUri + prefixedDataModelUri);
 
-		return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
+		return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash1);
 	}
 }

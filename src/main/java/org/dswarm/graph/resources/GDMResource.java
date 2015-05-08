@@ -53,6 +53,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -519,7 +520,15 @@ public class GDMResource {
 
 		final Resource resource = gdmReader.read();
 
-		String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
+		if (resource == null) {
+			GDMResource.LOG.debug(
+					"no record found for data mode uri = '{}' and record uri = '{}' and version = '{}' from graph db",
+					dataModelUri, optionalRecordUri, optionalVersion);
+
+			return Response.status(404).build();
+		}
+
+		final String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
 
 		GDMResource.LOG
 				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
@@ -1028,6 +1037,8 @@ public class GDMResource {
 		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 		service.submit(new Callable<Void>() {
 
+			@Nullable
+			@Override
 			public Void call() {
 
 				newResourceDB.shutdown();
@@ -1049,6 +1060,8 @@ public class GDMResource {
 		final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 		service.submit(new Callable<Void>() {
 
+			@Nullable
+			@Override
 			public Void call() {
 
 				resourceDB.shutdown();
@@ -1066,6 +1079,7 @@ public class GDMResource {
 
 		return processedResources.toList().map(new Func1<List<Long>, Void>() {
 
+			@Nullable
 			@Override public Void call(final List<Long> processedResourcesSet) {
 
 				// determine all record URIs of the data model

@@ -16,7 +16,6 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -28,6 +27,8 @@ import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.types.Tuple;
+import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Predicate;
@@ -52,7 +53,8 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final NodeHandler         startNodeHandler;
 	protected final RelationshipHandler relationshipHandler;
 
-	protected final String  dataModelUri;
+	protected final String dataModelUri;
+	protected final String prefixedDataModelUri;
 	protected       Integer version;
 
 	protected final GraphDatabaseService database;
@@ -71,7 +73,15 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 			final NamespaceIndex namespaceIndexArg,
 			final String typeArg) throws DMPGraphException {
 
-		dataModelUri = dataModelUriArg;
+		final Tuple<String, String> uriParts = URI.determineParts(dataModelUriArg);
+		if (uriParts.v1().isEmpty()) {
+			prefixedDataModelUri = dataModelUriArg;
+			dataModelUri = namespaceIndexArg.createFullURI(dataModelUriArg);
+		} else {
+			dataModelUri = dataModelUriArg;
+			prefixedDataModelUri = namespaceIndexArg.createPrefixedURI(dataModelUri);
+		}
+
 		database = databaseArg;
 		tx = txArg;
 		namespaceIndex = namespaceIndexArg;
@@ -182,7 +192,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 			// note: we can also optionally check for the "resource property at the relationship (this property will only be
 			// written right now for model that came as GDM JSON)
-			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(prefixedDataModelUri)) {
 
 				final long statementId = rel.getId();
 

@@ -180,7 +180,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start read versioned GDM record by ID test for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/2222";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/2222";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -201,7 +201,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 		requestJson.put(DMPStatics.VERSION_IDENTIFIER, 1);
 
-		final Resource actualResource = readGDMRecord(requestJson, 6);
+		final Resource actualResource = readGDMRecord(requestJson, 5);
 
 		Assert.assertEquals(recordURI, actualResource.getUri());
 
@@ -467,6 +467,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		final String body = response.getEntity(String.class);
+
+		System.out.println("body = " + body);
 
 		final Resource resource = objectMapper.readValue(body, Resource.class);
 

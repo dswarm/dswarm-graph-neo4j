@@ -131,7 +131,7 @@ public class RDFResource {
 
 		try {
 
-			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor, true);
 			final RDFParser parser = new JenaModelParser(model);
 			parser.setRDFHandler(handler);
 			parser.parse();
@@ -181,7 +181,7 @@ public class RDFResource {
 
 		try {
 
-			final RDFHandler handler = new SimpleRDFNeo4jHandler(processor);
+			final RDFHandler handler = new SimpleRDFNeo4jHandler(processor, true);
 			final RDFParser parser = new JenaModelParser(model);
 			parser.setRDFHandler(handler);
 			parser.parse();
@@ -241,7 +241,7 @@ public class RDFResource {
 
 		try {
 
-			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.SimpleRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.SimpleRDFNeo4jHandler(processor, true);
 			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
 			parser.parse(model);
 
@@ -337,7 +337,7 @@ public class RDFResource {
 
 		try {
 
-			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.DataModelRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.DataModelRDFNeo4jHandler(processor, true);
 			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
 			parser.parse(model);
 

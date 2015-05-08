@@ -32,8 +32,8 @@ public class SimpleRDFNeo4jHandler extends RDFNeo4jHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleRDFNeo4jHandler.class);
 
-	public SimpleRDFNeo4jHandler(final RDFNeo4jProcessor processorArg) throws DMPGraphException {
+	public SimpleRDFNeo4jHandler(final RDFNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(new SimpleNeo4jHandler(processorArg.getProcessor()), processorArg);
+		super(new SimpleNeo4jHandler(processorArg.getProcessor(), enableVersioning), processorArg);
 	}
 }

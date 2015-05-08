@@ -33,9 +33,9 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jVersionHandler.class);
 
-	public DataModelNeo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelNeo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(processorArg);
+		super(processorArg, enableVersioning);
 
 		processor.ensureRunningTx();
 

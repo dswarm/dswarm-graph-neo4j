@@ -42,9 +42,12 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected final BasicNeo4jProcessor processor;
 
-	public Neo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	private final boolean enableVersioning;
+
+	public Neo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioningArg) throws DMPGraphException {
 
 		processor = processorArg;
+		enableVersioning = enableVersioningArg;
 	}
 
 	@Override
@@ -60,7 +63,16 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected void init() {
 
-		latestVersion = retrieveLatestVersion() + 1;
+		final int currentLatestVersion = retrieveLatestVersion();
+
+		if(enableVersioning) {
+
+			latestVersion = currentLatestVersion + 1;
+		} else {
+
+			latestVersion = currentLatestVersion;
+		}
+
 		range = Range.range(latestVersion);
 	}
 

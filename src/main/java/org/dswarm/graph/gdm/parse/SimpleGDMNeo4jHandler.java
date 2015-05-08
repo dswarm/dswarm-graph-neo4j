@@ -31,8 +31,8 @@ public class SimpleGDMNeo4jHandler extends GDMNeo4jHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleGDMNeo4jHandler.class);
 
-	public SimpleGDMNeo4jHandler(final GDMNeo4jProcessor processorArg) throws DMPGraphException {
+	public SimpleGDMNeo4jHandler(final GDMNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(new SimpleNeo4jHandler(processorArg.getProcessor()), processorArg);
+		super(new SimpleNeo4jHandler(processorArg.getProcessor(), enableVersioning), processorArg);
 	}
 }

@@ -24,9 +24,9 @@ import org.dswarm.graph.BasicNeo4jProcessor;
  */
 public class SimpleNeo4jVersionHandler extends Neo4jVersionHandler {
 
-	public SimpleNeo4jVersionHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	public SimpleNeo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(processorArg);
+		super(processorArg, enableVersioning);
 	}
 
 	@Override

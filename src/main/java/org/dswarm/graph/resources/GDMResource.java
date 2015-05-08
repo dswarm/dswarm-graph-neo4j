@@ -194,6 +194,17 @@ public class GDMResource {
 		final Optional<String> optionalDataModelURI = getMetadataPart(DMPStatics.DATA_MODEL_URI_IDENTIFIER, metadata, true);
 		final String dataModelURI = optionalDataModelURI.get();
 		final Optional<Boolean> optionalEnableVersioning = getEnableVersioningFlag(metadata);
+
+		final boolean enableVersioning;
+
+		if(optionalEnableVersioning.isPresent()) {
+
+			enableVersioning = optionalEnableVersioning.get();
+		} else {
+
+			enableVersioning = true;
+		}
+
 		final Tuple<Observable<Resource>, BufferedInputStream> modelTuple = getModel(content);
 		final Observable<Resource> model = modelTuple.v1();
 		final BufferedInputStream bis = modelTuple.v2();
@@ -211,14 +222,14 @@ public class GDMResource {
 
 		try {
 
-			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor);
+			final GDMNeo4jHandler handler = new DataModelGDMNeo4jHandler(processor, enableVersioning);
 			final Observable<Resource> newModel;
 			final Observable<Void> deprecateRecordsObservable;
 
 			// note: versioning is enable by default
 			// FIXME DD-809 and subtasks: skip delta calculation for now
 			//noinspection PointlessBooleanExpression,ConstantConditions
-			if (false && (!optionalEnableVersioning.isPresent() || optionalEnableVersioning.get())) {
+			if (false && enableVersioning) {
 
 				LOG.info("do versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
@@ -301,7 +312,7 @@ public class GDMResource {
 
 			final Long size = handler.getHandler().getCountedStatements();
 
-			if (size > 0) {
+			if (enableVersioning && size > 0) {
 
 				// update data model version only when some statements are written to the DB
 				((Neo4jUpdateHandler) handler.getHandler()).getVersionHandler().updateLatestVersion();
@@ -362,7 +373,7 @@ public class GDMResource {
 
 		try {
 
-			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor);
+			final GDMHandler handler = new SimpleGDMNeo4jHandler(processor, true);
 			final GDMParser parser = new GDMModelParser(model);
 			parser.setGDMHandler(handler);
 			final Observable<Void> processedResources = parser.parse();

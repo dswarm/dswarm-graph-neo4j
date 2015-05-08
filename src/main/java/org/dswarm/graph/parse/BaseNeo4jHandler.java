@@ -77,10 +77,12 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	protected VersionHandler versionHandler = null;
 
 	protected final BasicNeo4jProcessor processor;
+	protected final boolean enableVersioning;
 
-	public BaseNeo4jHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	public BaseNeo4jHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioningArg) throws DMPGraphException {
 
 		processor = processorArg;
+		enableVersioning = enableVersioningArg;
 
 		init();
 	}

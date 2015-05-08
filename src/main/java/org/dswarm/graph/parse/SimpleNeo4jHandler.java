@@ -32,14 +32,14 @@ public class SimpleNeo4jHandler extends BaseNeo4jHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(SimpleNeo4jHandler.class);
 
-	public SimpleNeo4jHandler(final BasicNeo4jProcessor processorArg) throws DMPGraphException {
+	public SimpleNeo4jHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(processorArg);
+		super(processorArg, enableVersioning);
 	}
 
 	@Override
 	protected void init() throws DMPGraphException {
 
-		versionHandler = new SimpleNeo4jVersionHandler(processor);
+		versionHandler = new SimpleNeo4jVersionHandler(processor, enableVersioning);
 	}
 }

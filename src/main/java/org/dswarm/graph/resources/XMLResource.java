@@ -131,7 +131,7 @@ public class XMLResource {
 			optionalVersion = Optional.fromNullable(versionNode.asInt());
 		} else {
 
-			optionalVersion = null;
+			optionalVersion = Optional.absent();
 		}
 
 		final JsonNode allVersionsNode = json.get(DMPStatics.ALL_VERSIONS_IDENTIFIER);

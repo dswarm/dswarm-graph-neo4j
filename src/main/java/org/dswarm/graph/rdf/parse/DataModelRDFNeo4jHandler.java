@@ -29,8 +29,8 @@ public class DataModelRDFNeo4jHandler extends RDFNeo4jHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelRDFNeo4jHandler.class);
 
-	public DataModelRDFNeo4jHandler(final RDFNeo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelRDFNeo4jHandler(final RDFNeo4jProcessor processorArg, final boolean enableVersioniong) throws DMPGraphException {
 
-		super(new DataModelNeo4jHandler(processorArg.getProcessor()), processorArg);
+		super(new DataModelNeo4jHandler(processorArg.getProcessor(), enableVersioniong), processorArg);
 	}
 }

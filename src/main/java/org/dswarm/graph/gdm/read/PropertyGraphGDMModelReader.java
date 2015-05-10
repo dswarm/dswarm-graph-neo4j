@@ -80,11 +80,11 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
 			PropertyGraphGDMModelReader.LOG
-					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, dataModelUri,
+					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, prefixedDataModelUri,
 							version);
 
 			recordNodesIter = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-					dataModelUri);
+					prefixedDataModelUri);
 
 			if (recordNodesIter == null) {
 
@@ -92,7 +92,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
-								recordClassLabel, dataModelUri, version,
+								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -105,7 +105,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
-								recordClassLabel, dataModelUri, version,
+								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -158,8 +158,9 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					readResources++;
 				} else {
 
+
 					LOG.debug("couldn't find any statement for resource '{}' ('{}') in data model '{}' with version '{}'", currentResource.getUri(),
-							resourceUri, dataModelUri, version);
+							resourceUri, prefixedDataModelUri, version);
 				}
 
 				currentResourceStatements.clear();

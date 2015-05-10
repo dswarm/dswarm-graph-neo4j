@@ -73,6 +73,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 			final NamespaceIndex namespaceIndexArg,
 			final String typeArg) throws DMPGraphException {
 
+		// TODO: @zazi: we don't really need this, the data model uri parameter should always be a prefixed URI
 		final Tuple<String, String> uriParts = URI.determineParts(dataModelUriArg);
 		if (uriParts.v1().isEmpty()) {
 			prefixedDataModelUri = dataModelUriArg;

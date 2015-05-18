@@ -39,6 +39,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -64,6 +65,7 @@ import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
+import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
  * @author tgaengler
@@ -412,6 +414,8 @@ public class MaintainResource {
 
 	private void initPrefixes(final GraphDatabaseService database) throws DMPGraphException {
 
+		MaintainResource.LOG.debug("start initialising namespaces index");
+
 		final TransactionHandler tx = new Neo4jTransactionHandler(database);
 		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
@@ -431,7 +435,19 @@ public class MaintainResource {
 				final String prefix = entry.getKey();
 				final String namespace = entry.getValue();
 
-				namespaceIndex.addPrefix(namespace, prefix);
+				final Optional<Node> optionalPrefix = NamespaceUtils.getPrefix(namespace, database);
+
+				if (!optionalPrefix.isPresent()) {
+
+					namespaceIndex.addPrefix(namespace, prefix);
+				} else {
+
+					final String prefixFromDB = (String) optionalPrefix.get().getProperty(GraphProcessingStatics.PREFIX_PROPERTY);
+
+					MaintainResource.LOG
+							.debug("prefix '{}' is already available for namespace '{}', i.e., no further entry with prefix '{}' will be created",
+									prefixFromDB, namespace, prefix);
+				}
 			}
 
 			tx.succeedTx();
@@ -445,5 +461,7 @@ public class MaintainResource {
 
 			throw new DMPGraphException(message, e);
 		}
+
+		MaintainResource.LOG.debug("finished initialising namespaces index");
 	}
 }

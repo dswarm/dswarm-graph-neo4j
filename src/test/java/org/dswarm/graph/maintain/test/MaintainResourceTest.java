@@ -16,6 +16,12 @@
  */
 package org.dswarm.graph.maintain.test;
 
+import com.sun.jersey.api.client.ClientResponse;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
@@ -24,8 +30,28 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
  */
 public abstract class MaintainResourceTest extends BasicResourceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(MaintainResourceTest.class);
+
 	public MaintainResourceTest(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
 		super(neo4jDBWrapper, "/maintain", dbTypeArg);
+	}
+
+	/**
+	 * note: the first schema indices initialisation is done via @Before
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testInitSchemaIndicesMultipleTimes() throws Exception {
+
+		MaintainResourceTest.LOG.debug("start init schema indices test for maintain resource at {} DB", dbType);
+
+		final ClientResponse response = target().path("/schemaindices").post(ClientResponse.class, "");
+
+		System.out.println("response = " + response);
+
+		Assert.assertEquals("expected 200", 200, response.getStatus());
+
 	}
 }

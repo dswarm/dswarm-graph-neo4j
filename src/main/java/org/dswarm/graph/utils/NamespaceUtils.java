@@ -117,8 +117,7 @@ public class NamespaceUtils {
 
 			tx.ensureRunningTx();
 
-			final Optional<Node> optionalNode = Optional
-					.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
+			final Optional<Node> optionalNode = getPrefix(namespace, database);
 
 			if (optionalNode.isPresent()) {
 
@@ -151,6 +150,12 @@ public class NamespaceUtils {
 
 			throw new DMPGraphException(message, e);
 		}
+	}
+
+	public static Optional<Node> getPrefix(final String namespace, final GraphDatabaseService database) {
+
+		return Optional
+				.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
 	}
 
 	public static String getNamespace(final String prefix, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {

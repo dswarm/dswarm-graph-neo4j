@@ -39,7 +39,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -197,7 +199,7 @@ public class GDMResource {
 
 		final boolean enableVersioning;
 
-		if(optionalEnableVersioning.isPresent()) {
+		if (optionalEnableVersioning.isPresent()) {
 
 			enableVersioning = optionalEnableVersioning.get();
 		} else {
@@ -236,12 +238,12 @@ public class GDMResource {
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
 				// FIXME DD-809 and subtasks: skip delta calculation for now
-//				// = new resources model, since existing, modified resources were already written to the DB
-//				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
-//						prefixedDataModelURI,
-//						database,
-//						handler, namespaceIndex);
-//				final Observable<Resource> deltaModel = result.v1();
+				//				// = new resources model, since existing, modified resources were already written to the DB
+				//				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+				//						prefixedDataModelURI,
+				//						database,
+				//						handler, namespaceIndex);
+				//				final Observable<Resource> deltaModel = result.v1();
 				final Observable<Resource> deltaModel = model;
 
 				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
@@ -260,7 +262,7 @@ public class GDMResource {
 					// deprecate missing records in DB
 
 					// FIXME DD-809 and subtasks: skip delta calculation for now
-//					final Observable<Long> processedResources = result.v2();
+					//					final Observable<Long> processedResources = result.v2();
 					final Observable<Long> processedResources = Observable.empty();
 
 					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
@@ -424,9 +426,12 @@ public class GDMResource {
 	@Path("/get")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readGDM(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+	public Response readGDM(final String jsonObjectString, @Context final GraphDatabaseService database, @Context HttpHeaders requestHeaders)
+			throws DMPGraphException {
 
-		GDMResource.LOG.debug("try to read GDM statements from graph db");
+		final String headers = readHeaders(requestHeaders);
+
+		GDMResource.LOG.debug("try to read GDM statements from graph db with\n{}", headers);
 
 		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, READ_GDM_MODEL_TYPE);
 
@@ -1490,5 +1495,29 @@ public class GDMResource {
 
 			throw new DMPGraphException(message, e);
 		}
+	}
+
+	private String readHeaders(final HttpHeaders httpHeaders) {
+
+		final MultivaluedMap<String, String> headerParams = httpHeaders.getRequestHeaders();
+
+		final StringBuilder sb = new StringBuilder();
+
+		for (final Map.Entry<String, List<String>> entry : headerParams.entrySet()) {
+
+			final String headerIdentifier = entry.getKey();
+			final List<String> headerValues = entry.getValue();
+
+			sb.append("\t\t").append(headerIdentifier).append(" = ");
+
+			for(final String headerValue : headerValues) {
+
+				sb.append(headerValue).append(", ");
+			}
+
+			sb.append("\n");
+		}
+
+		return sb.toString();
 	}
 }

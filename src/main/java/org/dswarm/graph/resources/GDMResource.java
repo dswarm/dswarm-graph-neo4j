@@ -185,9 +185,13 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
+	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders) throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
+
+		final String headers = readHeaders(requestHeaders);
+
+		GDMResource.LOG.debug("try to process GDM statements and write them into graph db with\n{}", headers);
 
 		final List<BodyPart> bodyParts = getBodyParts(multiPart);
 		final ObjectNode metadata = getMetadata(bodyParts);
@@ -349,9 +353,13 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database) throws DMPGraphException, IOException {
+	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders) throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
+
+		final String headers = readHeaders(requestHeaders);
+
+		GDMResource.LOG.debug("try to process GDM statements and write them into graph db with\n{}", headers);
 
 		if (inputStream == null) {
 
@@ -426,7 +434,7 @@ public class GDMResource {
 	@Path("/get")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readGDM(final String jsonObjectString, @Context final GraphDatabaseService database, @Context HttpHeaders requestHeaders)
+	public Response readGDM(final String jsonObjectString, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders)
 			throws DMPGraphException {
 
 		final String headers = readHeaders(requestHeaders);

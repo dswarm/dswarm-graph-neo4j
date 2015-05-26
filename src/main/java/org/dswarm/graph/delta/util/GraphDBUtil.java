@@ -883,10 +883,10 @@ public final class GraphDBUtil {
 		return executeQueryWithSingleResult(query, "record_identifier", graphDB);
 	}
 
-	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String dataModelUri,
+	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String prefixedDataModelUri,
 			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, dataModelUri, namespaceIndex);
+		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, prefixedDataModelUri, namespaceIndex);
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
@@ -1146,7 +1146,7 @@ public final class GraphDBUtil {
 	private static String buildGetRecordUriQuery(
 			final String recordId,
 			final AttributePath recordIdentifierAP,
-			final String dataModelUri,
+			final String prefixedDataModelUri,
 			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
 			// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
@@ -1163,6 +1163,8 @@ public final class GraphDBUtil {
 
 		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
 		int i = attributes.size();
+
+		// prefix uris of recurd identifier attribute path
 		for (final Attribute attribute : attributes) {
 
 			final String fullUri = attribute.getUri();
@@ -1178,7 +1180,7 @@ public final class GraphDBUtil {
 		sb.append("(o:").append(NodeType.Literal).append(")\n")
 				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
 				.append("WHERE ")
-				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(dataModelUri).append('"')
+				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append('"')
 				.append(" AND ")
 				.append("o.").append(GraphStatics.VALUE_PROPERTY).append(" = \"").append(recordId).append('"').append('\n')
 				.append("RETURN ")

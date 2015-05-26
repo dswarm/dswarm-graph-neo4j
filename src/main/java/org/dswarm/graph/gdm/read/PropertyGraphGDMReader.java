@@ -27,8 +27,6 @@ import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.common.types.Tuple;
-import org.dswarm.common.web.URI;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Predicate;
@@ -53,8 +51,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final NodeHandler         startNodeHandler;
 	protected final RelationshipHandler relationshipHandler;
 
-	protected final String dataModelUri;
-	protected final String prefixedDataModelUri;
+	protected final String  prefixedDataModelUri;
 	protected       Integer version;
 
 	protected final GraphDatabaseService database;
@@ -67,22 +64,14 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 	protected final String type;
 
-	public PropertyGraphGDMReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg,
+	public PropertyGraphGDMReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService databaseArg,
 			final
 			TransactionHandler txArg,
 			final NamespaceIndex namespaceIndexArg,
 			final String typeArg) throws DMPGraphException {
 
-		// TODO: @zazi: we don't really need this, the data model uri parameter should always be a prefixed URI
-		final Tuple<String, String> uriParts = URI.determineParts(dataModelUriArg);
-		if (uriParts.v1().isEmpty()) {
-			prefixedDataModelUri = dataModelUriArg;
-			dataModelUri = namespaceIndexArg.createFullURI(dataModelUriArg);
-		} else {
-			dataModelUri = dataModelUriArg;
-			prefixedDataModelUri = namespaceIndexArg.createPrefixedURI(dataModelUri);
-		}
-
+		prefixedDataModelUri = prefixedDataModelUriArg;
 		database = databaseArg;
 		tx = txArg;
 		namespaceIndex = namespaceIndexArg;
@@ -99,7 +88,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 			try {
 
-				version = GraphVersionUtils.getLatestVersion(dataModelUri, database);
+				version = GraphVersionUtils.getLatestVersion(prefixedDataModelUri, database);
 			} catch (final Exception e) {
 
 				final String message = "couldn't retrieve latest version successfully";

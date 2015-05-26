@@ -41,11 +41,11 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMResourceReader.class);
 
-	public PropertyGraphGDMResourceReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
+	public PropertyGraphGDMResourceReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg, final String type)
 			throws DMPGraphException {
 
-		super(dataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, type);
+		super(prefixedDataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, type);
 	}
 
 	@Override

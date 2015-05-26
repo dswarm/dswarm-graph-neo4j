@@ -37,32 +37,32 @@ public class SchemaIndexUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SchemaIndexUtils.class);
 
-	public static void createSchemaIndices(final GraphDatabaseService database) throws DMPGraphException {
+	public static void createSchemaIndices(final GraphDatabaseService database, final String databaseIdentifier) throws DMPGraphException {
 
-		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, database);
-		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateSchemaIndex(GraphProcessingStatics.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database);
-		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, database);
-		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, database);
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, database, databaseIdentifier);
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, database, databaseIdentifier);
+		getOrCreateSchemaIndex(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, database, databaseIdentifier);
+		getOrCreateSchemaIndex(GraphProcessingStatics.LITERAL_LABEL, GraphStatics.VALUE_PROPERTY, database, databaseIdentifier);
+		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, database, databaseIdentifier);
+		getOrCreateSchemaIndex(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, database, databaseIdentifier);
 	}
 
-	private static void getOrCreateSchemaIndex(final Label label, final String property, final GraphDatabaseService database) throws DMPGraphException {
+	private static void getOrCreateSchemaIndex(final Label label, final String property, final GraphDatabaseService database, final String databaseIdentifier) throws DMPGraphException {
 
-		final IndexDefinition indexDefinition = SchemaIndexUtils.getOrCreateIndex(label, property, database);
+		final IndexDefinition indexDefinition = SchemaIndexUtils.getOrCreateIndex(label, property, database, databaseIdentifier);
 
 		if (indexDefinition == null) {
 
 			throw new DMPGraphException(
-					String.format("something went wrong while index determination/creation for label '%s' and property '%s'", label.name(),
-							property));
+					String.format("something went wrong while index determination/creation for label '%s' and property '%s' at database '%s'", label.name(),
+							property, databaseIdentifier));
 		}
 	}
 
 
-	public static IndexDefinition getOrCreateIndex(final Label label, final String property, final GraphDatabaseService database) {
+	public static IndexDefinition getOrCreateIndex(final Label label, final String property, final GraphDatabaseService database, final String databaseIdentifier) {
 
-		LOG.debug("try to find index for label = '{}' and property = '{}'", label.name(), property);
+		LOG.debug("try to find index for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 		boolean notFound = false;
 
@@ -124,7 +124,7 @@ public class SchemaIndexUtils {
 
 			if (!notFound) {
 
-				LOG.debug("found existing index for label = '{}' and property = '{}'", label.name(), property);
+				LOG.debug("found existing index for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 				tx.success();
 				tx.close();
@@ -133,20 +133,20 @@ public class SchemaIndexUtils {
 			}
 		} catch (final Exception e) {
 
-			LOG.error("sommething went wrong, while index determination for label '{}' and property '{}'", label, property, e);
+			LOG.error("sommething went wrong, while index determination for label '{}' and property '{}' at database '{}'", label, property, databaseIdentifier, e);
 		}
 
 		if (notFound) {
 
-			return createIndex(label, property, database);
+			return createIndex(label, property, database, databaseIdentifier);
 		}
 
 		return null;
 	}
 
-	public static IndexDefinition createIndex(final Label label, final String property, final GraphDatabaseService database) {
+	public static IndexDefinition createIndex(final Label label, final String property, final GraphDatabaseService database, final String databaseIdentifier) {
 
-		LOG.debug("try to create index for label = '{}' and property = '{}'", label.name(), property);
+		LOG.debug("try to create index for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 		final IndexDefinition indexDefinition;
 
@@ -155,30 +155,30 @@ public class SchemaIndexUtils {
 			final IndexCreator indexCreator = database.schema().indexFor(label).on(property);
 			indexDefinition = indexCreator.create();
 
-			LOG.debug("created index for label = '{}' and property = '{}'", label.name(), property);
+			LOG.debug("created index for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 			tx.success();
 			tx.close();
 		} catch (final Exception e) {
 
-			LOG.error("sommething went wrong, while index creation for label '{}' and property '{}'", label, property, e);
+			LOG.error("sommething went wrong, while index creation for label '{}' and property '{}' at database '{}'", label, property, databaseIdentifier, e);
 
 			return null;
 		}
 
-		return bringIndexOnline(label, property, database, indexDefinition);
+		return bringIndexOnline(label, property, database, databaseIdentifier, indexDefinition);
 	}
 
-	private static IndexDefinition bringIndexOnline(final Label label, final String property, final GraphDatabaseService database,
+	private static IndexDefinition bringIndexOnline(final Label label, final String property, final GraphDatabaseService database, final String databaseIdentifier,
 			final IndexDefinition indexDefinition) {
 
 		try (final Transaction tx = database.beginTx()) {
 
-			LOG.debug("try to bring index online for label = '{}' and property = '{}'", label.name(), property);
+			LOG.debug("try to bring index online for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 			database.schema().awaitIndexOnline(indexDefinition, 5, TimeUnit.SECONDS);
 
-			LOG.debug("brought index online for label = '{}' and property = '{}'", label.name(), property);
+			LOG.debug("brought index online for label = '{}' and property = '{}' at database '{}'", label.name(), property, databaseIdentifier);
 
 			tx.success();
 			tx.close();
@@ -186,7 +186,7 @@ public class SchemaIndexUtils {
 			return indexDefinition;
 		} catch (final Exception e) {
 
-			LOG.error("sommething went wrong, while bringing index online for label '{}' and property '{}'", label, property, e);
+			LOG.error("sommething went wrong, while bringing index online for label '{}' and property '{}' at database '{}'", label, property, databaseIdentifier, e);
 
 			return null;
 		}

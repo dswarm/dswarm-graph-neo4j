@@ -132,8 +132,6 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			if (subjectNode == null) {
 
-				subjectNode = database.createNode();
-
 				if (subject instanceof ResourceNode) {
 
 					subjectNode = database.createNode(GraphProcessingStatics.RESOURCE_LABEL);

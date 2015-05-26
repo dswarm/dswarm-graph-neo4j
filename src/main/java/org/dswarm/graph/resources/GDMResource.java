@@ -233,28 +233,22 @@ public class GDMResource {
 			final Observable<Void> deprecateRecordsObservable;
 
 			// note: versioning is enable by default
-			// FIXME DD-809 and subtasks: skip delta calculation for now
-			//noinspection PointlessBooleanExpression,ConstantConditions
-			if (false && enableVersioning) {
+			if (enableVersioning) {
 
 				LOG.info("do versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-				// FIXME DD-809 and subtasks: skip delta calculation for now
-				//				// = new resources model, since existing, modified resources were already written to the DB
-				//				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
-				//						prefixedDataModelURI,
-				//						database,
-				//						handler, namespaceIndex);
-				//				final Observable<Resource> deltaModel = result.v1();
-				final Observable<Resource> deltaModel = model;
+								// = new resources model, since existing, modified resources were already written to the DB
+								final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+										prefixedDataModelURI,
+										database,
+										handler, namespaceIndex);
+								final Observable<Resource> deltaModel = result.v1();
 
 				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
-				// FIXME DD-809 and subtasks: skip delta calculation for now
-				//noinspection PointlessBooleanExpression,ConstantConditions
-				if (false && optionalDeprecateMissingRecords.or(false)) {
+				if (optionalDeprecateMissingRecords.isPresent() && optionalDeprecateMissingRecords.get()) {
 
 					final Optional<String> optionalRecordClassURI = getMetadataPart(DMPStatics.RECORD_CLASS_URI_IDENTIFIER, metadata, false);
 
@@ -265,9 +259,7 @@ public class GDMResource {
 
 					// deprecate missing records in DB
 
-					// FIXME DD-809 and subtasks: skip delta calculation for now
-					//					final Observable<Long> processedResources = result.v2();
-					final Observable<Long> processedResources = Observable.empty();
+					final Observable<Long> processedResources = result.v2();
 
 					deprecateRecordsObservable = deprecateMissingRecords(processedResources, optionalRecordClassURI.get(), dataModelURI,
 							((Neo4jUpdateHandler) handler.getHandler())
@@ -693,7 +685,7 @@ public class GDMResource {
 					final String resourceURI = newResource.getUri();
 					final String prefixedResourceURI = namespaceIndex.createPrefixedURI(resourceURI);
 					final String hash = UUID.randomUUID().toString();
-					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "2",
+					final GraphDatabaseService newResourceDB = loadResource(newResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "-2",
 							namespaceIndex);
 
 					final Resource existingResource;
@@ -733,7 +725,7 @@ public class GDMResource {
 					}
 
 					final String existingResourceURI = existingResource.getUri();
-					final String prefixedExistingResourceURI = existingResourceURI; // handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
+					final String prefixedExistingResourceURI = handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
 					final long existingResourceHash = handler.getHandler().getProcessor().generateResourceHash(prefixedExistingResourceURI,
 							Optional.<String>absent());
 					processedResources.add(existingResourceHash);
@@ -741,7 +733,7 @@ public class GDMResource {
 					// final Model newResourceModel = new Model();
 					// newResourceModel.addResource(resource);
 
-					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "1",
+					final GraphDatabaseService existingResourceDB = loadResource(existingResource, IMPERMANENT_GRAPH_DATABASE_PATH + hash + "-1",
 							namespaceIndex);
 
 					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
@@ -1030,7 +1022,7 @@ public class GDMResource {
 		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)
 				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
 
-		SchemaIndexUtils.createSchemaIndices(impermanentDB);
+		SchemaIndexUtils.createSchemaIndices(impermanentDB, impermanentGraphDatabaseDir);
 
 		// TODO: implement handler that enriches the GDM resource with useful information for changeset detection
 		final GDMHandler handler = new Neo4jDeltaGDMHandler(impermanentDB, namespaceIndex);

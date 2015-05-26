@@ -38,14 +38,14 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 	private static final String TYPE = "GDM record by ID";
 
 	private final String        recordId;
-	private       String        recordURI;
+	private       String        prefixedRecordURI;
 	private final AttributePath recordIdentifierAP;
 
-	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri,
+	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String prefixedDataModelUri,
 			final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
+		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
 		recordId = recordIdArg;
 		recordIdentifierAP = recordIdentifierAPArg;
@@ -55,14 +55,15 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 	@Override
 	protected Node getResourceNode() throws DMPGraphException {
 
-		if (recordURI == null) {
+		if (prefixedRecordURI == null) {
 
 			LOG.debug("couldn't a find a resource node to start traversal");
 
 			return null;
 		}
 
-		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, prefixedDataModelUri, Optional.of(version),
+		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(prefixedRecordURI, prefixedDataModelUri,
+				Optional.of(version),
 				database, tx, namespaceIndex);
 
 		return uriReader.getResourceNode();
@@ -70,6 +71,6 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 
 	private void determineRecordUri() throws DMPGraphException {
 
-		recordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, prefixedDataModelUri, database, namespaceIndex);
+		prefixedRecordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, prefixedDataModelUri, database, namespaceIndex);
 	}
 }

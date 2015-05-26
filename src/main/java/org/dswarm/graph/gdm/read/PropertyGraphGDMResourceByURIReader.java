@@ -34,21 +34,22 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 
 	private static final String TYPE = "GDM record by URI";
 
-	private final String recordUri;
+	private final String prefixedRecordUri;
 
-	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final Optional<Integer> optionalVersionArg,
+	public PropertyGraphGDMResourceByURIReader(final String prefixedRecordUriArg, final String prefixedDataModelUri,
+			final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
+		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
-		recordUri = recordUriArg;
+		prefixedRecordUri = prefixedRecordUriArg;
 	}
 
 	@Override
 	protected Node getResourceNode() throws DMPGraphException {
 
-		final long resourceUriDataModelUriHash1 = HashUtils.generateHash(recordUri + prefixedDataModelUri);
+		final long resourceUriDataModelUriHash1 = HashUtils.generateHash(prefixedRecordUri + prefixedDataModelUri);
 
 		return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash1);
 	}

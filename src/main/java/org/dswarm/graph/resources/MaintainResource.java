@@ -75,6 +75,8 @@ public class MaintainResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MaintainResource.class);
 
+	private static final String PERSISTENT_GRAPH_DATABASE_IDENTIFIER = "persistent graph database";
+
 	private static final long chunkSize = 50000;
 
 	// TODO: maybe divide this into 2 queries and without OPTIONAL
@@ -150,7 +152,7 @@ public class MaintainResource {
 	@Path("/schemaindices")
 	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
 
-		SchemaIndexUtils.createSchemaIndices(database);
+		SchemaIndexUtils.createSchemaIndices(database, PERSISTENT_GRAPH_DATABASE_IDENTIFIER);
 
 		initPrefixes(database);
 

@@ -32,8 +32,8 @@ public class DataModelRDFNeo4jProcessor extends RDFNeo4jProcessor {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelRDFNeo4jProcessor.class);
 
-	public DataModelRDFNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelRDFNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex, final String prefixedDataModelURIArg) throws DMPGraphException {
 
-		super(new DataModelNeo4jProcessor(database, tx, namespaceIndex, dataModelURIArg));
+		super(new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelURIArg));
 	}
 }

@@ -221,9 +221,10 @@ public class GDMResource {
 
 		final TransactionHandler tx = new Neo4jTransactionHandler(database);
 		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
-		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, tx, namespaceIndex, dataModelURI);
 
 		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
+
+		final GDMNeo4jProcessor processor = new DataModelGDMNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelURI);
 
 		LOG.info("process GDM statements and write them into graph db for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 

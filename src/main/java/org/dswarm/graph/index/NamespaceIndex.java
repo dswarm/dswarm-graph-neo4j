@@ -74,9 +74,15 @@ public class NamespaceIndex {
 		inMemoryNamespacePrefixesDB = mapDBTuple4.v2();
 	}
 
-	public void resetTXNamespaces() {
+	public void resetTXNamespaces() throws DMPGraphException {
 
 		if (tempNamespacePrefixes != null) {
+
+			if(!tempNamespacePrefixes.isEmpty()) {
+
+				// to ensure that no namespace prefix mapping get lost
+				pumpNFlushNamespacePrefixIndex();
+			}
 
 			tempNamespacePrefixes.clear();
 		}

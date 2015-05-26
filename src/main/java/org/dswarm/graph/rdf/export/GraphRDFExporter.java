@@ -31,7 +31,7 @@ import org.dswarm.graph.tx.TransactionHandler;
 
 public class GraphRDFExporter extends BaseRDFExporter {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GraphRDFExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GraphRDFExporter.class);
 	private final TransactionHandler tx;
 
 	public GraphRDFExporter(final GraphDatabaseService databaseArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) {
@@ -60,6 +60,8 @@ public class GraphRDFExporter extends BaseRDFExporter {
 
 			if (relations == null) {
 
+				tx.succeedTx();
+
 				return Optional.absent();
 			}
 
@@ -74,22 +76,22 @@ public class GraphRDFExporter extends BaseRDFExporter {
 			// (of
 			// one data resource) need to keep this size in mind)
 			if (BaseRDFExporter.JENA_MODEL_WARNING_SIZE == successfullyProcessedStatements) {
-				GraphRDFExporter.LOG.warn("reached " + BaseRDFExporter.JENA_MODEL_WARNING_SIZE
-						+ " statements. This is approximately the jena model implementation size limit.");
+				GraphRDFExporter.LOG.warn("reached {} statements. This is approximately the jena model implementation size limit.",
+						BaseRDFExporter.JENA_MODEL_WARNING_SIZE);
 			}
 
-			} catch (final Exception e) {
-
-				final String mesage = "couldn't finish read RDF TX successfully";
-
-				GraphRDFExporter.LOG.error(mesage, e);
-
-				throw new DMPGraphException(mesage);
-			} finally {
-
 			tx.succeedTx();
+		} catch (final Exception e) {
+
+			final String mesage = "couldn't finish read RDF TX successfully";
+
+			tx.failTx();
+
+			GraphRDFExporter.LOG.error(mesage, e);
+
+			throw new DMPGraphException(mesage);
 		}
 
-			return Optional.fromNullable(dataset);
-		}
+		return Optional.fromNullable(dataset);
+	}
 }

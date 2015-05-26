@@ -39,75 +39,68 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataModelNeo4jProcessor.class);
 
-	private final String dataModelURI;
+	private final String prefixedDataModelURI;
 
-	public DataModelNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex,
+			final String prefixedDataModelURIArg) throws DMPGraphException {
 
 		super(database, txArg, namespaceIndex);
 
-		final Optional<String> optionalPrefixedDataModelURI = optionalCreatePrefixedURI(Optional.fromNullable(dataModelURIArg));
-
-		if(optionalPrefixedDataModelURI.isPresent()) {
-
-			dataModelURI = optionalPrefixedDataModelURI.get();
-		} else {
-
-			dataModelURI = null;
-		}
+		prefixedDataModelURI = prefixedDataModelURIArg;
 	}
 
-	public String getDataModelURI() {
+	public String getPrefixedDataModelURI() {
 
-		return dataModelURI;
+		return prefixedDataModelURI;
 	}
 
 	@Override
-	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI) {
+	public void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalPrefixedDataModelURI) {
 
-		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
-		final long resourceUriDataModelUriHash = generateResourceHash(URI, Optional.of(finalDataModelURI));
+		final String finalPrefixedDataModelURI = getPrefixedDataModelURI(optionalPrefixedDataModelURI);
+		final long resourceUriDataModelUriHash = generateResourceHash(URI, Optional.of(finalPrefixedDataModelURI));
 
 		addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
 	}
 
 	@Override
-	public void handleObjectDataModel(final Node node, final Optional<String> optionalDataModelURI) {
+	public void handleObjectDataModel(final Node node, final Optional<String> optionalPrefixedDataModelURI) {
 
-		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+		final String finalPrefixedDataModelURI = getPrefixedDataModelURI(optionalPrefixedDataModelURI);
 
-		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalDataModelURI);
+		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalPrefixedDataModelURI);
 	}
 
 	@Override
-	public void handleSubjectDataModel(final Node node, String URI, final Optional<String> optionalDataModelURI) {
+	public void handleSubjectDataModel(final Node node, String prefixedURI, final Optional<String> optionalPrefixedDataModelURI) {
 
-		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
-		final long resourceUriDataModelUriHash = generateResourceHash(URI, Optional.of(finalDataModelURI));
+		final String finalPrefixedDataModelURI = getPrefixedDataModelURI(optionalPrefixedDataModelURI);
+		final long resourceUriDataModelUriHash = generateResourceHash(prefixedURI, Optional.of(finalPrefixedDataModelURI));
 
-		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalDataModelURI);
-		addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
+		node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, finalPrefixedDataModelURI);
+		addNodeToResourcesWDataModelIndex(prefixedURI, resourceUriDataModelUriHash, node);
 	}
 
 	@Override
-	public Optional<Node> getResourceNodeHits(final String resourceURI) {
+	public Optional<Node> getResourceNodeHits(final String prefixedResourceURI) {
 
-		final long resourceUriDataModelUriHash = generateResourceHash(resourceURI, Optional.of(dataModelURI));
+		final long resourceUriDataModelUriHash = generateResourceHash(prefixedResourceURI, Optional.of(prefixedDataModelURI));
 
 		return getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
 	}
 
-	@Override public long generateResourceHash(final String resourceURI, final Optional<String> optionalDataModelURI) {
+	@Override public long generateResourceHash(final String prefixedResourceURI, final Optional<String> optionalPrefixedDataModelURI) {
 
-		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
+		final String finalPrefixedDataModelURI = getPrefixedDataModelURI(optionalPrefixedDataModelURI);
 
-		final String hashString = resourceURI + finalDataModelURI;
+		final String hashString = prefixedResourceURI + finalPrefixedDataModelURI;
 
 		return HashUtils.generateHash(hashString);
 	}
 
 	@Override protected String putSaltToStatementHash(final String hash) {
 
-		return hash + " " + this.dataModelURI;
+		return hash + " " + this.prefixedDataModelURI;
 	}
 
 	@Override
@@ -116,7 +109,7 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, optionalIndex, versionHandler);
 
-		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, dataModelURI);
+		rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, prefixedDataModelURI);
 
 		rel.setProperty(VersioningStatics.VALID_FROM_PROPERTY, versionHandler.getRange().from());
 		rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getRange().to());
@@ -124,13 +117,13 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 		return rel;
 	}
 
-	private String getDataModelURI(final Optional<String> optionalDataModelURI) {
+	private String getPrefixedDataModelURI(final Optional<String> optionalPrefixedDataModelURI) {
 
-		if(optionalDataModelURI.isPresent()) {
+		if(optionalPrefixedDataModelURI.isPresent()) {
 
-			return optionalDataModelURI.get();
+			return optionalPrefixedDataModelURI.get();
 		}
 
-		return dataModelURI;
+		return prefixedDataModelURI;
 	}
 }

@@ -32,8 +32,8 @@ public class DataModelGDMNeo4jProcessor extends GDMNeo4jProcessor {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelGDMNeo4jProcessor.class);
 
-	public DataModelGDMNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelGDMNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex, final String prefixedDataModelURIArg) throws DMPGraphException {
 
-		super(new DataModelNeo4jProcessor(database, tx, namespaceIndex, dataModelURIArg));
+		super(new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelURIArg));
 	}
 }

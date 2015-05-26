@@ -35,15 +35,16 @@ import org.dswarm.graph.tx.TransactionHandler;
 
 public class DataModelRDFExporter extends BaseRDFExporter {
 
-	private static final Logger	LOG				= LoggerFactory.getLogger(DataModelRDFExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DataModelRDFExporter.class);
 
 	public static final int CYPHER_LIMIT = 1000;
 
-	private final String dataModelURI;
-	private final String prefixedDataModelURI;
+	private final String             dataModelURI;
+	private final String             prefixedDataModelURI;
 	private final TransactionHandler tx;
 
-	public DataModelRDFExporter(final GraphDatabaseService databaseArg, final String dataModelURIArg, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+	public DataModelRDFExporter(final GraphDatabaseService databaseArg, final String dataModelURIArg, final TransactionHandler txArg,
+			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 		super(databaseArg, namespaceIndex);
 		dataModelURI = dataModelURIArg;
 		tx = txArg;
@@ -58,7 +59,7 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 	@Override
 	public Optional<Dataset> export() throws DMPGraphException {
 
-		DataModelRDFExporter.LOG.debug("start exporting data for dataModelURI \"{}\"", dataModelURI);
+		DataModelRDFExporter.LOG.debug("start exporting data for dataModelURI \"{}\" ('{}')", dataModelURI, prefixedDataModelURI);
 
 		tx.ensureRunningTx();
 
@@ -74,9 +75,9 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				final Result result = database.execute("MATCH (n)-[r]->(m) WHERE r." + GraphStatics.DATA_MODEL_PROPERTY + " = \""
 						+ prefixedDataModelURI + "\" RETURN DISTINCT r ORDER BY id(r) SKIP " + start + " LIMIT " + DataModelRDFExporter.CYPHER_LIMIT);
 
-				if(result == null) {
+				if (result == null) {
 
-					DataModelRDFExporter.LOG.debug("no results for '{}'", dataModelURI);
+					DataModelRDFExporter.LOG.debug("no results for '{}' ('')", dataModelURI, prefixedDataModelURI);
 
 					break;
 				}
@@ -87,14 +88,14 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				// please note that the Jena model implementation has its size limits (~1 mio statements (?) -> so one graph (of
 				// one data resource) need to keep this size in mind)
 				if (BaseRDFExporter.JENA_MODEL_WARNING_SIZE == start) {
-					DataModelRDFExporter.LOG.warn("reached " + BaseRDFExporter.JENA_MODEL_WARNING_SIZE
-							+ " statements. This is approximately the jena model implementation size limit.");
+					DataModelRDFExporter.LOG.warn("reached {} statements. This is approximately the jena model implementation size limit.",
+							BaseRDFExporter.JENA_MODEL_WARNING_SIZE);
 				}
 
 				// activate for debug
 				// StringBuilder rows = new StringBuilder("\n\n");
 
-				while(result.hasNext()) {
+				while (result.hasNext()) {
 
 					final Map<String, Object> row = result.next();
 
@@ -132,16 +133,16 @@ public class DataModelRDFExporter extends BaseRDFExporter {
 				result.close();
 			}
 
-		}  catch (final Exception e) {
+			tx.succeedTx();
+		} catch (final Exception e) {
 
 			final String mesage = "couldn't finish read RDF TX successfully";
+
+			tx.failTx();
 
 			DataModelRDFExporter.LOG.error(mesage, e);
 
 			throw new DMPGraphException(mesage);
-		} finally {
-
-			tx.succeedTx();
 		}
 
 		return Optional.fromNullable(dataset);

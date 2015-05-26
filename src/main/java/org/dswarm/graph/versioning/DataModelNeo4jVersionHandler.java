@@ -65,7 +65,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 			finalDataModelURI = optionalDataModelURI.get();
 		} else {
 
-			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
+			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
 		}
 
 		super.setLatestVersion(Optional.fromNullable(finalDataModelURI));
@@ -76,7 +76,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		int latestVersion = 0;
 
-		final String dataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
+		final String dataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
 		final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
 
 		final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
@@ -102,7 +102,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		try {
 
-			final String dataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
+			final String dataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
 			final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
 			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
 

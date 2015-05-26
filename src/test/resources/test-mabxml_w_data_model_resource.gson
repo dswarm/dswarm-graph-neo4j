@@ -16,7 +16,7 @@
          "p" : "http://example.com/mypropertywdatamodelresourceobject",
          "o" : {
            "uri" : "http://example.com/mydataresource",
-           "data_model" : "http://example.com/"
+           "data_model" : "http://example.com/datamodel1"
          }
        },{
     "order" : 1,

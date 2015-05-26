@@ -70,9 +70,9 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 				return null;
 			}
 
-			final String resourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
+			final String prefixedResourceUri = (String) recordNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
-			if (resourceUri == null) {
+			if (prefixedResourceUri == null) {
 
 				LOG.debug("there is no resource URI at record node '{}'", recordNode.getId());
 
@@ -83,7 +83,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 				return null;
 			}
 
-			final String fullResourceUri = namespaceIndex.createFullURI(resourceUri);
+			final String fullResourceUri = namespaceIndex.createFullURI(prefixedResourceUri);
 			currentResource = new Resource(fullResourceUri);
 			startNodeHandler.handleNode(recordNode);
 

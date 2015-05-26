@@ -132,6 +132,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			if (subjectNode == null) {
 
+				subjectNode = database.createNode();
+
 				if (subject instanceof ResourceNode) {
 
 					subjectNode = database.createNode(GraphProcessingStatics.RESOURCE_LABEL);
@@ -176,20 +178,20 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				boolean isType = false;
 
-				final String prefixedObjectURI;
+				final Optional<String> optionalPrefixedObjectURI;
 
 				// add Label if this is a type entry
 				if (predicateName.equals(RDF.type.getURI())) {
 
 					final String objectURI = ((ResourceNode) object).getUri();
-					prefixedObjectURI = namespaceIndex.createPrefixedURI(objectURI);
+					optionalPrefixedObjectURI = Optional.of(namespaceIndex.createPrefixedURI(objectURI));
 
-					addLabel(subjectNode, prefixedObjectURI);
+					addLabel(subjectNode, optionalPrefixedObjectURI.get());
 
 					isType = true;
 				} else {
 
-					prefixedObjectURI = null;
+					optionalPrefixedObjectURI = Optional.absent();
 				}
 
 				// Check index for object
@@ -205,7 +207,18 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 						objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL, GraphProcessingStatics.RESOURCE_LABEL);
 						objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
-						objectNode.setProperty(GraphStatics.URI_PROPERTY, prefixedObjectURI);
+						final String finalPrefixedObjectURI;
+
+						if(optionalPrefixedObjectURI.isPresent()) {
+
+							finalPrefixedObjectURI = optionalPrefixedObjectURI.get();
+						} else {
+
+							final String objectURI = ((ResourceNode) object).getUri();
+							finalPrefixedObjectURI = namespaceIndex.createPrefixedURI(objectURI);
+						}
+
+						objectNode.setProperty(GraphStatics.URI_PROPERTY, finalPrefixedObjectURI);
 
 						if (isType) {
 

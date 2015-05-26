@@ -185,7 +185,8 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes("multipart/mixed")
-	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders) throws DMPGraphException, IOException {
+	public Response writeGDM(final MultiPart multiPart, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders)
+			throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
 
@@ -239,12 +240,12 @@ public class GDMResource {
 
 				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
 
-								// = new resources model, since existing, modified resources were already written to the DB
-								final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
-										prefixedDataModelURI,
-										database,
-										handler, namespaceIndex);
-								final Observable<Resource> deltaModel = result.v1();
+				// = new resources model, since existing, modified resources were already written to the DB
+				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+						prefixedDataModelURI,
+						database,
+						handler, namespaceIndex);
+				final Observable<Resource> deltaModel = result.v1();
 
 				final Optional<Boolean> optionalDeprecateMissingRecords = getDeprecateMissingRecordsFlag(metadata);
 
@@ -345,7 +346,8 @@ public class GDMResource {
 	@POST
 	@Path("/put")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders) throws DMPGraphException, IOException {
+	public Response writeGDM(final InputStream inputStream, @Context final GraphDatabaseService database, @Context final HttpHeaders requestHeaders)
+			throws DMPGraphException, IOException {
 
 		LOG.debug("try to process GDM statements and write them into graph db");
 
@@ -511,35 +513,54 @@ public class GDMResource {
 		final Optional<String> optionalLegacyRecordIdentifierAP = getStringValue(DMPStatics.LEGACY_RECORD_IDENTIFIER_ATTRIBUTE_PATH, requestJSON);
 		final Optional<String> optionalRecordId = getStringValue(DMPStatics.RECORD_ID_IDENTIFIER, requestJSON);
 
-		GDMResource.LOG.debug("try to read GDM record for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
-				dataModelUri, optionalRecordUri, optionalVersion);
-
 		final TransactionHandler tx = new Neo4jTransactionHandler(database);
 		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelUri);
+
 		final GDMResourceReader gdmReader;
+		final String requestParameter;
 
 		if (optionalRecordUri.isPresent()) {
 
-			gdmReader = new PropertyGraphGDMResourceByURIReader(optionalRecordUri.get(), dataModelUri, optionalVersion, database, tx, namespaceIndex);
+			final String recordURI = optionalRecordUri.get();
+			final String prefixedRecordURI = namespaceIndex.createPrefixedURI(recordURI);
+
+			requestParameter = String.format("and record uri = '%s' ('%s')", recordURI, prefixedRecordURI);
+
+			GDMResource.LOG
+					.debug("try to read GDM record for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
+							dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
+
+			gdmReader = new PropertyGraphGDMResourceByURIReader(prefixedRecordURI, prefixedDataModelURI, optionalVersion, database, tx,
+					namespaceIndex);
 		} else if (optionalLegacyRecordIdentifierAP.isPresent() && optionalRecordId.isPresent()) {
 
 			final AttributePath legacyRecordIdentifierAP = AttributePathUtil.parseAttributePathString(optionalLegacyRecordIdentifierAP.get());
+			final String recordId = optionalRecordId.get();
 
-			gdmReader = new PropertyGraphGDMResourceByIDReader(optionalRecordId.get(), legacyRecordIdentifierAP, dataModelUri, optionalVersion,
+			requestParameter = String
+					.format("and legacy record identifier attribute path = '%s' and record identifier = '%s'", legacyRecordIdentifierAP, recordId);
+
+			GDMResource.LOG
+					.debug("try to read GDM record for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
+							dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
+
+			gdmReader = new PropertyGraphGDMResourceByIDReader(recordId, legacyRecordIdentifierAP, prefixedDataModelURI, optionalVersion,
 					database, tx, namespaceIndex);
 		} else {
 
 			throw new DMPGraphException(
-					"no identifiers given to retrieve a GDM record from the grap db. Please specify a record URI or legacy record identifier attribute path + record identifier");
+					"no identifiers given to retrieve a GDM record from the graph db. Please specify a record URI or legacy record identifier attribute path + record identifier");
 		}
 
 		final Resource resource = gdmReader.read();
 
 		if (resource == null) {
+
 			GDMResource.LOG.debug(
-					"no record found for data mode uri = '{}' and record uri = '{}' and version = '{}' from graph db",
-					dataModelUri, optionalRecordUri, optionalVersion);
+					"no record found for data mode uri = '{}' ('{}') {} and version = '{}' from graph db",
+					dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
 
 			return Response.status(404).build();
 		}
@@ -547,8 +568,8 @@ public class GDMResource {
 		final String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
 
 		GDMResource.LOG
-				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' and record uri = '{}' and version = '{}' from graph db",
-						resource.size(), gdmReader.countStatements(), dataModelUri, optionalRecordUri, optionalVersion);
+				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
+						resource.size(), gdmReader.countStatements(), dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
 
 		return Response.ok().entity(result).build();
 	}
@@ -568,19 +589,24 @@ public class GDMResource {
 		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 		final Optional<Integer> optionalVersion = getIntValue(DMPStatics.VERSION_IDENTIFIER, requestJSON);
 
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelUri);
+
 		GDMResource.LOG
-				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
-						keyAPString, searchValue, dataModelUri, optionalVersion);
+				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+						keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 
 		final AttributePath keyAP = AttributePathUtil.parseAttributePathString(keyAPString);
 
-		final Collection<String> recordURIs = GraphDBUtil.determineRecordUris(searchValue, keyAP, dataModelUri, database);
+		final Collection<String> recordURIs = GraphDBUtil.determineRecordUris(searchValue, keyAP, prefixedDataModelURI, database, namespaceIndex);
 
 		if (recordURIs == null || recordURIs.isEmpty()) {
 
 			GDMResource.LOG
-					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
-							keyAPString, searchValue, dataModelUri, optionalVersion);
+					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+							keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 
 			final StreamingOutput stream = new StreamingOutput() {
 
@@ -614,12 +640,9 @@ public class GDMResource {
 					int resourcesSize = 0;
 					long statementsSize = 0;
 
-					final TransactionHandler tx = new Neo4jTransactionHandler(database);
-					final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
-
 					for (final String recordUri : recordURIs) {
 
-						final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, dataModelUri,
+						final GDMResourceReader gdmReader = new PropertyGraphGDMResourceByURIReader(recordUri, prefixedDataModelURI,
 								optionalVersion, database, tx, namespaceIndex);
 
 						try {
@@ -645,13 +668,13 @@ public class GDMResource {
 					if (resourcesSize > 0) {
 
 						GDMResource.LOG
-								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
-										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, optionalVersion);
+								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 					} else {
 
 						GDMResource.LOG
-								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' with version = '{}' from graph db",
-										keyAPString, searchValue, dataModelUri, optionalVersion);
+								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+										keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {
 
@@ -1510,7 +1533,7 @@ public class GDMResource {
 
 			sb.append("\t\t").append(headerIdentifier).append(" = ");
 
-			for(final String headerValue : headerValues) {
+			for (final String headerValue : headerValues) {
 
 				sb.append(headerValue).append(", ");
 			}

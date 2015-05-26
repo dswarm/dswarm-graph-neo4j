@@ -890,10 +890,10 @@ public final class GraphDBUtil {
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
-	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath keyAttributePath, final String dataModelUri,
-			final GraphDatabaseService graphDB) throws DMPGraphException {
+	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri,
+			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		final String query = buildGetRecordUrisQuery(searchValue, keyAttributePath, dataModelUri);
+		final String query = buildGetRecordUrisQuery(searchValue, keyAttributePath, prefixedDataModelUri, namespaceIndex);
 
 		return executeQueryWithMultipleResults(query, "record_uri", graphDB);
 	}
@@ -1164,7 +1164,7 @@ public final class GraphDBUtil {
 		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
 		int i = attributes.size();
 
-		// prefix uris of recurd identifier attribute path
+		// prefix uris of record identifier attribute path
 		for (final Attribute attribute : attributes) {
 
 			final String fullUri = attribute.getUri();
@@ -1176,6 +1176,8 @@ public final class GraphDBUtil {
 				sb.append("()");
 			}
 		}
+
+		// TODO: refactor query, so that schema indices are utilised properly, i.e., value match needs to be the first query part
 
 		sb.append("(o:").append(NodeType.Literal).append(")\n")
 				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
@@ -1189,31 +1191,39 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath keyAttributePath, final String dataModelUri) {
+	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri, final NamespaceIndex namespaceIndex)
+			throws DMPGraphException {
 
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder("MATCH ");
 
-		sb.append("START o=node:").append(GraphIndexStatics.VALUES_INDEX_NAME).append("(").append(GraphStatics.VALUE).append("=\"")
-				.append(searchValue).append("\")\nMATCH (n)");
+		sb.append("(n:").append(NodeType.Resource).append(")");
 
-		int i = 1;
+		final LinkedList<Attribute> attributes = keyAttributePath.getAttributes();
+		int i = attributes.size();
 
-		for (final Attribute attribute : keyAttributePath.getAttributes()) {
+		for (final Attribute attribute : attributes) {
 
-			sb.append("-[:`").append(attribute.getUri()).append("`]->");
+			final String attributeURI = attribute.getUri();
+			final String prefixedAttributeURI = namespaceIndex.createPrefixedURI(attributeURI);
 
-			if (i < keyAttributePath.getAttributes().size()) {
+			sb.append("-[:`").append(prefixedAttributeURI).append("`]->");
+
+			if (--i > 0) {
 
 				sb.append("()");
 			}
-
-			i++;
 		}
 
-		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\nn.")
-				.append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(dataModelUri).append("\" AND\no.")
-				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN n.")
-				.append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+		// TODO: refactor query, so that schema indices are utilised properly, i.e., value match needs to be the first query part
+
+		sb.append("(o:").append(NodeType.Literal).append(")\n")
+				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
+				.append("WHERE ")
+				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append('"')
+				.append(" AND ")
+				.append("o.").append(GraphStatics.VALUE_PROPERTY).append(" = \"").append(searchValue).append('"').append('\n')
+				.append("RETURN ")
+				.append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
 
 		return sb.toString();
 	}

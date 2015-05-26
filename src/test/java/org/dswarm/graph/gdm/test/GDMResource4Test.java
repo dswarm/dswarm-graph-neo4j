@@ -119,7 +119,8 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("read '{}' statements", model.size());
 
-		Assert.assertEquals("the number of statements should be 191", 191, model.size());
+		// 191 - 39 rdf:type statements = 152
+		Assert.assertEquals("the number of statements should be 152", 152, model.size());
 
 		LOG.debug("finished read GDM model test for GDM resource at {} DB", dbType);
 	}
@@ -140,7 +141,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		requestJson.put(DMPStatics.RECORD_URI_IDENTIFIER, recordURI);
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, DATA_MODEL_URI);
 
-		final Resource actualResource = readGDMRecord(requestJson, 191);
+		final Resource actualResource = readGDMRecord(requestJson, 152);
 
 		Assert.assertEquals(recordURI, actualResource.getUri());
 
@@ -152,7 +153,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start read GDM record by ID test for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/11111";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/11111";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -168,7 +169,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		requestJson.put(DMPStatics.LEGACY_RECORD_IDENTIFIER_ATTRIBUTE_PATH, legacyRecordIdentifierAP);
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 
-		final Resource actualResource = readGDMRecord(requestJson, 6);
+		final Resource actualResource = readGDMRecord(requestJson, 5);
 
 		Assert.assertEquals(recordURI, actualResource.getUri());
 
@@ -220,7 +221,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start read versioned GDM record by URI test for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/3333";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/3333";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -259,7 +260,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start search GDM records test 1 for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/4444";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/4444";
 
 		writeGDMToDBInternal(dataModelURI, MABXML_RESOURCE_GSON);
 
@@ -275,7 +276,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 
-		final Model actualModel = searchGDMRecords(requestJson, 191);
+		final Model actualModel = searchGDMRecords(requestJson, 152);
 
 		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
 
@@ -287,7 +288,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start search GDM records test 2 for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/5555";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/5555";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -303,7 +304,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		requestJson.put(DMPStatics.SEARCH_VALUE_IDENTIFIER, searchValue);
 		requestJson.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 
-		final Model actualModel = searchGDMRecords(requestJson, 6);
+		final Model actualModel = searchGDMRecords(requestJson, 5);
 
 		Assert.assertEquals(recordURI, actualModel.getResources().iterator().next().getUri());
 
@@ -315,7 +316,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start search GDM records test 3 for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/6666";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/6666";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -355,7 +356,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 
 		LOG.debug("start search GDM records test 4 for GDM resource at {} DB", dbType);
 
-		final String dataModelURI = "ttp://data.slub-dresden.de/resources/7777";
+		final String dataModelURI = "http://data.slub-dresden.de/resources/7777";
 
 		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
 
@@ -467,8 +468,6 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		final String body = response.getEntity(String.class);
-
-		System.out.println("body = " + body);
 
 		final Resource resource = objectMapper.readValue(body, Resource.class);
 

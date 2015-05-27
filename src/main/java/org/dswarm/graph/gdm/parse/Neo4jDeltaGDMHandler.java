@@ -132,8 +132,6 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			if (subjectNode == null) {
 
-				subjectNode = database.createNode();
-
 				if (subject instanceof ResourceNode) {
 
 					subjectNode = database.createNode(GraphProcessingStatics.RESOURCE_LABEL);
@@ -150,7 +148,6 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 					// note: can I expect an id here?
 					bnodes.put("" + subject.getId(), subjectNode);
-					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
 				addedNodes++;

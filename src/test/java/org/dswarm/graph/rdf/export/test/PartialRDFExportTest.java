@@ -243,6 +243,8 @@ public abstract class PartialRDFExportTest extends RDFExportTest {
 		// read expected model from file
 		final Model expectedModel = RDFDataMgr.loadModel(expectedModelFile);
 		Assert.assertNotNull("expected model shouldn't be null", expectedModel);
+
+		// note: remove rdf:type statements, since they won't available at read requests right now
 		expectedModel.removeAll(null, RDF.type, null);
 
 		// check if statements are the "same" (isomorphic, i.e. blank nodes may have different IDs)

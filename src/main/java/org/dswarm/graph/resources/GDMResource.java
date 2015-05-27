@@ -721,7 +721,7 @@ public class GDMResource {
 
 						// determine legacy resource identifier via content schema
 						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
-								.getRecordIdentifierAttributePath(), prefixedResourceURI);
+								.getRecordIdentifierAttributePath(), prefixedResourceURI, namespaceIndex);
 
 						// try to retrieve existing model via legacy record identifier
 						// note: version is absent -> should make use of latest version
@@ -761,7 +761,7 @@ public class GDMResource {
 							namespaceIndex);
 
 					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
-							optionalContentSchema);
+							optionalContentSchema, namespaceIndex);
 
 					if (!changeset.hasChanges()) {
 
@@ -815,11 +815,18 @@ public class GDMResource {
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
-			final Resource newResource, final GraphDatabaseService newResourceDB, final Optional<ContentSchema> optionalContentSchema)
+			final Resource newResource, final GraphDatabaseService newResourceDB, final Optional<ContentSchema> optionalContentSchema,
+			final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
-		enrichModel(existingResourceDB, existingResource.getUri());
-		enrichModel(newResourceDB, newResource.getUri());
+		final String existingResourceURI = existingResource.getUri();
+		final String newResourceURI = newResource.getUri();
+
+		final String prefixedExistingResourceURI = namespaceIndex.createPrefixedURI(existingResourceURI);
+		final String prefixedNewResourceURI = namespaceIndex.createPrefixedURI(newResourceURI);
+
+		enrichModel(existingResourceDB, prefixedExistingResourceURI);
+		enrichModel(newResourceDB, prefixedNewResourceURI);
 
 		// GraphDBUtil.printNodes(existingResourceDB);
 		// GraphDBUtil.printRelationships(existingResourceDB);
@@ -861,9 +868,9 @@ public class GDMResource {
 
 			final AttributePath commonAttributePath = optionalCommonAttributePath.get();
 
-			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, newResource.getUri(), commonAttributePath,
+			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, prefixedNewResourceURI, commonAttributePath,
 					optionalContentSchema.get());
-			final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, existingResource.getUri(),
+			final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, prefixedExistingResourceURI,
 					commonAttributePath, optionalContentSchema.get());
 
 			// do delta calculation on enriched GDM models in graph
@@ -876,7 +883,7 @@ public class GDMResource {
 			// see step 7
 			// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
 			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(Optional.fromNullable(existingCSEntities),
-					Optional.fromNullable(newCSEntities), existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+					Optional.fromNullable(newCSEntities), existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			exactCSMatcher.match();
 
 			final Optional<? extends Collection<CSEntity>> newExactCSNonMatches = exactCSMatcher.getNewEntitiesNonMatches();
@@ -888,7 +895,7 @@ public class GDMResource {
 			// 1.2 hash with key, value + entity order + value order => matches value entities
 			final FirstDegreeExactCSValueMatcher firstDegreeExactCSValueMatcher = new FirstDegreeExactCSValueMatcher(
 					existingFirstDegreeExactCSValueNonMatches, newFirstDegreeExactCSValueNonMatches, existingResourceDB, newResourceDB,
-					existingResource.getUri(), newResource.getUri());
+					prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeExactCSValueMatcher.match();
 
 			final Optional<? extends Collection<ValueEntity>> newExactCSValueNonMatches = firstDegreeExactCSValueMatcher.getNewEntitiesNonMatches();
@@ -899,7 +906,7 @@ public class GDMResource {
 			// 2. identify modifications for cs entities
 			// 2.1 hash with key + entity order + value order => matches value entities
 			final ModificationMatcher<ValueEntity> modificationCSMatcher = new FirstDegreeModificationCSValueMatcher(existingExactCSValueNonMatches,
-					newExactCSValueNonMatches, existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+					newExactCSValueNonMatches, existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			modificationCSMatcher.match();
 
 			// 2.2 hash with key + entity order => matches value entities
@@ -916,8 +923,7 @@ public class GDMResource {
 			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
 			// 7.1.1 key + predicate + sub graph hash + order
 			final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
-					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB,
-					existingResource.getUri(), newResource.getUri());
+					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeExactSubGraphEntityMatcher.match();
 
 			final Optional<? extends Collection<SubGraphEntity>> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
@@ -933,8 +939,7 @@ public class GDMResource {
 					existingFirstDegreeExactSubGraphEntityNonMatches, existingResourceDB);
 			// 7.2.1 key + predicate + sub graph leaf path hash + order
 			final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
-					existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, existingResource.getUri(),
-					newResource.getUri());
+					existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeExactSubGraphLeafEntityMatcher.match();
 
 			final Optional<? extends Collection<SubGraphLeafEntity>> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
@@ -944,7 +949,7 @@ public class GDMResource {
 			// 7.3 identify modifications of (non-hierarchical) sub graphs
 			final FirstDegreeModificationSubGraphLeafEntityMatcher firstDegreeModificationSubGraphLeafEntityMatcher = new FirstDegreeModificationSubGraphLeafEntityMatcher(
 					existingFirstDegreeExactSubGraphLeafEntityNonMatches, newFirstDegreeExactSubGraphLeafEntityNonMatches, existingResourceDB,
-					newResourceDB, existingResource.getUri(), newResource.getUri());
+					newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeModificationSubGraphLeafEntityMatcher.match();
 
 			for (final Map.Entry<ValueEntity, ValueEntity> modificationEntry : modificationCSMatcher.getModifications().entrySet()) {
@@ -961,13 +966,13 @@ public class GDMResource {
 		}
 
 		// 3. identify exact matches of resource node-based statements
-		final Collection<ValueEntity> newFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(newResource.getUri(), newResourceDB);
-		final Collection<ValueEntity> existingFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(existingResource.getUri(),
+		final Collection<ValueEntity> newFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(prefixedNewResourceURI, newResourceDB);
+		final Collection<ValueEntity> existingFlatResourceNodeValueEntities = GraphDBUtil.getFlatResourceNodeValues(prefixedExistingResourceURI,
 				existingResourceDB);
 		// 3.1 with key (predicate), value + value order => matches value entities
 		final FirstDegreeExactGDMValueMatcher firstDegreeExactGDMValueMatcher = new FirstDegreeExactGDMValueMatcher(
 				Optional.fromNullable(existingFlatResourceNodeValueEntities), Optional.fromNullable(newFlatResourceNodeValueEntities),
-				existingResourceDB, newResourceDB, existingResource.getUri(), newResource.getUri());
+				existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 		firstDegreeExactGDMValueMatcher.match();
 
 		final Optional<? extends Collection<ValueEntity>> newFirstDegreeExactGDMValueNonMatches = firstDegreeExactGDMValueMatcher
@@ -978,7 +983,7 @@ public class GDMResource {
 		// 4.1 with key (predicate), value + value order => matches value entities
 		final FirstDegreeModificationGDMValueMatcher firstDegreeModificationGDMValueMatcher = new FirstDegreeModificationGDMValueMatcher(
 				existingFirstDegreeExactGDMValueNonMatches, newFirstDegreeExactGDMValueNonMatches, existingResourceDB, newResourceDB,
-				existingResource.getUri(), newResource.getUri());
+				prefixedExistingResourceURI, prefixedNewResourceURI);
 		firstDegreeModificationGDMValueMatcher.match();
 
 		// 5. identify additions in new model graph
@@ -1008,20 +1013,20 @@ public class GDMResource {
 		}
 
 		// traverse resource graphs to extract changeset
-		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(),
+		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(prefixedNewResourceURI,
 				DeltaState.ADDITION, newResourceDB);
 		final Map<String, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
-				existingResource.getUri(), DeltaState.DELETION, existingResourceDB);
+				prefixedExistingResourceURI, DeltaState.DELETION, existingResourceDB);
 		final Map<String, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
 
-		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(newResource.getUri(),
+		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(prefixedNewResourceURI,
 				DeltaState.MODIFICATION, newResourceDB);
 		final Map<String, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
-				existingResource.getUri(), DeltaState.MODIFICATION, existingResourceDB);
+				prefixedExistingResourceURI, DeltaState.MODIFICATION, existingResourceDB);
 		final Map<String, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
 		for (final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher
@@ -1062,9 +1067,9 @@ public class GDMResource {
 		return impermanentDB;
 	}
 
-	private void enrichModel(final GraphDatabaseService graphDB, final String resourceUri) throws DMPGraphException {
+	private void enrichModel(final GraphDatabaseService graphDB, final String prefixedResourceURI) throws DMPGraphException {
 
-		final GDMWorker worker = new PropertyEnrichGDMWorker(resourceUri, graphDB);
+		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, graphDB);
 		worker.work();
 	}
 

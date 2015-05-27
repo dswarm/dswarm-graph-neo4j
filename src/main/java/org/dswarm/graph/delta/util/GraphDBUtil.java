@@ -42,10 +42,9 @@ import org.neo4j.graphdb.PathExpanderBuilder;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.traversal.BranchOrderingPolicies;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
@@ -59,7 +58,6 @@ import org.dswarm.common.model.Attribute;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaState;
@@ -75,6 +73,7 @@ import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.utils.GraphUtils;
 
 /**
  * @author tgaengler
@@ -83,7 +82,8 @@ public final class GraphDBUtil {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GraphDBUtil.class);
 
-	private static final RelationshipType rdfTypeRelType = DynamicRelationshipType.withName("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+	// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+	private static final RelationshipType rdfTypeRelType = DynamicRelationshipType.withName("rdf:type");
 
 	public static void addNodeId(final Set<Long> nodeIds, final Long nodeId) throws DMPGraphException {
 
@@ -111,47 +111,51 @@ public final class GraphDBUtil {
 	 * note: should be run in transaction scope
 	 *
 	 * @param graphDB
-	 * @param resourceURI
+	 * @param prefixedResourceURI
 	 * @return
 	 */
-	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI) {
+	public static Node getResourceNode(final GraphDatabaseService graphDB, final String prefixedResourceURI) {
 
-		final Index<Node> resources = graphDB.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
+		final ResourceIterator<Node> resources = graphDB.findNodes(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, prefixedResourceURI);
 
 		if (resources == null) {
 
-			return null;
-		}
-
-		final IndexHits<Node> hits = resources.get(GraphStatics.URI, resourceURI);
-
-		if (hits == null || !hits.hasNext()) {
-
-			if (hits != null) {
-
-				hits.close();
-			}
+			LOG.debug("couldn't find resource node for resource identifier '{}'", prefixedResourceURI);
 
 			return null;
 		}
 
-		final Node node = hits.next();
+		if (!resources.hasNext()) {
 
-		hits.close();
+			LOG.debug("couldn't find resource node for resource identifier '{}'", prefixedResourceURI);
 
-		return node;
+			resources.close();
+
+			return null;
+		}
+
+		final Node resourceNode = resources.next();
+
+		if (resources.hasNext()) {
+
+			LOG.warn("there are more than one resource nodes for resource identifier '{}'", prefixedResourceURI);
+		}
+
+		resources.close();
+
+		return resourceNode;
 	}
 
 	/**
 	 * note: should be run in transaction scope
 	 *
 	 * @param graphDB
-	 * @param resourceURI
+	 * @param prefixedResourceURI
 	 * @return
 	 */
-	public static Node getResourceNode(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
+	public static Node getResourceNode(final GraphDatabaseService graphDB, final String prefixedResourceURI, final String prefixedDataModelURI) {
 
-		final long resourceUriDataModelUriHash = HashUtils.generateHash(resourceURI + dataModelURI);
+		final long resourceUriDataModelUriHash = HashUtils.generateHash(prefixedResourceURI + prefixedDataModelURI);
 
 		return graphDB.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash);
 	}
@@ -174,12 +178,12 @@ public final class GraphDBUtil {
 	 * note: should be run in transaction scope
 	 *
 	 * @param graphDB
-	 * @param resourceURI
+	 * @param prefixedResourceURI
 	 * @return
 	 */
-	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String resourceURI) {
+	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String prefixedResourceURI) {
 
-		final Node resourceNode = getResourceNode(graphDB, resourceURI);
+		final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI);
 
 		// TODO: maybe replace with gethEntityPaths(GraphdataBaseService, Node)
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
@@ -207,13 +211,13 @@ public final class GraphDBUtil {
 	 * note: should be run in transaction scope
 	 *
 	 * @param graphDB
-	 * @param resourceURI
-	 * @param dataModelURI
+	 * @param prefixedResourceURI
+	 * @param prefixedDataModelURI
 	 * @return
 	 */
-	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String resourceURI, final String dataModelURI) {
+	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String prefixedResourceURI, final String prefixedDataModelURI) {
 
-		final Node resourceNode = getResourceNode(graphDB, resourceURI, dataModelURI);
+		final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI, prefixedDataModelURI);
 
 		return getResourcePaths(graphDB, resourceNode);
 	}
@@ -270,9 +274,11 @@ public final class GraphDBUtil {
 
 				if (!finalRelMatchedState) {
 
+					LOG.debug("couldn't mark relationship: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
+
 					incomplete = true;
 
-					break;
+					continue;
 				}
 
 				final Boolean subjectMatchedState = (Boolean) rel.getStartNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
@@ -280,9 +286,11 @@ public final class GraphDBUtil {
 
 				if (!finalSubjectMatchedState) {
 
+					LOG.debug("couldn't start node: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
+
 					incomplete = true;
 
-					break;
+					continue;
 				}
 
 				final Boolean objectMatchedState = (Boolean) rel.getEndNode().getProperty(DeltaStatics.MATCHED_PROPERTY, null);
@@ -290,9 +298,9 @@ public final class GraphDBUtil {
 
 				if (!finalObjectMatchedState) {
 
-					incomplete = true;
+					LOG.debug("couldn't mark end node: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
 
-					break;
+					incomplete = true;
 				}
 			}
 
@@ -303,11 +311,11 @@ public final class GraphDBUtil {
 			return result;
 		} catch (final Exception e) {
 
-			final String message = "couldn't complete the graph matching completeness check for graph DB '" + graphDB + "'";
+			final String message = String.format("couldn't complete the graph matching completeness check for graph DB '%s'", graphDB);
 
 			GraphDBUtil.LOG.error(message, e);
 
-			throw new DMPGraphException(message);
+			throw new DMPGraphException(message, e);
 		}
 	}
 
@@ -409,7 +417,8 @@ public final class GraphDBUtil {
 	 * @param nodeHashes
 	 * @return
 	 */
-	public static boolean calculateEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes) {
+	public static boolean calculateEntityHash(final GraphDatabaseService graphDB, final long entityNodeId, final Map<Long, Long> nodeHashes)
+			throws DMPGraphException {
 
 		final Node entityNode = graphDB.getNodeById(entityNodeId);
 
@@ -468,9 +477,9 @@ public final class GraphDBUtil {
 	 * @param node
 	 * @return
 	 */
-	public static Long calculateNodeHash(final Node node) {
+	public static Long calculateNodeHash(final Node node) throws DMPGraphException {
 
-		final NodeType nodeType = getNodeType(node);
+		final NodeType nodeType = GraphUtils.determineNodeType(node);
 
 		if (nodeType == null) {
 
@@ -496,9 +505,9 @@ public final class GraphDBUtil {
 	 * @param node
 	 * @return
 	 */
-	public static Long calculateSimpleNodeHash(final Node node) {
+	public static Long calculateSimpleNodeHash(final Node node) throws DMPGraphException {
 
-		final NodeType nodeType = getNodeType(node);
+		final NodeType nodeType = GraphUtils.determineNodeType(node);
 
 		if (nodeType == null) {
 
@@ -507,18 +516,6 @@ public final class GraphDBUtil {
 		}
 
 		return (long) nodeType.hashCode();
-	}
-
-	private static NodeType getNodeType(final Node node) {
-
-		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
-
-		if (nodeTypeString == null) {
-
-			return null;
-		}
-
-		return NodeType.getByName(nodeTypeString);
 	}
 
 	private static String getValue(final Node node, final NodeType nodeType) {
@@ -629,7 +626,7 @@ public final class GraphDBUtil {
 		}
 	}
 
-	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String resourceURI,
+	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String prefixedResourceURI,
 			final AttributePath commonAttributePath, final ContentSchema contentSchema)
 			throws DMPGraphException {
 
@@ -637,7 +634,7 @@ public final class GraphDBUtil {
 
 		try (final Transaction tx = graphDB.beginTx()) {
 
-			final Node resourceNode = getResourceNode(graphDB, resourceURI);
+			final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI);
 
 			// determine CS entity nodes
 			final ResourceIterable<Node> csEntityNodes = graphDB.traversalDescription().breadthFirst()
@@ -841,7 +838,8 @@ public final class GraphDBUtil {
 					}
 
 					// TODO: remove this later, it'S just for debugging purpose right now
-					if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
+					// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+					if ("rdf:type".equals(predicate)) {
 
 						final long relId = nonMatchedRel.getId();
 						final String value = (String) nonMatchedRel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
@@ -875,10 +873,11 @@ public final class GraphDBUtil {
 		return subgraphEntities;
 	}
 
-	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String recordURI)
+	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String prefixedRecordURI,
+			final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
-		final String query = buildGetRecordIdentifierQuery(recordIdentifierAP, recordURI);
+		final String query = buildGetRecordIdentifierQuery(recordIdentifierAP, prefixedRecordURI, namespaceIndex);
 
 		return executeQueryWithSingleResult(query, "record_identifier", graphDB);
 	}
@@ -890,7 +889,8 @@ public final class GraphDBUtil {
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
-	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri,
+	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath keyAttributePath,
+			final String prefixedDataModelUri,
 			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
 		final String query = buildGetRecordUrisQuery(searchValue, keyAttributePath, prefixedDataModelUri, namespaceIndex);
@@ -898,12 +898,12 @@ public final class GraphDBUtil {
 		return executeQueryWithMultipleResults(query, "record_uri", graphDB);
 	}
 
-	public static Collection<ValueEntity> getFlatResourceNodeValues(final String resourceURI, final GraphDatabaseService graphDB)
+	public static Collection<ValueEntity> getFlatResourceNodeValues(final String prefixedResourceURI, final GraphDatabaseService graphDB)
 			throws DMPGraphException {
 
 		try (final Transaction tx = graphDB.beginTx()) {
 
-			final Node resourceNode = getResourceNode(graphDB, resourceURI);
+			final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI);
 
 			final Collection<ValueEntity> flatResourceNodeValues = getFlatNodeValues(resourceNode, graphDB);
 
@@ -920,7 +920,7 @@ public final class GraphDBUtil {
 		}
 	}
 
-	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) {
+	private static Collection<ValueEntity> getFlatNodeValues(final Node node, final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		if (node == null) {
 			return Collections.emptyList();
@@ -939,17 +939,11 @@ public final class GraphDBUtil {
 
 			final Relationship rel = path.lastRelationship();
 			final String predicate = rel.getType().name();
-			final long valueNodeId = path.endNode().getId();
+			final Node endNode = path.endNode();
+			final long valueNodeId = endNode.getId();
 
-			final String nodeTypeString = (String) path.endNode().getProperty(GraphStatics.NODETYPE_PROPERTY, null);
-
-			if (nodeTypeString == null) {
-
-				// skip none typed nodes?
-				continue;
-			}
-
-			final NodeType valueNodeType = NodeType.getByName(nodeTypeString);
+			// TODO: are there any nodes without node type?
+			final NodeType valueNodeType = GraphUtils.determineNodeType(endNode);
 			final String value;
 
 			switch (valueNodeType) {
@@ -957,9 +951,9 @@ public final class GraphDBUtil {
 				case Resource:
 				case TypeResource:
 
-					String tempValue = (String) path.endNode().getProperty(GraphStatics.URI_PROPERTY, null);
+					String tempValue = (String) endNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
-					final String dataModel = (String) path.endNode().getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
+					final String dataModel = (String) endNode.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
 					if (dataModel != null) {
 
@@ -971,7 +965,7 @@ public final class GraphDBUtil {
 					break;
 				case Literal:
 
-					value = (String) path.endNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
+					value = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
 
 					break;
 				default:
@@ -1020,19 +1014,29 @@ public final class GraphDBUtil {
 
 		for (final AttributePath keyAttributePath : contentSchema.getKeyAttributePaths()) {
 
-			final LinkedList<Attribute> relativeKeyAttributePath = determineRelativeAttributePath(keyAttributePath, commonAttributePath);
+			final Optional<LinkedList<Attribute>> optionalRelativeKeyAttributePath = determineRelativeAttributePath(keyAttributePath,
+					commonAttributePath);
 
-			final Iterable<Path> relativeKeyPaths = graphDB.traversalDescription().depthFirst()
-					.evaluator(Evaluators.toDepth(relativeKeyAttributePath.size())).evaluator(new EntityEvaluator(relativeKeyAttributePath))
-					.traverse(csEntityNodesArray);
+			if (optionalRelativeKeyAttributePath.isPresent()) {
 
-			for (final Path relativeKeyPath : relativeKeyPaths) {
+				final LinkedList<Attribute> relativeKeyAttributePath = optionalRelativeKeyAttributePath.get();
 
-				final Node keyNode = relativeKeyPath.endNode();
-				final Node csEntityNode = relativeKeyPath.startNode();
-				final String keyValue = (String) keyNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
-				final KeyEntity keyEntity = new KeyEntity(keyNode.getId(), keyValue);
-				csEntities.get(csEntityNode.getId()).addKeyEntity(keyEntity);
+				final Iterable<Path> relativeKeyPaths = graphDB.traversalDescription().depthFirst()
+						.evaluator(Evaluators.toDepth(relativeKeyAttributePath.size())).evaluator(new EntityEvaluator(relativeKeyAttributePath))
+						.traverse(csEntityNodesArray);
+
+				for (final Path relativeKeyPath : relativeKeyPaths) {
+
+					final Node keyNode = relativeKeyPath.endNode();
+					final Node csEntityNode = relativeKeyPath.startNode();
+					final String keyValue = (String) keyNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+					final KeyEntity keyEntity = new KeyEntity(keyNode.getId(), keyValue);
+					csEntities.get(csEntityNode.getId()).addKeyEntity(keyEntity);
+				}
+			} else {
+
+				LOG.debug("couldn't determine relative key attribute path for key attribute path '{}' and common attribute path ''",
+						keyAttributePath.toString(), commonAttributePath.toString());
 			}
 		}
 	}
@@ -1040,25 +1044,38 @@ public final class GraphDBUtil {
 	private static void determineValueEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
 			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
-		final LinkedList<Attribute> relativeValueAttributePath = determineRelativeAttributePath(contentSchema.getValueAttributePath(),
+		final AttributePath valueAttributePath = contentSchema.getValueAttributePath();
+
+		final Optional<LinkedList<Attribute>> optionalRelativeValueAttributePath = determineRelativeAttributePath(
+				valueAttributePath,
 				commonAttributePath);
 
-		final Iterable<Path> relativeValuePaths = graphDB.traversalDescription().depthFirst()
-				.evaluator(Evaluators.toDepth(relativeValueAttributePath.size())).evaluator(new EntityEvaluator(relativeValueAttributePath))
-				.traverse(csEntityNodesArray);
+		if (optionalRelativeValueAttributePath.isPresent()) {
 
-		for (final Path relativeValuePath : relativeValuePaths) {
+			final LinkedList<Attribute> relativeValueAttributePath = optionalRelativeValueAttributePath.get();
 
-			final Node valueNode = relativeValuePath.endNode();
-			final Node csEntityNode = relativeValuePath.startNode();
-			final String valueValue = (String) valueNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
-			final Long valueOrder = (Long) relativeValuePath.lastRelationship().getProperty(GraphStatics.ORDER_PROPERTY, null);
-			final ValueEntity valueEntity = new ValueEntity(valueNode.getId(), valueValue, valueOrder);
-			csEntities.get(csEntityNode.getId()).addValueEntity(valueEntity);
+			final Iterable<Path> relativeValuePaths = graphDB.traversalDescription().depthFirst()
+					.evaluator(Evaluators.toDepth(relativeValueAttributePath.size())).evaluator(new EntityEvaluator(relativeValueAttributePath))
+					.traverse(csEntityNodesArray);
+
+			for (final Path relativeValuePath : relativeValuePaths) {
+
+				final Node valueNode = relativeValuePath.endNode();
+				final Node csEntityNode = relativeValuePath.startNode();
+				final String valueValue = (String) valueNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+				final Long valueOrder = (Long) relativeValuePath.lastRelationship().getProperty(GraphStatics.ORDER_PROPERTY, null);
+				final ValueEntity valueEntity = new ValueEntity(valueNode.getId(), valueValue, valueOrder);
+				csEntities.get(csEntityNode.getId()).addValueEntity(valueEntity);
+			}
+		} else {
+
+			LOG.debug("couldn't determine relative value attribute path for value attribute path '{}' and common attribute path ''",
+					valueAttributePath.toString(), commonAttributePath.toString());
 		}
 	}
 
-	private static LinkedList<Attribute> determineRelativeAttributePath(final AttributePath attributePath, final AttributePath commonAttributePath) {
+	private static Optional<LinkedList<Attribute>> determineRelativeAttributePath(final AttributePath attributePath,
+			final AttributePath commonAttributePath) {
 
 		final Iterator<Attribute> apIter = attributePath.getAttributes().iterator();
 		final Iterator<Attribute> commonAPIter = commonAttributePath.getAttributes().iterator();
@@ -1081,7 +1098,7 @@ public final class GraphDBUtil {
 
 		if (!apIter.hasNext()) {
 
-			return null;
+			return Optional.absent();
 		}
 
 		final LinkedList<Attribute> relativeAttributePath = new LinkedList<>();
@@ -1091,7 +1108,7 @@ public final class GraphDBUtil {
 			relativeAttributePath.add(apIter.next());
 		}
 
-		return relativeAttributePath;
+		return Optional.of(relativeAttributePath);
 	}
 
 	private static void determineCSEntityOrder(final Collection<CSEntity> csEntities) {
@@ -1110,35 +1127,39 @@ public final class GraphDBUtil {
 		}
 	}
 
-	private static String buildGetRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String recordURI) {
+	private static String buildGetRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String prefixedRecordURI,
+			final NamespaceIndex namespaceIndex)
+			throws DMPGraphException {
 
-		// START n=node:resources(__URI__="http://data.slub-dresden.de/datamodels/7/records/a1280f78-5f96-4fe6-b916-5e38e5d620d3")
-		// MATCH (n)-[r:`http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#id`]->(o)
-		// WHERE n.__NODETYPE__ = "__RESOURCE__" AND
-		// o.__NODETYPE__ = "__LITERAL__"
-		// RETURN o.__VALUE__ AS record_identifier;
+		//		MATCH (n:RESOURCE {uri;"ns2:18d68601-0623-42b4-ad89-f8954cc25912"})
+		//      WITH n
+		//		MATCH (n)-[:`oaipmh:header`]->()-[:`oaipmh:identifier`]->()-[:`rdf:value`]->(o:LITERAL)
+		//		RETURN o.value AS record_identifier;
 
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder("MATCH ");
 
-		sb.append("START n=node:").append(GraphIndexStatics.RESOURCES_INDEX_NAME).append("(").append(GraphStatics.URI).append(" =\"")
-				.append(recordURI).append("\")\nMATCH (n)");
+		sb.append("(n:").append(NodeType.Resource).append(" {").append(GraphStatics.URI_PROPERTY).append(":\"").append(prefixedRecordURI).append("\"})\n")
+				.append("WITH n\n")
+				.append("MATCH ").append("(n)");
 
-		int i = 1;
-		for (final Attribute attribute : recordIdentifierAP.getAttributes()) {
+		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
+		int i = attributes.size();
 
-			sb.append("-[:`").append(attribute.getUri()).append("`]->");
+		for (final Attribute attribute : attributes) {
 
-			if (i < recordIdentifierAP.getAttributes().size()) {
+			final String fullUri = attribute.getUri();
+			final String prefixedURI = namespaceIndex.createPrefixedURI(fullUri);
+
+			sb.append("-[:`").append(prefixedURI).append("`]->");
+
+			if (--i > 0) {
 
 				sb.append("()");
 			}
-
-			i++;
 		}
 
-		sb.append("(o)\n").append("WHERE n.").append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Resource).append("\" AND\no.")
-				.append(GraphStatics.NODETYPE_PROPERTY).append(" = \"").append(NodeType.Literal).append("\"\nRETURN o.")
-				.append(GraphStatics.VALUE_PROPERTY).append(" AS record_identifier");
+		sb.append("(o:").append(NodeType.Literal).append(")\n")
+				.append("RETURN o.").append(GraphStatics.VALUE_PROPERTY).append(" AS record_identifier");
 
 		return sb.toString();
 	}
@@ -1149,13 +1170,13 @@ public final class GraphDBUtil {
 			final String prefixedDataModelUri,
 			final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-			// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
-		  // USING INDEX o:LITERAL(value)
-			// WHERE
-			//  n.datamodel = "ns1:2222" AND
-			//  n.value = "7890"
-			// RETURN
-			//  n.uri as record_uri
+		// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
+		// USING INDEX o:LITERAL(value)
+		// WHERE
+		//  n.datamodel = "ns1:2222" AND
+		//  n.value = "7890"
+		// RETURN
+		//  n.uri as record_uri
 
 		final StringBuilder sb = new StringBuilder("MATCH ");
 
@@ -1191,7 +1212,8 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri, final NamespaceIndex namespaceIndex)
+	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri,
+			final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
 		final StringBuilder sb = new StringBuilder("MATCH ");
@@ -1234,7 +1256,8 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER).append("`)\nRETURN id(m) AS leaf_node");
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER)
+				.append("`)\nRETURN id(m) AS leaf_node");
 
 		return sb.toString();
 	}
@@ -1245,7 +1268,8 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER).append("`)\nRETURN id(m) AS leaf_node, m.")
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m:`").append(GraphProcessingStatics.LEAF_IDENTIFIER)
+				.append("`)\nRETURN id(m) AS leaf_node, m.")
 				.append(GraphStatics.URI_PROPERTY).append(" AS leaf_uri, m.").append(GraphStatics.VALUE_PROPERTY).append(" AS leaf_value");
 
 		return sb.toString();

@@ -18,17 +18,16 @@ package org.dswarm.graph.delta.evaluator;
 
 import java.util.LinkedList;
 
-import org.dswarm.common.model.Attribute;
-import org.dswarm.graph.delta.util.PathPrinter;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
-import org.neo4j.kernel.Traversal;
+
+import org.dswarm.common.model.Attribute;
 
 /**
- * Created by tgaengler on 30/07/14.
+ * @author tgaengler
  */
 public class EntityEvaluator implements Evaluator {
 
@@ -63,8 +62,10 @@ public class EntityEvaluator implements Evaluator {
 
 		final Relationship lastRelationship = path.lastRelationship();
 		final String attributeURI = relativeAttributePathAttributes.get(currentHierarchy - 1).getUri();
-		lastRelationship.getType().name();
-		Traversal.pathToString(path, new PathPrinter());
+
+		// TODO: this was for debugging, or?
+		//lastRelationship.getType().name();
+		//Paths.pathToString(path, new PathPrinter());
 
 		if (!lastRelationship.isType(DynamicRelationshipType.withName(attributeURI))) {
 

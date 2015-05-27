@@ -18,6 +18,7 @@ package org.dswarm.graph.gdm.work;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
@@ -41,13 +42,13 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 	private final NodeHandler						startNodeHandler;
 	private final HierarchyLevelRelationshipHandler	relationshipHandler;
 
-	private final String							resourceUri;
+	private final String prefixedResourceUri;
 
-	private final GraphDatabaseService				database;
+	private final GraphDatabaseService database;
 
-	public PropertyEnrichGDMWorker(final String resourceUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyEnrichGDMWorker(final String prefixedResourceUriArg, final GraphDatabaseService databaseArg) {
 
-		resourceUri = resourceUriArg;
+		prefixedResourceUri = prefixedResourceUriArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -57,15 +58,15 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 	@Override
 	public void work() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			PropertyEnrichGDMWorker.LOG.debug("start enrich GDM TX");
 
-			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceUri);
+			final Node recordNode = GraphDBUtil.getResourceNode(database, prefixedResourceUri);
 
 			if (recordNode == null) {
 
-				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '" + resourceUri + "'");
+				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '{}'", prefixedResourceUri);
 
 				tx.success();
 
@@ -94,7 +95,7 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 		@Override
 		public void handleNode(final Node node, final int hierarchyLevel) throws DMPGraphException {
 
-			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(resourceUri)) {
+			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(prefixedResourceUri)) {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
@@ -128,16 +129,14 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 		@Override
 		public void handleRelationship(final Relationship rel, final int hierarchyLevel) throws DMPGraphException {
 
-			final long statementId = rel.getId();
-
 			// subject
 
 			final Node subjectNode = rel.getStartNode();
-			subjectNode.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel);
+			subjectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel);
 
 			// predicate
 
-			rel.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel);
+			rel.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel);
 
 			// object
 
@@ -150,7 +149,7 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 				case Resource:
 				case TypeResource:
 
-					objectNode.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel + 1);
+					objectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel + 1);
 
 					break;
 				default:

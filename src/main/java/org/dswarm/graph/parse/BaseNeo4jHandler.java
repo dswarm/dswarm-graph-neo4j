@@ -127,7 +127,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 		try {
 
-			if (!statement.getOptionalSubjectNodeType().isPresent() || !statement.getOptionalPredicateURI().isPresent()
+			final Optional<String> optionalPredicateURI = statement.getOptionalPredicateURI();
+
+			if (!statement.getOptionalSubjectNodeType().isPresent() || !optionalPredicateURI.isPresent()
 					|| !statement.getOptionalObjectNodeType().isPresent()) {
 
 				throw new DMPGraphException("cannot handle statement, because no subject node type or predicate uri or object node type is present");
@@ -209,7 +211,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 				optionalStatementResourceHash = statement.getOptionalResourceHash();
 			}
 
-			final Optional<String> optionalPrefixedPredicateURI = processor.optionalCreatePrefixedURI(statement.getOptionalPredicateURI());
+			final Optional<String> optionalPrefixedPredicateURI = processor.optionalCreatePrefixedURI(optionalPredicateURI);
 
 			if (NodeType.Literal.equals(objectNodeType)) {
 
@@ -222,7 +224,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 				boolean isType = false;
 
 				// add Label to subject node, if object is a type entry
-				if (statement.getOptionalPredicateURI().get().equals(RDF.type.getURI())) {
+				if (optionalPredicateURI.get().equals(RDF.type.getURI())) {
 
 					processor.addLabel(subjectNode, optionalPrefixedObjectURI.get());
 

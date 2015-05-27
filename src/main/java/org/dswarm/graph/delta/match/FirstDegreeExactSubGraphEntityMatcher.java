@@ -41,10 +41,10 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 
 	public FirstDegreeExactSubGraphEntityMatcher(final Optional<? extends Collection<SubGraphEntity>> existingSubGraphEntitiesArg,
 			final Optional<? extends Collection<SubGraphEntity>> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) throws DMPGraphException {
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
 
-		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,
-				newResourceURIArg, new SubGraphEntityMarker());
+		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg,
+				prefixedNewResourceURIArg, new SubGraphEntityMarker());
 	}
 
 	/**

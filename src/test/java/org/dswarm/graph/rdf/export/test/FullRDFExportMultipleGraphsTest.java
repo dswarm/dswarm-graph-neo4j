@@ -108,6 +108,8 @@ public abstract class FullRDFExportMultipleGraphsTest extends RDFExportTest {
 		final InputStream inputStream2 = byteSource.openStream();
 		final Model modelFromOriginalRDFile2 = ModelFactory.createDefaultModel();
 		modelFromOriginalRDFile2.read(inputStream2, null, "TURTLE");
+
+		// note: remove rdf:type statements, since they won't available at read requests right now
 		modelFromOriginalRDFile2.removeAll(null, RDF.type, null);
 		inputStream2.close();
 

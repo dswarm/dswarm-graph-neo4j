@@ -39,10 +39,10 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 
 	public ModificationMatcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg,
 			final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg,
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg,
 			final Marker<ENTITY> markerArg) throws DMPGraphException {
 
-		super(existingEntitiesArg, newEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg, markerArg);
+		super(existingEntitiesArg, newEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg, prefixedNewResourceURIArg, markerArg);
 	}
 
 	@Override
@@ -97,11 +97,11 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 
 		ModificationMatcher.LOG.debug("mark matched paths in existing resource (modifications)");
 
-		markPaths(getMatches(existingEntities), DeltaState.MODIFICATION, existingResourceDB, existingResourceURI);
+		markPaths(getMatches(existingEntities), DeltaState.MODIFICATION, existingResourceDB, prefixedExistingResourceURI);
 
 		ModificationMatcher.LOG.debug("mark matched paths in new resource (modifications)");
 
-		markPaths(getMatches(newEntities), DeltaState.MODIFICATION, newResourceDB, newResourceURI);
+		markPaths(getMatches(newEntities), DeltaState.MODIFICATION, newResourceDB, prefixedNewResourceURI);
 	}
 
 	/**
@@ -111,11 +111,11 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 
 		ModificationMatcher.LOG.debug("mark non-matched paths in existing resource (deletions)");
 
-		markPaths(getNonMatches(existingEntities), DeltaState.DELETION, existingResourceDB, existingResourceURI);
+		markPaths(getNonMatches(existingEntities), DeltaState.DELETION, existingResourceDB, prefixedExistingResourceURI);
 
 		ModificationMatcher.LOG.debug("mark non-matched paths in new resource (additions)");
 
-		markPaths(getNonMatches(newEntities), DeltaState.ADDITION, newResourceDB, newResourceURI);
+		markPaths(getNonMatches(newEntities), DeltaState.ADDITION, newResourceDB, prefixedNewResourceURI);
 	}
 
 }

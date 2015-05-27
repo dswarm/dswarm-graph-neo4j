@@ -43,7 +43,7 @@ public class CSEntityMarker implements Marker<CSEntity> {
 
 	@Override
 	public void markPaths(final Collection<CSEntity> csEntities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String resourceURI) throws DMPGraphException {
+			final String prefixedResourceURI) throws DMPGraphException {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Map<CSEntity, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
@@ -110,7 +110,7 @@ public class CSEntityMarker implements Marker<CSEntity> {
 			finalDeltaState = DeltaState.ExactMatch;
 		}
 
-		GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
+		GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, prefixedResourceURI, pathEndNodeIds);
 
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNodeIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {
 

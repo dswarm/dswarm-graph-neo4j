@@ -182,6 +182,8 @@ public abstract class FullRDFExportSingleGraphTest extends RDFExportTest {
 		final Model modelFromOriginalRDFile = ModelFactory.createDefaultModel();
 		modelFromOriginalRDFile.read(inputStream, null, "TURTLE");
 		inputStream.close();
+
+		// note: remove rdf:type statements, since they won't available at read requests right now
 		modelFromOriginalRDFile.removeAll(null, RDF.type, null);
 
 		final long statementsInOriginalRDFFile = modelFromOriginalRDFile.size();

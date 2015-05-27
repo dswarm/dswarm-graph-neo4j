@@ -49,20 +49,20 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 	protected final GraphDatabaseService existingResourceDB;
 	protected final GraphDatabaseService newResourceDB;
 
-	protected final String existingResourceURI;
-	protected final String newResourceURI;
+	protected final String prefixedExistingResourceURI;
+	protected final String prefixedNewResourceURI;
 
 	protected final Marker<ENTITY> marker;
 
 	public Matcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg, final Optional<? extends Collection<ENTITY>> newEntitiesArg,
-			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg,
-			final String newResourceURIArg, final Marker<ENTITY> markerArg) throws DMPGraphException {
+			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg,
+			final String prefixedNewResourceURIArg, final Marker<ENTITY> markerArg) throws DMPGraphException {
 
 		existingResourceDB = existingResourceDBArg;
 		newResourceDB = newResourceDBArg;
 
-		existingResourceURI = existingResourceURIArg;
-		newResourceURI = newResourceURIArg;
+		prefixedExistingResourceURI = prefixedExistingResourceURIArg;
+		prefixedNewResourceURI = prefixedNewResourceURIArg;
 
 		marker = markerArg;
 
@@ -162,7 +162,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 				}
 			}
 
-			Matcher.LOG.debug("'" + matches.size() + "' matches");
+			Matcher.LOG.debug("'{}' matches",  matches.size());
 
 			matchesCalculated = true;
 		}
@@ -202,19 +202,19 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 		Matcher.LOG.debug("mark matched paths in existing resource (exact matches)");
 
-		markPaths(getMatches(existingEntities), DeltaState.ExactMatch, existingResourceDB, existingResourceURI);
+		markPaths(getMatches(existingEntities), DeltaState.ExactMatch, existingResourceDB, prefixedExistingResourceURI);
 
 		Matcher.LOG.debug("mark matched paths in new resource (exact matches)");
 
-		markPaths(getMatches(newEntities), DeltaState.ExactMatch, newResourceDB, newResourceURI);
+		markPaths(getMatches(newEntities), DeltaState.ExactMatch, newResourceDB, prefixedNewResourceURI);
 	}
 
 	protected void markPaths(final Optional<? extends Collection<ENTITY>> entities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String resourceURI) throws DMPGraphException {
+			final String prefixedResourceURI) throws DMPGraphException {
 
 		if (entities.isPresent()) {
 
-			marker.markPaths(entities.get(), deltaState, graphDB, resourceURI);
+			marker.markPaths(entities.get(), deltaState, graphDB, prefixedResourceURI);
 		}
 	}
 }

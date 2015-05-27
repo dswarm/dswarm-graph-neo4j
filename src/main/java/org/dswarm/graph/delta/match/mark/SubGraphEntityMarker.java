@@ -40,7 +40,7 @@ public class SubGraphEntityMarker implements Marker<SubGraphEntity> {
 	private static final Logger	LOG	= LoggerFactory.getLogger(SubGraphEntityMarker.class);
 
 	@Override public void markPaths(final Collection<SubGraphEntity> subGraphEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB, final String resourceURI) throws DMPGraphException {
+			final GraphDatabaseService graphDB, final String prefixedResourceURI) throws DMPGraphException {
 
 		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 

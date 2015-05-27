@@ -67,8 +67,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void mabxmlVersioningTest() throws IOException {
 
@@ -79,8 +77,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				Optional.<String>absent());
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void csvVersioningTest() throws IOException {
 
@@ -97,8 +93,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	 *
 	 * @throws IOException
 	 */
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void csvVersioning01Test2() throws IOException {
 
@@ -115,8 +109,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	 *
 	 * @throws IOException
 	 */
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void csvVersioning02Test2() throws IOException {
 
@@ -128,8 +120,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				Optional.of("http://data.slub-dresden.de/resources/1/schema#RecordType"));
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void csvVersioningTest2() throws IOException {
 
@@ -146,8 +136,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	 *
 	 * @throws IOException
 	 */
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void csvVersioningTest3() throws IOException {
 
@@ -156,8 +144,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				Optional.of("http://data.slub-dresden.de/resources/1/schema#RecordType"));
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void selectedMabxmlVersioning01Test() throws IOException {
 
@@ -168,8 +154,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 113, 95, false, Optional.<String> absent());
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void selectedMabxmlVersioning02Test() throws IOException {
 
@@ -180,8 +164,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 75, 55, false, Optional.<String> absent());
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void selectedMabxmlVersioning03Test() throws IOException {
 
@@ -192,8 +174,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 223, 180, false, Optional.<String> absent());
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void selectedMabxmlVersioning04Test() throws IOException {
 
@@ -204,8 +184,6 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 423, 310, false, Optional.<String> absent());
 	}
 
-	// FIXME DD-809 and subtasks: skip delta calculation for now
-	@Ignore
 	@Test
 	public void selectedMabxmlVersioningTest() throws IOException {
 

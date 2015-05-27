@@ -35,10 +35,10 @@ public class FirstDegreeModificationGDMValueMatcher extends ModificationMatcher<
 
 	public FirstDegreeModificationGDMValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
 			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) throws
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws
 			DMPGraphException {
 
-		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
+		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg, prefixedNewResourceURIArg,
 				new ValueEntityMarker());
 	}
 
@@ -49,7 +49,7 @@ public class FirstDegreeModificationGDMValueMatcher extends ModificationMatcher<
 	 * @return
 	 */
 	@Override
-	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities, final GraphDatabaseService resourceD) throws DMPGraphException {
+	protected Map<String, ValueEntity> generateHashes(Collection<ValueEntity> valueEntities, final GraphDatabaseService resourceDB) throws DMPGraphException {
 
 		final Map<String, ValueEntity> hashedValueEntities = new HashMap<>();
 

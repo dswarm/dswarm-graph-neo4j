@@ -28,7 +28,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public interface Marker<ENTITY> {
 
-	void markPaths(final Collection<ENTITY> entities, final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI)
+	void markPaths(final Collection<ENTITY> entities, final DeltaState deltaState, final GraphDatabaseService graphDB, final String prefixedResourceURI)
 			throws DMPGraphException;
 
 }

@@ -65,11 +65,11 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 	private final GraphDatabaseService database;
 
-	private final Map<String, Statement> currentSubGraphs = new LinkedHashMap<>();
+	private final Map<Long, Statement> currentSubGraphs = new LinkedHashMap<>();
 	private final List<Path>             subGraphPaths    = new ArrayList<>();
 
-	final Map<Long, org.dswarm.graph.json.Node> bnodes        = new HashMap<Long, org.dswarm.graph.json.Node>();
-	final Map<String, ResourceNode>             resourceNodes = new HashMap<String, ResourceNode>();
+	final Map<Long, org.dswarm.graph.json.Node> bnodes        = new HashMap<>();
+	final Map<String, ResourceNode>             resourceNodes = new HashMap<>();
 	final Map<String, Predicate>                predicates    = new HashMap<>();
 
 	public PropertyGraphDeltaGDMSubGraphWorker(final String prefixedResourceURIArg, final DeltaState deltaStateArg,
@@ -84,7 +84,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 	}
 
 	@Override
-	public Map<String, Statement> work() throws DMPGraphException {
+	public Map<Long, Statement> work() throws DMPGraphException {
 
 		try (final Transaction tx = database.beginTx()) {
 
@@ -110,18 +110,18 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 			// convert paths to statement collections
 			for (final Path subGraphPath : subGraphPaths) {
 
-				String stmtIdentifier = null;
+				Long stmtIdentifier = null;
 
 				if (deltaState.equals(DeltaState.MODIFICATION)) {
 
-					stmtIdentifier = Long.valueOf(subGraphPath.endNode().getId()).toString();
+					stmtIdentifier = subGraphPath.endNode().getId();
 				}
 
 				for (final Relationship rel : subGraphPath.relationships()) {
 
 					if (!deltaState.equals(DeltaState.MODIFICATION)) {
 
-						stmtIdentifier = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+						stmtIdentifier = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 					}
 
 					if (currentSubGraphs.containsKey(stmtIdentifier)) {
@@ -133,7 +133,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 					final Predicate predicate = getPredicate(rel.getType().name());
 					final org.dswarm.graph.json.Node object = getNode(rel.getEndNode());
 					final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
-					final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+					final Long uuid = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
 					final Statement statement = new Statement(subject, predicate, object);
 
@@ -144,7 +144,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 					if (uuid != null) {
 
-						statement.setUUID(uuid);
+						statement.setUUID(uuid.toString());
 					}
 
 					currentSubGraphs.put(stmtIdentifier, statement);

@@ -62,4 +62,26 @@ public final class HashUtils {
 
 		return ret;
 	}
+
+	/**
+	 * generates hash from uuid (string value) only, if it cannot be converted to a long value
+	 *
+	 * @param uuid
+	 * @return
+	 */
+	public static Long getUUID(final String uuid) {
+
+		if(uuid == null) {
+
+			return null;
+		}
+
+		try {
+
+			return Long.valueOf(uuid);
+		} catch (final NumberFormatException e) {
+
+			return HashUtils.generateHash(uuid);
+		}
+	}
 }

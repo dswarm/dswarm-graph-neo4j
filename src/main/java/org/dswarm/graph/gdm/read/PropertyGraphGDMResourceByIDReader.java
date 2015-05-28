@@ -39,16 +39,17 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 
 	private final String        recordId;
 	private       String        prefixedRecordURI;
-	private final AttributePath recordIdentifierAP;
+	private final AttributePath prefixedRecordIdentifierAP;
 
-	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String prefixedDataModelUri,
+	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath prefixedRecordIdentifierAPArg,
+			final String prefixedDataModelUri,
 			final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
 		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
 		recordId = recordIdArg;
-		recordIdentifierAP = recordIdentifierAPArg;
+		prefixedRecordIdentifierAP = prefixedRecordIdentifierAPArg;
 		determineRecordUri();
 	}
 
@@ -71,6 +72,6 @@ public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResource
 
 	private void determineRecordUri() throws DMPGraphException {
 
-		prefixedRecordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, prefixedDataModelUri, database, namespaceIndex);
+		prefixedRecordURI = GraphDBUtil.determineRecordUri(recordId, prefixedRecordIdentifierAP, prefixedDataModelUri, database);
 	}
 }

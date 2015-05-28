@@ -596,7 +596,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
-		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
+		return HashUtils.generateHash(hashString);
 	}
 
 	public Optional<String> getIdentifier(final long nodeId, final Optional<NodeType> optionalNodeType) {

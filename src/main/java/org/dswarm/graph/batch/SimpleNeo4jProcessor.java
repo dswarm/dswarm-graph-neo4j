@@ -79,7 +79,7 @@ public class SimpleNeo4jProcessor extends BatchNeo4jProcessor {
 
 		final String hashString = resourceURI;
 
-		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
+		return HashUtils.generateHash(hashString);
 	}
 
 	@Override protected String putSaltToStatementHash(final String hash) {

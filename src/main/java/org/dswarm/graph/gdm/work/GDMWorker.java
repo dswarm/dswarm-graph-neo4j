@@ -20,5 +20,5 @@ import org.dswarm.graph.DMPGraphException;
 
 public interface GDMWorker {
 
-	public void work() throws DMPGraphException;
+	void work() throws DMPGraphException;
 }

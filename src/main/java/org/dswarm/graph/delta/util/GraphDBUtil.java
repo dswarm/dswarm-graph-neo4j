@@ -259,13 +259,16 @@ public final class GraphDBUtil {
 	 * @param graphDB
 	 * @return
 	 */
-	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB) throws DMPGraphException {
+	public static boolean checkGraphMatchingCompleteness(final GraphDatabaseService graphDB, final String type) throws DMPGraphException {
 
 		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> rels = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
 			boolean incomplete = false;
+
+			int positiveCounter = 0;
+			int negativeCounter = 0;
 
 			for (final Relationship rel : rels) {
 
@@ -274,9 +277,11 @@ public final class GraphDBUtil {
 
 				if (!finalRelMatchedState) {
 
-					LOG.debug("couldn't mark relationship: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
+					LOG.debug("couldn't mark relationship in {}: {}", type, GraphDBPrintUtil.printDeltaRelationship(rel));
 
 					incomplete = true;
+
+					negativeCounter++;
 
 					continue;
 				}
@@ -286,9 +291,11 @@ public final class GraphDBUtil {
 
 				if (!finalSubjectMatchedState) {
 
-					LOG.debug("couldn't start node: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
+					LOG.debug("couldn't mark start node in {}: {}", type, GraphDBPrintUtil.printDeltaRelationship(rel));
 
 					incomplete = true;
+
+					negativeCounter++;
 
 					continue;
 				}
@@ -298,11 +305,19 @@ public final class GraphDBUtil {
 
 				if (!finalObjectMatchedState) {
 
-					LOG.debug("couldn't mark end node: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
+					LOG.debug("couldn't mark end node in {}: {}", type, GraphDBPrintUtil.printDeltaRelationship(rel));
 
 					incomplete = true;
+
+					negativeCounter++;
+
+					continue;
 				}
+
+				positiveCounter++;
 			}
+
+			LOG.debug("marked '{}' relationships completely and missed '{}' ones in {}", positiveCounter, negativeCounter, type);
 
 			final boolean result = !incomplete;
 
@@ -627,7 +642,7 @@ public final class GraphDBUtil {
 	}
 
 	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String prefixedResourceURI,
-			final AttributePath commonAttributePath, final ContentSchema contentSchema)
+			final AttributePath commonPrefixedAttributePath, final ContentSchema prefixedContentSchema)
 			throws DMPGraphException {
 
 		final Map<Long, CSEntity> csEntities = new LinkedHashMap<>();
@@ -638,8 +653,8 @@ public final class GraphDBUtil {
 
 			// determine CS entity nodes
 			final ResourceIterable<Node> csEntityNodes = graphDB.traversalDescription().breadthFirst()
-					.evaluator(Evaluators.toDepth(commonAttributePath.getAttributes().size()))
-					.evaluator(new EntityEvaluator(commonAttributePath.getAttributes()))
+					.evaluator(Evaluators.toDepth(commonPrefixedAttributePath.getAttributes().size()))
+					.evaluator(new EntityEvaluator(commonPrefixedAttributePath.getAttributes()))
 					.traverse(resourceNode).nodes();
 
 			if (csEntityNodes == null) {
@@ -659,16 +674,16 @@ public final class GraphDBUtil {
 			final Node[] csEntityNodesArray = new Node[csEntityNodesList.size()];
 			csEntityNodesList.toArray(csEntityNodesArray);
 
-			if (contentSchema.getKeyAttributePaths() != null) {
+			if (prefixedContentSchema.getKeyAttributePaths() != null) {
 
 				// determine key entities
-				determineKeyEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
+				determineKeyEntities(graphDB, commonPrefixedAttributePath, prefixedContentSchema, csEntities, csEntityNodesArray);
 			}
 
-			if (contentSchema.getValueAttributePath() != null) {
+			if (prefixedContentSchema.getValueAttributePath() != null) {
 
 				// determine value entities
-				determineValueEntities(graphDB, commonAttributePath, contentSchema, csEntities, csEntityNodesArray);
+				determineValueEntities(graphDB, commonPrefixedAttributePath, prefixedContentSchema, csEntities, csEntityNodesArray);
 			}
 
 			tx.success();
@@ -839,10 +854,12 @@ public final class GraphDBUtil {
 
 					// TODO: remove this later, it'S just for debugging purpose right now
 					// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+					final Node endNode = nonMatchedRel.getEndNode();
+
 					if ("rdf:type".equals(predicate)) {
 
 						final long relId = nonMatchedRel.getId();
-						final String value = (String) nonMatchedRel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
+						final String value = (String) endNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
 						final String logout = "in determineNonMatchedCSEntitySubGraphs with rel id = '" + relId + "', value = '" + value + "'";
 						System.out.println(logout);
@@ -851,8 +868,14 @@ public final class GraphDBUtil {
 						GraphDBUtil.LOG.debug(relPrint);
 					}
 
-					final long endNodeId = nonMatchedRel.getEndNode().getId();
-					final int endNodeHierarchyLevel = (int) nonMatchedRel.getEndNode().getProperty("__HIERARCHY_LEVEL__");
+					final long endNodeId = endNode.getId();
+
+					if(!endNode.hasProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY)) {
+
+						System.out.println("dirty node: " + GraphDBPrintUtil.printDeltaRelationship(nonMatchedRel));
+					}
+
+					final int endNodeHierarchyLevel = (int) endNode.getProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY);
 
 					final SubGraphEntity subGraphEntity = new SubGraphEntity(endNodeId, predicate, deltaState, csEntity, finalOrder,
 							endNodeHierarchyLevel);
@@ -873,27 +896,26 @@ public final class GraphDBUtil {
 		return subgraphEntities;
 	}
 
-	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath recordIdentifierAP, final String prefixedRecordURI,
-			final NamespaceIndex namespaceIndex)
+	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath prefixedRecordIdentifierAP, final String prefixedRecordURI)
 			throws DMPGraphException {
 
-		final String query = buildGetRecordIdentifierQuery(recordIdentifierAP, prefixedRecordURI, namespaceIndex);
+		final String query = buildGetRecordIdentifierQuery(prefixedRecordIdentifierAP, prefixedRecordURI);
 
 		return executeQueryWithSingleResult(query, "record_identifier", graphDB);
 	}
 
-	public static String determineRecordUri(final String recordId, final AttributePath recordIdentifierAP, final String prefixedDataModelUri,
-			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+	public static String determineRecordUri(final String recordId, final AttributePath prefixedRecordIdentifierAP, final String prefixedDataModelUri,
+			final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final String query = buildGetRecordUriQuery(recordId, recordIdentifierAP, prefixedDataModelUri, namespaceIndex);
+		final String query = buildGetRecordUriQuery(recordId, prefixedRecordIdentifierAP, prefixedDataModelUri);
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
-	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath keyAttributePath,
+	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath prefixedKeyAttributePath,
 			final String prefixedDataModelUri,
-			final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+			final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		final String query = buildGetRecordUrisQuery(searchValue, keyAttributePath, prefixedDataModelUri, namespaceIndex);
+		final String query = buildGetRecordUrisQuery(searchValue, prefixedKeyAttributePath, prefixedDataModelUri);
 
 		return executeQueryWithMultipleResults(query, "record_uri", graphDB);
 	}
@@ -1010,9 +1032,9 @@ public final class GraphDBUtil {
 	}
 
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
-			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
+			final ContentSchema prefixedContentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
-		for (final AttributePath keyAttributePath : contentSchema.getKeyAttributePaths()) {
+		for (final AttributePath keyAttributePath : prefixedContentSchema.getKeyAttributePaths()) {
 
 			final Optional<LinkedList<Attribute>> optionalRelativeKeyAttributePath = determineRelativeAttributePath(keyAttributePath,
 					commonAttributePath);
@@ -1127,8 +1149,7 @@ public final class GraphDBUtil {
 		}
 	}
 
-	private static String buildGetRecordIdentifierQuery(final AttributePath recordIdentifierAP, final String prefixedRecordURI,
-			final NamespaceIndex namespaceIndex)
+	private static String buildGetRecordIdentifierQuery(final AttributePath prefixedRecordIdentifierAP, final String prefixedRecordURI)
 			throws DMPGraphException {
 
 		//		MATCH (n:RESOURCE {uri;"ns2:18d68601-0623-42b4-ad89-f8954cc25912"})
@@ -1142,15 +1163,14 @@ public final class GraphDBUtil {
 				.append("WITH n\n")
 				.append("MATCH ").append("(n)");
 
-		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
+		final List<Attribute> attributes = prefixedRecordIdentifierAP.getAttributes();
 		int i = attributes.size();
 
 		for (final Attribute attribute : attributes) {
 
-			final String fullUri = attribute.getUri();
-			final String prefixedURI = namespaceIndex.createPrefixedURI(fullUri);
+			final String prefixedAttributeUri = attribute.getUri();
 
-			sb.append("-[:`").append(prefixedURI).append("`]->");
+			sb.append("-[:`").append(prefixedAttributeUri).append("`]->");
 
 			if (--i > 0) {
 
@@ -1166,9 +1186,8 @@ public final class GraphDBUtil {
 
 	private static String buildGetRecordUriQuery(
 			final String recordId,
-			final AttributePath recordIdentifierAP,
-			final String prefixedDataModelUri,
-			final NamespaceIndex namespaceIndex) throws DMPGraphException {
+			final AttributePath prefixedRecordIdentifierAP,
+			final String prefixedDataModelUri) throws DMPGraphException {
 
 		// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
 		// USING INDEX o:LITERAL(value)
@@ -1182,16 +1201,15 @@ public final class GraphDBUtil {
 
 		sb.append("(n:").append(NodeType.Resource).append(")");
 
-		final List<Attribute> attributes = recordIdentifierAP.getAttributes();
+		final List<Attribute> attributes = prefixedRecordIdentifierAP.getAttributes();
 		int i = attributes.size();
 
 		// prefix uris of record identifier attribute path
 		for (final Attribute attribute : attributes) {
 
-			final String fullUri = attribute.getUri();
-			final String prefixedURI = namespaceIndex.createPrefixedURI(fullUri);
+			final String prefixedAttributeUri = attribute.getUri();
 
-			sb.append("-[:`").append(prefixedURI).append("`]-");
+			sb.append("-[:`").append(prefixedAttributeUri).append("`]-");
 
 			if (--i > 0) {
 				sb.append("()");
@@ -1212,21 +1230,19 @@ public final class GraphDBUtil {
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath keyAttributePath, final String prefixedDataModelUri,
-			final NamespaceIndex namespaceIndex)
+	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath prefixedKeyAttributePath, final String prefixedDataModelUri)
 			throws DMPGraphException {
 
 		final StringBuilder sb = new StringBuilder("MATCH ");
 
 		sb.append("(n:").append(NodeType.Resource).append(")");
 
-		final LinkedList<Attribute> attributes = keyAttributePath.getAttributes();
+		final LinkedList<Attribute> attributes = prefixedKeyAttributePath.getAttributes();
 		int i = attributes.size();
 
 		for (final Attribute attribute : attributes) {
 
-			final String attributeURI = attribute.getUri();
-			final String prefixedAttributeURI = namespaceIndex.createPrefixedURI(attributeURI);
+			final String prefixedAttributeURI = attribute.getUri();
 
 			sb.append("-[:`").append(prefixedAttributeURI).append("`]->");
 

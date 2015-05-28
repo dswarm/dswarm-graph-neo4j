@@ -25,5 +25,5 @@ import org.neo4j.graphdb.Relationship;
  */
 public interface SubGraphRelationshipHandler {
 
-	public void handleRelationship(Relationship rel, Path path) throws DMPGraphException;
+	void handleRelationship(Relationship rel, Path path) throws DMPGraphException;
 }

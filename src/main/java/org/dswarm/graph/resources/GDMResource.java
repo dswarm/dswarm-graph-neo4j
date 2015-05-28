@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,7 @@ import rx.functions.Action0;
 import rx.functions.Func1;
 
 import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.Attribute;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.model.ContentSchema;
 import org.dswarm.common.model.util.AttributePathUtil;
@@ -116,6 +118,7 @@ import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
+import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.index.SchemaIndexUtils;
 import org.dswarm.graph.json.Resource;
@@ -239,10 +242,10 @@ public class GDMResource {
 
 				LOG.info("do versioning with GDM statements for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
 
-				final Optional<ContentSchema> optionalContentSchema = getContentSchema(metadata);
+				final Optional<ContentSchema> optionalPrefixedContentSchema = getPrefixedContentSchema(metadata, namespaceIndex);
 
 				// = new resources model, since existing, modified resources were already written to the DB
-				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalContentSchema,
+				final Tuple<Observable<Resource>, Observable<Long>> result = calculateDeltaForDataModel(model, optionalPrefixedContentSchema,
 						prefixedDataModelURI,
 						database,
 						handler, namespaceIndex);
@@ -538,16 +541,18 @@ public class GDMResource {
 		} else if (optionalLegacyRecordIdentifierAP.isPresent() && optionalRecordId.isPresent()) {
 
 			final AttributePath legacyRecordIdentifierAP = AttributePathUtil.parseAttributePathString(optionalLegacyRecordIdentifierAP.get());
+			final AttributePath prefixedLegacyRecordIdentifierAP = prefixAttributePath(legacyRecordIdentifierAP, namespaceIndex);
 			final String recordId = optionalRecordId.get();
 
 			requestParameter = String
-					.format("and legacy record identifier attribute path = '%s' and record identifier = '%s'", legacyRecordIdentifierAP, recordId);
+					.format("and legacy record identifier attribute path = '%s' ('%s') and record identifier = '%s'", legacyRecordIdentifierAP,
+							prefixedLegacyRecordIdentifierAP, recordId);
 
 			GDMResource.LOG
-					.debug("try to read GDM record for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
+					.info("try to read GDM record for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
 							dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
 
-			gdmReader = new PropertyGraphGDMResourceByIDReader(recordId, legacyRecordIdentifierAP, prefixedDataModelURI, optionalVersion,
+			gdmReader = new PropertyGraphGDMResourceByIDReader(recordId, prefixedLegacyRecordIdentifierAP, prefixedDataModelURI, optionalVersion,
 					database, tx, namespaceIndex);
 		} else {
 
@@ -559,7 +564,7 @@ public class GDMResource {
 
 		if (resource == null) {
 
-			GDMResource.LOG.debug(
+			GDMResource.LOG.info(
 					"no record found for data mode uri = '{}' ('{}') {} and version = '{}' from graph db",
 					dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
 
@@ -569,7 +574,7 @@ public class GDMResource {
 		final String result = serializeJSON(resource, READ_GDM_RECORD_TYPE);
 
 		GDMResource.LOG
-				.debug("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
+				.info("finished reading '{}' GDM statements ('{}' via GDM reader) for data model uri = '{}' ('{}') {} and version = '{}' from graph db",
 						resource.size(), gdmReader.countStatements(), dataModelUri, prefixedDataModelURI, requestParameter, optionalVersion);
 
 		return Response.ok().entity(result).build();
@@ -595,19 +600,20 @@ public class GDMResource {
 
 		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelUri);
 
-		GDMResource.LOG
-				.debug("try to search GDM records for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
-						keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
-
 		final AttributePath keyAP = AttributePathUtil.parseAttributePathString(keyAPString);
+		final AttributePath prefixedKeyAP = prefixAttributePath(keyAP, namespaceIndex);
 
-		final Collection<String> recordURIs = GraphDBUtil.determineRecordUris(searchValue, keyAP, prefixedDataModelURI, database, namespaceIndex);
+		GDMResource.LOG
+				.info("try to search GDM records for key attribute path = '{}' ('{}') and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+						keyAP, prefixedKeyAP, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
+
+		final Collection<String> recordURIs = GraphDBUtil.determineRecordUris(searchValue, prefixedKeyAP, prefixedDataModelURI, database);
 
 		if (recordURIs == null || recordURIs.isEmpty()) {
 
 			GDMResource.LOG
-					.debug("couldn't find any record for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
-							keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
+					.info("couldn't find any record for key attribute path = '{}' ('{}') and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+							keyAP, prefixedKeyAP, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 
 			final StreamingOutput stream = new StreamingOutput() {
 
@@ -669,13 +675,14 @@ public class GDMResource {
 					if (resourcesSize > 0) {
 
 						GDMResource.LOG
-								.debug("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
-										resourcesSize, statementsSize, keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
+								.info("finished reading '{} records with '{}' GDM statements for key attribute path = '{}' ('{}') and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+										resourcesSize, statementsSize, keyAP, prefixedKeyAP, searchValue, dataModelUri, prefixedDataModelURI,
+										optionalVersion);
 					} else {
 
 						GDMResource.LOG
-								.debug("couldn't retrieve any record for key attribute path = '{}' and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
-										keyAPString, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
+								.info("couldn't retrieve any record for key attribute path = '{}' ('{}') and search value = '{}' in data model '{}' ('{}') with version = '{}' from graph db",
+										keyAP, prefixedKeyAP, searchValue, dataModelUri, prefixedDataModelURI, optionalVersion);
 					}
 				} catch (final DMPGraphException e) {
 
@@ -689,7 +696,7 @@ public class GDMResource {
 
 	private Tuple<Observable<Resource>, Observable<Long>> calculateDeltaForDataModel(
 			final Observable<Resource> model,
-			final Optional<ContentSchema> optionalContentSchema,
+			final Optional<ContentSchema> optionalPrefixedContentSchema,
 			final String prefixedDataModelURI,
 			final GraphDatabaseService permanentDatabase,
 			final GDMUpdateHandler handler,
@@ -717,16 +724,16 @@ public class GDMResource {
 
 					final TransactionHandler tx = new Neo4jTransactionHandler(permanentDatabase);
 
-					if (optionalContentSchema.isPresent() && optionalContentSchema.get().getRecordIdentifierAttributePath() != null) {
+					if (optionalPrefixedContentSchema.isPresent() && optionalPrefixedContentSchema.get().getRecordIdentifierAttributePath() != null) {
 
 						// determine legacy resource identifier via content schema
-						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalContentSchema.get()
-								.getRecordIdentifierAttributePath(), prefixedResourceURI, namespaceIndex);
+						final String recordIdentifier = GraphDBUtil.determineRecordIdentifier(newResourceDB, optionalPrefixedContentSchema.get()
+								.getRecordIdentifierAttributePath(), prefixedResourceURI);
 
 						// try to retrieve existing model via legacy record identifier
 						// note: version is absent -> should make use of latest version
 						gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
-								optionalContentSchema.get().getRecordIdentifierAttributePath(),
+								optionalPrefixedContentSchema.get().getRecordIdentifierAttributePath(),
 								prefixedDataModelURI, Optional.<Integer>absent(), permanentDatabase, tx, namespaceIndex);
 					} else {
 
@@ -761,7 +768,7 @@ public class GDMResource {
 							namespaceIndex);
 
 					final Changeset changeset = calculateDeltaForResource(existingResource, existingResourceDB, newResource, newResourceDB,
-							optionalContentSchema, namespaceIndex);
+							optionalPrefixedContentSchema, namespaceIndex);
 
 					if (!changeset.hasChanges()) {
 
@@ -815,7 +822,7 @@ public class GDMResource {
 	}
 
 	private Changeset calculateDeltaForResource(final Resource existingResource, final GraphDatabaseService existingResourceDB,
-			final Resource newResource, final GraphDatabaseService newResourceDB, final Optional<ContentSchema> optionalContentSchema,
+			final Resource newResource, final GraphDatabaseService newResourceDB, final Optional<ContentSchema> optionalPrefixedContentSchema,
 			final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
@@ -825,8 +832,11 @@ public class GDMResource {
 		final String prefixedExistingResourceURI = namespaceIndex.createPrefixedURI(existingResourceURI);
 		final String prefixedNewResourceURI = namespaceIndex.createPrefixedURI(newResourceURI);
 
-		enrichModel(existingResourceDB, prefixedExistingResourceURI);
-		enrichModel(newResourceDB, prefixedNewResourceURI);
+		final long existingResourceHash = HashUtils.generateHash(prefixedExistingResourceURI);
+		final long newResourceHash = HashUtils.generateHash(prefixedNewResourceURI);
+
+		enrichModel(existingResourceDB, prefixedExistingResourceURI, existingResourceHash);
+		enrichModel(newResourceDB, prefixedNewResourceURI, newResourceHash);
 
 		// GraphDBUtil.printNodes(existingResourceDB);
 		// GraphDBUtil.printRelationships(existingResourceDB);
@@ -852,26 +862,27 @@ public class GDMResource {
 
 		final Map<Long, Long> changesetModifications = new HashMap<>();
 
-		final Optional<AttributePath> optionalCommonAttributePath;
+		final Optional<AttributePath> optionalPrefixedCommonAttributePath;
 
-		if (optionalContentSchema.isPresent()) {
+		if (optionalPrefixedContentSchema.isPresent()) {
 
-			optionalCommonAttributePath = AttributePathUtil.determineCommonAttributePath(optionalContentSchema.get());
+			optionalPrefixedCommonAttributePath = AttributePathUtil.determineCommonAttributePath(optionalPrefixedContentSchema.get());
 		} else {
 
-			optionalCommonAttributePath = Optional.absent();
+			optionalPrefixedCommonAttributePath = Optional.absent();
 		}
 
-		if (optionalCommonAttributePath.isPresent()) {
+		if (optionalPrefixedCommonAttributePath.isPresent()) {
 
 			// do specific processing with content schema knowledge
 
-			final AttributePath commonAttributePath = optionalCommonAttributePath.get();
+			final AttributePath commonPrefixedAttributePath = optionalPrefixedCommonAttributePath.get();
+			final ContentSchema prefixedContentSchema = optionalPrefixedContentSchema.get();
 
-			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, prefixedNewResourceURI, commonAttributePath,
-					optionalContentSchema.get());
+			final Collection<CSEntity> newCSEntities = GraphDBUtil.getCSEntities(newResourceDB, prefixedNewResourceURI, commonPrefixedAttributePath,
+					prefixedContentSchema);
 			final Collection<CSEntity> existingCSEntities = GraphDBUtil.getCSEntities(existingResourceDB, prefixedExistingResourceURI,
-					commonAttributePath, optionalContentSchema.get());
+					commonPrefixedAttributePath, prefixedContentSchema);
 
 			// do delta calculation on enriched GDM models in graph
 			// note: we can also follow a different strategy, i.e., all most exact steps first and the reduce this level, i.e., do
@@ -923,7 +934,8 @@ public class GDMResource {
 			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
 			// 7.1.1 key + predicate + sub graph hash + order
 			final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
-					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
+					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB,
+					prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeExactSubGraphEntityMatcher.match();
 
 			final Optional<? extends Collection<SubGraphEntity>> newFirstDegreeExactSubGraphEntityNonMatches = firstDegreeExactSubGraphEntityMatcher
@@ -939,7 +951,8 @@ public class GDMResource {
 					existingFirstDegreeExactSubGraphEntityNonMatches, existingResourceDB);
 			// 7.2.1 key + predicate + sub graph leaf path hash + order
 			final FirstDegreeExactSubGraphLeafEntityMatcher firstDegreeExactSubGraphLeafEntityMatcher = new FirstDegreeExactSubGraphLeafEntityMatcher(
-					existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
+					existingSubGraphLeafEntities, newSubGraphLeafEntities, existingResourceDB, newResourceDB, prefixedExistingResourceURI,
+					prefixedNewResourceURI);
 			firstDegreeExactSubGraphLeafEntityMatcher.match();
 
 			final Optional<? extends Collection<SubGraphLeafEntity>> newFirstDegreeExactSubGraphLeafEntityNonMatches = firstDegreeExactSubGraphLeafEntityMatcher
@@ -998,36 +1011,43 @@ public class GDMResource {
 		// maybe utilise confidence value for different matching approaches
 
 		// check graph matching completeness
-		final boolean isExistingResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(existingResourceDB);
+		final boolean isExistingResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(existingResourceDB, "existing resource");
 
-		if (!isExistingResourceMatchedCompletely) {
+		final boolean isNewResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(newResourceDB, "new resource");
 
-			throw new DMPGraphException("existing resource wasn't matched completely by the delta algo");
-		}
+		if (!isExistingResourceMatchedCompletely && !isNewResourceMatchedCompletely) {
 
-		final boolean isNewResourceMatchedCompletely = GraphDBUtil.checkGraphMatchingCompleteness(newResourceDB);
+			throw new DMPGraphException("existing and new resource weren't matched completely by the delta algo");
+		} else {
 
-		if (!isNewResourceMatchedCompletely) {
+			if (!isExistingResourceMatchedCompletely) {
 
-			throw new DMPGraphException("new resource wasn't matched completely by the delta algo");
+				throw new DMPGraphException("existing resource wasn't matched completely by the delta algo");
+			}
+
+			if (!isNewResourceMatchedCompletely) {
+
+				throw new DMPGraphException("new resource wasn't matched completely by the delta algo");
+			}
 		}
 
 		// traverse resource graphs to extract changeset
 		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(prefixedNewResourceURI,
 				DeltaState.ADDITION, newResourceDB);
-		final Map<String, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
+		final Map<Long, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
 				prefixedExistingResourceURI, DeltaState.DELETION, existingResourceDB);
-		final Map<String, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
+		final Map<Long, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
 
-		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(prefixedNewResourceURI,
+		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
+				prefixedNewResourceURI,
 				DeltaState.MODIFICATION, newResourceDB);
-		final Map<String, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
+		final Map<Long, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
 				prefixedExistingResourceURI, DeltaState.MODIFICATION, existingResourceDB);
-		final Map<String, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
+		final Map<Long, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
 		for (final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher
 				.getModifications().entrySet()) {
@@ -1067,9 +1087,9 @@ public class GDMResource {
 		return impermanentDB;
 	}
 
-	private void enrichModel(final GraphDatabaseService graphDB, final String prefixedResourceURI) throws DMPGraphException {
+	private void enrichModel(final GraphDatabaseService graphDB, final String prefixedResourceURI, final long resourceHash) throws DMPGraphException {
 
-		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, graphDB);
+		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, resourceHash, graphDB);
 		worker.work();
 	}
 
@@ -1393,7 +1413,8 @@ public class GDMResource {
 		return Optional.of(metadataPartValue);
 	}
 
-	private Optional<ContentSchema> getContentSchema(final ObjectNode metadata) throws DMPGraphException {
+	private Optional<ContentSchema> getPrefixedContentSchema(final ObjectNode metadata, final NamespaceIndex namespaceIndex)
+			throws DMPGraphException {
 
 		final Optional<JsonNode> optionalContentSchemaJSON = getMetadataPartNode(DMPStatics.CONTENT_SCHEMA_IDENTIFIER, metadata, false);
 
@@ -1407,7 +1428,14 @@ public class GDMResource {
 			final String contentSchemaJSONString = objectMapper.writeValueAsString(optionalContentSchemaJSON.get());
 			final ContentSchema contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
 
-			return Optional.fromNullable(contentSchema);
+			final Optional<ContentSchema> contentSchemaOptional = Optional.fromNullable(contentSchema);
+
+			if (contentSchemaOptional.isPresent()) {
+
+				return prefixContentSchema(contentSchemaOptional.get(), namespaceIndex);
+			}
+
+			return contentSchemaOptional;
 		} catch (final IOException e) {
 
 			final String message = "could not deserialise content schema JSON for write from graph DB request";
@@ -1416,6 +1444,79 @@ public class GDMResource {
 
 			return Optional.absent();
 		}
+	}
+
+	private Optional<ContentSchema> prefixContentSchema(final ContentSchema contentSchema, final NamespaceIndex namespaceIndex)
+			throws DMPGraphException {
+
+		final Map<AttributePath, AttributePath> prefixedAttributePathMap = new HashMap<>();
+		final Map<Attribute, Attribute> prefixedAttributeMap = new HashMap<>();
+
+		final LinkedList<AttributePath> keyAttributePaths = contentSchema.getKeyAttributePaths();
+		final LinkedList<AttributePath> prefixedKeyAttributePaths = new LinkedList<>();
+
+		for (final AttributePath keyAttributePath : keyAttributePaths) {
+
+			final AttributePath prefixedKeyAttributePath = prefixAttributePath(keyAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
+					namespaceIndex);
+			prefixedKeyAttributePaths.add(prefixedKeyAttributePath);
+		}
+
+		final AttributePath recordIdentifierAttributePath = contentSchema.getRecordIdentifierAttributePath();
+		final AttributePath prefixedRecordIdentifierAttributePath = prefixAttributePath(recordIdentifierAttributePath, prefixedAttributePathMap,
+				prefixedAttributeMap, namespaceIndex);
+
+		final AttributePath valueAttributePath = contentSchema.getValueAttributePath();
+		final AttributePath prefixedValueAttributePath = prefixAttributePath(valueAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
+				namespaceIndex);
+
+		return Optional.of(new ContentSchema(prefixedRecordIdentifierAttributePath, prefixedKeyAttributePaths, prefixedValueAttributePath));
+	}
+
+	private AttributePath prefixAttributePath(final AttributePath attributePath, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+
+		final Map<AttributePath, AttributePath> prefixedAttributePathMap = new HashMap<>();
+		final Map<Attribute, Attribute> prefixedAttributeMap = new HashMap<>();
+
+		return prefixAttributePath(attributePath, prefixedAttributePathMap, prefixedAttributeMap, namespaceIndex);
+	}
+
+	private AttributePath prefixAttributePath(final AttributePath attributePath, final Map<AttributePath, AttributePath> prefixedAttributePathMap,
+			final Map<Attribute, Attribute> prefixedAttributeMap, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+
+		if (!prefixedAttributeMap.containsKey(attributePath)) {
+
+			final LinkedList<Attribute> attributes = attributePath.getAttributes();
+			final LinkedList<Attribute> prefixedAttributes = new LinkedList<>();
+
+			for (final Attribute attribute : attributes) {
+
+				final Attribute prefixedAttribute = prefixAttribute(attribute, prefixedAttributeMap, namespaceIndex);
+				prefixedAttributes.add(prefixedAttribute);
+			}
+
+			final AttributePath prefixedAttributePath = new AttributePath(prefixedAttributes);
+
+			prefixedAttributePathMap.put(attributePath, prefixedAttributePath);
+		}
+
+		return prefixedAttributePathMap.get(attributePath);
+	}
+
+	private Attribute prefixAttribute(final Attribute attribute, final Map<Attribute, Attribute> prefixedAttributeMap,
+			final NamespaceIndex namespaceIndex) throws DMPGraphException {
+
+		if (!prefixedAttributeMap.containsKey(attribute)) {
+
+			final String attributeUri = attribute.getUri();
+			final String prefixedAttributeURI = namespaceIndex.createPrefixedURI(attributeUri);
+
+			final Attribute prefixedAttribute = new Attribute(prefixedAttributeURI);
+
+			prefixedAttributeMap.put(attribute, prefixedAttribute);
+		}
+
+		return prefixedAttributeMap.get(attribute);
 	}
 
 	/**

@@ -16,13 +16,6 @@
  */
 package org.dswarm.graph.gdm.work;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.DeltaStatics;
-import org.dswarm.graph.delta.util.GraphDBUtil;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.read.NodeHandler;
-import org.dswarm.graph.utils.GraphUtils;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -31,24 +24,34 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.DeltaStatics;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.read.NodeHandler;
+import org.dswarm.graph.utils.GraphUtils;
+
 /**
  * @author tgaengler
  */
 public class PropertyEnrichGDMWorker implements GDMWorker {
 
-	private static final Logger						LOG	= LoggerFactory.getLogger(PropertyEnrichGDMWorker.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyEnrichGDMWorker.class);
 
-	private final HierarchyLevelNodeHandler			nodeHandler;
-	private final NodeHandler						startNodeHandler;
-	private final HierarchyLevelRelationshipHandler	relationshipHandler;
+	private final HierarchyLevelNodeHandler         nodeHandler;
+	private final NodeHandler                       startNodeHandler;
+	private final HierarchyLevelRelationshipHandler relationshipHandler;
 
 	private final String prefixedResourceUri;
+	private final long   resourceHash;
 
 	private final GraphDatabaseService database;
 
-	public PropertyEnrichGDMWorker(final String prefixedResourceUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyEnrichGDMWorker(final String prefixedResourceUriArg, final long resourceHashArg, final GraphDatabaseService databaseArg) {
 
 		prefixedResourceUri = prefixedResourceUriArg;
+		resourceHash = resourceHashArg;
 		database = databaseArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
@@ -95,7 +98,7 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 		@Override
 		public void handleNode(final Node node, final int hierarchyLevel) throws DMPGraphException {
 
-			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(prefixedResourceUri)) {
+			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(resourceHash)) {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
@@ -154,8 +157,17 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 					break;
 				default:
 
-					// continue traversal with object node
-					nodeHandler.handleNode(rel.getEndNode(), hierarchyLevel + 1);
+					// note: we need to filter out bnodes without further statements, e.g., mabxml:tfType nodes have no statements (except of the optional rdf:type statement)
+					if (objectNode.hasRelationship(Direction.OUTGOING)) {
+
+						// continue traversal with object node
+						nodeHandler.handleNode(objectNode, hierarchyLevel + 1);
+					} else {
+
+						// i.e. we need to stop traversal here, and set the hierarchy level property
+
+						objectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel + 1);
+					}
 
 					break;
 			}

@@ -73,7 +73,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
 		readGDMFromDBThatWasWrittenAsGDM(Optional.of(requestJson), "versioning/mabxml_dmp.gson", "versioning/mabxml_dmp2.gson",
-				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149, false,
+				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 124, 149, false,
 				Optional.<String>absent());
 	}
 

@@ -26,13 +26,13 @@ import org.dswarm.graph.json.Statement;
  */
 public final class ChangesetUtil {
 
-	public static Map<Long, Statement> providedModifiedStatements(final Map<String, Statement> modifiedStatements) {
+	public static Map<Long, Statement> providedModifiedStatements(final Map<Long, Statement> modifiedStatements) {
 
 		final Map<Long, Statement> newModifiedStatements = new LinkedHashMap<>();
 
-		for(final Map.Entry<String, Statement> modifiedStatementsEntry : modifiedStatements.entrySet()) {
+		for(final Map.Entry<Long, Statement> modifiedStatementsEntry : modifiedStatements.entrySet()) {
 
-			newModifiedStatements.put(Long.valueOf(modifiedStatementsEntry.getKey()), modifiedStatementsEntry.getValue());
+			newModifiedStatements.put(modifiedStatementsEntry.getKey(), modifiedStatementsEntry.getValue());
 		}
 
 		return newModifiedStatements;

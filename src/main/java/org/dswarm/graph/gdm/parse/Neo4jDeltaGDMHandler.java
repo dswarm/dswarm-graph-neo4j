@@ -123,7 +123,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			final org.dswarm.graph.json.Node object = st.getObject();
 
-			final Long statementUUID = getUUID(st.getUUID());
+			final Long statementUUID = HashUtils.getUUID(st.getUUID());
 			final Long order = st.getOrder();
 
 			// Check index for subject
@@ -372,14 +372,14 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 		final Relationship rel;
 
-		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
+		final IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
 
 		if (hits == null || !hits.hasNext()) {
 
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
 
-			final Long finalStatementUUID;
+			final long finalStatementUUID;
 
 			if (statementUUID == null) {
 
@@ -536,21 +536,5 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 
 		return identifier;
-	}
-
-	private Long getUUID(final String uuid) {
-
-		if(uuid == null) {
-
-			return null;
-		}
-
-		try {
-
-			return Long.valueOf(uuid);
-		} catch (final NumberFormatException e) {
-
-			return HashUtils.generateHash(uuid);
-		}
 	}
 }

@@ -547,7 +547,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 			finalStatementUUID = UUID.randomUUID().toString();
 		}
 
-		final long statementUUIDHash = SipHash.digest(HashUtils.SPEC_KEY, finalStatementUUID.getBytes(Charsets.UTF_8));
+		final long statementUUIDHash = HashUtils.getUUID(finalStatementUUID);
 
 		final Relationship rel = processor.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUIDHash,
 				optionalQualifiedAttributes, Optional.of(resourceIndexCounter.incrementAndGet()), versionHandler);

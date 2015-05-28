@@ -243,9 +243,14 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				addRelationship(subjectNode, prefixedPredicateURI, objectNode, optionalResourceHash, subject, resourceHash, statementUUID, order, index,
-						subject.getType(),
-						object.getType());
+				// leave out, rdf:type statements for now (enable, them if footprint is not too high)
+				if (!isType) {
+
+					addRelationship(subjectNode, prefixedPredicateURI, objectNode, optionalResourceHash, subject, resourceHash, statementUUID, order,
+							index,
+							subject.getType(),
+							object.getType());
+				}
 			}
 
 			totalTriples++;

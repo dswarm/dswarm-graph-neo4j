@@ -135,7 +135,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	 * @throws DMPGraphException
 	 */
 	@Override
-	public void handleStatement(final String stmtUUID, final long resourceHash, final long index, final long order) throws DMPGraphException {
+	public void handleStatement(final Long stmtUUID, final long resourceHash, final long index, final long order) throws DMPGraphException {
 
 		((TransactionalNeo4jProcessor) handler.getProcessor()).ensureRunningTx();
 
@@ -209,7 +209,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 	}
 
 	@Override
-	public org.dswarm.graph.json.Node deprecateStatement(final String uuid) throws DMPGraphException {
+	public org.dswarm.graph.json.Node deprecateStatement(final Long uuid) throws DMPGraphException {
 
 		((TransactionalNeo4jProcessor) handler.getProcessor()).ensureRunningTx();
 

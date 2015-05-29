@@ -17,6 +17,7 @@
 package org.dswarm.graph.gdm.read;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Optional;
@@ -89,20 +90,11 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 			if (!currentResourceStatements.isEmpty()) {
 
-				// note, this is just an integer number (i.e. NOT long)
-				final int mapSize = currentResourceStatements.size();
-
-				long i = 0;
-
 				final Set<Statement> statements = new LinkedHashSet<>();
 
-				while (i < mapSize) {
+				for(List<Statement> statementList : currentResourceStatements.values()) {
 
-					i++;
-
-					final Statement statement = currentResourceStatements.get(i);
-
-					statements.add(statement);
+					statements.addAll(statementList);
 				}
 
 				currentResource.setStatements(statements);

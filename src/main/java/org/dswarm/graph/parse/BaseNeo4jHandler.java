@@ -383,14 +383,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		}
 	}
 
-	@Override
-	public void deprecateStatement(long index) {
+//	@Override
+//	public void deprecateStatement(long index) {
+//
+//		throw new NotImplementedException();
+//	}
 
-		throw new NotImplementedException();
-	}
-
 	@Override
-	public Relationship deprecateStatement(final String uuid) throws DMPGraphException {
+	public Relationship deprecateStatement(final Long uuid) throws DMPGraphException {
 
 		processor.ensureRunningTx();
 

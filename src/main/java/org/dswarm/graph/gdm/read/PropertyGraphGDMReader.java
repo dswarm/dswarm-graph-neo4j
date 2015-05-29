@@ -16,10 +16,15 @@
  */
 package org.dswarm.graph.gdm.read;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -28,9 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
@@ -58,11 +65,14 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final NamespaceIndex       namespaceIndex;
 
 	protected Resource currentResource;
-	protected final Map<Long, Statement> currentResourceStatements = new TreeMap<>();
+	protected final Map<Long, List<Statement>> currentResourceStatements = new TreeMap<>();
 
 	protected final TransactionHandler tx;
 
 	protected final String type;
+
+	private final Set<Long> processedNodes = new HashSet<>();
+	private final Predicate rdfType        = new Predicate(RDF.type.getURI());
 
 	public PropertyGraphGDMReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
 			final GraphDatabaseService databaseArg,
@@ -237,12 +247,26 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				if (index != null) {
 
-					currentResourceStatements.put(index, statement);
+					optionallyAddRDFTypeStatement(subjectNode, subjectGDMNode, index);
+
+					addStatement(index, statement);
+
+					if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
+
+						optionallyAddRDFTypeStatement(objectNode, objectGDMNode, index);
+					}
 				} else {
 
 					// note maybe improve this here (however, this is the case for model that where written from RDF)
 
+					optionallyAddRDFTypeStatement(subjectNode, subjectGDMNode);
+
 					currentResource.addStatement(statement);
+
+					if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
+
+						optionallyAddRDFTypeStatement(objectNode, objectGDMNode);
+					}
 				}
 
 				if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
@@ -252,5 +276,52 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 				}
 			}
 		}
+	}
+
+	private void optionallyAddRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode, final long index) throws DMPGraphException {
+
+		final long nodeId = node.getId();
+
+		if (!processedNodes.contains(nodeId)) {
+
+			final Statement typeStmt = createRDFTypeStatement(node, gdmNode);
+
+			addStatement(index, typeStmt);
+
+			processedNodes.add(nodeId);
+		}
+	}
+
+	private void optionallyAddRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
+
+		final long nodeId = node.getId();
+
+		if (!processedNodes.contains(nodeId)) {
+
+			final Statement typeStmt = createRDFTypeStatement(node, gdmNode);
+
+			currentResource.addStatement(typeStmt);
+
+			processedNodes.add(nodeId);
+		}
+	}
+
+	private Statement createRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
+
+		final String typeLabel = GraphDBUtil.determineTypeLabel(node);
+		final String fullTypeURI = namespaceIndex.createFullURI(typeLabel);
+		final org.dswarm.graph.json.Node typeNode = new ResourceNode(fullTypeURI);
+
+		return new Statement(gdmNode, rdfType, typeNode);
+	}
+
+	private void addStatement(final long index, final Statement statement) {
+
+		if (!currentResourceStatements.containsKey(index)) {
+
+			currentResourceStatements.put(index, new ArrayList<Statement>());
+		}
+
+		currentResourceStatements.get(index).add(statement);
 	}
 }

@@ -33,8 +33,8 @@ public interface TransactionalNeo4jProcessor extends Neo4jProcessor {
 
 	void succeedTx() throws DMPGraphException;
 
-	// TODO: statement uuid is now hashed, i.e., it's a long value
-	Optional<Relationship> getRelationshipFromStatementIndex(final String stmtUUID);
+	// note: statement uuid is now hashed, i.e., it's a long value
+	Optional<Relationship> getRelationshipFromStatementIndex(final Long stmtUUID);
 
 	GraphDatabaseService getDatabase();
 

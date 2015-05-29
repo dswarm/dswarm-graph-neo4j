@@ -835,8 +835,8 @@ public class GDMResource {
 		final long existingResourceHash = HashUtils.generateHash(prefixedExistingResourceURI);
 		final long newResourceHash = HashUtils.generateHash(prefixedNewResourceURI);
 
-		enrichModel(existingResourceDB, prefixedExistingResourceURI, existingResourceHash);
-		enrichModel(newResourceDB, prefixedNewResourceURI, newResourceHash);
+		enrichModel(existingResourceDB, namespaceIndex, prefixedExistingResourceURI, existingResourceHash);
+		enrichModel(newResourceDB, namespaceIndex, prefixedNewResourceURI, newResourceHash);
 
 		// GraphDBUtil.printNodes(existingResourceDB);
 		// GraphDBUtil.printRelationships(existingResourceDB);
@@ -1033,20 +1033,20 @@ public class GDMResource {
 
 		// traverse resource graphs to extract changeset
 		final PropertyGraphDeltaGDMSubGraphWorker addedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(prefixedNewResourceURI,
-				DeltaState.ADDITION, newResourceDB);
+				DeltaState.ADDITION, newResourceDB, namespaceIndex);
 		final Map<Long, Statement> addedStatements = addedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker removedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
-				prefixedExistingResourceURI, DeltaState.DELETION, existingResourceDB);
+				prefixedExistingResourceURI, DeltaState.DELETION, existingResourceDB, namespaceIndex);
 		final Map<Long, Statement> removedStatements = removedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker newModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
 				prefixedNewResourceURI,
-				DeltaState.MODIFICATION, newResourceDB);
+				DeltaState.MODIFICATION, newResourceDB, namespaceIndex);
 		final Map<Long, Statement> newModifiedStatements = newModifiedStatementsPGDGDMSGWorker.work();
 
 		final PropertyGraphDeltaGDMSubGraphWorker existingModifiedStatementsPGDGDMSGWorker = new PropertyGraphDeltaGDMSubGraphWorker(
-				prefixedExistingResourceURI, DeltaState.MODIFICATION, existingResourceDB);
+				prefixedExistingResourceURI, DeltaState.MODIFICATION, existingResourceDB, namespaceIndex);
 		final Map<Long, Statement> existingModifiedStatements = existingModifiedStatementsPGDGDMSGWorker.work();
 
 		for (final Map.Entry<ValueEntity, ValueEntity> firstDegreeModificationGDMValueModificationEntry : firstDegreeModificationGDMValueMatcher
@@ -1087,9 +1087,9 @@ public class GDMResource {
 		return impermanentDB;
 	}
 
-	private void enrichModel(final GraphDatabaseService graphDB, final String prefixedResourceURI, final long resourceHash) throws DMPGraphException {
+	private void enrichModel(final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex, final String prefixedResourceURI, final long resourceHash) throws DMPGraphException {
 
-		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, resourceHash, graphDB);
+		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, resourceHash, graphDB, namespaceIndex);
 		worker.work();
 	}
 

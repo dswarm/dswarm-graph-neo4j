@@ -71,7 +71,6 @@ import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
 import org.dswarm.graph.delta.match.model.ValueEntity;
 import org.dswarm.graph.hash.HashUtils;
-import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.utils.GraphUtils;
 
@@ -83,7 +82,37 @@ public final class GraphDBUtil {
 	private static final Logger LOG = LoggerFactory.getLogger(GraphDBUtil.class);
 
 	// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-	private static final RelationshipType rdfTypeRelType = DynamicRelationshipType.withName("rdf:type");
+	public static final RelationshipType RDF_TYPE_REL_TYPE = DynamicRelationshipType.withName("rdf:type");
+
+	public static final String determineTypeLabel(final Node node) throws DMPGraphException {
+
+		final Iterable<Label> labels = node.getLabels();
+
+		if (labels == null) {
+
+			throw new DMPGraphException(String.format("there are no labels at node %s", GraphDBPrintUtil.printNode(node)));
+		}
+
+		for (final Label label : labels) {
+
+			final String labelName = label.name();
+
+			if (labelName.equals(GraphProcessingStatics.LEAF_IDENTIFIER)) {
+
+				continue;
+			}
+
+			try {
+
+				NodeType.getByName(labelName);
+			} catch (final IllegalArgumentException e) {
+
+				return labelName;
+			}
+		}
+
+		throw new DMPGraphException(String.format("couldn't determine type label for node %s", GraphDBPrintUtil.printNode(node)));
+	}
 
 	public static void addNodeId(final Set<Long> nodeIds, final Long nodeId) throws DMPGraphException {
 
@@ -116,7 +145,8 @@ public final class GraphDBUtil {
 	 */
 	public static Node getResourceNode(final GraphDatabaseService graphDB, final String prefixedResourceURI) {
 
-		final ResourceIterator<Node> resources = graphDB.findNodes(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, prefixedResourceURI);
+		final ResourceIterator<Node> resources = graphDB
+				.findNodes(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, prefixedResourceURI);
 
 		if (resources == null) {
 
@@ -602,7 +632,8 @@ public final class GraphDBUtil {
 			throws DMPGraphException {
 
 		// fetch type nodes as well
-		final Iterable<Relationship> typeRels = graphDB.getNodeById(nodeId).getRelationships(Direction.OUTGOING, rdfTypeRelType);
+		final Node nodeById = graphDB.getNodeById(nodeId);
+		final Iterable<Relationship> typeRels = nodeById.getRelationships(Direction.OUTGOING, RDF_TYPE_REL_TYPE);
 
 		if (typeRels != null && typeRels.iterator().hasNext()) {
 
@@ -612,6 +643,21 @@ public final class GraphDBUtil {
 				GraphDBUtil.LOG.debug("fetch entity type rel: '{}'", typeRel.getId());
 
 				GraphDBUtil.addNodeId(pathEndNodeIds, typeRel.getEndNode().getId());
+			}
+		} else {
+
+			// TODO: looks like that this doesn't match anything at all
+
+			final NodeType valueNodeType = GraphUtils.determineNodeType(nodeById);
+
+			if(valueNodeType.equals(NodeType.BNode) || valueNodeType.equals(NodeType.TypeBNode)) {
+
+				if(nodeById.hasLabel(GraphProcessingStatics.LEAF_LABEL)) {
+
+					GraphDBUtil.LOG.debug("found leaf bnode {}", GraphDBPrintUtil.printNode(nodeById));
+
+					GraphDBUtil.addNodeId(pathEndNodeIds, nodeId);
+				}
 			}
 		}
 	}
@@ -869,12 +915,6 @@ public final class GraphDBUtil {
 					}
 
 					final long endNodeId = endNode.getId();
-
-					if(!endNode.hasProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY)) {
-
-						System.out.println("dirty node: " + GraphDBPrintUtil.printDeltaRelationship(nonMatchedRel));
-					}
-
 					final int endNodeHierarchyLevel = (int) endNode.getProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY);
 
 					final SubGraphEntity subGraphEntity = new SubGraphEntity(endNodeId, predicate, deltaState, csEntity, finalOrder,

@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -39,6 +40,7 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.LiteralNode;
@@ -161,6 +163,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 				final String value = literal.getValue();
 				final Node objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL, GraphProcessingStatics.LITERAL_LABEL);
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
+				// not really needed, or? -since label is set
 				objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
 				final long finalResourceHash = addResourceProperty(subjectNode, subject, objectNode, resourceHash);
@@ -202,6 +205,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 						// object is a resource node
 
 						objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL, GraphProcessingStatics.RESOURCE_LABEL);
+						// not really needed, or? -since label is set
 						objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
 						final String finalPrefixedObjectURI;
@@ -243,14 +247,14 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 					addedNodes++;
 				}
 
-				// leave out, rdf:type statements for now (enable, them if footprint is not too high)
-				if (!isType) {
+//				// leave out, rdf:type statements for now (enable, them if footprint is not too high)
+//				if (!isType) {
 
 					addRelationship(subjectNode, prefixedPredicateURI, objectNode, optionalResourceHash, subject, resourceHash, statementUUID, order,
 							index,
 							subject.getType(),
 							object.getType());
-				}
+//				}
 			}
 
 			totalTriples++;

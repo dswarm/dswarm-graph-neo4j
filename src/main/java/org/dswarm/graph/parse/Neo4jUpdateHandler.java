@@ -26,9 +26,9 @@ import org.dswarm.graph.versioning.VersionHandler;
  */
 public interface Neo4jUpdateHandler extends Neo4jHandler {
 
-	public void deprecateStatement(final long index);
+	//void deprecateStatement(final long index);
 
-	public Relationship deprecateStatement(final String uuid) throws DMPGraphException;
+	Relationship deprecateStatement(final Long uuid) throws DMPGraphException;
 
-	public VersionHandler getVersionHandler();
+	VersionHandler getVersionHandler();
 }

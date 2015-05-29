@@ -158,7 +158,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeRDFToDBInternal(dataModelURI);
 
 		final String recordClassURI = "http://www.openarchives.org/OAI/2.0/recordType";
-		final int numberOfStatements = 1935;
+		final int numberOfStatements = 2601;
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer> absent());
 
@@ -175,7 +175,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal(dataModelURI, DEFAULT_GDM_FILE_NAME);
 
 		final String recordClassURI = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType";
-		final int numberOfStatements = 152;
+		final int numberOfStatements = 191;
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
 
@@ -193,7 +193,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal(dataModelURI, fileName);
 
 		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
-		final int numberOfStatements = 220;
+		final int numberOfStatements = 230;
 
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.of(10));
 

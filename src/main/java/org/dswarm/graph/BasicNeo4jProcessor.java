@@ -569,7 +569,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 				GraphStatics.HASH);
 	}
 
-	public Optional<Relationship> getRelationshipFromStatementIndex(final String uuid) {
+	public Optional<Relationship> getRelationshipFromStatementIndex(final Long uuid) {
 
 		if (statementUUIDs == null) {
 

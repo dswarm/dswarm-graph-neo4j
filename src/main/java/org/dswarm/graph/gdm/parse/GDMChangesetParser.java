@@ -24,6 +24,7 @@ import java.util.Set;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.util.GraphDBPrintUtil;
+import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.json.Node;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
@@ -96,10 +98,10 @@ public class GDMChangesetParser implements GDMUpdateParser {
 			final Iterable<Relationship> newRelationships = GlobalGraphOperations.at(newResourceDB).getAllRelationships();
 			final Iterator<Relationship> newRelationshipsIter = newRelationships.iterator();
 
-			final Set<String> alreadyAddedStatementUUIDs = new HashSet<>();
-			final Set<String> alreadyDeletedStatementUUIDs = new HashSet<>();
-			final Set<String> alreadyModifiedExistingStatementUUIDs = new HashSet<>();
-			final Set<String> alreadyModifiedNewStatementUUIDs = new HashSet<>();
+			final Set<Long> alreadyAddedStatementUUIDs = new HashSet<>();
+			final Set<Long> alreadyDeletedStatementUUIDs = new HashSet<>();
+			final Set<Long> alreadyModifiedExistingStatementUUIDs = new HashSet<>();
+			final Set<Long> alreadyModifiedNewStatementUUIDs = new HashSet<>();
 
 			long index = 1;
 			Relationship existingRelationship = existingRelationshipsIter.next();
@@ -170,7 +172,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 					case ADDITION:
 
-						final String newResourceStmtUUID = (String) newRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
+						final Long newResourceStmtUUID = (Long) newRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
 						final Statement addedStatement = changeset.getAdditions().get(newResourceStmtUUID);
 
 						// retrieve start node via subject identifier (?) - start node must be a resource node (i.e., we could probably verify this requirement)
@@ -191,7 +193,8 @@ public class GDMChangesetParser implements GDMUpdateParser {
 								optionalDataModelURI = Optional.absent();
 							}
 
-							final long subjectHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedSubjectURI, optionalDataModelURI);
+							final long subjectHash = gdmHandler.getHandler().getProcessor()
+									.generateResourceHash(prefixedSubjectURI, optionalDataModelURI);
 
 							if (existingResourceHash != subjectHash) {
 
@@ -201,7 +204,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 							}
 						}
 
-						final String addedStmtUUID = addedStatement.getUUID();
+						final Long addedStmtUUID = Long.valueOf(addedStatement.getUUID());
 
 						gdmHandler.handleStatement(addedStatement, existingResourceHash, index);
 						alreadyAddedStatementUUIDs.add(addedStmtUUID);
@@ -214,12 +217,20 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						break;
 					case DELETION:
 
-						final String existingResourceStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
+						final Long existingResourceStmtUUID = (Long) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
 						// note: we don't need to retrieve the stmt from the changeset, we just need the uuid of it
 						// final Statement deletedStatement = changeset.getDeletions().get(existingResourceStmtUUID);
 
-						// utilise statement uuid from existing statement to deprecate it
-						gdmHandler.deprecateStatement(existingResourceStmtUUID);
+						final RelationshipType relType = existingRelationship.getType();
+						final String relTypeName = relType.name();
+
+						// skip rdf:type rels, since they do not exist in the permanent graph
+						if (!relTypeName.equals(GraphDBUtil.RDF_TYPE_REL_TYPE.name())) {
+
+							// utilise statement uuid from existing statement to deprecate it
+							gdmHandler.deprecateStatement(existingResourceStmtUUID);
+						}
+
 						alreadyDeletedStatementUUIDs.add(existingResourceStmtUUID);
 
 						break;
@@ -229,12 +240,12 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						final Statement modifiedStatement = changeset.getNewModifiedStatements().get(modifiedNodeId);
 
 						final Statement finalModifiedStatement;
-						final String existingModifiedStmtUUID;
+						final Long existingModifiedStmtUUID;
 
 						if (modifiedStatement != null) {
 
 							finalModifiedStatement = modifiedStatement;
-							existingModifiedStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
+							existingModifiedStmtUUID = (Long) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
 						} else {
 
 							final Long newModifiedNodeId = newRelationship.getEndNode().getId();
@@ -261,7 +272,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 							}
 
 							final Statement existingModifiedStatement = changeset.getExistingModifiedStatements().get(existingModifiedNodeId);
-							existingModifiedStmtUUID = existingModifiedStatement.getUUID();
+							existingModifiedStmtUUID = Long.valueOf(existingModifiedStatement.getUUID());
 
 							increaseExistingRelationship = false;
 						}
@@ -281,7 +292,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						finalModifiedStatement.setSubject(subject);
 
 						gdmHandler.handleStatement(finalModifiedStatement, existingResourceHash, index);
-						alreadyModifiedNewStatementUUIDs.add(finalModifiedStatement.getUUID());
+						alreadyModifiedNewStatementUUIDs.add(Long.valueOf(finalModifiedStatement.getUUID()));
 
 						index++;
 
@@ -311,7 +322,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 					// note: we don't really know how equal/unequal the statements are at this moment, so it's better to compare them more in detail (? - once again?) - we could also hold a map of exact matched statements
 
 					// deprecate old statement and write it as new statement with a different index
-					final String existingStmtUUID = (String) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
+					final Long existingStmtUUID = (Long) existingRelationship.getProperty(GraphStatics.UUID_PROPERTY, null);
 					final Long newStmtOrder = (Long) newRelationship.getProperty(GraphStatics.ORDER_PROPERTY, null);
 
 					final long finalNewStmtOrder;
@@ -324,9 +335,16 @@ public class GDMChangesetParser implements GDMUpdateParser {
 						finalNewStmtOrder = (long) 1;
 					}
 
-					gdmHandler.deprecateStatement(existingStmtUUID);
+					final RelationshipType relType = existingRelationship.getType();
+					final String relTypeName = relType.name();
 
-					gdmHandler.handleStatement(existingStmtUUID, existingResourceHash, index, finalNewStmtOrder);
+					// skip rdf:type rels, since they do not exist in the permanent graph
+					if (!relTypeName.equals(GraphDBUtil.RDF_TYPE_REL_TYPE.name())) {
+
+						gdmHandler.deprecateStatement(existingStmtUUID);
+
+						gdmHandler.handleStatement(existingStmtUUID, existingResourceHash, index, finalNewStmtOrder);
+					}
 				}
 
 				index++;
@@ -370,15 +388,15 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		return DeltaState.getByName(deltaStateString);
 	}
 
-	private boolean checkStmt(final Relationship rel, final DeltaState deltaState, final Set<String> alreadyAddedStatementUUIDs,
-			final Set<String> alreadyDeletedStatementUUIDs, final Set<String> alreadyModifiedStatementUUIDs) {
+	private boolean checkStmt(final Relationship rel, final DeltaState deltaState, final Set<Long> alreadyAddedStatementUUIDs,
+			final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedStatementUUIDs) {
 
 		if (rel == null) {
 
 			return false;
 		}
 
-		final String newStmtUUID = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+		final Long newStmtUUID = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
 		boolean stmtAlreadyProcessed = false;
 
@@ -413,8 +431,8 @@ public class GDMChangesetParser implements GDMUpdateParser {
 		return stmtAlreadyProcessed;
 	}
 
-	private Relationship getNewRel(final Iterator<Relationship> newRelationshipsIter, final Set<String> alreadyAddedStatementUUIDs,
-			final Set<String> alreadyDeletedStatementUUIDs, final Set<String> alreadyModifiedNewStatementUUIDs) {
+	private Relationship getNewRel(final Iterator<Relationship> newRelationshipsIter, final Set<Long> alreadyAddedStatementUUIDs,
+			final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedNewStatementUUIDs) {
 
 		final Relationship newRelationship = increaseRelationship(newRelationshipsIter);
 		final DeltaState deltaState = getDeltaState(newRelationship);

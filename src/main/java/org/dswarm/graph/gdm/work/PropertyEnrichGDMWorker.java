@@ -16,6 +16,7 @@
  */
 package org.dswarm.graph.gdm.work;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.Direction;
@@ -187,7 +188,8 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 						// i.e. we need to set additional rdf:type statement here
 
-						final String typeLabel = GraphDBUtil.determineTypeLabel(objectNode);
+						final Optional<String> optionalTypeLabel = GraphDBUtil.determineTypeLabel(objectNode);
+						final String typeLabel = optionalTypeLabel.get();
 
 						final Node typeNode = determineNode(typeLabel);
 

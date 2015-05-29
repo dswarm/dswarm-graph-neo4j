@@ -284,9 +284,14 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 		if (!processedNodes.contains(nodeId)) {
 
-			final Statement typeStmt = createRDFTypeStatement(node, gdmNode);
+			final Optional<Statement> optionalTypeStmt = createRDFTypeStatement(node, gdmNode);
 
-			addStatement(index, typeStmt);
+			if (optionalTypeStmt.isPresent()) {
+
+				final Statement typeStmt = optionalTypeStmt.get();
+
+				addStatement(index, typeStmt);
+			}
 
 			processedNodes.add(nodeId);
 		}
@@ -298,21 +303,32 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 		if (!processedNodes.contains(nodeId)) {
 
-			final Statement typeStmt = createRDFTypeStatement(node, gdmNode);
+			final Optional<Statement> optionalTypeStmt = createRDFTypeStatement(node, gdmNode);
 
-			currentResource.addStatement(typeStmt);
+			if (optionalTypeStmt.isPresent()) {
+
+				final Statement typeStmt = optionalTypeStmt.get();
+
+				currentResource.addStatement(typeStmt);
+			}
 
 			processedNodes.add(nodeId);
 		}
 	}
 
-	private Statement createRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
+	private Optional<Statement> createRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
 
-		final String typeLabel = GraphDBUtil.determineTypeLabel(node);
+		final Optional<String> optionalTypeLabel = GraphDBUtil.determineTypeLabel(node);
+
+		if (!optionalTypeLabel.isPresent()) {
+
+			return Optional.absent();
+		}
+		final String typeLabel = optionalTypeLabel.get();
 		final String fullTypeURI = namespaceIndex.createFullURI(typeLabel);
 		final org.dswarm.graph.json.Node typeNode = new ResourceNode(fullTypeURI);
 
-		return new Statement(gdmNode, rdfType, typeNode);
+		return Optional.of(new Statement(gdmNode, rdfType, typeNode));
 	}
 
 	private void addStatement(final long index, final Statement statement) {

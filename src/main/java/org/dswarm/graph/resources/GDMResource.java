@@ -1087,7 +1087,8 @@ public class GDMResource {
 		return impermanentDB;
 	}
 
-	private void enrichModel(final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex, final String prefixedResourceURI, final long resourceHash) throws DMPGraphException {
+	private void enrichModel(final GraphDatabaseService graphDB, final NamespaceIndex namespaceIndex, final String prefixedResourceURI,
+			final long resourceHash) throws DMPGraphException {
 
 		final GDMWorker worker = new PropertyEnrichGDMWorker(prefixedResourceURI, resourceHash, graphDB, namespaceIndex);
 		worker.work();
@@ -1453,13 +1454,21 @@ public class GDMResource {
 		final Map<Attribute, Attribute> prefixedAttributeMap = new HashMap<>();
 
 		final LinkedList<AttributePath> keyAttributePaths = contentSchema.getKeyAttributePaths();
-		final LinkedList<AttributePath> prefixedKeyAttributePaths = new LinkedList<>();
+		final LinkedList<AttributePath> prefixedKeyAttributePaths;
 
-		for (final AttributePath keyAttributePath : keyAttributePaths) {
+		if (keyAttributePaths != null) {
 
-			final AttributePath prefixedKeyAttributePath = prefixAttributePath(keyAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
-					namespaceIndex);
-			prefixedKeyAttributePaths.add(prefixedKeyAttributePath);
+			prefixedKeyAttributePaths = new LinkedList<>();
+
+			for (final AttributePath keyAttributePath : keyAttributePaths) {
+
+				final AttributePath prefixedKeyAttributePath = prefixAttributePath(keyAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
+						namespaceIndex);
+				prefixedKeyAttributePaths.add(prefixedKeyAttributePath);
+			}
+		} else {
+
+			prefixedKeyAttributePaths = null;
 		}
 
 		final AttributePath recordIdentifierAttributePath = contentSchema.getRecordIdentifierAttributePath();
@@ -1467,8 +1476,17 @@ public class GDMResource {
 				prefixedAttributeMap, namespaceIndex);
 
 		final AttributePath valueAttributePath = contentSchema.getValueAttributePath();
-		final AttributePath prefixedValueAttributePath = prefixAttributePath(valueAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
-				namespaceIndex);
+
+		final AttributePath prefixedValueAttributePath;
+
+		if (valueAttributePath != null) {
+
+			prefixedValueAttributePath = prefixAttributePath(valueAttributePath, prefixedAttributePathMap, prefixedAttributeMap,
+					namespaceIndex);
+		} else {
+
+			prefixedValueAttributePath = null;
+		}
 
 		return Optional.of(new ContentSchema(prefixedRecordIdentifierAttributePath, prefixedKeyAttributePaths, prefixedValueAttributePath));
 	}

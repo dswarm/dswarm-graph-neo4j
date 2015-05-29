@@ -84,7 +84,7 @@ public final class GraphDBUtil {
 	// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
 	public static final RelationshipType RDF_TYPE_REL_TYPE = DynamicRelationshipType.withName("rdf:type");
 
-	public static final String determineTypeLabel(final Node node) throws DMPGraphException {
+	public static final Optional<String> determineTypeLabel(final Node node) throws DMPGraphException {
 
 		final Iterable<Label> labels = node.getLabels();
 
@@ -92,6 +92,8 @@ public final class GraphDBUtil {
 
 			throw new DMPGraphException(String.format("there are no labels at node %s", GraphDBPrintUtil.printNode(node)));
 		}
+
+		boolean nodeIsResource = false;
 
 		for (final Label label : labels) {
 
@@ -104,11 +106,23 @@ public final class GraphDBUtil {
 
 			try {
 
-				NodeType.getByName(labelName);
+				final NodeType nodeType = NodeType.getByName(labelName);
+
+				if(NodeType.Resource.equals(nodeType)) {
+
+					nodeIsResource = true;
+				}
 			} catch (final IllegalArgumentException e) {
 
-				return labelName;
+				return Optional.of(labelName);
 			}
+		}
+
+		if(nodeIsResource) {
+
+			// object resources don't need a type label
+
+			return Optional.absent();
 		}
 
 		throw new DMPGraphException(String.format("couldn't determine type label for node %s", GraphDBPrintUtil.printNode(node)));

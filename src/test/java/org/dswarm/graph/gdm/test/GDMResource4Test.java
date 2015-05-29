@@ -255,7 +255,6 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("finished read versioned GDM record by URI test for GDM resource at {} DB", dbType);
 	}
 
-	@Ignore
 	@Test
 	public void searchGDMRecordFromDBThatWasWrittenAsGDM1() throws IOException {
 
@@ -352,6 +351,7 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("finished search GDM records test 3 for GDM resource at {} DB", dbType);
 	}
 
+	@Ignore
 	@Test
 	public void searchGDMRecordFromDBThatWasWrittenAsGDM4() throws IOException {
 

@@ -108,7 +108,7 @@ public final class GraphDBUtil {
 
 				final NodeType nodeType = NodeType.getByName(labelName);
 
-				if(NodeType.Resource.equals(nodeType)) {
+				if (NodeType.Resource.equals(nodeType)) {
 
 					nodeIsResource = true;
 				}
@@ -118,7 +118,7 @@ public final class GraphDBUtil {
 			}
 		}
 
-		if(nodeIsResource) {
+		if (nodeIsResource) {
 
 			// object resources don't need a type label
 
@@ -259,7 +259,8 @@ public final class GraphDBUtil {
 	 * @param prefixedDataModelURI
 	 * @return
 	 */
-	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String prefixedResourceURI, final String prefixedDataModelURI) {
+	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String prefixedResourceURI,
+			final String prefixedDataModelURI) {
 
 		final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI, prefixedDataModelURI);
 
@@ -664,9 +665,9 @@ public final class GraphDBUtil {
 
 			final NodeType valueNodeType = GraphUtils.determineNodeType(nodeById);
 
-			if(valueNodeType.equals(NodeType.BNode) || valueNodeType.equals(NodeType.TypeBNode)) {
+			if (valueNodeType.equals(NodeType.BNode) || valueNodeType.equals(NodeType.TypeBNode)) {
 
-				if(nodeById.hasLabel(GraphProcessingStatics.LEAF_LABEL)) {
+				if (nodeById.hasLabel(GraphProcessingStatics.LEAF_LABEL)) {
 
 					GraphDBUtil.LOG.debug("found leaf bnode {}", GraphDBPrintUtil.printNode(nodeById));
 
@@ -950,7 +951,8 @@ public final class GraphDBUtil {
 		return subgraphEntities;
 	}
 
-	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath prefixedRecordIdentifierAP, final String prefixedRecordURI)
+	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath prefixedRecordIdentifierAP,
+			final String prefixedRecordURI)
 			throws DMPGraphException {
 
 		final String query = buildGetRecordIdentifierQuery(prefixedRecordIdentifierAP, prefixedRecordURI);
@@ -1213,7 +1215,8 @@ public final class GraphDBUtil {
 
 		final StringBuilder sb = new StringBuilder("MATCH ");
 
-		sb.append("(n:").append(NodeType.Resource).append(" {").append(GraphStatics.URI_PROPERTY).append(":\"").append(prefixedRecordURI).append("\"})\n")
+		sb.append("(n:").append(NodeType.Resource).append(" {").append(GraphStatics.URI_PROPERTY).append(":\"").append(prefixedRecordURI)
+				.append("\"})\n")
 				.append("WITH n\n")
 				.append("MATCH ").append("(n)");
 
@@ -1243,79 +1246,76 @@ public final class GraphDBUtil {
 			final AttributePath prefixedRecordIdentifierAP,
 			final String prefixedDataModelUri) throws DMPGraphException {
 
-		// MATCH (n:RESOURCE)-[:`http://data.slub-dresden.de/resources/1/schema#id`]->(o:LITERAL)
-		// USING INDEX o:LITERAL(value)
-		// WHERE
-		//  n.datamodel = "ns1:2222" AND
-		//  n.value = "7890"
-		// RETURN
-		//  n.uri as record_uri
+		// MATCH (o:LITERAL {value : "ID06978834"})
+		// WITH o
+		// MATCH (o)<-[:`mabxml:id`]-(n:RESOURCE)
+		// WHERE n.datamodel = "ns1:1"
+		// RETURN n.uri;
 
-		final StringBuilder sb = new StringBuilder("MATCH ");
-
-		sb.append("(n:").append(NodeType.Resource).append(")");
+		final StringBuilder sb = new StringBuilder();
+		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(recordId).append("\"})\n")
+				.append("WITH o\n")
+				.append("MATCH (o)");
 
 		final List<Attribute> attributes = prefixedRecordIdentifierAP.getAttributes();
-		int i = attributes.size();
+		int i = attributes.size() -1;
 
-		// prefix uris of record identifier attribute path
-		for (final Attribute attribute : attributes) {
+		while (i >= 0) {
 
-			final String prefixedAttributeUri = attribute.getUri();
+			final Attribute attribute = attributes.get(i);
+			final String prefixedAttributeURI = attribute.getUri();
 
-			sb.append("-[:`").append(prefixedAttributeUri).append("`]-");
+			sb.append("<-[:`").append(prefixedAttributeURI).append("`]-");
 
-			if (--i > 0) {
+			if (i > 0) {
+
 				sb.append("()");
 			}
+
+			i--;
 		}
 
-		// TODO: refactor query, so that schema indices are utilised properly, i.e., value match needs to be the first query part
-
-		sb.append("(o:").append(NodeType.Literal).append(")\n")
-				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
-				.append("WHERE ")
-				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append('"')
-				.append(" AND ")
-				.append("o.").append(GraphStatics.VALUE_PROPERTY).append(" = \"").append(recordId).append('"').append('\n')
-				.append("RETURN ")
-				.append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+		sb.append("(n:").append(NodeType.Resource).append(")\n")
+				.append("WITH n\n")
+				.append("MATCH n\n")
+				.append("WHERE n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append("\"\n")
+				.append("RETURN ").append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
 
 		return sb.toString();
 	}
 
-	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath prefixedKeyAttributePath, final String prefixedDataModelUri)
+	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath prefixedKeyAttributePath,
+			final String prefixedDataModelUri)
 			throws DMPGraphException {
 
-		final StringBuilder sb = new StringBuilder("MATCH ");
+		final StringBuilder sb = new StringBuilder();
+		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(searchValue).append("\"})\n")
+				.append("WITH o\n")
+				.append("MATCH (o)");
 
-		sb.append("(n:").append(NodeType.Resource).append(")");
+		final List<Attribute> attributes = prefixedKeyAttributePath.getAttributes();
+		int i = attributes.size() -1;
 
-		final LinkedList<Attribute> attributes = prefixedKeyAttributePath.getAttributes();
-		int i = attributes.size();
+		while (i >= 0) {
 
-		for (final Attribute attribute : attributes) {
-
+			final Attribute attribute = attributes.get(i);
 			final String prefixedAttributeURI = attribute.getUri();
 
-			sb.append("-[:`").append(prefixedAttributeURI).append("`]->");
+			sb.append("<-[:`").append(prefixedAttributeURI).append("`]-");
 
-			if (--i > 0) {
+			if (i > 0) {
 
 				sb.append("()");
 			}
+
+			i--;
 		}
 
-		// TODO: refactor query, so that schema indices are utilised properly, i.e., value match needs to be the first query part
-
-		sb.append("(o:").append(NodeType.Literal).append(")\n")
-				.append("USING INDEX o:").append(NodeType.Literal).append("(").append(GraphStatics.VALUE_PROPERTY).append(")\n")
-				.append("WHERE ")
-				.append("n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append('"')
-				.append(" AND ")
-				.append("o.").append(GraphStatics.VALUE_PROPERTY).append(" = \"").append(searchValue).append('"').append('\n')
-				.append("RETURN ")
-				.append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
+		sb.append("(n:").append(NodeType.Resource).append(")\n")
+				.append("WITH n\n")
+				.append("MATCH n\n")
+				.append("WHERE n.").append(GraphStatics.DATA_MODEL_PROPERTY).append(" = \"").append(prefixedDataModelUri).append("\"\n")
+				.append("RETURN ").append("n.").append(GraphStatics.URI_PROPERTY).append(" AS record_uri");
 
 		return sb.toString();
 	}

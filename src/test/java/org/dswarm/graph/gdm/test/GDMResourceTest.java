@@ -182,6 +182,28 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
 
+	/**
+	 * read multiple records
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void readGDMFromDBThatWasWrittenAsGDM2() throws IOException {
+
+		LOG.debug("start read test  for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "http://data.slub-dresden.de/resources/1000";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+		final int numberOfStatements = 113;
+
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+
+		LOG.debug("finished read test 2 for GDM resource at {} DB", dbType);
+	}
+
 	@Test
 	public void testAtMostParameter() throws IOException {
 

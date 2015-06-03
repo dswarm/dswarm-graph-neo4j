@@ -42,11 +42,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -135,7 +133,7 @@ import org.dswarm.graph.versioning.VersioningStatics;
  * @author tgaengler
  */
 @Path("/gdm")
-public class GDMResource {
+public class GDMResource extends GraphResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GDMResource.class);
 
@@ -1579,89 +1577,5 @@ public class GDMResource {
 		}
 
 		return result;
-	}
-
-	private Optional<String> getStringValue(final String key, final JsonNode json) {
-
-		final JsonNode node = json.get(key);
-		final Optional<String> optionalValue;
-
-		if (node != null) {
-
-			optionalValue = Optional.fromNullable(node.asText());
-		} else {
-
-			optionalValue = Optional.absent();
-		}
-
-		return optionalValue;
-	}
-
-	private Optional<Integer> getIntValue(final String key, final JsonNode json) {
-
-		final JsonNode node = json.get(key);
-		final Optional<Integer> optionalValue;
-
-		if (node != null) {
-
-			optionalValue = Optional.fromNullable(node.asInt());
-		} else {
-
-			optionalValue = Optional.absent();
-		}
-
-		return optionalValue;
-	}
-
-	private ObjectNode deserializeJSON(final String jsonString, final String type) throws DMPGraphException {
-
-		try {
-
-			return objectMapper.readValue(jsonString, ObjectNode.class);
-		} catch (final IOException e) {
-
-			final String message = String.format("could not deserialise request JSON for %s", type);
-
-			GDMResource.LOG.debug(message);
-
-			throw new DMPGraphException(message, e);
-		}
-	}
-
-	private String serializeJSON(final Object object, final String type) throws DMPGraphException {
-
-		try {
-
-			return objectMapper.writeValueAsString(object);
-		} catch (final JsonProcessingException e) {
-
-			final String message = String.format("some problems occur, while processing the JSON for %s", type);
-
-			throw new DMPGraphException(message, e);
-		}
-	}
-
-	private String readHeaders(final HttpHeaders httpHeaders) {
-
-		final MultivaluedMap<String, String> headerParams = httpHeaders.getRequestHeaders();
-
-		final StringBuilder sb = new StringBuilder();
-
-		for (final Map.Entry<String, List<String>> entry : headerParams.entrySet()) {
-
-			final String headerIdentifier = entry.getKey();
-			final List<String> headerValues = entry.getValue();
-
-			sb.append("\t\t").append(headerIdentifier).append(" = ");
-
-			for (final String headerValue : headerValues) {
-
-				sb.append(headerValue).append(", ");
-			}
-
-			sb.append("\n");
-		}
-
-		return sb.toString();
 	}
 }

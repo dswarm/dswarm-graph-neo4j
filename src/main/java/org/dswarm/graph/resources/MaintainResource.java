@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,16 +35,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Result;
@@ -54,14 +53,19 @@ import org.neo4j.graphdb.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.DMPStatics;
 import org.dswarm.common.types.Tuple;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.DataModelNeo4jProcessor;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.deprecate.DataModelNeo4jDeprecator;
+import org.dswarm.graph.deprecate.RelationshipDeprecator;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.index.SchemaIndexUtils;
-import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
@@ -71,7 +75,7 @@ import org.dswarm.graph.utils.NamespaceUtils;
  * @author tgaengler
  */
 @Path("/maintain")
-public class MaintainResource {
+public class MaintainResource extends GraphResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MaintainResource.class);
 
@@ -82,8 +86,7 @@ public class MaintainResource {
 	// TODO: maybe divide this into 2 queries and without OPTIONAL
 	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
-	private static final JsonFactory  jsonFactory  = new JsonFactory();
-	private static final ObjectMapper objectMapper = new ObjectMapper();
+	private static final String DEPRECATE_DATA_MODEL_TYPE = "deprecate data model";
 
 	public MaintainResource() {
 
@@ -96,6 +99,50 @@ public class MaintainResource {
 		MaintainResource.LOG.debug("ping was called");
 
 		return "pong";
+	}
+
+	@POST
+	@Path("/deprecate/datamodel")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deprecateDataModel(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+
+		MaintainResource.LOG.info("try to deprecate data model in graph db");
+
+		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, DEPRECATE_DATA_MODEL_TYPE);
+
+		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		final String prefixedDataModelUri = namespaceIndex.createPrefixedURI(dataModelUri);
+
+		MaintainResource.LOG.info("try to deprecate statements in data model '{}' ('{}') in graph db", dataModelUri, prefixedDataModelUri);
+
+		final BasicNeo4jProcessor processor = new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelUri);
+
+		final RelationshipDeprecator statementDeprecator = new DataModelNeo4jDeprecator(processor, true, prefixedDataModelUri);
+
+		statementDeprecator.work();
+
+		final int relationshipsDeprecated = statementDeprecator.getRelationshipsDeprecated();
+
+		if (relationshipsDeprecated > 0) {
+
+			// update data model version only when some statements are deprecated the DB
+			statementDeprecator.getVersionHandler().updateLatestVersion();
+		}
+
+		statementDeprecator.closeTransaction();
+
+		LOG.info("deprecated '{}' relationships in data model '{}' ('{}') in graph db", relationshipsDeprecated, dataModelUri, prefixedDataModelUri);
+
+		final ObjectNode resultJSON = simpleObjectMapper.createObjectNode();
+		resultJSON.put("deprecated", relationshipsDeprecated);
+		final String result = serializeJSON(resultJSON, DEPRECATE_DATA_MODEL_TYPE);
+
+		return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	/**
@@ -132,7 +179,7 @@ public class MaintainResource {
 		MaintainResource.LOG.debug("finished cleaning up the db");
 
 		final StringWriter out = new StringWriter();
-		final JsonGenerator generator = jsonFactory.createGenerator(out);
+		final JsonGenerator generator = simpleObjectMapper.getFactory().createGenerator(out);
 
 		generator.writeStartObject();
 		generator.writeNumberField("deleted", deleted);
@@ -427,7 +474,7 @@ public class MaintainResource {
 
 			final URL prefixesFileURL = Resources.getResource("prefixes.json");
 			final String prefixesJSONString = Resources.toString(prefixesFileURL, Charsets.UTF_8);
-			final Map<String, String> prefixesNamespacesMap = objectMapper
+			final Map<String, String> prefixesNamespacesMap = simpleObjectMapper
 					.readValue(prefixesJSONString, new TypeReference<HashMap<String, String>>() {
 
 					});

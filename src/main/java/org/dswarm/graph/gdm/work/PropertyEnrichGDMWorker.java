@@ -16,56 +16,82 @@
  */
 package org.dswarm.graph.gdm.work;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.util.GraphDBUtil;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.read.NodeHandler;
-import org.dswarm.graph.utils.GraphUtils;
+import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.DeltaStatics;
+import org.dswarm.graph.delta.util.GraphDBPrintUtil;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.read.NodeHandler;
+import org.dswarm.graph.utils.GraphUtils;
 
 /**
  * @author tgaengler
  */
 public class PropertyEnrichGDMWorker implements GDMWorker {
 
-	private static final Logger						LOG	= LoggerFactory.getLogger(PropertyEnrichGDMWorker.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyEnrichGDMWorker.class);
 
-	private final HierarchyLevelNodeHandler			nodeHandler;
-	private final NodeHandler						startNodeHandler;
-	private final HierarchyLevelRelationshipHandler	relationshipHandler;
+	private final HierarchyLevelNodeHandler         nodeHandler;
+	private final NodeHandler                       startNodeHandler;
+	private final HierarchyLevelRelationshipHandler relationshipHandler;
 
-	private final String							resourceUri;
+	private final String prefixedResourceUri;
+	private final long   resourceHash;
 
-	private final GraphDatabaseService				database;
+	private final GraphDatabaseService database;
+	private final NamespaceIndex       namespaceIndex;
 
-	public PropertyEnrichGDMWorker(final String resourceUriArg, final GraphDatabaseService databaseArg) {
+	private final RelationshipType prefixedRDFType;
+	private final Label            prefixedRDFSClass;
 
-		resourceUri = resourceUriArg;
+	public PropertyEnrichGDMWorker(final String prefixedResourceUriArg, final long resourceHashArg, final GraphDatabaseService databaseArg, final
+	NamespaceIndex namespaceIndexArg) throws DMPGraphException {
+
+		prefixedResourceUri = prefixedResourceUriArg;
+		resourceHash = resourceHashArg;
 		database = databaseArg;
+		namespaceIndex = namespaceIndexArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
+
+		final String prefixedRDFTypeURI = namespaceIndex.createPrefixedURI(RDF.type.getURI());
+		final String prefixedRDFSClassURI = namespaceIndex.createPrefixedURI(RDFS.Class.getURI());
+
+		prefixedRDFType = DynamicRelationshipType.withName(prefixedRDFTypeURI);
+		prefixedRDFSClass = DynamicLabel.label(prefixedRDFSClassURI);
 	}
 
 	@Override
 	public void work() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			PropertyEnrichGDMWorker.LOG.debug("start enrich GDM TX");
 
-			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceUri);
+			final Node recordNode = GraphDBUtil.getResourceNode(database, prefixedResourceUri);
 
 			if (recordNode == null) {
 
-				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '" + resourceUri + "'");
+				PropertyEnrichGDMWorker.LOG.debug("couldn't find record for resource '{}'", prefixedResourceUri);
 
 				tx.success();
 
@@ -94,7 +120,7 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 		@Override
 		public void handleNode(final Node node, final int hierarchyLevel) throws DMPGraphException {
 
-			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(resourceUri)) {
+			if (node.hasProperty(GraphStatics.RESOURCE_PROPERTY) && node.getProperty(GraphStatics.RESOURCE_PROPERTY).equals(resourceHash)) {
 
 				final Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 
@@ -128,16 +154,14 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 		@Override
 		public void handleRelationship(final Relationship rel, final int hierarchyLevel) throws DMPGraphException {
 
-			final long statementId = rel.getId();
-
 			// subject
 
 			final Node subjectNode = rel.getStartNode();
-			subjectNode.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel);
+			subjectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel);
 
 			// predicate
 
-			rel.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel);
+			rel.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel);
 
 			// object
 
@@ -150,16 +174,55 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 				case Resource:
 				case TypeResource:
 
-					objectNode.setProperty("__HIERARCHY_LEVEL__", hierarchyLevel + 1);
+					objectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel + 1);
 
 					break;
 				default:
 
-					// continue traversal with object node
-					nodeHandler.handleNode(rel.getEndNode(), hierarchyLevel + 1);
+					// note: we need to filter out bnodes without further statements, e.g., mabxml:tfType nodes have no statements (except of the optional rdf:type statement)
+					if (objectNode.hasRelationship(Direction.OUTGOING)) {
+
+						// continue traversal with object node
+						nodeHandler.handleNode(objectNode, hierarchyLevel + 1);
+					} else {
+
+						// i.e. we need to set additional rdf:type statement here
+
+						final Optional<String> optionalTypeLabel = GraphDBUtil.determineTypeLabel(objectNode);
+						final String typeLabel = optionalTypeLabel.get();
+
+						final Node typeNode = determineNode(typeLabel);
+
+						objectNode.createRelationshipTo(typeNode, prefixedRDFType);
+
+						//						objectNode.setProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, hierarchyLevel + 1);
+						//						objectNode.addLabel(GraphProcessingStatics.LEAF_LABEL);
+						//						// not really needed, or? -since label is set
+						//						objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
+
+						// continue traversal with object node
+						nodeHandler.handleNode(objectNode, hierarchyLevel + 1);
+
+						LOG.debug("BNODE has no outgoing rels " + GraphDBPrintUtil.printDeltaRelationship(rel));
+					}
 
 					break;
 			}
+		}
+
+		private Node determineNode(final String typeLabel) {
+
+			final Node typeNode = database.findNode(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, typeLabel);
+
+			if(typeNode != null) {
+
+				return typeNode;
+			}
+
+			final Node newTypeNode = database.createNode(GraphProcessingStatics.RESOURCE_LABEL, GraphProcessingStatics.RESOURCE_TYPE_LABEL, prefixedRDFSClass);
+			newTypeNode.setProperty(GraphStatics.URI_PROPERTY, typeLabel);
+
+			return newTypeNode;
 		}
 	}
 }

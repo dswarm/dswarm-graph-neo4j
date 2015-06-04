@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.match.mark.SubGraphEntityMarker;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.util.GraphDBUtil;
@@ -41,10 +43,10 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 
 	public FirstDegreeExactSubGraphEntityMatcher(final Optional<? extends Collection<SubGraphEntity>> existingSubGraphEntitiesArg,
 			final Optional<? extends Collection<SubGraphEntity>> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) throws DMPGraphException {
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
 
-		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg,
-				newResourceURIArg, new SubGraphEntityMarker());
+		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg,
+				prefixedNewResourceURIArg, new SubGraphEntityMarker());
 	}
 
 	/**
@@ -163,7 +165,7 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 					continue;
 				}
 
-				final Integer hierarchyLevel = (Integer) leafNode.getProperty("__HIERARCHY_LEVEL__", null);
+				final Integer hierarchyLevel = (Integer) leafNode.getProperty(DeltaStatics.HIERARCHY_LEVEL_PROPERTY, null);
 
 				if (hierarchyLevel != null) {
 
@@ -213,7 +215,7 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m)").append("\nWHERE m.__HIERARCHY_LEVEL__ = ").append(hierarchyLevel)
+		sb.append("START n=node(").append(nodeId).append(")\nMATCH (n)-[r*]->(m)").append("\nWHERE m.").append(DeltaStatics.HIERARCHY_LEVEL_PROPERTY).append(" = ").append(hierarchyLevel)
 				.append("\nRETURN id(m) AS hierarchy_level_node");
 
 		return sb.toString();

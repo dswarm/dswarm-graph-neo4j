@@ -16,24 +16,29 @@
  */
 package org.dswarm.graph;
 
+import com.github.emboss.siphash.SipHash;
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
  */
-public class SimpleNeo4jProcessor extends Neo4jProcessor {
+public class SimpleNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
-	public SimpleNeo4jProcessor(final GraphDatabaseService database) throws DMPGraphException {
+	public SimpleNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		super(database);
+		super(database, txArg, namespaceIndex);
 	}
 
 	@Override
@@ -41,7 +46,9 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 		if (optionalDataModelURI.isPresent()) {
 
-			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
+			final long resourceUriDataModelUriHash = generateResourceHash(URI, optionalDataModelURI);
+
+			addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
 		}
 	}
 
@@ -59,8 +66,10 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 
 		if (optionalDataModelURI.isPresent()) {
 
+			final long resourceUriDataModelUriHash = generateResourceHash(URI, optionalDataModelURI);
+
 			node.setProperty(GraphStatics.DATA_MODEL_PROPERTY, optionalDataModelURI.get());
-			addNodeToResourcesWDataModelIndex(URI, optionalDataModelURI.get(), node);
+			addNodeToResourcesWDataModelIndex(URI, resourceUriDataModelUriHash, node);
 		}
 	}
 
@@ -68,6 +77,13 @@ public class SimpleNeo4jProcessor extends Neo4jProcessor {
 	public Optional<Node> getResourceNodeHits(final String resourceURI) {
 
 		return getNodeFromResourcesIndex(resourceURI);
+	}
+
+	@Override public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
+
+		final String hashString = resourceURI;
+
+		return HashUtils.generateHash(hashString);
 	}
 
 	@Override protected String putSaltToStatementHash(final String hash) {

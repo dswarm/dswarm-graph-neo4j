@@ -57,7 +57,7 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 
 	private final GraphDatabaseService	database;
 
-	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<Long, Statement>();
+	private final Map<Long, Statement>	currentResourceStatements	= new HashMap<>();
 
 	public PropertyGraphSignGDMWorker(final String resourceUriArg, final GraphDatabaseService databaseArg) {
 
@@ -71,7 +71,7 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 	@Override
 	public void work() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			PropertyGraphSignGDMWorker.LOG.debug("start sign GDM TX");
 
@@ -90,7 +90,7 @@ public class PropertyGraphSignGDMWorker implements GDMWorker {
 				return;
 			}
 
-			while(leafNodes.hasNext()) {
+			while (leafNodes.hasNext()) {
 
 				final Node leafNode = leafNodes.next();
 

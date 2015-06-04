@@ -24,7 +24,7 @@ import org.dswarm.graph.json.Node;
  */
 public interface GDMUpdateHandler extends GDMHandler {
 
-	public void handleStatement(final String stmtUUID, final String resourceURI, final long index, final long order) throws DMPGraphException;
+	void handleStatement(final Long stmtUUID, final long resourceHash, final long index, final long order) throws DMPGraphException;
 
-	public Node deprecateStatement(final String uuid) throws DMPGraphException;
+	Node deprecateStatement(final Long uuid) throws DMPGraphException;
 }

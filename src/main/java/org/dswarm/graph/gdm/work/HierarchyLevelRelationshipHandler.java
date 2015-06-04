@@ -24,5 +24,5 @@ import org.neo4j.graphdb.Relationship;
  */
 public interface HierarchyLevelRelationshipHandler {
 
-	public void handleRelationship(Relationship rel, int hierarchyLevel) throws DMPGraphException;
+	void handleRelationship(Relationship rel, int hierarchyLevel) throws DMPGraphException;
 }

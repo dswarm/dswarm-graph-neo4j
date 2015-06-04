@@ -103,7 +103,7 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		writeGDMToDBInternal("http://data.slub-dresden.de/resources/1", DEFAULT_GDM_FILE_NAME);
 		writeGDMToDBInternal("http://data.slub-dresden.de/resources/2", DEFAULT_GDM_FILE_NAME);
 
-		final String typeQuery = "MATCH (n) WHERE n.__NODETYPE__ = \"__TYPE_RESOURCE__\" RETURN id(n) AS node_id, n.__URI__ AS node_uri;";
+		final String typeQuery = "MATCH (n:TYPE_RESOURCE) RETURN id(n) AS node_id, n.uri AS node_uri;";
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 
@@ -180,6 +180,28 @@ public abstract class GDMResourceTest extends BasicResourceTest {
 		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
 
 		LOG.debug("finished read test for GDM resource at {} DB", dbType);
+	}
+
+	/**
+	 * read multiple records
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void readGDMFromDBThatWasWrittenAsGDM2() throws IOException {
+
+		LOG.debug("start read test  for GDM resource at {} DB", dbType);
+
+		final String dataModelURI = "http://data.slub-dresden.de/resources/1000";
+
+		writeGDMToDBInternal(dataModelURI, "versioning/csv.gdm.v1.json");
+
+		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
+		final int numberOfStatements = 113;
+
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+
+		LOG.debug("finished read test 2 for GDM resource at {} DB", dbType);
 	}
 
 	@Test

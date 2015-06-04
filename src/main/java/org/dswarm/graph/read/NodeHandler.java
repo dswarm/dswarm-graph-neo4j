@@ -27,5 +27,5 @@ import org.neo4j.graphdb.Node;
  */
 public interface NodeHandler {
 
-	public void handleNode(Node node) throws DMPGraphException;
+	void handleNode(final Node node) throws DMPGraphException;
 }

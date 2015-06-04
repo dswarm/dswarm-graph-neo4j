@@ -39,9 +39,9 @@ public class FirstDegreeExactCSEntityMatcher extends Matcher<CSEntity> {
 
 	public FirstDegreeExactCSEntityMatcher(final Optional<? extends Collection<CSEntity>> existingCSEntitiesArg,
 			final Optional<? extends Collection<CSEntity>> newCSEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourcURIArg, final String newResourceURIArg) throws DMPGraphException {
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourcURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
 
-		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourcURIArg, newResourceURIArg,
+		super(existingCSEntitiesArg, newCSEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourcURIArg, prefixedNewResourceURIArg,
 				new CSEntityMarker());
 
 		// TODO: could be removed later

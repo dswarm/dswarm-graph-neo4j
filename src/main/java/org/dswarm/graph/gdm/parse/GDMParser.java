@@ -30,9 +30,9 @@ public interface GDMParser {
 	/**
 	 * Sets the GDMHandler that will handle the parsed GDM data.
 	 */
-	public void setGDMHandler(GDMHandler handler);
+	void setGDMHandler(GDMHandler handler);
 
-	public Observable<Void> parse() throws DMPGraphException;
+	Observable<Void> parse() throws DMPGraphException;
 
-	public long parsedResources();
+	long parsedResources();
 }

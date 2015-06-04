@@ -17,6 +17,7 @@
 package org.dswarm.graph.parse;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.model.Statement;
 
 /**
@@ -24,17 +25,23 @@ import org.dswarm.graph.model.Statement;
  */
 public interface Neo4jHandler {
 
-	public void handleStatement(final Statement statement) throws DMPGraphException;
+	Neo4jProcessor getProcessor();
 
-	public void setResourceUri(final String resourceUri);
+	void handleStatement(final Statement statement) throws DMPGraphException;
 
-	public void closeTransaction() throws DMPGraphException;
+	void setResourceUri(final String resourceUri) throws DMPGraphException;
 
-	public long getCountedStatements();
+	void setResourceHash(final long resourceHash);
 
-	public int getRelationshipsAdded();
+	void resetResourceIndexCounter();
 
-	public int getNodesAdded();
+	void closeTransaction() throws DMPGraphException;
 
-	public int getCountedLiterals();
+	long getCountedStatements();
+
+	int getRelationshipsAdded();
+
+	int getNodesAdded();
+
+	int getCountedLiterals();
 }

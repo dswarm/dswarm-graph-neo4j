@@ -17,8 +17,10 @@
 package org.dswarm.graph.resources;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -31,10 +33,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -56,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.MediaTypeUtil;
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.rdf.DataModelRDFNeo4jProcessor;
 import org.dswarm.graph.rdf.RDFNeo4jProcessor;
 import org.dswarm.graph.rdf.SimpleRDFNeo4jProcessor;
@@ -70,6 +76,8 @@ import org.dswarm.graph.rdf.parse.SimpleRDFNeo4jHandler;
 import org.dswarm.graph.rdf.pnx.parse.PNXParser;
 import org.dswarm.graph.rdf.read.PropertyGraphRDFReader;
 import org.dswarm.graph.rdf.read.RDFReader;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -115,13 +123,18 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("deserialized RDF statements that were serialised as Turtle or N3");
 
-		RDFResource.LOG.debug("try to write RDF statements into graph db");
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
-		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, dataModelURI);
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
+
+		RDFResource.LOG.debug("try to write RDF statements into graph db for data model '{}' ('{}')", dataModelURI, prefixedDataModelURI);
+
+		final RDFNeo4jProcessor processor = new DataModelRDFNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelURI);
 
 		try {
 
-			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor);
+			final RDFHandler handler = new DataModelRDFNeo4jHandler(processor, true);
 			final RDFParser parser = new JenaModelParser(model);
 			parser.setRDFHandler(handler);
 			parser.parse();
@@ -130,10 +143,10 @@ public class RDFResource {
 			rdfInputStream.close();
 
 			LOG.debug(
-					"finished writing {} RDF statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+					"finished writing {} RDF statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}' ('{}')",
 					handler.getHandler().getCountedStatements(),
 					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
-					dataModelURI);
+					dataModelURI, prefixedDataModelURI);
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
@@ -143,7 +156,7 @@ public class RDFResource {
 				rdfInputStream.close();
 			}
 
-			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -165,11 +178,13 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFNeo4jProcessor processor = new SimpleRDFNeo4jProcessor(database, tx, namespaceIndex);
 
 		try {
 
-			final RDFHandler handler = new SimpleRDFNeo4jHandler(processor);
+			final RDFHandler handler = new SimpleRDFNeo4jHandler(processor, true);
 			final RDFParser parser = new JenaModelParser(model);
 			parser.setRDFHandler(handler);
 			parser.parse();
@@ -190,7 +205,7 @@ public class RDFResource {
 				inputStream.close();
 			}
 
-			LOG.error("couldn't write RDF statements into graph db: " + e.getMessage(), e);
+			LOG.error("couldn't write RDF statements into graph db: {}", e.getMessage(), e);
 
 			throw e;
 		}
@@ -223,11 +238,14 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.SimpleRDFNeo4jProcessor(database, tx,
+				namespaceIndex);
 
 		try {
 
-			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.SimpleRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.SimpleRDFNeo4jHandler(processor, true);
 			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
 			parser.parse(model);
 
@@ -317,11 +335,17 @@ public class RDFResource {
 
 		RDFResource.LOG.debug("try to write RDF statements into graph db");
 
-		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
+
+		final org.dswarm.graph.rdf.pnx.RDFNeo4jProcessor processor = new org.dswarm.graph.rdf.pnx.DataModelRDFNeo4jProcessor(database, tx,
+				namespaceIndex, prefixedDataModelURI);
 
 		try {
 
-			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.DataModelRDFNeo4jHandler(processor);
+			final org.dswarm.graph.rdf.pnx.parse.RDFHandler handler = new org.dswarm.graph.rdf.pnx.parse.DataModelRDFNeo4jHandler(processor, true);
 			final org.dswarm.graph.rdf.pnx.parse.RDFParser parser = new PNXParser(handler);
 			parser.parse(model);
 
@@ -330,10 +354,10 @@ public class RDFResource {
 			rdfInputStream.close();
 
 			LOG.debug(
-					"finished writing {} RDF statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}'",
+					"finished writing {} RDF statements (added {} relationships, added {} nodes (resources + bnodes + literals), added {} literals) into graph db for data model URI '{}' ('{}')",
 					handler.getHandler().getCountedStatements(),
 					handler.getHandler().getRelationshipsAdded(), handler.getHandler().getNodesAdded(), handler.getHandler().getCountedLiterals(),
-					dataModelURI);
+					dataModelURI, prefixedDataModelURI);
 		} catch (final Exception e) {
 
 			processor.getProcessor().failTx();
@@ -374,22 +398,54 @@ public class RDFResource {
 		final String recordClassUri = json.get(DMPStatics.RECORD_CLASS_URI_IDENTIFIER).asText();
 		final String dataModelUri = json.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
 
-		LOG.debug("try to read RDF statements for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri
-				+ "' from graph db");
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
-		final RDFReader rdfReader = new PropertyGraphRDFReader(recordClassUri, dataModelUri, database);
-		final Model model = rdfReader.read();
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelUri);
+		final String prefixedRecordClassURI = namespaceIndex.createPrefixedURI(recordClassUri);
 
-		// model.write(System.out, "N-TRIPLE");
+		LOG.debug("try to read RDF statements for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') from graph db",
+				dataModelUri, prefixedDataModelURI, recordClassUri, prefixedRecordClassURI);
 
-		final StringWriter writer = new StringWriter();
-		model.write(writer, "N-TRIPLE");
-		final String result = writer.toString();
+		final RDFReader rdfReader = new PropertyGraphRDFReader(prefixedRecordClassURI, prefixedDataModelURI, database, tx, namespaceIndex);
 
-		LOG.debug("finished reading '" + model.size() + "' RDF statements ('" + rdfReader.countStatements()
-				+ "' via RDF reader) for data model uri = '" + dataModelUri + "' and record class uri = '" + recordClassUri + "' from graph db");
+		final StreamingOutput stream = new StreamingOutput() {
 
-		return Response.ok().entity(result).build();
+			@Override
+			public void write(final OutputStream os) throws IOException, WebApplicationException {
+
+				try {
+
+					final BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+
+					final Optional<Model> optionalModel = rdfReader.read();
+
+					if (optionalModel.isPresent()) {
+
+						final Model model = optionalModel.get();
+
+						LOG.debug(
+								"finished reading '{}' RDF statements ('{}' via RDF reader) for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') from graph db",
+								model.size(), rdfReader.countStatements(), dataModelUri, prefixedDataModelURI, recordClassUri, prefixedRecordClassURI);
+
+						model.write(bos, "N-TRIPLE");
+
+					} else {
+
+						bos.close();
+						os.close();
+
+						LOG.debug("couldn't find any RDF records for data model uri = '{}' ('{}') and record class uri = '{}' ('{}') from graph db",
+								dataModelUri, prefixedDataModelURI, recordClassUri, prefixedRecordClassURI);
+					}
+				} catch (final DMPGraphException e) {
+
+					throw new WebApplicationException(e);
+				}
+			}
+		};
+
+		return Response.ok(stream, "application/n-triples").build();
 	}
 
 	/**
@@ -409,28 +465,37 @@ public class RDFResource {
 	public Response exportAllRDFForDownload(@Context final GraphDatabaseService database,
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat) throws DMPGraphException {
 
-		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"" + exportFormat + "\"");
+		RDFResource.LOG.debug("Start processing request to export all rdf data to format \"{}\"", exportFormat);
 
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
-		} catch (IllegalArgumentException wrongFormat) {
-			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
-					+ wrongFormat.getLocalizedMessage());
+		} catch (final IllegalArgumentException wrongFormat) {
+			RDFResource.LOG.debug("Requested format \"{}\" can not be used to create a MediaType. See exception: {}", exportFormat,
+					wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 
 		// determine export language and file extension
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-		RDFResource.LOG.debug("Exporting rdf data to " + formatType.toString());
+		RDFResource.LOG.debug("Exporting rdf data to {}", formatType);
 
-		final String result = exportAllRDFInternal(database, exportLanguage);
+		final Optional<String> result = exportAllRDFInternal(database, exportLanguage);
 
-		RDFResource.LOG.debug("End processing request to export all rdf data to format \"" + exportFormat + "\"");
+		if (result.isPresent()) {
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+			RDFResource.LOG.debug("End processing request to export all rdf data to format \"{}\"", exportFormat);
+
+			return Response.ok(result.get()).type(formatType.toString())
+					.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+
+		} else {
+
+			RDFResource.LOG.debug("Could not find any data");
+
+			return Response.status(404).build();
+		}
 	}
 
 	/**
@@ -452,31 +517,37 @@ public class RDFResource {
 			@HeaderParam("Accept") @DefaultValue(MediaTypeUtil.N_QUADS) final String exportFormat,
 			@QueryParam("data_model_uri") final String dataModelURI) throws DMPGraphException {
 
-		RDFResource.LOG.debug("Start processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
-				+ "\"");
+		RDFResource.LOG.debug("Start processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
 
 		// determine export language and file extension
 		final MediaType formatType;
 		try {
 			formatType = MediaType.valueOf(exportFormat);
-		} catch (IllegalArgumentException wrongFormat) {
+		} catch (final IllegalArgumentException wrongFormat) {
 			// SR TODO remove log (antipattern log+throw)
-			RDFResource.LOG.debug("Requested format \"" + exportFormat + "\" can not be used to create a MediaType. See exception: "
-					+ wrongFormat.getLocalizedMessage());
+			RDFResource.LOG.debug("Requested format \"{}\" can not be used to create a MediaType. See exception: {}", exportFormat,
+					wrongFormat.getLocalizedMessage());
 			throw new DMPGraphException(wrongFormat.getLocalizedMessage());
 		}
 		final Lang exportLanguage = RDFLanguages.contentTypeToLang(formatType.toString());
 		final String fileExtension = exportLanguage.getFileExtensions().get(0);
-		RDFResource.LOG.debug("Interpreting requested format \"" + exportFormat + "\" as \"" + formatType.toString() + "\"");
+		RDFResource.LOG.debug("Interpreting requested format \"{}\" as \"{}\"", exportFormat, formatType);
 
 		// export and serialize data
-		final String result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
+		final Optional<String> result = exportSingleRDFInternal(database, exportLanguage, dataModelURI);
 
-		RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"" + dataModelURI + "\" to format \"" + exportFormat
-				+ "\"");
+		if (result.isPresent()) {
 
-		return Response.ok(result).type(formatType.toString())
-				.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+			RDFResource.LOG.debug("End processing request to export rdf data for data model uri \"{}\" to format \"{}\"", dataModelURI, exportFormat);
+
+			return Response.ok(result.get()).type(formatType.toString())
+					.header("Content-Disposition", "attachment; filename*=UTF-8''rdf_export." + fileExtension).build();
+		} else {
+
+			RDFResource.LOG.debug("Could not find data model for uri \"{}\"", dataModelURI);
+
+			return Response.status(404).build();
+		}
 	}
 
 	/**
@@ -485,29 +556,41 @@ public class RDFResource {
 	 * @param dataModelURI db internal identifier of the data model
 	 * @return a single data model, serialized in exportLanguage
 	 */
-	private String exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
+	private Optional<String> exportSingleRDFInternal(final GraphDatabaseService database, final Lang exportLanguage, final String dataModelURI)
 			throws DMPGraphException {
 
-		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"" + dataModelURI + "\" from graph db to format \""
-				+ exportLanguage.getLabel() + "\"");
-
 		// get data from neo4j
-		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI);
-		final Dataset dataset = rdfExporter.export();
-		final Model exportedModel = dataset.getNamedModel(dataModelURI);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
 
-		// serialize (export) model to exportLanguage
-		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, exportedModel, exportLanguage);
-		final String result = writer.toString();
+		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
 
-		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
-				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
-				+ "'))");
+		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"{}\" ('') from graph db to format \"{}\"", dataModelURI,
+				prefixedDataModelURI, exportLanguage.getLabel());
 
-		// LOG.debug("exported result:\n" + result);
+		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI, tx, namespaceIndex);
+		final Optional<Dataset> dataset = rdfExporter.export();
 
-		return result;
+		if (dataset.isPresent()) {
+
+			final Model exportedModel = dataset.get().getNamedModel(dataModelURI);
+
+			// serialize (export) model to exportLanguage
+			final StringWriter writer = new StringWriter();
+			RDFDataMgr.write(writer, exportedModel, exportLanguage);
+			final String result = writer.toString();
+
+			RDFResource.LOG
+					.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}')) for data model '{}' ('')",
+							rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements(),
+							dataModelURI, prefixedDataModelURI);
+
+			// LOG.debug("exported result:\n" + result);
+
+			return Optional.of(result);
+		}
+
+		return Optional.absent();
 	}
 
 	/**
@@ -515,24 +598,31 @@ public class RDFResource {
 	 * @param exportLanguage the language all data should be serialized in
 	 * @return all data models serialized in exportLanguage
 	 */
-	private String exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) throws DMPGraphException {
+	private Optional<String> exportAllRDFInternal(final GraphDatabaseService database, final Lang exportLanguage) throws DMPGraphException {
 
 		RDFResource.LOG.debug("try to export all RDF statements (one graph = one data resource/model) from graph db");
 
 		// get data from neo4j
-		final RDFExporter rdfExporter = new GraphRDFExporter(database);
-		final Dataset dataset = rdfExporter.export();
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+		final RDFExporter rdfExporter = new GraphRDFExporter(database, tx, namespaceIndex);
+		final Optional<Dataset> dataset = rdfExporter.export();
 
-		// serialize (export) model to exportLanguage
-		final StringWriter writer = new StringWriter();
-		RDFDataMgr.write(writer, dataset, exportLanguage);
-		final String result = writer.toString();
+		if (dataset.isPresent()) {
 
-		RDFResource.LOG.debug("finished exporting " + rdfExporter.countStatements() + " RDF statements from graph db (processed statements = '"
-				+ rdfExporter.processedStatements() + "' (successfully processed statements = '" + rdfExporter.successfullyProcessedStatements()
-				+ "'))");
+			// serialize (export) model to exportLanguage
+			final StringWriter writer = new StringWriter();
+			RDFDataMgr.write(writer, dataset.get(), exportLanguage);
+			final String result = writer.toString();
 
-		return result;
+			RDFResource.LOG
+					.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}'))",
+							rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements());
+
+			return Optional.of(result);
+		}
+
+		return Optional.absent();
 	}
 
 }

@@ -21,5 +21,5 @@ package org.dswarm.graph.parse;
  */
 public interface Handler {
 
-	public Neo4jHandler getHandler();
+	Neo4jHandler getHandler();
 }

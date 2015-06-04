@@ -17,7 +17,9 @@
 package org.dswarm.graph.gdm.parse;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
@@ -74,23 +76,29 @@ public class GDMModelParser implements GDMParser {
 					return null;
 				}
 
-				long i = 0;
+				AtomicLong counter = new AtomicLong(0);
 
-				gdmHandler.getHandler().setResourceUri(resource.getUri());
+				try {
 
-				for (final Statement statement : statements) {
+					final String prefixedResourceUri = gdmHandler.getHandler().getProcessor().createPrefixedURI(resource.getUri());
+					final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional.<String>absent());
 
-					i++;
+					gdmHandler.getHandler().setResourceUri(prefixedResourceUri);
+					gdmHandler.getHandler().setResourceHash(resourceHash);
+					gdmHandler.getHandler().resetResourceIndexCounter();
 
-					// note: just increasing the counter probably won't work at an update ;)
+					for (final Statement statement : statements) {
 
-					try {
+						final long i = counter.incrementAndGet();
 
-						gdmHandler.handleStatement(statement, resource.getUri(), i);
-					} catch (final DMPGraphException e) {
+						// note: just increasing the counter probably won't work at an update ;)
 
-						throw new RuntimeException(e);
+						gdmHandler.handleStatement(statement, resourceHash, i);
+
 					}
+				} catch (final DMPGraphException e) {
+
+					throw new RuntimeException(e);
 				}
 
 				parsedResources++;

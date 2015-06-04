@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.carrotsearch.hppc.LongObjectOpenHashMap;
+import com.carrotsearch.hppc.LongLongOpenHashMap;
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
 import com.github.emboss.siphash.SipHash;
 import com.google.common.base.Charsets;
@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.MapDBUtils;
@@ -54,9 +55,9 @@ import org.dswarm.graph.model.Statement;
 /**
  * @author tgaengler
  */
-public abstract class Neo4jProcessor {
+public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Neo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BatchNeo4jProcessor.class);
 
 	protected int addedLabels = 0;
 
@@ -64,7 +65,7 @@ public abstract class Neo4jProcessor {
 	private         BatchInserterIndex resources;
 	private         BatchInserterIndex resourcesWDataModel;
 	private         BatchInserterIndex resourceTypes;
-	private BatchInserterIndex		statementUUIDs;
+	private         BatchInserterIndex statementUUIDs;
 
 	private BatchInserterIndexProvider resourcesProvider;
 	private BatchInserterIndexProvider resourcesWDataModelProvider;
@@ -88,16 +89,16 @@ public abstract class Neo4jProcessor {
 	protected final DB        tempStatementHashesDB;
 	//protected final LongLongOpenHashMap tempStatementHashes;
 
-	protected final LongObjectOpenHashMap<String> nodeResourceMap;
+	protected final LongLongOpenHashMap nodeResourceMap;
 
-	public Neo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
+	public BatchNeo4jProcessor(final BatchInserter inserter) throws DMPGraphException {
 
 		this.inserter = inserter;
 
-		Neo4jProcessor.LOG.debug("start writing");
+		BatchNeo4jProcessor.LOG.debug("start writing");
 
 		bnodes = new ObjectLongOpenHashMap<>();
-		nodeResourceMap = new LongObjectOpenHashMap<>();
+		nodeResourceMap = new LongLongOpenHashMap();
 
 		tempResourcesIndex = new ObjectLongOpenHashMap<>();
 		tempResourcesWDataModelIndex = new ObjectLongOpenHashMap<>();
@@ -117,7 +118,7 @@ public abstract class Neo4jProcessor {
 
 	protected void pumpNFlushNClearIndices() {
 
-		Neo4jProcessor.LOG.debug("start pumping indices");
+		BatchNeo4jProcessor.LOG.debug("start pumping indices");
 
 		copyNFlushNClearIndex(tempResourcesIndex, resources, GraphStatics.URI, GraphIndexStatics.RESOURCES_INDEX_NAME);
 		copyNFlushNClearIndex(tempResourcesWDataModelIndex, resourcesWDataModel, GraphStatics.URI_W_DATA_MODEL,
@@ -126,28 +127,28 @@ public abstract class Neo4jProcessor {
 		copyNFlushNClearLongIndex(tempStatementHashes, tempStatementHashesDB, statementHashes, GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME,
 				statementHashesDB);
 
-		Neo4jProcessor.LOG.debug("finished pumping indices");
+		BatchNeo4jProcessor.LOG.debug("finished pumping indices");
 
-		Neo4jProcessor.LOG.debug("start shutting down indices");
+		BatchNeo4jProcessor.LOG.debug("start shutting down indices");
 
 		resourcesProvider.shutdown();
 		resourcesWDataModelProvider.shutdown();
 		resourceTypesProvider.shutdown();
 		valuesProvider.shutdown();
 
-		Neo4jProcessor.LOG.debug("finished shutting down indices");
+		BatchNeo4jProcessor.LOG.debug("finished shutting down indices");
 	}
 
 	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex,
 			final String indexProperty, final String indexName) {
 
-		Neo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
+		BatchNeo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
 
 		final Object[] keys = tempIndex.keys;
 		final long[] values = tempIndex.values;
 		final boolean[] states = tempIndex.allocated;
 
-		Neo4jProcessor.LOG.debug("keys size = '{}' :: values size = '{}' :: states size = '{}'", keys.length, values.length, states.length);
+		BatchNeo4jProcessor.LOG.debug("keys size = '{}' :: values size = '{}' :: states size = '{}'", keys.length, values.length, states.length);
 
 		int j = 0;
 		long tick = System.currentTimeMillis();
@@ -169,27 +170,27 @@ public abstract class Neo4jProcessor {
 					sinceLast = j;
 					final double duration = (double) entryDelta / timeDelta;
 
-					Neo4jProcessor.LOG.debug("wrote '{}' entries @ ~{} entries/second.", j, duration);
+					BatchNeo4jProcessor.LOG.debug("wrote '{}' entries @ ~{} entries/second.", j, duration);
 
 					tick = System.currentTimeMillis();
 				}
 			}
 		}
 
-		Neo4jProcessor.LOG.debug("finished pumping '{}' index; wrote '{}' entries", indexName, j);
+		BatchNeo4jProcessor.LOG.debug("finished pumping '{}' index; wrote '{}' entries", indexName, j);
 
-		Neo4jProcessor.LOG.debug("start flushing and clearing index");
+		BatchNeo4jProcessor.LOG.debug("start flushing and clearing index");
 
 		neo4jIndex.flush();
 		tempIndex.clear();
 
-		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
+		BatchNeo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
 	private void copyNFlushNClearLongIndex(final Set<Long> tempIndex, final DB inMemoryDB, final Set<Long> persistentIndex, final String indexName,
 			final DB persistentDB) {
 
-		Neo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
+		BatchNeo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
 
 		int j = 0;
 		long tick = System.currentTimeMillis();
@@ -209,15 +210,15 @@ public abstract class Neo4jProcessor {
 				sinceLast = j;
 				final double duration = (double) entryDelta / timeDelta;
 
-				Neo4jProcessor.LOG.debug("wrote '{}' entries @ ~{} entries/second.", j, duration);
+				BatchNeo4jProcessor.LOG.debug("wrote '{}' entries @ ~{} entries/second.", j, duration);
 
 				tick = System.currentTimeMillis();
 			}
 		}
 
-		Neo4jProcessor.LOG.debug("finished pumping index '{}' index; wrote '{}' entries", indexName, tempIndex.size());
+		BatchNeo4jProcessor.LOG.debug("finished pumping index '{}' index; wrote '{}' entries", indexName, tempIndex.size());
 
-		Neo4jProcessor.LOG.debug("start flushing and clearing index");
+		BatchNeo4jProcessor.LOG.debug("start flushing and clearing index");
 
 		//persistentIndex.flush();
 		tempIndex.clear();
@@ -226,7 +227,7 @@ public abstract class Neo4jProcessor {
 		persistentDB.commit();
 		persistentDB.close();
 
-		Neo4jProcessor.LOG.debug("finished flushing and clearing index");
+		BatchNeo4jProcessor.LOG.debug("finished flushing and clearing index");
 	}
 
 	protected void initValueIndex() throws DMPGraphException {
@@ -241,8 +242,8 @@ public abstract class Neo4jProcessor {
 
 			final String message = "couldn't load indices successfully";
 
-			Neo4jProcessor.LOG.error(message, e);
-			Neo4jProcessor.LOG.debug("couldn't finish writing successfully");
+			BatchNeo4jProcessor.LOG.error(message, e);
+			BatchNeo4jProcessor.LOG.debug("couldn't finish writing successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -259,8 +260,8 @@ public abstract class Neo4jProcessor {
 
 			final String message = "couldn't load indices successfully";
 
-			Neo4jProcessor.LOG.error(message, e);
-			Neo4jProcessor.LOG.debug("couldn't finish write TX successfully");
+			BatchNeo4jProcessor.LOG.error(message, e);
+			BatchNeo4jProcessor.LOG.debug("couldn't finish write TX successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -290,8 +291,8 @@ public abstract class Neo4jProcessor {
 
 			final String message = "couldn't load indices successfully";
 
-			Neo4jProcessor.LOG.error(message, e);
-			Neo4jProcessor.LOG.debug("couldn't load indices successfully");
+			BatchNeo4jProcessor.LOG.error(message, e);
+			BatchNeo4jProcessor.LOG.debug("couldn't load indices successfully");
 
 			throw new DMPGraphException(message);
 		}
@@ -379,7 +380,7 @@ public abstract class Neo4jProcessor {
 
 	public void flushIndices() throws DMPGraphException {
 
-		Neo4jProcessor.LOG.debug("start flushing indices");
+		BatchNeo4jProcessor.LOG.debug("start flushing indices");
 
 		if (resources == null) {
 
@@ -390,7 +391,7 @@ public abstract class Neo4jProcessor {
 		flushStatementIndices();
 		clearTempIndices();
 
-		Neo4jProcessor.LOG.debug("finished flushing indices");
+		BatchNeo4jProcessor.LOG.debug("finished flushing indices");
 	}
 
 	public void flushStatementIndices() {
@@ -461,39 +462,39 @@ public abstract class Neo4jProcessor {
 		return getNodeIdFromBNodesIndex(optionalResourceId.get());
 	}
 
-	public Optional<String> determineResourceUri(final long subjectNodeId, final Optional<NodeType> optionalSubjectNodeType,
-			final Optional<String> optionalSubjectURI, final Optional<String> optionalResourceURI) {
+	public Optional<Long> determineResourceHash(final long subjectNodeId, final Optional<NodeType> optionalSubjectNodeType,
+			final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
-		final Optional<String> optionalResourceUri;
+		final Optional<Long> finalOptionalResourceHash;
 
 		if (nodeResourceMap.containsKey(subjectNodeId)) {
 
-			optionalResourceUri = Optional.of(nodeResourceMap.lget());
+			finalOptionalResourceHash = Optional.of(nodeResourceMap.lget());
 		} else {
 
-			optionalResourceUri = determineResourceUri(optionalSubjectNodeType, optionalSubjectURI, optionalResourceURI);
+			finalOptionalResourceHash = determineResourceHash(optionalSubjectNodeType, optionalSubjectHash, optionalResourceHash);
 
-			if (optionalResourceUri.isPresent()) {
+			if (finalOptionalResourceHash.isPresent()) {
 
-				nodeResourceMap.put(subjectNodeId, optionalResourceUri.get());
+				nodeResourceMap.put(subjectNodeId, finalOptionalResourceHash.get());
 			}
 		}
 
-		return optionalResourceUri;
+		return finalOptionalResourceHash;
 	}
 
-	public Optional<String> determineResourceUri(final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
-			final Optional<String> optionalResourceURI) {
+	public Optional<Long> determineResourceHash(final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash,
+			final Optional<Long> optionalResourceHash) {
 
-		final Optional<String> optionalResourceUri;
+		final Optional<Long> finalOptionalResourceHash;
 
 		if (optionalSubjectNodeType.isPresent()
 				&& (NodeType.Resource == optionalSubjectNodeType.get() || NodeType.TypeResource == optionalSubjectNodeType.get())) {
 
-			optionalResourceUri = optionalSubjectURI;
-		} else if (optionalResourceURI.isPresent()) {
+			finalOptionalResourceHash = optionalSubjectHash;
+		} else if (optionalResourceHash.isPresent()) {
 
-			optionalResourceUri = optionalResourceURI;
+			finalOptionalResourceHash = optionalResourceHash;
 		} else {
 
 			// shouldn't never be the case
@@ -501,7 +502,7 @@ public abstract class Neo4jProcessor {
 			return Optional.absent();
 		}
 
-		return optionalResourceUri;
+		return finalOptionalResourceHash;
 	}
 
 	public void addLabel(final long nodeId, final String labelString) {
@@ -585,7 +586,7 @@ public abstract class Neo4jProcessor {
 
 			final String message = "cannot generate statement hash, because the subject node type or object node type or subject identifier or object identifier is not present";
 
-			Neo4jProcessor.LOG.error(message);
+			BatchNeo4jProcessor.LOG.error(message);
 
 			throw new DMPGraphException(message);
 		}
@@ -595,7 +596,7 @@ public abstract class Neo4jProcessor {
 
 		final String hashString = putSaltToStatementHash(simpleHashString);
 
-		return SipHash.digest(HashUtils.SPEC_KEY, hashString.getBytes(Charsets.UTF_8));
+		return HashUtils.generateHash(hashString);
 	}
 
 	public Optional<String> getIdentifier(final long nodeId, final Optional<NodeType> optionalNodeType) {
@@ -653,6 +654,16 @@ public abstract class Neo4jProcessor {
 			final Optional<String> optionalDataModelURI);
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
+
+	@Override public String createPrefixedURI(String fullURI) throws DMPGraphException {
+
+		// TODO:
+
+		return null;
+	}
+
+	@Override
+	public abstract long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI);
 
 	protected abstract String putSaltToStatementHash(final String hash);
 

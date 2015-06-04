@@ -19,12 +19,15 @@ package org.dswarm.graph.resources;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -33,8 +36,14 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.io.Resources;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Result;
@@ -48,8 +57,15 @@ import org.slf4j.LoggerFactory;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
+import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.index.MapDBUtils;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.index.SchemaIndexUtils;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
+import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
  * @author tgaengler
@@ -59,12 +75,15 @@ public class MaintainResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MaintainResource.class);
 
+	private static final String PERSISTENT_GRAPH_DATABASE_IDENTIFIER = "persistent graph database";
+
 	private static final long chunkSize = 50000;
 
 	// TODO: maybe divide this into 2 queries and without OPTIONAL
 	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
-	private static final JsonFactory jsonFactory = new JsonFactory();
+	private static final JsonFactory  jsonFactory  = new JsonFactory();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	public MaintainResource() {
 
@@ -113,7 +132,7 @@ public class MaintainResource {
 		MaintainResource.LOG.debug("finished cleaning up the db");
 
 		final StringWriter out = new StringWriter();
-		JsonGenerator generator = jsonFactory.createGenerator(out);
+		final JsonGenerator generator = jsonFactory.createGenerator(out);
 
 		generator.writeStartObject();
 		generator.writeNumberField("deleted", deleted);
@@ -121,7 +140,23 @@ public class MaintainResource {
 		generator.flush();
 		generator.close();
 
-		return Response.ok(out.toString(), MediaType.APPLICATION_JSON_TYPE).build();
+		final String result = out.toString();
+
+		out.flush();
+		out.close();
+
+		return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+	}
+
+	@POST
+	@Path("/schemaindices")
+	public Response createSchemaIndices(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		SchemaIndexUtils.createSchemaIndices(database, PERSISTENT_GRAPH_DATABASE_IDENTIFIER);
+
+		initPrefixes(database);
+
+		return Response.ok().build();
 	}
 
 	private long deleteSomeStatements(final GraphDatabaseService database) throws DMPGraphException {
@@ -148,6 +183,7 @@ public class MaintainResource {
 					MaintainResource.LOG.debug("there are no more results for removal available, i.e. result is empty");
 
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -158,6 +194,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -170,6 +207,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -182,6 +220,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -194,6 +233,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -204,6 +244,7 @@ public class MaintainResource {
 
 					result.close();
 					tx.success();
+					tx.close();
 
 					break;
 				}
@@ -226,6 +267,7 @@ public class MaintainResource {
 
 				result.close();
 				tx.success();
+				tx.close();
 			} catch (final Exception e) {
 
 				final String message = "couldn't finish delete-all-entities TX successfully";
@@ -275,7 +317,7 @@ public class MaintainResource {
 
 			final DB mapDB = statementHashesMapDBIndexTuple.v2();
 
-			if(mapDB.exists(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME)) {
+			if (mapDB.exists(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME)) {
 
 				MaintainResource.LOG.debug("delete {} mapdb index", GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 
@@ -299,6 +341,7 @@ public class MaintainResource {
 			}
 
 			itx.success();
+			itx.close();
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish delete legacy indices TX successfully";
@@ -324,29 +367,33 @@ public class MaintainResource {
 				MaintainResource.LOG.debug("no schema available");
 
 				itx.success();
+				itx.close();
 
 				return;
 			}
 
-			Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
+			final Iterable<IndexDefinition> indexDefinitions = schema.getIndexes();
 
 			if (indexDefinitions == null) {
 
 				MaintainResource.LOG.debug("no schema indices available");
 
 				itx.success();
+				itx.close();
 
 				return;
 			}
 
 			for (final IndexDefinition indexDefinition : indexDefinitions) {
 
-				MaintainResource.LOG.debug("drop '{}' : '{}' schema index", indexDefinition.getLabel().name(), indexDefinition.getPropertyKeys().iterator().next());
+				MaintainResource.LOG.debug("drop '{}' : '{}' schema index", indexDefinition.getLabel().name(),
+						indexDefinition.getPropertyKeys().iterator().next());
 
 				indexDefinition.drop();
 			}
 
 			itx.success();
+			itx.close();
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish delete schema indices TX successfully";
@@ -365,5 +412,58 @@ public class MaintainResource {
 
 		// storeDir + File.separator + MapDBUtils.INDEX_DIR + name
 		return MapDBUtils.createOrGetPersistentLongIndexTreeSetGlobalTransactional(storeDir + File.separator + name, name);
+	}
+
+	private void initPrefixes(final GraphDatabaseService database) throws DMPGraphException {
+
+		MaintainResource.LOG.debug("start initialising namespaces index");
+
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		tx.ensureRunningTx();
+
+		try {
+
+			final URL prefixesFileURL = Resources.getResource("prefixes.json");
+			final String prefixesJSONString = Resources.toString(prefixesFileURL, Charsets.UTF_8);
+			final Map<String, String> prefixesNamespacesMap = objectMapper
+					.readValue(prefixesJSONString, new TypeReference<HashMap<String, String>>() {
+
+					});
+
+			for (final Map.Entry<String, String> entry : prefixesNamespacesMap.entrySet()) {
+
+				final String prefix = entry.getKey();
+				final String namespace = entry.getValue();
+
+				final Optional<Node> optionalPrefix = NamespaceUtils.getPrefix(namespace, database);
+
+				if (!optionalPrefix.isPresent()) {
+
+					namespaceIndex.addPrefix(namespace, prefix);
+				} else {
+
+					final String prefixFromDB = (String) optionalPrefix.get().getProperty(GraphProcessingStatics.PREFIX_PROPERTY);
+
+					MaintainResource.LOG
+							.debug("prefix '{}' is already available for namespace '{}', i.e., no further entry with prefix '{}' will be created",
+									prefixFromDB, namespace, prefix);
+				}
+			}
+
+			tx.succeedTx();
+		} catch (final Exception e) {
+
+			tx.failTx();
+
+			final String message = "couldn't initialize prefixes successfully";
+
+			LOG.error(message);
+
+			throw new DMPGraphException(message, e);
+		}
+
+		MaintainResource.LOG.debug("finished initialising namespaces index");
 	}
 }

@@ -60,7 +60,7 @@ public abstract class MaintainResourceDeleteTest extends RDFExportTest {
 
 		Assert.assertNotNull("response body shouldn't be null", body);
 
-		Assert.assertEquals("{\"deleted\":10404}", body);
+		Assert.assertEquals("{\"deleted\":7755}", body);
 
 		MaintainResourceDeleteTest.LOG.debug("finished delete test for maintain resource at " + dbType + " DB");
 	}

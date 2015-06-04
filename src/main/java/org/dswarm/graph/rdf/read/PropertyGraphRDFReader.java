@@ -19,6 +19,7 @@ package org.dswarm.graph.rdf.read;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -30,83 +31,96 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.read.NodeHandler;
 import org.dswarm.graph.read.RelationshipHandler;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
  */
 public class PropertyGraphRDFReader implements RDFReader {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(PropertyGraphRDFReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphRDFReader.class);
 
-	private final NodeHandler			nodeHandler;
-	private final NodeHandler			startNodeHandler;
-	private final RelationshipHandler	relationshipHandler;
+	private final NodeHandler         nodeHandler;
+	private final NodeHandler         startNodeHandler;
+	private final RelationshipHandler relationshipHandler;
 
-	private final String				recordClassUri;
-	private final String dataModelUri;
+	private final String prefixedRecordClassUri;
+	private final String prefixedDataModelUri;
 
 	private final GraphDatabaseService database;
+	private final TransactionHandler   tx;
+	private final NamespaceIndex       namespaceIndex;
 
 	private Model model;
 
-	public PropertyGraphRDFReader(final String recordClassUriArg, final String dataModelUriArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphRDFReader(final String prefixedRcordClassUriArg, final String prefixedDataModelUriArg, final GraphDatabaseService databaseArg,
+			final TransactionHandler txArg, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
-		recordClassUri = recordClassUriArg;
-		dataModelUri = dataModelUriArg;
+		prefixedRecordClassUri = prefixedRcordClassUriArg;
 		database = databaseArg;
+		tx = txArg;
+		namespaceIndex = namespaceIndexArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
+		prefixedDataModelUri = prefixedDataModelUriArg;
 	}
 
 	@Override
-	public Model read() throws DMPGraphException {
+	public Optional<Model> read() throws DMPGraphException {
 
-		try (final Transaction tx = database.beginTx()) {
+		tx.ensureRunningTx();
+
+		try {
 
 			LOG.debug("start read RDF TX");
 
-			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
+			final Label recordClassLabel = DynamicLabel.label(prefixedRecordClassUri);
 
-			final ResourceIterator<Node> recordNodes = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-					dataModelUri);
+			final ResourceIterator<Node> recordNodes = database.findNodes(
+					recordClassLabel,
+					GraphStatics.DATA_MODEL_PROPERTY,
+					prefixedDataModelUri);
 
 			if (recordNodes == null) {
 
-				tx.success();
+				tx.succeedTx();
 
-				return null;
+				return Optional.absent();
 			}
 
 			model = ModelFactory.createDefaultModel();
 
-			while(recordNodes.hasNext()) {
+			while (recordNodes.hasNext()) {
 
 				final Node recordNode = recordNodes.next();
-
 				startNodeHandler.handleNode(recordNode);
 			}
 
 			recordNodes.close();
-			tx.success();
+
+			tx.succeedTx();
 		} catch (final Exception e) {
 
 			final String message = "couldn't finish read RDF TX successfully";
 
+			tx.failTx();
+
 			LOG.error(message, e);
 
 			throw new DMPGraphException(message);
+
 		}
 
-		return model;
+		return Optional.of(model);
 	}
 
 	@Override
@@ -156,49 +170,51 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		final Map<Long, Resource>	bnodes		= new HashMap<>();
-		final Map<String, Resource>  resources     = new HashMap<>();
+		final Map<Long, Resource>   bnodes    = new HashMap<>();
+		final Map<String, Resource> resources = new HashMap<>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
-			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(prefixedDataModelUri)) {
 
-				// TODO: utilise __NODETYPE__ property for switch
+				// TODO: utilise node type for switch
 
-				final String subject = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
+				final String prefixedSubjectURI = (String) rel.getStartNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
 				final Resource subjectResource;
 
-				if (subject == null) {
+				if (prefixedSubjectURI == null) {
 
-					// subject is a bnode
+					// prefixedSubjectURI is a bnode
 
 					final long subjectId = rel.getStartNode().getId();
 					subjectResource = createResourceFromBNode(subjectId);
 				} else {
 
-					subjectResource = createResourceFromURI(subject);
+					final String fullObjectUri = namespaceIndex.createFullURI(prefixedSubjectURI);
+					subjectResource = createResourceFromURI(fullObjectUri);
 				}
 
-				final String predicate = rel.getType().name();
+				final String prefixedPredicateURI = rel.getType().name();
+				final String predicateURI = namespaceIndex.createFullURI(prefixedPredicateURI);
 				//.getProperty(GraphStatics.URI_PROPERTY, null);
-				final Property predicateProperty = model.createProperty(predicate);
+				final Property predicate = model.createProperty(predicateURI);
 
 				final String object;
 
-				final String objectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
+				final String prefixedObjectURI = (String) rel.getEndNode().getProperty(GraphStatics.URI_PROPERTY, null);
 
 				final Resource objectResource;
 
-				// TODO: utilise __NODETYPE__ property for switch
+				// TODO: utilise node type for switch
 
-				if (objectURI != null) {
+				if (prefixedObjectURI != null) {
 
 					// object is a resource
 
-					object = objectURI;
-					objectResource = createResourceFromURI(object);
+					final String fullResourceUri = namespaceIndex.createFullURI(prefixedObjectURI);
+					objectResource = createResourceFromURI(fullResourceUri);
 				} else {
 
 					// check, whether object is a bnode
@@ -217,13 +233,13 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 						object = (String) rel.getEndNode().getProperty(GraphStatics.VALUE_PROPERTY, null);
 
-						model.add(subjectResource, predicateProperty, object);
+						model.add(subjectResource, predicate, object);
 
 						return;
 					}
 				}
 
-				model.add(subjectResource, predicateProperty, objectResource);
+				model.add(subjectResource, predicate, objectResource);
 
 				// continue traversal with object node
 				nodeHandler.handleNode(rel.getEndNode());
@@ -242,7 +258,7 @@ public class PropertyGraphRDFReader implements RDFReader {
 
 		private Resource createResourceFromURI(final String uri) {
 
-			if (!resources.containsKey(uri)) {
+			if (!resources.containsKey(uri)) { // TODO: name space prefixing
 
 				resources.put(uri, model.createResource(uri));
 			}

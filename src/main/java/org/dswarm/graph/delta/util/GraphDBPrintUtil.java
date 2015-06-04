@@ -19,13 +19,7 @@ package org.dswarm.graph.delta.util;
 import java.io.File;
 import java.net.URL;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.DeltaStatics;
-import org.dswarm.graph.model.GraphStatics;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -33,21 +27,27 @@ import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.Traversal;
+import org.neo4j.graphdb.traversal.Paths;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.DeltaStatics;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.utils.GraphUtils;
 
 /**
  * @author tgaengler
  */
 public final class GraphDBPrintUtil {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(GraphDBPrintUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GraphDBPrintUtil.class);
 
 	public static void printRelationships(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -80,7 +80,7 @@ public final class GraphDBPrintUtil {
 
 	public static void printDeltaRelationships(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -104,7 +104,7 @@ public final class GraphDBPrintUtil {
 
 	public static void writeDeltaRelationships(final GraphDatabaseService graphDB, final URL fileURL) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Relationship> relationships = GlobalGraphOperations.at(graphDB).getAllRelationships();
 
@@ -133,7 +133,7 @@ public final class GraphDBPrintUtil {
 
 	public static void printNodes(final GraphDatabaseService graphDB) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Node> nodes = GlobalGraphOperations.at(graphDB).getAllNodes();
 
@@ -167,7 +167,7 @@ public final class GraphDBPrintUtil {
 		}
 	}
 
-	public static String printDeltaRelationship(final Relationship relationship) {
+	public static String printDeltaRelationship(final Relationship relationship) throws DMPGraphException {
 
 		final Long index = (Long) relationship.getProperty(GraphStatics.INDEX_PROPERTY, null);
 		final String startNodeString = printNode(relationship.getStartNode());
@@ -181,10 +181,9 @@ public final class GraphDBPrintUtil {
 		return sb.toString();
 	}
 
-	public static String printNode(final Node node) {
+	public static String printNode(final Node node) throws DMPGraphException {
 
-		final String nodeTypeString = (String) node.getProperty(GraphStatics.NODETYPE_PROPERTY, null);
-		final NodeType nodeType = NodeType.getByName(nodeTypeString);
+		final NodeType nodeType = GraphUtils.determineNodeType(node);
 		final StringBuilder sb = new StringBuilder();
 		sb.append("(").append(node.getId()).append(":type='").append(nodeType).append("',");
 
@@ -272,7 +271,7 @@ public final class GraphDBPrintUtil {
 
 	public static void printPaths(final GraphDatabaseService graphDB, final String resourceURI) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
 			printPaths(paths);
@@ -295,11 +294,11 @@ public final class GraphDBPrintUtil {
 	 */
 	public static void printPaths(final Iterable<Path> paths) {
 
-		final Traversal.PathDescriptor<Path> pathPrinter = new PathPrinter();
+		final Paths.PathDescriptor<Path> pathPrinter = new PathPrinter();
 
 		for (final Path path : paths) {
 
-			final String pathString = Traversal.pathToString(path, pathPrinter);
+			final String pathString = Paths.pathToString(path, pathPrinter);
 
 			System.out.println(pathString);
 		}
@@ -307,7 +306,7 @@ public final class GraphDBPrintUtil {
 
 	public static void printEntityPaths(final GraphDatabaseService graphDB, final long nodeId) throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> paths = GraphDBUtil.getEntityPaths(graphDB, nodeId);
 			printPaths(paths);

@@ -23,5 +23,5 @@ import org.dswarm.graph.json.Statement;
 
 public interface GDMSubGraphWorker {
 
-	public Map<String, Statement> work() throws DMPGraphException;
+	Map<Long, Statement> work() throws DMPGraphException;
 }

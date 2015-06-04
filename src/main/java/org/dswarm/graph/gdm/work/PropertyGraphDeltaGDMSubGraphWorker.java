@@ -30,6 +30,7 @@ import org.dswarm.graph.NodeType;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.DeltaStatics;
 import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.Predicate;
 import org.dswarm.graph.json.ResourceNode;
@@ -60,40 +61,43 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 	private final NodeHandler					startNodeHandler;
 	private final SubGraphRelationshipHandler	relationshipHandler;
 
-	private final String						resourceURI;
-	private final DeltaState					deltaState;
+	private final String     prefixedResourceURI;
+	private final DeltaState deltaState;
 
-	private final GraphDatabaseService			database;
+	private final GraphDatabaseService database;
+	private final NamespaceIndex namespaceIndex;
 
-	private final Map<String, Statement>			currentSubGraphs	= new LinkedHashMap<>();
-	private final List<Path> subGraphPaths = new ArrayList<>();
+	private final Map<Long, Statement> currentSubGraphs = new LinkedHashMap<>();
+	private final List<Path>             subGraphPaths    = new ArrayList<>();
 
-	final Map<Long, org.dswarm.graph.json.Node>	bnodes			= new HashMap<Long, org.dswarm.graph.json.Node>();
-	final Map<String, ResourceNode>				resourceNodes	= new HashMap<String, ResourceNode>();
-	final Map<String, Predicate> predicates = new HashMap<>();
+	final Map<Long, org.dswarm.graph.json.Node> bnodes        = new HashMap<>();
+	final Map<String, ResourceNode>             resourceNodes = new HashMap<>();
+	final Map<String, Predicate>                predicates    = new HashMap<>();
 
-	public PropertyGraphDeltaGDMSubGraphWorker(final String resourceURIArg, final DeltaState deltaStateArg, final GraphDatabaseService databaseArg) {
+	public PropertyGraphDeltaGDMSubGraphWorker(final String prefixedResourceURIArg, final DeltaState deltaStateArg,
+			final GraphDatabaseService databaseArg, final NamespaceIndex namespaceIndexArg) {
 
-		resourceURI = resourceURIArg;
+		prefixedResourceURI = prefixedResourceURIArg;
 		deltaState = deltaStateArg;
 		database = databaseArg;
+		namespaceIndex = namespaceIndexArg;
 		nodeHandler = new CBDNodeHandler();
 		startNodeHandler = new CBDStartNodeHandler();
 		relationshipHandler = new CBDRelationshipHandler();
 	}
 
 	@Override
-	public Map<String, Statement> work() throws DMPGraphException {
+	public Map<Long, Statement> work() throws DMPGraphException {
 
-		try(final Transaction tx = database.beginTx()) {
+		try (final Transaction tx = database.beginTx()) {
 
 			PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("start delta GDM TX");
 
-			final Node recordNode = GraphDBUtil.getResourceNode(database, resourceURI);
+			final Node recordNode = GraphDBUtil.getResourceNode(database, prefixedResourceURI);
 
 			if (recordNode == null) {
 
-				PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("couldn't find record for resource '" + resourceURI + "'");
+				PropertyGraphDeltaGDMSubGraphWorker.LOG.debug("couldn't find record for resource '{}'", prefixedResourceURI);
 
 				tx.success();
 
@@ -109,18 +113,18 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 			// convert paths to statement collections
 			for (final Path subGraphPath : subGraphPaths) {
 
-				String stmtIdentifier = null;
+				Long stmtIdentifier = null;
 
-				if(deltaState.equals(DeltaState.MODIFICATION)) {
+				if (deltaState.equals(DeltaState.MODIFICATION)) {
 
-					stmtIdentifier = Long.valueOf(subGraphPath.endNode().getId()).toString();
+					stmtIdentifier = subGraphPath.endNode().getId();
 				}
 
 				for (final Relationship rel : subGraphPath.relationships()) {
 
-					if(!deltaState.equals(DeltaState.MODIFICATION)) {
+					if (!deltaState.equals(DeltaState.MODIFICATION)) {
 
-						stmtIdentifier = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+						stmtIdentifier = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 					}
 
 					if (currentSubGraphs.containsKey(stmtIdentifier)) {
@@ -129,21 +133,23 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 					}
 
 					final org.dswarm.graph.json.Node subject = getNode(rel.getStartNode());
-					final Predicate predicate = getPredicate(rel.getType().name());
+					final String prefixedPredicateURI = rel.getType().name();
+					final String fullPredicateURI = namespaceIndex.createFullURI(prefixedPredicateURI);
+					final Predicate predicate = getPredicate(fullPredicateURI);
 					final org.dswarm.graph.json.Node object = getNode(rel.getEndNode());
 					final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
-					final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+					final Long uuid = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 
 					final Statement statement = new Statement(subject, predicate, object);
 
-					if(order != null) {
+					if (order != null) {
 
 						statement.setOrder(order);
 					}
 
-					if(uuid != null) {
+					if (uuid != null) {
 
-						statement.setUUID(uuid);
+						statement.setUUID(uuid.toString());
 					}
 
 					currentSubGraphs.put(stmtIdentifier, statement);
@@ -186,8 +192,8 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 			case Resource:
 			case TypeResource:
-				final String uri = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
-				gdmNode = createResourceFromURI(id, uri);
+				final String prefixedURI = (String) node.getProperty(GraphStatics.URI_PROPERTY, null);
+				gdmNode = createResourceFromURI(id, prefixedURI);
 
 				break;
 			case BNode:
@@ -220,14 +226,16 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 		return bnodes.get(bnodeId);
 	}
 
-	private ResourceNode createResourceFromURI(final long id, final String uri) {
+	private ResourceNode createResourceFromURI(final long id, final String prefixedURI) throws DMPGraphException {
 
-		if (!resourceNodes.containsKey(uri)) {
+		if (!resourceNodes.containsKey(prefixedURI)) {
 
-			resourceNodes.put(uri, new ResourceNode(id, uri));
+			final String fullURI = namespaceIndex.createFullURI(prefixedURI);
+
+			resourceNodes.put(prefixedURI, new ResourceNode(id, fullURI));
 		}
 
-		return resourceNodes.get(uri);
+		return resourceNodes.get(prefixedURI);
 	}
 
 	private class CBDNodeHandler implements SubGraphNodeHandler {
@@ -307,7 +315,7 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 			if (deltaStateString == null) {
 
-				throw new DMPGraphException("statement " + rel.getId() + " should have a delta state");
+				throw new DMPGraphException(String.format("statement %d should have a delta state",  rel.getId()));
 			}
 
 			final DeltaState currentDeltaState = DeltaState.getByName(deltaStateString);
@@ -348,7 +356,9 @@ public class PropertyGraphDeltaGDMSubGraphWorker implements GDMSubGraphWorker {
 
 		public DeltaPath(final Map<Long, Relationship> relsArg) {
 
-			startNode = Iterables.getFirst(relsArg.values(), null).getStartNode();
+			final Relationship first = Iterables.getFirst(relsArg.values(), null);
+
+			startNode = first.getStartNode();
 			rels = relsArg;
 		}
 

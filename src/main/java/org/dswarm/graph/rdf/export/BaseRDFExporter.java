@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.common.rdf.utils.RDFUtils;
 import org.dswarm.graph.read.RelationshipHandler;
@@ -50,6 +51,8 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 	protected final GraphDatabaseService database;
 
+	private final NamespaceIndex namespaceIndex;
+
 	protected Dataset dataset;
 
 	private long processedStatements = 0;
@@ -58,9 +61,11 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 	protected static final int JENA_MODEL_WARNING_SIZE = 1000000;
 
-	public BaseRDFExporter(final GraphDatabaseService databaseArg) {
+	// TODO: TransactionHandler
+	public BaseRDFExporter(final GraphDatabaseService databaseArg, final NamespaceIndex namespaceIndexArg) {
 
 		database = databaseArg;
+		namespaceIndex = namespaceIndexArg;
 		relationshipHandler = new CBDRelationshipHandler();
 	}
 
@@ -74,8 +79,8 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 		// TODO: maybe a hash map is not appropriated for bigger exports
 
-		final Map<Long, Resource>   bnodes    = new HashMap<Long, Resource>();
-		final Map<String, Resource> resources = new HashMap<String, Resource>();
+		final Map<Long, Resource>   bnodes    = new HashMap<>();
+		final Map<String, Resource> resources = new HashMap<>();
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
@@ -84,17 +89,18 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 			// data model
 
-			final String dataModelURI = (String) rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
+			final String prefixedDataModelURI = (String) rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY, null);
 
-			if (dataModelURI == null) {
+			if (prefixedDataModelURI == null) {
 
-				final String message = "data model URI can't be null (relationship id = '" + rel.getId() + "'";
+				final String message = String.format("data model URI can't be null (relationship id = '%s')", rel.getId());
 
 				BaseRDFExporter.LOG.error(message);
 
 				throw new DMPGraphException(message);
 			}
 
+			final String dataModelURI = namespaceIndex.createFullURI(prefixedDataModelURI);
 			final Model model;
 
 			if (dataset.containsNamedModel(dataModelURI)) {
@@ -109,7 +115,7 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 			if (model == null) {
 
-				final String message = "RDF model for graph '" + dataModelURI + "' can't be null (relationship id = '" + rel.getId() + "'";
+				final String message = String.format("RDF model for graph '%s' ('%s') can't be null (relationship id = '%s')", dataModelURI, prefixedDataModelURI, rel.getId());
 
 				BaseRDFExporter.LOG.error(message);
 
@@ -128,9 +134,9 @@ public abstract class BaseRDFExporter implements RDFExporter {
 				case Resource:
 				case TypeResource:
 
-					final String subjectURI = (String) subjectNode.getProperty(GraphStatics.URI_PROPERTY, null);
+					final String prefixedSubjectURI = (String) subjectNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
-					if (subjectURI == null) {
+					if (prefixedSubjectURI == null) {
 
 						final String message = "subject URI can't be null";
 
@@ -139,7 +145,8 @@ public abstract class BaseRDFExporter implements RDFExporter {
 						throw new DMPGraphException(message);
 					}
 
-					subjectResource = createResourceFromURI(subjectURI, model);
+					final String fullSubjectURI = namespaceIndex.createFullURI(prefixedSubjectURI);
+					subjectResource = createResourceFromURI(fullSubjectURI, model);
 
 					break;
 				case BNode:
@@ -158,11 +165,12 @@ public abstract class BaseRDFExporter implements RDFExporter {
 					throw new DMPGraphException(message);
 			}
 
-			// predicate
+			// predicateURI
 
-			final String predicate = rel.getType().name();
-					//.getProperty(GraphStatics.URI_PROPERTY, null);
-			final Property predicateProperty = model.createProperty(predicate);
+			final String prefixedPredicate = rel.getType().name();
+			final String predicateURI = namespaceIndex.createFullURI(prefixedPredicate);
+			//.getProperty(GraphStatics.URI_PROPERTY, null);
+			final Property predicate = model.createProperty(predicateURI);
 
 			// object
 
@@ -176,9 +184,9 @@ public abstract class BaseRDFExporter implements RDFExporter {
 				case Resource:
 				case TypeResource:
 
-					final String objectURI = (String) objectNode.getProperty(GraphStatics.URI_PROPERTY, null);
+					final String prefixedObjectURI = (String) objectNode.getProperty(GraphStatics.URI_PROPERTY, null);
 
-					if (objectURI == null) {
+					if (prefixedObjectURI == null) {
 
 						final String message = "object URI can't be null";
 
@@ -186,8 +194,8 @@ public abstract class BaseRDFExporter implements RDFExporter {
 
 						throw new DMPGraphException(message);
 					}
-
-					objectRDFNode = createResourceFromURI(objectURI, model);
+					final String fullObjectURI = namespaceIndex.createFullURI(prefixedObjectURI);
+					objectRDFNode = createResourceFromURI(fullObjectURI, model);
 
 					break;
 				case BNode:
@@ -200,8 +208,7 @@ public abstract class BaseRDFExporter implements RDFExporter {
 					break;
 				case Literal:
 
-					final Node endNode = objectNode;
-					final String object = (String) endNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
+					final String object = (String) objectNode.getProperty(GraphStatics.VALUE_PROPERTY, null);
 
 					if (object == null) {
 
@@ -212,9 +219,9 @@ public abstract class BaseRDFExporter implements RDFExporter {
 						throw new DMPGraphException(message);
 					}
 
-					if (endNode.hasProperty(GraphStatics.DATATYPE_PROPERTY)) {
+					if (objectNode.hasProperty(GraphStatics.DATATYPE_PROPERTY)) {
 
-						final String literalType = (String) endNode.getProperty(GraphStatics.DATATYPE_PROPERTY, null);
+						final String literalType = (String) objectNode.getProperty(GraphStatics.DATATYPE_PROPERTY, null);
 
 						if (literalType != null) {
 
@@ -233,24 +240,23 @@ public abstract class BaseRDFExporter implements RDFExporter {
 					break;
 				default:
 
-					final String message = "unknown node type " + objectNodeType.getName() + " for object node";
+					final String message = String.format("unknown node type %s for object node", objectNodeType.getName());
 
 					BaseRDFExporter.LOG.error(message);
 
 					throw new DMPGraphException(message);
 			}
 
-			if (subjectResource == null || predicateProperty == null || objectRDFNode == null) {
+			if (subjectResource == null || predicate == null || objectRDFNode == null) {
 
-				final String message = "couldn't determine the complete statement (subject-predicate-object + data model) for relationship '"
-						+ rel.getId() + "'";
+				final String message = String.format("couldn't determine the complete statement (subject-predicateURI-object + data model) for relationship '%s'", rel.getId());
 
 				BaseRDFExporter.LOG.error(message);
 
 				throw new DMPGraphException(message);
 			}
 
-			model.add(subjectResource, predicateProperty, objectRDFNode);
+			model.add(subjectResource, predicate, objectRDFNode);
 
 			successfullyProcessedStatements++;
 		}

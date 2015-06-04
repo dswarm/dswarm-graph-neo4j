@@ -16,29 +16,36 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Predicate;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.Statement;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.read.NodeHandler;
-import org.dswarm.graph.read.RelationshipHandler;
-import org.dswarm.graph.versioning.Range;
-import org.dswarm.graph.versioning.VersioningStatics;
-import org.dswarm.graph.versioning.utils.GraphVersionUtils;
-
+import com.google.common.base.Optional;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.json.Predicate;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.ResourceNode;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.read.NodeHandler;
+import org.dswarm.graph.read.RelationshipHandler;
+import org.dswarm.graph.tx.TransactionHandler;
+import org.dswarm.graph.versioning.Range;
+import org.dswarm.graph.versioning.VersioningStatics;
+import org.dswarm.graph.versioning.utils.GraphVersionUtils;
 
 /**
  * @author tgaengler
@@ -51,23 +58,33 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final NodeHandler         startNodeHandler;
 	protected final RelationshipHandler relationshipHandler;
 
-	protected final String  dataModelUri;
+	protected final String  prefixedDataModelUri;
 	protected       Integer version;
 
 	protected final GraphDatabaseService database;
+	protected final NamespaceIndex       namespaceIndex;
 
 	protected Resource currentResource;
-	protected final Map<Long, Statement> currentResourceStatements = new HashMap<>();
+	protected final Map<Long, List<Statement>> currentResourceStatements = new TreeMap<>();
 
-	protected Transaction tx = null;
+	protected final TransactionHandler tx;
 
 	protected final String type;
 
-	public PropertyGraphGDMReader(final String dataModelUriArg, final Optional<Integer> optionalVersionArg, final GraphDatabaseService databaseArg,
+	private final Set<Long> processedNodes = new HashSet<>();
+	private final Predicate rdfType        = new Predicate(RDF.type.getURI());
+
+	public PropertyGraphGDMReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService databaseArg,
+			final
+			TransactionHandler txArg,
+			final NamespaceIndex namespaceIndexArg,
 			final String typeArg) throws DMPGraphException {
 
-		dataModelUri = dataModelUriArg;
+		prefixedDataModelUri = prefixedDataModelUriArg;
 		database = databaseArg;
+		tx = txArg;
+		namespaceIndex = namespaceIndexArg;
 		type = typeArg;
 
 		if (optionalVersionArg.isPresent()) {
@@ -75,13 +92,13 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 			version = optionalVersionArg.get();
 		} else {
 
-			tx = database.beginTx();
+			tx.ensureRunningTx();
 
 			PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
 
 			try {
 
-				version = GraphVersionUtils.getLatestVersion(dataModelUri, database);
+				version = GraphVersionUtils.getLatestVersion(prefixedDataModelUri, database);
 			} catch (final Exception e) {
 
 				final String message = "couldn't retrieve latest version successfully";
@@ -89,8 +106,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 				PropertyGraphGDMReader.LOG.error(message, e);
 				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
 
-				tx.failure();
-				tx.close();
+				tx.failTx();
 
 				throw new DMPGraphException(message);
 			}
@@ -169,14 +185,14 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 	private class CBDRelationshipHandler implements RelationshipHandler {
 
-		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper();
+		private final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper = new PropertyGraphGDMReaderHelper(namespaceIndex);
 
 		@Override
 		public void handleRelationship(final Relationship rel) throws DMPGraphException {
 
 			// note: we can also optionally check for the "resource property at the relationship (this property will only be
 			// written right now for model that came as GDM JSON)
-			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(dataModelUri)) {
+			if (rel.getProperty(GraphStatics.DATA_MODEL_PROPERTY).equals(prefixedDataModelUri)) {
 
 				final long statementId = rel.getId();
 
@@ -188,7 +204,8 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 				// predicate
 
 				final String predicate = rel.getType().name();
-				final Predicate predicateProperty = new Predicate(predicate);
+				final String fullPredicateURI = namespaceIndex.createFullURI(predicate);
+				final Predicate predicateProperty = new Predicate(fullPredicateURI);
 
 				// object
 
@@ -197,7 +214,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				// qualified properties at relationship (statement)
 
-				final String uuid = (String) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
+				final Long uuid = (Long) rel.getProperty(GraphStatics.UUID_PROPERTY, null);
 				final Long order = (Long) rel.getProperty(GraphStatics.ORDER_PROPERTY, null);
 				final String confidence = (String) rel.getProperty(GraphStatics.CONFIDENCE_PROPERTY, null);
 				final String evidence = (String) rel.getProperty(GraphStatics.EVIDENCE_PROPERTY, null);
@@ -212,7 +229,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				if (uuid != null) {
 
-					statement.setUUID(uuid);
+					statement.setUUID(uuid.toString());
 				}
 
 				if (confidence != null) {
@@ -230,12 +247,26 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 				if (index != null) {
 
-					currentResourceStatements.put(index, statement);
+					optionallyAddRDFTypeStatement(subjectNode, subjectGDMNode, index);
+
+					addStatement(index, statement);
+
+					if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
+
+						optionallyAddRDFTypeStatement(objectNode, objectGDMNode, index);
+					}
 				} else {
 
 					// note maybe improve this here (however, this is the case for model that where written from RDF)
 
+					optionallyAddRDFTypeStatement(subjectNode, subjectGDMNode);
+
 					currentResource.addStatement(statement);
+
+					if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
+
+						optionallyAddRDFTypeStatement(objectNode, objectGDMNode);
+					}
 				}
 
 				if (!objectGDMNode.getType().equals(org.dswarm.graph.json.NodeType.Literal)) {
@@ -247,24 +278,66 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 		}
 	}
 
-	protected void ensureTx() throws DMPGraphException {
+	private void optionallyAddRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode, final long index) throws DMPGraphException {
 
-		if (tx == null) {
+		final long nodeId = node.getId();
 
-			try {
+		if (!processedNodes.contains(nodeId)) {
 
-				PropertyGraphGDMReader.LOG.debug("start read {} TX", type);
+			final Optional<Statement> optionalTypeStmt = createRDFTypeStatement(node, gdmNode);
 
-				tx = database.beginTx();
-			} catch (final Exception e) {
+			if (optionalTypeStmt.isPresent()) {
 
-				final String message = "couldn't acquire tx successfully";
+				final Statement typeStmt = optionalTypeStmt.get();
 
-				PropertyGraphGDMReader.LOG.error(message, e);
-				PropertyGraphGDMReader.LOG.debug("couldn't finish read {} TX successfully", type);
-
-				throw new DMPGraphException(message);
+				addStatement(index, typeStmt);
 			}
+
+			processedNodes.add(nodeId);
 		}
+	}
+
+	private void optionallyAddRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
+
+		final long nodeId = node.getId();
+
+		if (!processedNodes.contains(nodeId)) {
+
+			final Optional<Statement> optionalTypeStmt = createRDFTypeStatement(node, gdmNode);
+
+			if (optionalTypeStmt.isPresent()) {
+
+				final Statement typeStmt = optionalTypeStmt.get();
+
+				currentResource.addStatement(typeStmt);
+			}
+
+			processedNodes.add(nodeId);
+		}
+	}
+
+	private Optional<Statement> createRDFTypeStatement(final Node node, final org.dswarm.graph.json.Node gdmNode) throws DMPGraphException {
+
+		final Optional<String> optionalTypeLabel = GraphDBUtil.determineTypeLabel(node);
+
+		if (!optionalTypeLabel.isPresent()) {
+
+			return Optional.absent();
+		}
+		final String typeLabel = optionalTypeLabel.get();
+		final String fullTypeURI = namespaceIndex.createFullURI(typeLabel);
+		final org.dswarm.graph.json.Node typeNode = new ResourceNode(fullTypeURI);
+
+		return Optional.of(new Statement(gdmNode, rdfType, typeNode));
+	}
+
+	private void addStatement(final long index, final Statement statement) {
+
+		if (!currentResourceStatements.containsKey(index)) {
+
+			currentResourceStatements.put(index, new ArrayList<Statement>());
+		}
+
+		currentResourceStatements.get(index).add(statement);
 	}
 }

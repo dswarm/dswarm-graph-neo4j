@@ -16,56 +16,62 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import org.dswarm.common.model.AttributePath;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.util.GraphDBUtil;
-
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.tx.TransactionHandler;
+
 /**
  * @author tgaengler
  */
 public class PropertyGraphGDMResourceByIDReader extends PropertyGraphGDMResourceReader {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(PropertyGraphGDMResourceByIDReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMResourceByIDReader.class);
 
 	private static final String TYPE = "GDM record by ID";
 
-	private final String		recordId;
-	private String recordURI;
-	private final AttributePath	recordIdentifierAP;
+	private final String        recordId;
+	private       String        prefixedRecordURI;
+	private final AttributePath prefixedRecordIdentifierAP;
 
-	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath recordIdentifierAPArg, final String dataModelUri, final Optional<Integer> optionalVersionArg,
-			final GraphDatabaseService database) throws DMPGraphException {
+	public PropertyGraphGDMResourceByIDReader(final String recordIdArg, final AttributePath prefixedRecordIdentifierAPArg,
+			final String prefixedDataModelUri,
+			final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, TYPE);
+		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
 		recordId = recordIdArg;
-		recordIdentifierAP = recordIdentifierAPArg;
+		prefixedRecordIdentifierAP = prefixedRecordIdentifierAPArg;
 		determineRecordUri();
 	}
 
 	@Override
 	protected Node getResourceNode() throws DMPGraphException {
 
-		if (recordURI == null) {
+		if (prefixedRecordURI == null) {
 
 			LOG.debug("couldn't a find a resource node to start traversal");
 
 			return null;
 		}
 
-		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(recordURI, dataModelUri, Optional.of(version), database);
+		final PropertyGraphGDMResourceByURIReader uriReader = new PropertyGraphGDMResourceByURIReader(prefixedRecordURI, prefixedDataModelUri,
+				Optional.of(version),
+				database, tx, namespaceIndex);
 
 		return uriReader.getResourceNode();
 	}
 
 	private void determineRecordUri() throws DMPGraphException {
 
-		recordURI = GraphDBUtil.determineRecordUri(recordId, recordIdentifierAP, dataModelUri, database);
+		prefixedRecordURI = GraphDBUtil.determineRecordUri(recordId, prefixedRecordIdentifierAP, prefixedDataModelUri, database);
 	}
 }

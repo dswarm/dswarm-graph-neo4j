@@ -36,7 +36,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public class SubGraphLeafEntityMarker implements Marker<SubGraphLeafEntity> {
 
 	@Override public void markPaths(final Collection<SubGraphLeafEntity> subGraphLeafEntities, final DeltaState deltaState,
-			final GraphDatabaseService graphDB, final String resourceURI) throws DMPGraphException {
+			final GraphDatabaseService graphDB, final String prefixedResourceURI) throws DMPGraphException {
 
 		final Map<Long, Set<Long>> pathEndNodesIdsFromCSEntityMap = new HashMap<>();
 

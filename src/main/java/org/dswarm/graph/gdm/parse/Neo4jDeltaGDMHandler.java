@@ -16,16 +16,13 @@
  */
 package org.dswarm.graph.gdm.parse;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -41,8 +38,11 @@ import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.NodeType;
 import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.delta.util.GraphDBPrintUtil;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.LiteralNode;
 import org.dswarm.graph.json.ResourceNode;
 import org.dswarm.graph.json.Statement;
@@ -56,40 +56,40 @@ import org.dswarm.graph.parse.Neo4jHandler;
  */
 public class Neo4jDeltaGDMHandler implements GDMHandler {
 
-	private static final Logger			LOG					= LoggerFactory.getLogger(Neo4jDeltaGDMHandler.class);
+	private static final Logger LOG        = LoggerFactory.getLogger(Neo4jDeltaGDMHandler.class);
+	public static final  int    DELTA_SIZE = 50000;
+	public static final  int    DELTA_TIME = 30;
 
-	private int							totalTriples		= 0;
-	private int							addedNodes			= 0;
-	private int							addedLabels			= 0;
-	private int							addedRelationships	= 0;
-	private int							sinceLastCommit		= 0;
-	private int							i					= 0;
-	private int							literals			= 0;
+	private long totalTriples       = 0;
+	private int addedNodes         = 0;
+	private int addedLabels        = 0;
+	private int addedRelationships = 0;
+	private long sinceLastCommit    = 0;
+	private int i                  = 0;
+	private int literals           = 0;
 
-	private long						tick				= System.currentTimeMillis();
-	private final GraphDatabaseService	database;
-	private final Index<Node>			resources;
-	private final Index<Node>			resourceTypes;
-	private final Index<Node>			values;
-	private final Map<String, Node>		bnodes;
-	private final Index<Relationship>	statementHashes;
-	private final Index<Relationship>	statementUUIDs;
-	private final Map<Long, String>		nodeResourceMap;
+	private long tick = System.currentTimeMillis();
+	private final GraphDatabaseService database;
+	private final Map<String, Node>    bnodes;
+	private final Index<Relationship>  statementHashes;
+	private final Index<Relationship>  statementUUIDs;
+	private final Map<Long, Long>      nodeResourceMap;
+	private final NamespaceIndex namespaceIndex;
 
-	private Transaction					tx;
+	private Transaction tx;
 
-	public Neo4jDeltaGDMHandler(final GraphDatabaseService database) throws DMPGraphException {
+	public Neo4jDeltaGDMHandler(final GraphDatabaseService database, final NamespaceIndex namespaceIndexArg) throws DMPGraphException {
 
 		this.database = database;
+
+		namespaceIndex = namespaceIndexArg;
+
 		tx = database.beginTx();
 
 		try {
 
 			LOG.debug("start write TX");
 
-			resources = database.index().forNodes(GraphIndexStatics.RESOURCES_INDEX_NAME);
-			resourceTypes = database.index().forNodes(GraphIndexStatics.RESOURCE_TYPES_INDEX_NAME);
-			values = database.index().forNodes(GraphIndexStatics.VALUES_INDEX_NAME);
 			bnodes = new HashMap<>();
 			statementHashes = database.index().forRelationships(GraphIndexStatics.STATEMENT_HASHES_INDEX_NAME);
 			statementUUIDs = database.index().forRelationships(GraphIndexStatics.STATEMENT_UUIDS_INDEX_NAME);
@@ -109,13 +109,11 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 	}
 
 	@Override
-	public void handleStatement(final Statement st, final String resourceURI, final long index) throws DMPGraphException {
+	public void handleStatement(final Statement st, final long resourceHash, final long index) throws DMPGraphException {
 
 		// utilise r for the resource property
 
 		i++;
-
-		// System.out.println("handle statement " + i + ": " + st.toString());
 
 		try {
 
@@ -123,10 +121,11 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			final org.dswarm.graph.json.Predicate predicate = st.getPredicate();
 			final String predicateName = predicate.getUri();
+			final String prefixedPredicateURI = namespaceIndex.createPrefixedURI(predicateName);
 
 			final org.dswarm.graph.json.Node object = st.getObject();
 
-			final String statementUUID = st.getUUID();
+			final Long statementUUID = HashUtils.getUUID(st.getUUID());
 			final Long order = st.getOrder();
 
 			// Check index for subject
@@ -135,22 +134,22 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			if (subjectNode == null) {
 
-				subjectNode = database.createNode();
-
 				if (subject instanceof ResourceNode) {
 
-					final String subjectURI = ((ResourceNode) subject).getUri();
+					subjectNode = database.createNode(GraphProcessingStatics.RESOURCE_LABEL);
 
-					subjectNode.setProperty(GraphStatics.URI_PROPERTY, subjectURI);
-					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
-					resources.add(subjectNode, GraphStatics.URI, subjectURI);
+					final String subjectURI = ((ResourceNode) subject).getUri();
+					final String prefixedSubjectURI = namespaceIndex.createPrefixedURI(subjectURI);
+
+					subjectNode.setProperty(GraphStatics.URI_PROPERTY, prefixedSubjectURI);
 				} else {
 
 					// subject is a blank node
 
+					subjectNode = database.createNode(GraphProcessingStatics.BNODE_LABEL);
+
 					// note: can I expect an id here?
 					bnodes.put("" + subject.getId(), subjectNode);
-					subjectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
 				}
 
 				addedNodes++;
@@ -162,34 +161,42 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				final LiteralNode literal = (LiteralNode) object;
 				final String value = literal.getValue();
-				final Node objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL);
+				final Node objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL, GraphProcessingStatics.LITERAL_LABEL);
 				objectNode.setProperty(GraphStatics.VALUE_PROPERTY, value);
-				objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Literal.toString());
+				// not really needed, or? -since label is set
 				objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
-				values.add(objectNode, GraphStatics.VALUE, value);
 
-				final String resourceUri = addResourceProperty(subjectNode, subject, objectNode, resourceURI);
+				final long finalResourceHash = addResourceProperty(subjectNode, subject, objectNode, resourceHash);
 
 				addedNodes++;
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, resourceURI, statementUUID, order, index, subject.getType(),
-						object.getType());
+				addRelationship(subjectNode, prefixedPredicateURI, objectNode, Optional.of(finalResourceHash), subject, resourceHash, statementUUID, order,
+						index,
+						subject.getType(), object.getType());
 			} else { // must be Resource
-						// Make sure object exists
+				// Make sure object exists
 
 				boolean isType = false;
+
+				final Optional<String> optionalPrefixedObjectURI;
 
 				// add Label if this is a type entry
 				if (predicateName.equals(RDF.type.getURI())) {
 
-					addLabel(subjectNode, ((ResourceNode) object).getUri());
+					final String objectURI = ((ResourceNode) object).getUri();
+					optionalPrefixedObjectURI = Optional.of(namespaceIndex.createPrefixedURI(objectURI));
+
+					addLabel(subjectNode, optionalPrefixedObjectURI.get());
 
 					isType = true;
+				} else {
+
+					optionalPrefixedObjectURI = Optional.absent();
 				}
 
 				// Check index for object
 				Node objectNode = determineNode(object, isType);
-				String resourceUri = null;
+				Optional<Long> optionalResourceHash = Optional.absent();
 
 				if (objectNode == null) {
 
@@ -197,49 +204,57 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 						// object is a resource node
 
-						objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL);
+						objectNode = database.createNode(GraphProcessingStatics.LEAF_LABEL, GraphProcessingStatics.RESOURCE_LABEL);
+						// not really needed, or? -since label is set
 						objectNode.setProperty(GraphProcessingStatics.LEAF_IDENTIFIER, true);
 
-						final String objectURI = ((ResourceNode) object).getUri();
+						final String finalPrefixedObjectURI;
 
-						objectNode.setProperty(GraphStatics.URI_PROPERTY, objectURI);
+						if(optionalPrefixedObjectURI.isPresent()) {
 
-						if (!isType) {
-
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
+							finalPrefixedObjectURI = optionalPrefixedObjectURI.get();
 						} else {
 
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-							addLabel(objectNode, RDFS.Class.getURI());
-
-							resourceTypes.add(objectNode, GraphStatics.URI, objectURI);
+							final String objectURI = ((ResourceNode) object).getUri();
+							finalPrefixedObjectURI = namespaceIndex.createPrefixedURI(objectURI);
 						}
 
-						resources.add(objectNode, GraphStatics.URI, objectURI);
+						objectNode.setProperty(GraphStatics.URI_PROPERTY, finalPrefixedObjectURI);
+
+						if (isType) {
+
+							addLabel(objectNode, NodeType.TypeResource.toString());
+							addLabel(objectNode, namespaceIndex.getRDFCLASSPrefixedURI());
+						}
 					} else {
 
 						// object is a blank node
 
-						objectNode = database.createNode();
+						objectNode = database.createNode(GraphProcessingStatics.BNODE_LABEL);
 
 						bnodes.put("" + object.getId(), objectNode);
 
 						if (!isType) {
 
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.BNode.toString());
-							resourceUri = addResourceProperty(subjectNode, subject, objectNode, resourceURI);
+							optionalResourceHash = Optional.of(addResourceProperty(subjectNode, subject, objectNode, resourceHash));
 						} else {
 
-							objectNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeBNode.toString());
-							addLabel(objectNode, RDFS.Class.getURI());
+							addLabel(objectNode, NodeType.TypeBNode.toString());
+							addLabel(objectNode, namespaceIndex.getRDFCLASSPrefixedURI());
 						}
 					}
 
 					addedNodes++;
 				}
 
-				addRelationship(subjectNode, predicateName, objectNode, resourceUri, subject, resourceURI, statementUUID, order, index, subject.getType(),
-						object.getType());
+//				// leave out, rdf:type statements for now (enable, them if footprint is not too high)
+//				if (!isType) {
+
+					addRelationship(subjectNode, prefixedPredicateURI, objectNode, optionalResourceHash, subject, resourceHash, statementUUID, order,
+							index,
+							subject.getType(),
+							object.getType());
+//				}
 			}
 
 			totalTriples++;
@@ -247,7 +262,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 			final long nodeDelta = totalTriples - sinceLastCommit;
 			final long timeDelta = (System.currentTimeMillis() - tick) / 1000;
 
-			if (nodeDelta >= 50000 || timeDelta >= 30) { // Commit every 50k operations or every 30 seconds
+			if (nodeDelta >= DELTA_SIZE || timeDelta >= DELTA_TIME) { // Commit every 50k operations or every 30 seconds
 
 				tx.success();
 				tx.close();
@@ -255,7 +270,8 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 				sinceLastCommit = totalTriples;
 
-				LOG.debug(totalTriples + " triples @ ~" + (double) nodeDelta / timeDelta + " triples/second.");
+				final double duration = (double) nodeDelta / timeDelta;
+				LOG.debug("{} triples @ ~{} triples/second.", totalTriples, duration);
 
 				tick = System.currentTimeMillis();
 			}
@@ -272,11 +288,21 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		}
 	}
 
+	@Override public NamespaceIndex getNamespaceIndex() {
+
+		return namespaceIndex;
+	}
+
 	@Override public Neo4jHandler getHandler() {
 
 		// nothing TODO here ...
 
 		return null;
+	}
+
+	@Override public GraphDatabaseService getDatabase() {
+
+		return database;
 	}
 
 	public void closeTransaction() {
@@ -287,21 +313,25 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		tx.close();
 	}
 
-	public int getCountedStatements() {
+	@Override
+	public long getCountedStatements() {
 
 		return totalTriples;
 	}
 
+	@Override
 	public int getNodesAdded() {
 
 		return addedNodes;
 	}
 
-	public int getRelationShipsAdded() {
+	@Override
+	public int getRelationshipsAdded() {
 
 		return addedRelationships;
 	}
 
+	@Override
 	public int getCountedLiterals() {
 
 		return literals;
@@ -312,7 +342,6 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		final Label label = DynamicLabel.label(labelString);
 		boolean hit = false;
 		final Iterable<Label> labels = node.getLabels();
-		final List<Label> labelList = new LinkedList<Label>();
 
 		for (final Label lbl : labels) {
 
@@ -321,23 +350,21 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 				hit = true;
 				break;
 			}
-
-			labelList.add(lbl);
 		}
 
 		if (!hit) {
 
-			labelList.add(label);
 			node.addLabel(label);
 			addedLabels++;
 		}
 	}
 
-	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode, final String resourceUri,
-			final org.dswarm.graph.json.Node subject, final String resourceURI, final String statementUUID, final Long order, final long index,
+	private Relationship addRelationship(final Node subjectNode, final String predicateName, final Node objectNode,
+			final Optional<Long> optionalResourceHash,
+			final org.dswarm.graph.json.Node subject, final long resourceHash, final Long statementUUID, final Long order, final long index,
 			final org.dswarm.graph.json.NodeType subjectNodeType, final org.dswarm.graph.json.NodeType objectNodeType) throws DMPGraphException {
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		final String subjectIdentifier = getIdentifier(subjectNode, subjectNodeType);
 		final String objectIdentifier = getIdentifier(objectNode, objectNodeType);
@@ -345,31 +372,22 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		sb.append(subjectNodeType.toString()).append(":").append(subjectIdentifier).append(" ").append(predicateName).append(" ")
 				.append(objectNodeType.toString()).append(":").append(objectIdentifier).append(" ");
 
-		MessageDigest messageDigest = null;
-
-		try {
-			messageDigest = MessageDigest.getInstance("SHA-256");
-		} catch (NoSuchAlgorithmException e) {
-
-			throw new DMPGraphException("couldn't instantiate hash algo");
-		}
-		messageDigest.update(sb.toString().getBytes());
-		final String hash = new String(messageDigest.digest());
+		final long hash = HashUtils.generateHash(sb.toString());
 
 		final Relationship rel;
 
-		IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
+		final IndexHits<Relationship> hits = statementHashes.get(GraphStatics.HASH, hash);
 
 		if (hits == null || !hits.hasNext()) {
 
 			final RelationshipType relType = DynamicRelationshipType.withName(predicateName);
 			rel = subjectNode.createRelationshipTo(objectNode, relType);
 
-			final String finalStatementUUID;
+			final long finalStatementUUID;
 
 			if (statementUUID == null) {
 
-				finalStatementUUID = UUID.randomUUID().toString();
+				finalStatementUUID = HashUtils.generateHash(UUID.randomUUID().toString());
 			} else {
 
 				finalStatementUUID = statementUUID;
@@ -389,13 +407,13 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			addedRelationships++;
 
-			addResourceProperty(subjectNode, subject, rel, resourceUri, resourceURI);
+			addResourceProperty(subjectNode, subject, rel, optionalResourceHash, resourceHash);
 		} else {
 
 			rel = hits.next();
 		}
 
-		if(hits != null) {
+		if (hits != null) {
 
 			hits.close();
 		}
@@ -403,7 +421,7 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		return rel;
 	}
 
-	private Node determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) {
+	private Node determineNode(final org.dswarm.graph.json.Node resource, final boolean isType) throws DMPGraphException {
 
 		final Node node;
 
@@ -411,33 +429,16 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 
 			// resource node
 
-			final IndexHits<Node> hits;
+			final String resourceURI = ((ResourceNode) resource).getUri();
+			final String prefixedResourceURI = namespaceIndex.createPrefixedURI(resourceURI);
 
 			if (!isType) {
 
-				hits = resources.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.URI_PROPERTY, prefixedResourceURI);
 			} else {
 
-				hits = resourceTypes.get(GraphStatics.URI, ((ResourceNode) resource).getUri());
+				return database.findNode(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, prefixedResourceURI);
 			}
-
-			if (hits != null && hits.hasNext()) {
-
-				// node exists
-
-				node = hits.next();
-
-				hits.close();
-
-				return node;
-			}
-
-			if(hits != null) {
-
-				hits.close();
-			}
-
-			return null;
 		}
 
 		if (resource instanceof LiteralNode) {
@@ -454,62 +455,60 @@ public class Neo4jDeltaGDMHandler implements GDMHandler {
 		return node;
 	}
 
-	private String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Node objectNode,
-			final String resourceURI) {
+	private long addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Node objectNode,
+			final long resourceHash) throws DMPGraphException {
 
-		final String resourceUri = determineResourceUri(subjectNode, subject, resourceURI);
+		final long finalResourceHash = determineResourceHash(subjectNode, subject, resourceHash);
 
-		if (resourceUri == null) {
+		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceHash);
 
-			return null;
-		}
-
-		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, resourceUri);
-
-		return resourceUri;
+		return finalResourceHash;
 	}
 
-	private String addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Relationship rel,
-			final String resourceUri, final String resourceURI) {
+	private long addResourceProperty(final Node subjectNode, final org.dswarm.graph.json.Node subject, final Relationship rel,
+			final Optional<Long> optionalResourceHash, final long resourceHash) throws DMPGraphException {
 
-		final String finalResourceUri;
+		final long finalResourceHash;
 
-		if (resourceUri != null) {
+		if (optionalResourceHash.isPresent()) {
 
-			finalResourceUri = resourceUri;
+			finalResourceHash = optionalResourceHash.get();
 		} else {
 
-			finalResourceUri = determineResourceUri(subjectNode, subject, resourceURI);
+			finalResourceHash = determineResourceHash(subjectNode, subject, resourceHash);
 		}
 
-		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceUri);
+		rel.setProperty(GraphStatics.RESOURCE_PROPERTY, finalResourceHash);
 
-		return finalResourceUri;
+		return finalResourceHash;
 	}
 
-	private String determineResourceUri(final Node subjectNode, final org.dswarm.graph.json.Node subject, final String resourceURI) {
+	private long determineResourceHash(final Node subjectNode, final org.dswarm.graph.json.Node subject, final long resourceHash)
+			throws DMPGraphException {
 
-		final Long nodeId = subjectNode.getId();
+		final long nodeId = subjectNode.getId();
 
-		final String resourceUri;
+		final long finalResourceHash;
 
 		if (nodeResourceMap.containsKey(nodeId)) {
 
-			resourceUri = nodeResourceMap.get(nodeId);
+			finalResourceHash = nodeResourceMap.get(nodeId);
 		} else {
 
 			if (subject instanceof ResourceNode) {
 
-				resourceUri = ((ResourceNode) subject).getUri();
+				final String subjectURI = ((ResourceNode) subject).getUri();
+				final String prefixedSubjectURI = namespaceIndex.createPrefixedURI(subjectURI);
+				finalResourceHash = HashUtils.generateHash(prefixedSubjectURI);
 			} else {
 
-				resourceUri = resourceURI;
+				finalResourceHash = resourceHash;
 			}
 
-			nodeResourceMap.put(nodeId, resourceUri);
+			nodeResourceMap.put(nodeId, finalResourceHash);
 		}
 
-		return resourceUri;
+		return finalResourceHash;
 	}
 
 	private String getIdentifier(final Node node, final org.dswarm.graph.json.NodeType nodeType) {

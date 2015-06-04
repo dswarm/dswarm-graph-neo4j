@@ -16,12 +16,15 @@
  */
 package org.dswarm.graph.gdm.parse;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.json.Resource;
+import org.dswarm.graph.json.Statement;
+import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
  * @author tgaengler
@@ -61,13 +64,16 @@ public class GDMResourceParser implements GDMParser {
 
 		long i = 0;
 
+		final String prefixedResourceUri = gdmHandler.getNamespaceIndex().createPrefixedURI(resource.getUri());
+		final long resourceHash = HashUtils.generateHash(prefixedResourceUri);
+
 		for (final Statement statement : resource.getStatements()) {
 
 			i++;
 
 			// note: just increasing the counter probably won't work at an update ;)
 
-			gdmHandler.handleStatement(statement, resource.getUri(), i);
+			gdmHandler.handleStatement(statement, resourceHash, i);
 		}
 
 		((Neo4jDeltaGDMHandler) gdmHandler).closeTransaction();

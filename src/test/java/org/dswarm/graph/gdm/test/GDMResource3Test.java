@@ -34,6 +34,7 @@ import org.dswarm.graph.test.Neo4jDBWrapper;
 import com.google.common.base.Optional;
 import com.google.common.io.ByteSource;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,11 +67,13 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
+	@Ignore
 	@Test
 	public void mabxmlVersioningTest() throws IOException {
 
 		final ObjectNode requestJson = getMABXMLContentSchema();
 
+		// 157, 149
 		readGDMFromDBThatWasWrittenAsGDM(Optional.of(requestJson), "versioning/mabxml_dmp.gson", "versioning/mabxml_dmp2.gson",
 				"http://data.slub-dresden.de/resources/1", "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 157, 149, false,
 				Optional.<String>absent());
@@ -108,6 +111,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	 *
 	 * @throws IOException
 	 */
+	@Ignore
 	@Test
 	public void csvVersioning02Test2() throws IOException {
 
@@ -119,6 +123,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				Optional.of("http://data.slub-dresden.de/resources/1/schema#RecordType"));
 	}
 
+	@Ignore
 	@Test
 	public void csvVersioningTest2() throws IOException {
 
@@ -135,6 +140,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 	 *
 	 * @throws IOException
 	 */
+	@Ignore
 	@Test
 	public void csvVersioningTest3() throws IOException {
 
@@ -183,6 +189,7 @@ public abstract class GDMResource3Test extends BasicResourceTest {
 				"http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType", 423, 310, false, Optional.<String> absent());
 	}
 
+	@Ignore
 	@Test
 	public void selectedMabxmlVersioningTest() throws IOException {
 

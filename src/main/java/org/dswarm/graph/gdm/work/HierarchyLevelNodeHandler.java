@@ -26,5 +26,5 @@ import org.neo4j.graphdb.Node;
  */
 public interface HierarchyLevelNodeHandler {
 
-	public void handleNode(Node node, int hierarchyLevel) throws DMPGraphException;
+	void handleNode(Node node, int hierarchyLevel) throws DMPGraphException;
 }

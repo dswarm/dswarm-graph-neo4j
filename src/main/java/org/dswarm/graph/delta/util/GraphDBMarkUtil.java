@@ -39,12 +39,12 @@ public final class GraphDBMarkUtil {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(GraphDBMarkUtil.class);
 
-	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String resourceURI,
+	public static void markPaths(final DeltaState deltaState, final GraphDatabaseService graphDB, final String prefixedResourceURI,
 			final Set<Long> pathEndNodeIds) throws DMPGraphException {
 
 		try(final Transaction tx = graphDB.beginTx()) {
 
-			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, resourceURI);
+			final Iterable<Path> paths = GraphDBUtil.getResourcePaths(graphDB, prefixedResourceURI);
 
 			markPaths(deltaState, pathEndNodeIds, paths);
 
@@ -55,7 +55,7 @@ public final class GraphDBMarkUtil {
 
 			GraphDBMarkUtil.LOG.error(message, e);
 
-			throw new DMPGraphException(message);
+			throw new DMPGraphException(message, e);
 		}
 	}
 
@@ -79,7 +79,7 @@ public final class GraphDBMarkUtil {
 		}
 	}
 
-	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) {
+	private static void markPaths(final DeltaState deltaState, final Set<Long> pathEndNodeIds, final Iterable<Path> paths) throws DMPGraphException {
 
 		final Set<Long> markedPathEndNodeIds = Sets.newHashSet();
 
@@ -100,9 +100,10 @@ public final class GraphDBMarkUtil {
 					}
 
 					// TODO: remove this later, it'S just for debugging purpose right now
-					if (rel.getType().name().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+					// http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+					if (rel.getType().name().equals("rdf:type")) {
 
-						GraphDBMarkUtil.LOG.debug("mark rel: " + GraphDBPrintUtil.printDeltaRelationship(rel));
+						GraphDBMarkUtil.LOG.debug("mark rel: {}", GraphDBPrintUtil.printDeltaRelationship(rel));
 					}
 
 					rel.setProperty(DeltaStatics.MATCHED_PROPERTY, true);
@@ -138,14 +139,13 @@ public final class GraphDBMarkUtil {
 
 		if (pathEndNodeIds.size() != markedPathEndNodeIds.size()) {
 
-			GraphDBMarkUtil.LOG.error("couldn't mark all paths; path end node ids size = '" + pathEndNodeIds.size()
-					+ "' :: marked path end node ids size = '" + markedPathEndNodeIds.size() + "'");
+			GraphDBMarkUtil.LOG.error("couldn't mark all paths; path end node ids size = '{}' :: marked path end node ids size = '{}'", pathEndNodeIds.size(), markedPathEndNodeIds.size());
 
 			for (final Long pathEndNodeId : pathEndNodeIds) {
 
 				if (!markedPathEndNodeIds.contains(pathEndNodeId)) {
 
-					GraphDBMarkUtil.LOG.error("couldn't mark path with end node id = '" + pathEndNodeId + "'");
+					GraphDBMarkUtil.LOG.error("couldn't mark path with end node id = '{}'", pathEndNodeId);
 				}
 			}
 		}

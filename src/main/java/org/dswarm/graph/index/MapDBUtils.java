@@ -17,10 +17,13 @@
 package org.dswarm.graph.index;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Set;
 
+import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import org.dswarm.common.types.Tuple;
 
@@ -38,11 +41,32 @@ public final class MapDBUtils {
 		return Tuple.tuple(createTreeSet(db, indexName), db);
 	}
 
+	public static Tuple<Map<String, String>, DB> createOrGetInMemoryStringStringIndexTreeMapNonTransactional(final String indexName) {
+
+		final DB db = createNonTransactionalInMemoryMapDB();
+
+		return Tuple.tuple(createStringStringTreeMap(db, indexName), db);
+	}
+
 	public static Tuple<Set<Long>, DB> createOrGetPersistentLongIndexTreeSetGlobalTransactional(final String indexFileName, final String indexName) {
 
 		final DB db = createGlobalTransactionalPermanentMapDB(indexFileName);
 
 		return Tuple.tuple(createTreeSet(db, indexName), db);
+	}
+
+	public static Tuple<Map<String, String>, DB> createOrGetPersistentStringStringIndexTreeMapGlobalTransactional(final String indexFileName, final String indexName) {
+
+		final DB db = createGlobalTransactionalPermanentMapDB(indexFileName);
+
+		return Tuple.tuple(createStringStringTreeMap(db, indexName), db);
+	}
+
+	public static Map<String, String> createStringStringTreeMap(final DB db, final String indexFileName) {
+
+		return db.createTreeMap(indexFileName)
+				.keySerializer(BTreeKeySerializer.STRING)
+				.valueSerializer(Serializer.STRING).makeOrGet();
 	}
 
 	public static Set<Long> createTreeSet(final DB db, final String indexFileName) {

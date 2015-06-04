@@ -35,9 +35,9 @@ public class FirstDegreeExactGDMValueMatcher extends Matcher<ValueEntity> {
 
 	public FirstDegreeExactGDMValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
 			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String existingResourceURIArg, final String newResourceURIArg) throws DMPGraphException {
+			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
 
-		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, existingResourceURIArg, newResourceURIArg,
+		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg, prefixedNewResourceURIArg,
 				new ValueEntityMarker());
 	}
 

@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 import org.dswarm.graph.versioning.DataModelNeo4jVersionHandler;
 
 /**
@@ -30,14 +30,14 @@ public class DataModelNeo4jHandler extends BaseNeo4jHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jHandler.class);
 
-	public DataModelNeo4jHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelNeo4jHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(processorArg);
+		super(processorArg, enableVersioning);
 	}
 
 	@Override
 	protected void init() throws DMPGraphException {
 
-		versionHandler = new DataModelNeo4jVersionHandler(processor);
+		versionHandler = new DataModelNeo4jVersionHandler(processor, enableVersioning);
 	}
 }

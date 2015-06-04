@@ -16,15 +16,16 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphIndexStatics;
-import org.dswarm.graph.model.GraphStatics;
-
 import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
+
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.GraphProcessingStatics;
+import org.dswarm.graph.hash.HashUtils;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -33,37 +34,23 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 
 	private static final String TYPE = "GDM record by URI";
 
-	private final String	recordUri;
+	private final String prefixedRecordUri;
 
-	public PropertyGraphGDMResourceByURIReader(final String recordUriArg, final String dataModelUri, final Optional<Integer> optionalVersionArg, final GraphDatabaseService database)
+	public PropertyGraphGDMResourceByURIReader(final String prefixedRecordUriArg, final String prefixedDataModelUri,
+			final Optional<Integer> optionalVersionArg,
+			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
-		super(dataModelUri, optionalVersionArg, database, TYPE);
+		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);
 
-		recordUri = recordUriArg;
+		prefixedRecordUri = prefixedRecordUriArg;
 	}
 
 	@Override
-	protected Node getResourceNode()  throws DMPGraphException {
+	protected Node getResourceNode() throws DMPGraphException {
 
-		final Index<Node> resourcesWDataModel = database.index().forNodes(GraphIndexStatics.RESOURCES_W_DATA_MODEL_INDEX_NAME);
-		final IndexHits<Node> hits = resourcesWDataModel.get(GraphStatics.URI_W_DATA_MODEL, recordUri + dataModelUri);
+		final long resourceUriDataModelUriHash1 = HashUtils.generateHash(prefixedRecordUri + prefixedDataModelUri);
 
-		if (hits == null) {
-
-			return null;
-		}
-		if (!hits.hasNext()) {
-
-			hits.close();
-
-			return null;
-		}
-
-		final Node node = hits.next();
-
-		hits.close();
-
-		return node;
+		return database.findNode(GraphProcessingStatics.RESOURCE_LABEL, GraphStatics.HASH, resourceUriDataModelUriHash1);
 	}
 }

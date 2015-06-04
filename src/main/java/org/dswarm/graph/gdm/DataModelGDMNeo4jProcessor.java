@@ -18,6 +18,9 @@ package org.dswarm.graph.gdm;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.tx.TransactionHandler;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +32,8 @@ public class DataModelGDMNeo4jProcessor extends GDMNeo4jProcessor {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelGDMNeo4jProcessor.class);
 
-	public DataModelGDMNeo4jProcessor(final GraphDatabaseService database, final String dataModelURIArg) throws DMPGraphException {
+	public DataModelGDMNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex, final String prefixedDataModelURIArg) throws DMPGraphException {
 
-		super(new DataModelNeo4jProcessor(database, dataModelURIArg));
+		super(new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelURIArg));
 	}
 }

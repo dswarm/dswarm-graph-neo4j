@@ -42,7 +42,7 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 	private static final Logger	LOG	= LoggerFactory.getLogger(ValueEntityMarker.class);
 
 	public void markPaths(final Collection<ValueEntity> valueEntities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String resourceURI) throws DMPGraphException {
+			final String prefixedResourceURI) throws DMPGraphException {
 
 		final Set<Long> pathEndNodeIds = new HashSet<>();
 		final Set<Long> modifiedPathEndNodeIds = new HashSet<>();
@@ -121,12 +121,12 @@ public class ValueEntityMarker implements Marker<ValueEntity> {
 			finalDeltaState = DeltaState.ExactMatch;
 		}
 
-		GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, resourceURI, pathEndNodeIds);
+		GraphDBMarkUtil.markPaths(finalDeltaState, graphDB, prefixedResourceURI, pathEndNodeIds);
 
 
 		if(!modifiedPathEndNodeIds.isEmpty()) {
 
-			GraphDBMarkUtil.markPaths(deltaState, graphDB, resourceURI, modifiedPathEndNodeIds);
+			GraphDBMarkUtil.markPaths(deltaState, graphDB, prefixedResourceURI, modifiedPathEndNodeIds);
 		}
 
 		for(final Map.Entry<CSEntity, Set<Long>> pathEndNideIdsFromCSEntityEntry : pathEndNodesIdsFromCSEntityMap.entrySet()) {

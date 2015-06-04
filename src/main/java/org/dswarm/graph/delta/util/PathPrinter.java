@@ -19,21 +19,37 @@ package org.dswarm.graph.delta.util;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.kernel.Traversal;
+import org.neo4j.graphdb.traversal.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.dswarm.graph.DMPGraphException;
 
 /**
  * @author tgaengler
  */
-public class PathPrinter implements Traversal.PathDescriptor<Path> {
+public class PathPrinter implements Paths.PathDescriptor<Path> {
 
-	private final static String	PREFIX			= "<-";
-	private final static String	INTERMEDIATE	= "--";
-	private final static String	SUFFIX			= "-->";
+	private static final Logger LOG = LoggerFactory.getLogger(PathPrinter.class);
+
+	private final static String PREFIX       = "<-";
+	private final static String INTERMEDIATE = "--";
+	private final static String SUFFIX       = "-->";
 
 	@Override
 	public String nodeRepresentation(final Path path, final Node node) {
 
-		return GraphDBPrintUtil.printNode(node);
+		try {
+
+			return GraphDBPrintUtil.printNode(node);
+		} catch (final DMPGraphException e) {
+
+			final String msg = "couldn't print path";
+
+			LOG.error(msg, e);
+
+			throw new RuntimeException(msg, e);
+		}
 	}
 
 	@Override

@@ -27,14 +27,14 @@ import java.util.Queue;
  */
 public class Changeset {
 
-	private final Map<String, Statement>	additions;
-	private final Map<String, Statement>	deletions;
+	private final Map<Long, Statement>	additions;
+	private final Map<Long, Statement>	deletions;
 	private final Map<Long, Long>			modifications;
 	private final Map<Long, Statement>		existingModifiedStatements;
 	private final Map<Long, Statement>		newModifiedStatements;
 	private final boolean					hasChanges;
 
-	public Changeset(final Map<String, Statement> additions, final Map<String, Statement> deletions, final Map<Long, Long> modifications,
+	public Changeset(final Map<Long, Statement> additions, final Map<Long, Statement> deletions, final Map<Long, Long> modifications,
 			final Map<Long, Statement> existingModifiedStatements, final Map<Long, Statement> newModifiedStatements) {
 
 		this.additions = additions;
@@ -52,12 +52,12 @@ public class Changeset {
 		return hasChanges;
 	}
 
-	public Map<String, Statement> getAdditions() {
+	public Map<Long, Statement> getAdditions() {
 
 		return additions;
 	}
 
-	public Map<String, Statement> getDeletions() {
+	public Map<Long, Statement> getDeletions() {
 
 		return deletions;
 	}

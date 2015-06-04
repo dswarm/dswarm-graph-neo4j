@@ -27,5 +27,5 @@ import org.neo4j.graphdb.Path;
  */
 public interface SubGraphNodeHandler {
 
-	public void handleNode(Node node, Path path) throws DMPGraphException;
+	void handleNode(Node node, Path path) throws DMPGraphException;
 }

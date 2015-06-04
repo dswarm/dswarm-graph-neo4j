@@ -27,19 +27,19 @@ import com.google.common.base.Optional;
  */
 public final class StatementBuilder {
 
-	private Optional<NodeType>				optionalSubjectNodeType		= Optional.absent();
-	private Optional<String>				optionalSubjectURI			= Optional.absent();
-	private Optional<String>				optionalSubjectId			= Optional.absent();
-	private Optional<String>				optionalSubjectDataModelURI	= Optional.absent();
-	private Optional<String>				optionalPredicateURI		= Optional.absent();
-	private Optional<NodeType>				optionalObjectNodeType		= Optional.absent();
-	private Optional<String>				optionalObjectURI			= Optional.absent();
-	private Optional<String>				optionalObjectValue			= Optional.absent();
-	private Optional<String>				optionalObjectId			= Optional.absent();
-	private Optional<String>				optionalObjectDataModelURI	= Optional.absent();
-	private Optional<String>				optionalStatementUUID		= Optional.absent();
-	private Optional<String>				optionalResourceURI			= Optional.absent();
-	private Optional<Map<String, Object>>	optionalQualifiedAttributes	= Optional.absent();
+	private Optional<NodeType>            optionalSubjectNodeType     = Optional.absent();
+	private Optional<String>              optionalSubjectURI          = Optional.absent();
+	private Optional<String>              optionalSubjectId           = Optional.absent();
+	private Optional<String>              optionalSubjectDataModelURI = Optional.absent();
+	private Optional<String>              optionalPredicateURI        = Optional.absent();
+	private Optional<NodeType>            optionalObjectNodeType      = Optional.absent();
+	private Optional<String>              optionalObjectURI           = Optional.absent();
+	private Optional<String>              optionalObjectValue         = Optional.absent();
+	private Optional<String>              optionalObjectId            = Optional.absent();
+	private Optional<String>              optionalObjectDataModelURI  = Optional.absent();
+	private Optional<String>              optionalStatementUUID       = Optional.absent();
+	private Optional<Long>                optionalResourceHash        = Optional.absent();
+	private Optional<Map<String, Object>> optionalQualifiedAttributes = Optional.absent();
 
 	public StatementBuilder() {
 	}
@@ -121,9 +121,9 @@ public final class StatementBuilder {
 		return this;
 	}
 
-	public StatementBuilder setOptionalResourceURI(final Optional<String> optionalResourceURI) {
+	public StatementBuilder setOptionalResourceHash(final Optional<Long> optionalResourceHash) {
 
-		this.optionalResourceURI = optionalResourceURI;
+		this.optionalResourceHash = optionalResourceHash;
 
 		return this;
 	}
@@ -245,14 +245,14 @@ public final class StatementBuilder {
 		return optionalStatementUUID;
 	}
 
-	public Optional<String> getOptionalResourceURI() {
+	public Optional<Long> getOptionalResourceHash() {
 
-		if (optionalResourceURI == null) {
+		if (optionalResourceHash == null) {
 
 			return Optional.absent();
 		}
 
-		return optionalResourceURI;
+		return optionalResourceHash;
 	}
 
 	public Optional<Map<String, Object>> getOptionalQualifiedAttributes() {
@@ -269,6 +269,6 @@ public final class StatementBuilder {
 
 		return new Statement(getOptionalSubjectNodeType(), getOptionalSubjectURI(), getOptionalSubjectId(), getOptionalSubjectDataModelURI(),
 				getOptionalPredicateURI(), getOptionalObjectNodeType(), getOptionalObjectURI(), getOptionalObjectValue(), getOptionalObjectId(),
-				getOptionalObjectDataModelURI(), getOptionalStatementUUID(), getOptionalResourceURI(), getOptionalQualifiedAttributes());
+				getOptionalObjectDataModelURI(), getOptionalStatementUUID(), getOptionalResourceHash(), getOptionalQualifiedAttributes());
 	}
 }

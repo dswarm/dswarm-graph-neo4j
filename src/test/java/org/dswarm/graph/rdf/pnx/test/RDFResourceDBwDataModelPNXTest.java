@@ -92,7 +92,7 @@ public abstract class RDFResourceDBwDataModelPNXTest extends BasicResourceTest {
 
 		LOG.debug("read '{}' statements", model.size());
 
-		Assert.assertEquals("the number of statements should be 2601", 2601, model.size());
+		Assert.assertEquals("the number of statements should be 1935", 1935, model.size());
 
 		LOG.debug("finished read test for RDF resource at {} DB", dbType);
 	}

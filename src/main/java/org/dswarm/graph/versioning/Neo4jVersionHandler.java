@@ -16,23 +16,16 @@
  */
 package org.dswarm.graph.versioning;
 
-import java.util.UUID;
-
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.model.GraphStatics;
-
-import org.neo4j.graphdb.DynamicRelationshipType;
+import com.google.common.base.Optional;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.model.GraphStatics;
 
 /**
  * @author tgaengler
@@ -47,11 +40,14 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	private Range range;
 
-	protected final Neo4jProcessor processor;
+	protected final BasicNeo4jProcessor processor;
 
-	public Neo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	private final boolean enableVersioning;
+
+	public Neo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioningArg) throws DMPGraphException {
 
 		processor = processorArg;
+		enableVersioning = enableVersioningArg;
 	}
 
 	@Override
@@ -67,7 +63,16 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 	protected void init() {
 
-		latestVersion = retrieveLatestVersion() + 1;
+		final int currentLatestVersion = retrieveLatestVersion();
+
+		if(enableVersioning) {
+
+			latestVersion = currentLatestVersion + 1;
+		} else {
+
+			latestVersion = currentLatestVersion;
+		}
+
 		range = Range.range(latestVersion);
 	}
 
@@ -82,8 +87,12 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
+			final String dataModelURI = optionalDataModelURI.get();
+			final long resourceUriDataModelUriHash = processor
+					.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+
 			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(),
-					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI), Optional.of(resourceUriDataModelUriHash));
 
 			if (optionalDataModelNode.isPresent()) {
 
@@ -92,51 +101,16 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 				return;
 			}
 
-			final Node dataModelNode = processor.getDatabase().createNode();
-			processor.addLabel(dataModelNode, VersioningStatics.DATA_MODEL_TYPE);
-			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, optionalDataModelURI.get());
+			final Label dataModelLabel = processor.getLabel(VersioningStatics.DATA_MODEL_TYPE);
+			final Label dataModelResourceLabel = processor.getLabel(NodeType.Resource.toString());
+
+			final Node dataModelNode = processor.getDatabase().createNode(dataModelLabel, dataModelResourceLabel);
+			dataModelNode.setProperty(GraphStatics.URI_PROPERTY, dataModelURI);
+			dataModelNode.setProperty(GraphStatics.HASH, resourceUriDataModelUriHash);
 			dataModelNode.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
-			dataModelNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.Resource.toString());
 			dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, range.from());
 
-			processor.addNodeToResourcesWDataModelIndex(optionalDataModelURI.get(), VersioningStatics.VERSIONING_DATA_MODEL_URI, dataModelNode);
-
-			Optional<Node> optionaDataModelTypeNode = processor.determineNode(Optional.of(NodeType.TypeResource), Optional.<String>absent(), Optional.of(
-					VersioningStatics.DATA_MODEL_TYPE), Optional.<String>absent());
-
-			final Node dataModelTypeNode;
-
-			if (optionaDataModelTypeNode.isPresent()) {
-
-				dataModelTypeNode = optionaDataModelTypeNode.get();
-			} else {
-
-				dataModelTypeNode = processor.getDatabase().createNode();
-				processor.addLabel(dataModelTypeNode, RDFS.Class.getURI());
-				dataModelTypeNode.setProperty(GraphStatics.URI_PROPERTY, VersioningStatics.DATA_MODEL_TYPE);
-				dataModelTypeNode.setProperty(GraphStatics.NODETYPE_PROPERTY, NodeType.TypeResource.toString());
-
-				processor.addNodeToResourceTypesIndex(VersioningStatics.DATA_MODEL_TYPE, dataModelTypeNode);
-			}
-
-			final long hash = processor.generateStatementHash(dataModelNode, RDF.type.getURI(), dataModelTypeNode, NodeType.Resource, NodeType.Resource);
-
-			final boolean statementExists = processor.checkStatementExists(hash);
-
-			if (!statementExists) {
-
-				final RelationshipType relType = DynamicRelationshipType.withName(RDF.type.getURI());
-				final Relationship rel = dataModelNode.createRelationshipTo(dataModelTypeNode, relType);
-				rel.setProperty(GraphStatics.INDEX_PROPERTY, 0);
-				rel.setProperty(GraphStatics.DATA_MODEL_PROPERTY, VersioningStatics.VERSIONING_DATA_MODEL_URI);
-
-				final String uuid = UUID.randomUUID().toString();
-
-				rel.setProperty(GraphStatics.UUID_PROPERTY, uuid);
-
-				processor.addHashToStatementIndex(hash);
-				processor.addStatementToIndex(rel, uuid);
-			}
+			processor.addNodeToResourcesWDataModelIndex(dataModelURI, resourceUriDataModelUriHash, dataModelNode);
 
 			latestVersionInitialized = true;
 		}

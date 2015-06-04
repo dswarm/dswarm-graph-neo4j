@@ -18,7 +18,7 @@ package org.dswarm.graph.versioning;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.DataModelNeo4jProcessor;
-import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.BasicNeo4jProcessor;
 
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -33,9 +33,9 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jVersionHandler.class);
 
-	public DataModelNeo4jVersionHandler(final Neo4jProcessor processorArg) throws DMPGraphException {
+	public DataModelNeo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
-		super(processorArg);
+		super(processorArg, enableVersioning);
 
 		processor.ensureRunningTx();
 
@@ -65,7 +65,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 			finalDataModelURI = optionalDataModelURI.get();
 		} else {
 
-			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getDataModelURI();
+			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
 		}
 
 		super.setLatestVersion(Optional.fromNullable(finalDataModelURI));
@@ -76,7 +76,10 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		int latestVersion = 0;
 
-		final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(((DataModelNeo4jProcessor) processor).getDataModelURI(), VersioningStatics.VERSIONING_DATA_MODEL_URI);
+		final String dataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
+		final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+
+		final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
 
 		if (optionalNode.isPresent()) {
 
@@ -99,12 +102,17 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
 		try {
 
-			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(((DataModelNeo4jProcessor) processor).getDataModelURI(), VersioningStatics.VERSIONING_DATA_MODEL_URI);
+			final String dataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
+			final long resourceUriDataModelUriHash = processor.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
+			final Optional<Node> optionalNode = processor.getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
 
 			if (optionalNode.isPresent()) {
 
 				final Node dataModelNode = optionalNode.get();
 				dataModelNode.setProperty(VersioningStatics.LATEST_VERSION_PROPERTY, latestVersion);
+			} else {
+
+				setLatestVersion(Optional.of(dataModelURI));
 			}
 		} catch (final Exception e) {
 

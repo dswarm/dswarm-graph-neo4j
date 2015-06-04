@@ -19,6 +19,7 @@ package org.dswarm.graph.gdm.read;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Optional;
@@ -32,10 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.Statement;
 import org.dswarm.graph.json.stream.ModelBuilder;
 import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.tx.TransactionHandler;
 
 /**
  * @author tgaengler
@@ -55,9 +58,10 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 	private ModelBuilder modelBuilder;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
-			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg) throws DMPGraphException {
+			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg)
+			throws DMPGraphException {
 
-		super(dataModelUriArg, optionalVersionArg, databaseArg, TYPE);
+		super(dataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, TYPE);
 
 		recordClassUri = recordClassUriArg;
 		optionalAtMost = optionalAtMostArg;
@@ -68,7 +72,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 		readResources = 0;
 
-		ensureTx();
+		tx.ensureRunningTx();
 
 		ResourceIterator<Node> recordNodesIter = null;
 
@@ -77,19 +81,19 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			final Label recordClassLabel = DynamicLabel.label(recordClassUri);
 
 			PropertyGraphGDMModelReader.LOG
-					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, dataModelUri,
+					.debug("try to read resources for class '{}' in data model '{}' with version '{}'", recordClassLabel, prefixedDataModelUri,
 							version);
 
 			recordNodesIter = database.findNodes(recordClassLabel, GraphStatics.DATA_MODEL_PROPERTY,
-					dataModelUri);
+					prefixedDataModelUri);
 
 			if (recordNodesIter == null) {
 
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
-								recordClassLabel, dataModelUri, version,
+								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -98,11 +102,11 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 			if (!recordNodesIter.hasNext()) {
 
 				recordNodesIter.close();
-				tx.success();
+				tx.succeedTx();
 
 				PropertyGraphGDMModelReader.LOG
 						.debug("there are no root nodes for '{}' in data model '{}'  with version '{}'; finished read {} TX successfully",
-								recordClassLabel, dataModelUri, version,
+								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
 				return Optional.absent();
@@ -133,25 +137,18 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					continue;
 				}
 
-				currentResource = new Resource(resourceUri);
+				final String fullResourceURI = namespaceIndex.createFullURI(resourceUri);
+
+				currentResource = new Resource(fullResourceURI);
 				startNodeHandler.handleNode(recordNode);
 
 				if (!currentResourceStatements.isEmpty()) {
 
-					// note, this is just an integer number (i.e. NOT long)
-					final int mapSize = currentResourceStatements.size();
-
-					long i = 0;
-
 					final Set<Statement> statements = new LinkedHashSet<>();
 
-					while (i < mapSize) {
+					for(List<Statement> statementList : currentResourceStatements.values()) {
 
-						i++;
-
-						final Statement statement = currentResourceStatements.get(i);
-
-						statements.add(statement);
+						statements.addAll(statementList);
 					}
 
 					currentResource.setStatements(statements);
@@ -166,15 +163,16 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 					readResources++;
 				} else {
 
-					LOG.debug("couldn't find any statement for resource '{}' in data model '{}' with version '{}'", currentResource.getUri(),
-							dataModelUri, version);
+
+					LOG.debug("couldn't find any statement for resource '{}' ('{}') in data model '{}' with version '{}'", currentResource.getUri(),
+							resourceUri, prefixedDataModelUri, version);
 				}
 
 				currentResourceStatements.clear();
 			}
 
 			recordNodesIter.close();
-			tx.success();
+			tx.succeedTx();
 
 			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX successfully", type);
 		} catch (final Exception e) {
@@ -186,12 +184,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 				recordNodesIter.close();
 			}
 
-			tx.failure();
-		} finally {
-
-			PropertyGraphGDMModelReader.LOG.debug("finished read {} TX finally", type);
-
-			tx.close();
+			tx.failTx();
 		}
 
 		return Optional.of(modelBuilder);

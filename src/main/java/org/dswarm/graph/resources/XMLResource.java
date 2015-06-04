@@ -33,21 +33,23 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.dswarm.common.DMPStatics;
-import org.dswarm.common.model.AttributePath;
-import org.dswarm.common.model.util.AttributePathUtil;
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.xml.read.PropertyGraphXMLReader;
-import org.dswarm.graph.xml.read.XMLReader;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.dswarm.common.DMPStatics;
+import org.dswarm.common.model.AttributePath;
+import org.dswarm.common.model.util.AttributePathUtil;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.index.NamespaceIndex;
+import org.dswarm.graph.tx.Neo4jTransactionHandler;
+import org.dswarm.graph.tx.TransactionHandler;
+import org.dswarm.graph.xml.read.PropertyGraphXMLReader;
+import org.dswarm.graph.xml.read.XMLReader;
 
 /**
  * TODO: refactor the design of the resources. this is not RESTy atm, i.e., there should be one pattern how the receive a certain
@@ -122,14 +124,25 @@ public class XMLResource {
 		}
 
 		final JsonNode versionNode = json.get(DMPStatics.VERSION_IDENTIFIER);
-		final Integer version;
+		final Optional<Integer> optionalVersion;
 
 		if (versionNode != null) {
 
-			version = versionNode.asInt();
+			optionalVersion = Optional.fromNullable(versionNode.asInt());
 		} else {
 
-			version = null;
+			optionalVersion = Optional.absent();
+		}
+
+		final JsonNode allVersionsNode = json.get(DMPStatics.ALL_VERSIONS_IDENTIFIER);
+		final Optional<Boolean> optionalAllversion;
+
+		if (allVersionsNode != null) {
+
+			optionalAllversion = Optional.fromNullable(allVersionsNode.asBoolean());
+		} else {
+
+			optionalAllversion = Optional.absent();
 		}
 
 		final Optional<JsonNode> optionalOriginalDataTypeNode = Optional.fromNullable(json.get(DMPStatics.ORIGINAL_DATA_TYPE_IDENTIFIER));
@@ -154,8 +167,11 @@ public class XMLResource {
 
 		LOG.debug("try to read XML records for data model uri = '{}' and record class uri = '{}' from graph db", dataModelUri, recordClassUri);
 
-		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, version,
-				optionalOriginalDataType, database);
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		final XMLReader xmlReader = new PropertyGraphXMLReader(optionalRootAttributePath, optionalRecordTag, recordClassUri, dataModelUri, optionalVersion, optionalAllversion,
+				optionalOriginalDataType, database, tx, namespaceIndex);
 
 		final StreamingOutput stream = new StreamingOutput() {
 

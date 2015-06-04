@@ -52,8 +52,6 @@ public abstract class MaintainResourceDeleteTest extends RDFExportTest {
 
 		final ClientResponse response = service().path("/maintain/delete").delete(ClientResponse.class);
 
-		System.out.println("response = " + response);
-
 		Assert.assertEquals("expected 200", 200, response.getStatus());
 
 		final String body = response.getEntity(String.class);

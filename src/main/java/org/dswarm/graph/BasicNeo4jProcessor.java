@@ -47,6 +47,7 @@ import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.model.Statement;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
+import org.dswarm.graph.utils.GraphUtils;
 import org.dswarm.graph.versioning.VersionHandler;
 
 /**
@@ -446,6 +447,17 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		}
 
 		return rel;
+	}
+
+	public long generateStatementHash(final Relationship rel) throws DMPGraphException {
+
+		final Node subjectNode = rel.getStartNode();
+		final Node objectNode = rel.getEndNode();
+		final String predicateName = rel.getType().name();
+		final NodeType subjectNodeType = GraphUtils.determineNodeType(subjectNode);
+		final NodeType objectNodeType = GraphUtils.determineNodeType(objectNode);
+
+		return generateStatementHash(subjectNode, predicateName, objectNode, subjectNodeType, objectNodeType);
 	}
 
 	public long generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode, final NodeType subjectNodeType,

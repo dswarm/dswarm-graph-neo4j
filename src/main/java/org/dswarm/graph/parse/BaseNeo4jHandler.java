@@ -28,11 +28,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.hp.hpl.jena.vocabulary.RDF;
-import org.apache.commons.lang.NotImplementedException;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -407,7 +404,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			rel.setProperty(VersioningStatics.VALID_TO_PROPERTY, versionHandler.getLatestVersion());
 
-			// TODO: remove statement hash from statement hashes index
+			// remove statement hash from statement hashes index
+			final long statementHash = processor.generateStatementHash(rel);
+			processor.removeHashFromStatementIndex(statementHash);
 
 			return rel;
 		} catch (final Exception e) {

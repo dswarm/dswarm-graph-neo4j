@@ -65,7 +65,6 @@ import org.dswarm.graph.deprecate.RelationshipDeprecator;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.index.SchemaIndexUtils;
-import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;

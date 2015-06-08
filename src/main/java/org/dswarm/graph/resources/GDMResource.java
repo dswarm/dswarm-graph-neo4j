@@ -1323,6 +1323,11 @@ public class GDMResource extends GraphResource {
 			throw new DMPGraphException(message);
 		}
 
+		if(LOG.isDebugEnabled()) {
+
+			LOG.debug("metadata of request '{}'", metadataString);
+		}
+
 		try {
 
 			return objectMapper.readValue(metadataString, ObjectNode.class);
@@ -1423,9 +1428,9 @@ public class GDMResource extends GraphResource {
 			final String contentSchemaJSONString = objectMapper.writeValueAsString(optionalContentSchemaJSON.get());
 			final ContentSchema contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
 
-			if(LOG.isTraceEnabled()) {
+			if(LOG.isDebugEnabled()) {
 
-				LOG.trace("try to prefix URIs of content schema '{}'", objectMapper.writeValueAsString(contentSchema));
+				LOG.debug("try to prefix URIs of content schema '{}'", objectMapper.writeValueAsString(contentSchema));
 			}
 
 			final Optional<ContentSchema> contentSchemaOptional = Optional.fromNullable(contentSchema);

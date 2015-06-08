@@ -1426,6 +1426,12 @@ public class GDMResource extends GraphResource {
 		try {
 
 			final String contentSchemaJSONString = objectMapper.writeValueAsString(optionalContentSchemaJSON.get());
+
+			if(LOG.isDebugEnabled()) {
+
+				LOG.debug("content schema JSON string '{}'", objectMapper.writeValueAsString(contentSchemaJSONString));
+			}
+
 			final ContentSchema contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
 
 			if(LOG.isDebugEnabled()) {

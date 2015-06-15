@@ -231,8 +231,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		// (optionally) persist namespaces that where utilised before
 		namespaceIndex.resetTXNamespaces();
-		// TODO: maybe change back to tx.ensureRunningTx
-		tx.renewTx();
+		tx.ensureRunningTx();
 		initIndices();
 
 		BasicNeo4jProcessor.LOG.debug("new tx is ready");

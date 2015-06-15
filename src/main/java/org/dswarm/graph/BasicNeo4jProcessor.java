@@ -134,8 +134,6 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 				tempStatementHashes.clear();
 			}
-
-			namespaceIndex.resetTXNamespaces();
 		} catch (final Exception e) {
 
 			failTx();
@@ -218,16 +216,9 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		LOG.debug("start clearing and closing mapdb indices");
 
-		if (!tempStatementHashesDB.isClosed()) {
-
-			tempStatementHashes.clear();
-			tempStatementHashesDB.close();
-		}
-
-		if (!statementHashesDB.isClosed()) {
-
-			statementHashesDB.close();
-		}
+		tempStatementHashes.clear();
+		closeMapDBIndex(tempStatementHashesDB);
+		closeMapDBIndex(statementHashesDB);
 
 		namespaceIndex.clearMaps();
 
@@ -239,6 +230,9 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 		BasicNeo4jProcessor.LOG.debug("beginning new tx");
 
 		tx.ensureRunningTx();
+		// (optionally) persist namespaces that where utilised before
+		namespaceIndex.resetTXNamespaces();
+		tx.renewTx();
 		initIndices();
 
 		BasicNeo4jProcessor.LOG.debug("new tx is ready");

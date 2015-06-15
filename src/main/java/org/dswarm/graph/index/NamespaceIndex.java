@@ -53,7 +53,7 @@ public class NamespaceIndex {
 	private final Map<String, String> prefixedURIURIMap;
 
 	private final GraphDatabaseService database;
-	private final TransactionHandler tx;
+	private final TransactionHandler   tx;
 
 	public NamespaceIndex(final GraphDatabaseService databaseArg, final TransactionHandler txArg) {
 
@@ -78,7 +78,7 @@ public class NamespaceIndex {
 
 		if (tempNamespacePrefixes != null) {
 
-			if(!tempNamespacePrefixes.isEmpty()) {
+			if (!tempNamespacePrefixes.isEmpty()) {
 
 				// to ensure that no namespace prefix mapping get lost
 				pumpNFlushNamespacePrefixIndex();
@@ -151,17 +151,11 @@ public class NamespaceIndex {
 		uriPrefixedURIMap.clear();
 		prefixedURIURIMap.clear();
 
-		if (!tempNamespacePrefixesDB.isClosed()) {
+		tempNamespacePrefixes.clear();
+		inMemoryNamespacePrefixes.clear();
 
-			tempNamespacePrefixes.clear();
-			tempNamespacePrefixesDB.close();
-		}
-
-		if (!inMemoryNamespacePrefixesDB.isClosed()) {
-
-			inMemoryNamespacePrefixes.clear();
-			inMemoryNamespacePrefixesDB.close();
-		}
+		closeMapDBIndex(tempNamespacePrefixesDB);
+		closeMapDBIndex(inMemoryNamespacePrefixesDB);
 	}
 
 	public void closeMapDBIndices() {

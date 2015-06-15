@@ -141,6 +141,8 @@ public class NamespaceIndex {
 
 	public void addPrefix(final String namespace, final String prefix) {
 
+		LOG.debug("write namespace '{}' with prefix '{}' to graph", namespace, prefix);
+
 		final Node prefixNode = database.createNode(GraphProcessingStatics.PREFIX_LABEL);
 		prefixNode.setProperty(GraphStatics.URI_PROPERTY, namespace);
 		prefixNode.setProperty(GraphProcessingStatics.PREFIX_PROPERTY, prefix);

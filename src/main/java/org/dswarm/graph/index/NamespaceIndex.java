@@ -85,7 +85,6 @@ public class NamespaceIndex {
 			}
 
 			tempNamespacePrefixes.clear();
-			inMemoryNamespacePrefixes.clear();
 		}
 	}
 

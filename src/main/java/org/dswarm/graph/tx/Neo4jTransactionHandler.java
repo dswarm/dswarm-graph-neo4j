@@ -91,12 +91,16 @@ public class Neo4jTransactionHandler implements TransactionHandler {
 		}
 	}
 
-	@Override public void ensureRunningTx() {
+	@Override public boolean ensureRunningTx() {
 
 		if (txIsClosed()) {
 
 			beginTx();
+
+			return true;
 		}
+
+		return false;
 	}
 
 	@Override public boolean txIsClosed() {

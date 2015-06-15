@@ -144,7 +144,7 @@ public class NamespaceUtils {
 
 			tx.failTx();
 
-			final String message = "couldn't retrieve prefix successfully";
+			final String message = String.format("couldn't retrieve prefix for namespace '%s' successfully", namespace);
 
 			LOG.error(message);
 
@@ -177,7 +177,7 @@ public class NamespaceUtils {
 
 			tx.failTx();
 
-			final String message = "couldn't retrieve namespace successfully";
+			final String message = String.format("couldn't retrieve namespace for prefix '%s' successfully", prefix);
 
 			LOG.error(message);
 

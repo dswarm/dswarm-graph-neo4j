@@ -29,7 +29,12 @@ public interface TransactionHandler {
 
 	void succeedTx();
 
-	void ensureRunningTx();
+	/**
+	 * Return true, if a new transaction was create; if an existing transaction is still open, this one will be returned.
+	 *
+	 * @return true, if a new transaction was create; if an existing transaction is still open, this one will be returned.
+	 */
+	boolean ensureRunningTx();
 
 	boolean txIsClosed();
 }

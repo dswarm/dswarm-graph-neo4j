@@ -153,9 +153,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			allVersions = false;
 
-			tx.ensureRunningTx();
+			final boolean createdNewTx = tx.ensureRunningTx();
 
-			PropertyGraphXMLReader.LOG.debug("start read XML TX");
+			PropertyGraphXMLReader.LOG.debug("start read XML TX (createdNewTx = '{}')", createdNewTx);
 
 			try {
 
@@ -182,9 +182,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		try {
 
-			PropertyGraphXMLReader.LOG.debug("start read XML TX");
+			final boolean createdNewTx = tx.ensureRunningTx();
 
-			tx.ensureRunningTx();
+			PropertyGraphXMLReader.LOG.debug("start read XML TX (createdNewTx = '{}')", createdNewTx);
 		} catch (final Exception e) {
 
 			final String message = "couldn't acquire tx successfully";

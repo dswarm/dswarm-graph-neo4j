@@ -138,6 +138,8 @@ public class NamespaceIndex {
 		inMemoryNamespacePrefixesDB.commit();
 
 		LOG.debug("finished flushing namespace prefix index");
+
+		tempNamespacePrefixes.clear();
 	}
 
 	public void addPrefix(final String namespace, final String prefix) {

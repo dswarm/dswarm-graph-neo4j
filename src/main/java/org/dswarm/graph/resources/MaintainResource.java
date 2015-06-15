@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -61,6 +64,7 @@ import org.dswarm.graph.DataModelNeo4jProcessor;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.deprecate.DataModelNeo4jDeprecator;
+import org.dswarm.graph.deprecate.RecordsNeo4jDeprecator;
 import org.dswarm.graph.deprecate.RelationshipDeprecator;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.NamespaceIndex;
@@ -86,6 +90,8 @@ public class MaintainResource extends GraphResource {
 	private static final String DELETE_CYPHER = "MATCH (a) WITH a LIMIT %d OPTIONAL MATCH (a)-[r]-() DELETE a,r RETURN COUNT(*) AS entity_count";
 
 	private static final String DEPRECATE_DATA_MODEL_TYPE = "deprecate data model";
+
+	private static final String DEPRECATE_RECORDS_TYPE = "deprecate records";
 
 	public MaintainResource() {
 
@@ -121,19 +127,19 @@ public class MaintainResource extends GraphResource {
 
 		final BasicNeo4jProcessor processor = new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelUri);
 
-		final RelationshipDeprecator statementDeprecator = new DataModelNeo4jDeprecator(processor, true, prefixedDataModelUri);
+		final RelationshipDeprecator dataModelDeprecator = new DataModelNeo4jDeprecator(processor, true, prefixedDataModelUri);
 
-		statementDeprecator.work();
+		dataModelDeprecator.work();
 
-		final int relationshipsDeprecated = statementDeprecator.getRelationshipsDeprecated();
+		final int relationshipsDeprecated = dataModelDeprecator.getRelationshipsDeprecated();
 
 		if (relationshipsDeprecated > 0) {
 
 			// update data model version only when some statements are deprecated the DB
-			statementDeprecator.getVersionHandler().updateLatestVersion();
+			dataModelDeprecator.getVersionHandler().updateLatestVersion();
 		}
 
-		statementDeprecator.closeTransaction();
+		dataModelDeprecator.closeTransaction();
 
 		LOG.info("deprecated '{}' relationships in data model '{}' ('{}') in graph db", relationshipsDeprecated, dataModelUri, prefixedDataModelUri);
 
@@ -142,6 +148,57 @@ public class MaintainResource extends GraphResource {
 		final String result = serializeJSON(resultJSON, DEPRECATE_DATA_MODEL_TYPE);
 
 		return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+	}
+
+	@POST
+	@Path("/deprecate/records")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deprecateRecords(final String jsonObjectString, @Context final GraphDatabaseService database) throws DMPGraphException {
+
+		MaintainResource.LOG.info("try to deprecate records in a data model in graph db");
+
+		final ObjectNode requestJSON = deserializeJSON(jsonObjectString, DEPRECATE_RECORDS_TYPE);
+
+		final String dataModelUri = requestJSON.get(DMPStatics.DATA_MODEL_URI_IDENTIFIER).asText();
+
+		final Collection<String> recordURIs = getRecordURIs(requestJSON);
+
+		final TransactionHandler tx = new Neo4jTransactionHandler(database);
+		final NamespaceIndex namespaceIndex = new NamespaceIndex(database, tx);
+
+		final String prefixedDataModelUri = namespaceIndex.createPrefixedURI(dataModelUri);
+
+		final Collection<String> prefixedRecordURIs = prefixRecordURIs(recordURIs, namespaceIndex);
+
+		MaintainResource.LOG.info("try to deprecate '{}' records in data model '{}' ('{}') in graph db", prefixedRecordURIs.size(), dataModelUri,
+				prefixedDataModelUri);
+
+		final BasicNeo4jProcessor processor = new DataModelNeo4jProcessor(database, tx, namespaceIndex, prefixedDataModelUri);
+
+		final RelationshipDeprecator recordsDeprecator = new RecordsNeo4jDeprecator(processor, true, prefixedDataModelUri, prefixedRecordURIs);
+
+		recordsDeprecator.work();
+
+		final int relationshipsDeprecated = recordsDeprecator.getRelationshipsDeprecated();
+
+		if (relationshipsDeprecated > 0) {
+
+			// update data model version only when some statements are deprecated the DB
+			recordsDeprecator.getVersionHandler().updateLatestVersion();
+		}
+
+		recordsDeprecator.closeTransaction();
+
+		LOG.info("deprecated '{}' records with '{}' relationships in data model '{}' ('{}') in graph db", prefixedRecordURIs.size(),
+				relationshipsDeprecated, dataModelUri, prefixedDataModelUri);
+
+		final ObjectNode resultJSON = simpleObjectMapper.createObjectNode();
+		resultJSON.put("deprecated", relationshipsDeprecated);
+		final String result = serializeJSON(resultJSON, DEPRECATE_DATA_MODEL_TYPE);
+
+		return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+
 	}
 
 	/**
@@ -511,5 +568,35 @@ public class MaintainResource extends GraphResource {
 		}
 
 		MaintainResource.LOG.debug("finished initialising namespaces index");
+	}
+
+	private Collection<String> getRecordURIs(final ObjectNode json) {
+
+		final JsonNode recordsNode = json.get(DMPStatics.RECORDS_IDENTIFIER);
+
+		final ArrayList<String> recordURIs = new ArrayList<>();
+
+		for (final JsonNode recordNode : recordsNode) {
+
+			final String recordURI = recordNode.asText();
+
+			recordURIs.add(recordURI);
+		}
+
+		return recordURIs;
+	}
+
+	private Collection<String> prefixRecordURIs(final Collection<String> recordURIs, final NamespaceIndex namespaceIndex) throws DMPGraphException {
+
+		final ArrayList<String> prefixedRecordURIs = new ArrayList<>();
+
+		for (final String recordURI : recordURIs) {
+
+			final String prefixedRecordURI = namespaceIndex.createPrefixedURI(recordURI);
+
+			prefixedRecordURIs.add(prefixedRecordURI);
+		}
+
+		return prefixedRecordURIs;
 	}
 }

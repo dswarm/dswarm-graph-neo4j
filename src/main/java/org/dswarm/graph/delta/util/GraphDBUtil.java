@@ -1253,12 +1253,13 @@ public final class GraphDBUtil {
 		// RETURN n.uri;
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(recordId).append("\"})\n")
+		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(recordId)
+				.append("\"})\n")
 				.append("WITH o\n")
 				.append("MATCH (o)");
 
 		final List<Attribute> attributes = prefixedRecordIdentifierAP.getAttributes();
-		int i = attributes.size() -1;
+		int i = attributes.size() - 1;
 
 		while (i >= 0) {
 
@@ -1289,12 +1290,13 @@ public final class GraphDBUtil {
 			throws DMPGraphException {
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(searchValue).append("\"})\n")
+		sb.append("MATCH (o:").append(NodeType.Literal).append(" {").append(GraphStatics.VALUE_PROPERTY).append(":\"").append(searchValue)
+				.append("\"})\n")
 				.append("WITH o\n")
 				.append("MATCH (o)");
 
 		final List<Attribute> attributes = prefixedKeyAttributePath.getAttributes();
-		int i = attributes.size() -1;
+		int i = attributes.size() - 1;
 
 		while (i >= 0) {
 

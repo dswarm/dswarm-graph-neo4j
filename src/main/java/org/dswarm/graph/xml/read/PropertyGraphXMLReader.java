@@ -50,6 +50,7 @@ import org.dswarm.common.model.Attribute;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
+import org.dswarm.common.xml.utils.XMLStreamWriterUtils;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.index.NamespaceIndex;
@@ -61,7 +62,6 @@ import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 import org.dswarm.graph.versioning.utils.GraphVersionUtils;
-import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
 
 /**
  * @author tgaengler

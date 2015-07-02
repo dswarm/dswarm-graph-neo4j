@@ -565,7 +565,7 @@ public class RDFResource {
 
 		final String prefixedDataModelURI = namespaceIndex.createPrefixedURI(dataModelURI);
 
-		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"{}\" ('') from graph db to format \"{}\"", dataModelURI,
+		RDFResource.LOG.debug("try to export all RDF statements for dataModelURI \"{}\" ('{}') from graph db to format \"{}\"", dataModelURI,
 				prefixedDataModelURI, exportLanguage.getLabel());
 
 		final RDFExporter rdfExporter = new DataModelRDFExporter(database, dataModelURI, tx, namespaceIndex);
@@ -581,7 +581,7 @@ public class RDFResource {
 			final String result = writer.toString();
 
 			RDFResource.LOG
-					.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}')) for data model '{}' ('')",
+					.debug("finished exporting {} RDF statements from graph db (processed statements = '{}' (successfully processed statements = '{}')) for data model '{}' ('{}')",
 							rdfExporter.countStatements(), rdfExporter.processedStatements(), rdfExporter.successfullyProcessedStatements(),
 							dataModelURI, prefixedDataModelURI);
 

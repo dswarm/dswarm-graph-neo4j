@@ -50,6 +50,7 @@ import org.dswarm.common.model.Attribute;
 import org.dswarm.common.model.AttributePath;
 import org.dswarm.common.types.Tuple;
 import org.dswarm.common.web.URI;
+import org.dswarm.common.xml.utils.XMLStreamWriterUtils;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.gdm.read.PropertyGraphGDMReaderHelper;
 import org.dswarm.graph.index.NamespaceIndex;
@@ -61,7 +62,6 @@ import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.Range;
 import org.dswarm.graph.versioning.VersioningStatics;
 import org.dswarm.graph.versioning.utils.GraphVersionUtils;
-import org.dswarm.graph.xml.utils.XMLStreamWriterUtils;
 
 /**
  * @author tgaengler
@@ -153,9 +153,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 			allVersions = false;
 
-			tx.ensureRunningTx();
+			final boolean createdNewTx = tx.ensureRunningTx();
 
-			PropertyGraphXMLReader.LOG.debug("start read XML TX");
+			PropertyGraphXMLReader.LOG.debug("start read XML TX (createdNewTx = '{}')", createdNewTx);
 
 			try {
 
@@ -182,9 +182,9 @@ public class PropertyGraphXMLReader implements XMLReader {
 
 		try {
 
-			PropertyGraphXMLReader.LOG.debug("start read XML TX");
+			final boolean createdNewTx = tx.ensureRunningTx();
 
-			tx.ensureRunningTx();
+			PropertyGraphXMLReader.LOG.debug("start read XML TX (createdNewTx = '{}')", createdNewTx);
 		} catch (final Exception e) {
 
 			final String message = "couldn't acquire tx successfully";

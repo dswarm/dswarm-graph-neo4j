@@ -1323,6 +1323,11 @@ public class GDMResource extends GraphResource {
 			throw new DMPGraphException(message);
 		}
 
+		if(LOG.isDebugEnabled()) {
+
+			LOG.debug("metadata of request '{}'", metadataString);
+		}
+
 		try {
 
 			return objectMapper.readValue(metadataString, ObjectNode.class);
@@ -1421,7 +1426,18 @@ public class GDMResource extends GraphResource {
 		try {
 
 			final String contentSchemaJSONString = objectMapper.writeValueAsString(optionalContentSchemaJSON.get());
+
+			if(LOG.isDebugEnabled()) {
+
+				LOG.debug("content schema JSON string '{}'", contentSchemaJSONString);
+			}
+
 			final ContentSchema contentSchema = objectMapper.readValue(contentSchemaJSONString, ContentSchema.class);
+
+			if(LOG.isDebugEnabled()) {
+
+				LOG.debug("try to prefix URIs of content schema '{}'", objectMapper.writeValueAsString(contentSchema));
+			}
 
 			final Optional<ContentSchema> contentSchemaOptional = Optional.fromNullable(contentSchema);
 
@@ -1435,7 +1451,7 @@ public class GDMResource extends GraphResource {
 
 			final String message = "could not deserialise content schema JSON for write from graph DB request";
 
-			GDMResource.LOG.debug(message);
+			GDMResource.LOG.error(message);
 
 			return Optional.absent();
 		}
@@ -1521,6 +1537,16 @@ public class GDMResource extends GraphResource {
 		if (!prefixedAttributeMap.containsKey(attribute)) {
 
 			final String attributeUri = attribute.getUri();
+
+			if(attributeUri == null || attributeUri.trim().isEmpty()) {
+
+				final String message = "attribute URI shouldn't be null or empty";
+
+				LOG.error(message);
+
+				throw new DMPGraphException(message);
+			}
+
 			final String prefixedAttributeURI = namespaceIndex.createPrefixedURI(attributeUri);
 
 			final Attribute prefixedAttribute = new Attribute(prefixedAttributeURI);

@@ -139,12 +139,14 @@ public class NamespaceUtils {
 				tempNamespacesPrefixesMap.put(namespace, prefix);
 			}
 
+			LOG.debug("minted new prefix '{}' for namespace '{}'", prefix, namespace);
+
 			return prefix;
 		} catch (final Exception e) {
 
 			tx.failTx();
 
-			final String message = "couldn't retrieve prefix successfully";
+			final String message = String.format("couldn't retrieve prefix for namespace '%s' successfully", namespace);
 
 			LOG.error(message);
 
@@ -158,43 +160,43 @@ public class NamespaceUtils {
 				.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
 	}
 
-	public static String getNamespace(final String prefix, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
+	public static String getNamespace(final String prefix, final GraphDatabaseService database, final TransactionHandler tx)
+			throws DMPGraphException {
 
 		if (prefix == null || prefix.trim().isEmpty()) {
 
 			throw new DMPGraphException("prefix shouldn't be null or empty");
 		}
 
-		Optional<Node> optionalNode = null;
-
 		try {
 
 			tx.ensureRunningTx();
 
-			optionalNode = Optional.fromNullable(
+			final Optional<Node> optionalNode = Optional.fromNullable(
 					database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, prefix));
+
+			if (!optionalNode.isPresent()) {
+
+				throw new DMPGraphException(String.format("couldn't find a namespace for prefix '%s'", prefix));
+			}
+
+			final Node node = optionalNode.get();
+			return (String) node.getProperty(GraphStatics.URI_PROPERTY);
 		} catch (final Exception e) {
 
 			tx.failTx();
 
-			final String message = "couldn't retrieve namespace successfully";
+			final String message = String.format("couldn't retrieve namespace for prefix '%s' successfully", prefix);
 
 			LOG.error(message);
 
 			throw new DMPGraphException(message, e);
 		}
-
-		if (optionalNode == null || !optionalNode.isPresent()) {
-
-			throw new DMPGraphException(String.format("couldn't find a namespace for prefix '%s'", prefix));
-		}
-
-		final Node node = optionalNode.get();
-		return (String) node.getProperty(GraphStatics.URI_PROPERTY);
 	}
 
 	public static String determinePrefixedURI(final String fullURI, final Map<String, String> tempNamespacePrefixes,
-			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
+			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database, final TransactionHandler tx)
+			throws DMPGraphException {
 
 		final Tuple<String, String> uriParts = URI.determineParts(fullURI);
 		final String namespaceURI = uriParts.v1();
@@ -205,7 +207,8 @@ public class NamespaceUtils {
 		return prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
 	}
 
-	public static String determineFullURI(final String prefixedURI, final GraphDatabaseService database, final TransactionHandler tx) throws DMPGraphException {
+	public static String determineFullURI(final String prefixedURI, final GraphDatabaseService database, final TransactionHandler tx)
+			throws DMPGraphException {
 
 		final String[] splittedPrefixedURI = prefixedURI.split(PREFIX_DELIMTER_STRING);
 

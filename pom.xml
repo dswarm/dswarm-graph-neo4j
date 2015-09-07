@@ -41,20 +41,20 @@
 		<maven-release-plugin.version>2.5.1</maven-release-plugin.version>
 		<maven-version-plugin.version>2.1</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>2.13.0</jena.version>
+		<jena.version>3.0.0</jena.version>
 		<!-- jersey 1.19 on is java 8 compatible -->
 		<jersey.version>1.18.1</jersey.version>
 		<junit.version>4.12</junit.version>
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.3-SNAPSHOT</dswarm.graph.model.version>
-		<dswarm.commons.version>0.0.2-SNAPSHOT</dswarm.commons.version>
+		<dswarm.commons.version>0.0.3-SNAPSHOT</dswarm.commons.version>
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
 		<aalto-xml.version>0.9.11</aalto-xml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
-		<mapdb.version>1.0.7</mapdb.version>
-		<rxjava.version>1.0.11</rxjava.version>
+		<mapdb.version>1.0.8</mapdb.version>
+		<rxjava.version>1.0.14</rxjava.version>
 	</properties>
 
 	<prerequisites>

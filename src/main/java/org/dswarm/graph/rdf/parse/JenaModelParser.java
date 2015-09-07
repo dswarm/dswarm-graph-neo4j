@@ -18,8 +18,8 @@ package org.dswarm.graph.rdf.parse;
 
 import org.dswarm.graph.DMPGraphException;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.StmtIterator;
 
 /**
  * @author tgaengler

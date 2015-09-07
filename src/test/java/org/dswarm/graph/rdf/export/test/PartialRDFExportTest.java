@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import javax.ws.rs.core.MediaType;
 
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Assert;
 
 import org.apache.http.HttpStatus;
@@ -36,8 +36,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import com.sun.jersey.api.client.ClientResponse;
 
 /**

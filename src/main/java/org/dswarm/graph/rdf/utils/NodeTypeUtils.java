@@ -19,7 +19,7 @@ package org.dswarm.graph.rdf.utils;
 import org.dswarm.graph.NodeType;
 
 import com.google.common.base.Optional;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFNode;
 
 /**
  * @author tgaengler

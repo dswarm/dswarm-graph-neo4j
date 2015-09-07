@@ -19,7 +19,7 @@ package org.dswarm.graph.index;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.RDFS;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

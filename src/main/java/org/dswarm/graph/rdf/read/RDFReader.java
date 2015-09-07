@@ -17,7 +17,7 @@
 package org.dswarm.graph.rdf.read;
 
 import com.google.common.base.Optional;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import org.dswarm.graph.DMPGraphException;
 

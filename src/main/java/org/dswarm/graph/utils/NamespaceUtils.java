@@ -40,7 +40,7 @@ public class NamespaceUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NamespaceUtils.class);
 
-	private static final String NAMESPACE_PREFIX_BASE  = "ns";
+	public static final String NAMESPACE_PREFIX_BASE  = "ns";
 	public static final  char   PREFIX_DELIMITER       = ':';
 	public static final  String PREFIX_DELIMTER_STRING = String.valueOf(PREFIX_DELIMITER);
 

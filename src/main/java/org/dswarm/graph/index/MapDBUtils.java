@@ -19,7 +19,6 @@ package org.dswarm.graph.index;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
@@ -57,7 +56,8 @@ public final class MapDBUtils {
 		return Tuple.tuple(createTreeSet(db, indexName), db);
 	}
 
-	public static Tuple<Map<String, String>, DB> createOrGetPersistentStringStringIndexTreeMapGlobalTransactional(final String indexFileName, final String indexName) {
+	public static Tuple<Map<String, String>, DB> createOrGetPersistentStringStringIndexTreeMapGlobalTransactional(final String indexFileName,
+			final String indexName) {
 
 		final DB db = createGlobalTransactionalPermanentMapDB(indexFileName);
 
@@ -71,6 +71,14 @@ public final class MapDBUtils {
 		return Tuple.tuple(createLongIndex(db, indexName), db);
 	}
 
+	public static Tuple<Atomic.Long, DB> createOrGetPersistentLongIndexGlobalTransactional(final String indexFileName, final String indexName,
+			final long initValue) {
+
+		final DB db = createGlobalTransactionalPermanentMapDB(indexFileName);
+
+		return Tuple.tuple(createOrGetLongIndex(db, indexName, initValue), db);
+	}
+
 	public static Map<String, String> createStringStringTreeMap(final DB db, final String indexName) {
 
 		return db.createTreeMap(indexName)
@@ -81,6 +89,26 @@ public final class MapDBUtils {
 	public static Atomic.Long createLongIndex(final DB db, final String indexName) {
 
 		return db.getAtomicLong(indexName);
+	}
+
+	public static Atomic.Long createOrGetLongIndex(final DB db, final String indexName, final long initValue) {
+
+		final Atomic.Long longIndex;
+
+		if (db.getCatalog().containsKey(indexName)) {
+
+			final Atomic.Long atomicLong = db.getAtomicLong(indexName);
+			atomicLong.getAndSet(initValue);
+
+			longIndex = atomicLong;
+
+			db.commit();
+		} else {
+
+			longIndex = db.createAtomicLong(indexName, initValue);
+		}
+
+		return longIndex;
 	}
 
 	public static Set<Long> createTreeSet(final DB db, final String indexName) {

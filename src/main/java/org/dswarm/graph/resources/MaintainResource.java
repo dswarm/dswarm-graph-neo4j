@@ -44,10 +44,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
@@ -69,6 +71,7 @@ import org.dswarm.graph.deprecate.RelationshipDeprecator;
 import org.dswarm.graph.index.MapDBUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.index.SchemaIndexUtils;
+import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.utils.GraphDatabaseUtils;
@@ -258,6 +261,15 @@ public class MaintainResource extends GraphResource {
 		SchemaIndexUtils.createSchemaIndices(database, PERSISTENT_GRAPH_DATABASE_IDENTIFIER);
 
 		initPrefixes(database);
+
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/initprefixcounter")
+	public Response initPrefixCounter(@Context final GraphDatabaseService database) throws DMPGraphException {
+
+		initPrefixCounterInternal(database);
 
 		return Response.ok().build();
 	}
@@ -598,5 +610,97 @@ public class MaintainResource extends GraphResource {
 		}
 
 		return prefixedRecordURIs;
+	}
+
+	private void initPrefixCounterInternal(final GraphDatabaseService database) throws DMPGraphException {
+
+		try (final Transaction tx = database.beginTx()) {
+
+			final ResourceIterator<Node> nodes = database.findNodes(GraphProcessingStatics.PREFIX_LABEL);
+
+			if (nodes == null) {
+
+				LOG.debug("no prefix nodes available - prefix does not need to initialised with a specific value");
+
+				tx.success();
+				tx.close();
+
+				return;
+			}
+
+			long biggestPrefixNumber = 0;
+
+			while (nodes.hasNext()) {
+
+				final Node prefixNode = nodes.next();
+
+				final Object prefixObject = prefixNode.getProperty(GraphProcessingStatics.PREFIX_PROPERTY, null);
+
+				if (prefixObject == null) {
+
+					LOG.debug("could not find prefix at prefix node '{}'", prefixNode.getId());
+
+					continue;
+				}
+
+				final String prefix = (String) prefixObject;
+
+				if (!prefix.startsWith(NamespaceUtils.NAMESPACE_PREFIX_BASE)) {
+
+					// namespace is no candidate for prefix counter number
+
+					continue;
+				}
+
+				if (!(prefix.length() > 2)) {
+
+					// namespace is no candidate for prefix counter number
+
+					continue;
+				}
+
+				final String prefixNumberString = prefix.substring(2, prefix.length());
+
+				try {
+
+					final Long prefixNumber = Long.valueOf(prefixNumberString);
+
+					if (prefixNumber > biggestPrefixNumber) {
+
+						biggestPrefixNumber = prefixNumber;
+					}
+				} catch (final NumberFormatException e) {
+
+					LOG.debug("could not convert prefix number string '{}' to a number", prefixNumberString);
+				}
+			}
+
+			nodes.close();
+
+			// create persistent prefix counter with biggest given prefix number + 1
+			biggestPrefixNumber = biggestPrefixNumber + 1;
+
+			final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
+
+			final Tuple<Atomic.Long, DB> prefixCounterTuple = MapDBUtils
+					.createOrGetPersistentLongIndexGlobalTransactional(storeDir + File.separator + GraphIndexStatics.PREFIX_COUNTER_INDEX_NAME,
+							GraphIndexStatics.PREFIX_COUNTER_INDEX_NAME, biggestPrefixNumber);
+			final DB prefixCounterDB = prefixCounterTuple.v2();
+
+			prefixCounterDB.commit();
+			prefixCounterDB.close();
+
+			LOG.info("initialized the prefix counter index with '{}'", biggestPrefixNumber);
+
+			tx.success();
+			tx.close();
+		} catch (final Exception e) {
+
+			final String message = "couldn't finish init prefix counter TX successfully";
+
+			MaintainResource.LOG.error(message, e);
+
+			throw new DMPGraphException(message);
+		}
 	}
 }

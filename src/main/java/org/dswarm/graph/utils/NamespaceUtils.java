@@ -17,9 +17,10 @@
 package org.dswarm.graph.utils;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Optional;
+import org.mapdb.Atomic;
+import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -39,13 +40,13 @@ public class NamespaceUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NamespaceUtils.class);
 
-	private static final AtomicInteger counter                = new AtomicInteger(0);
-	private static final String        NAMESPACE_PREFIX_BASE  = "ns";
-	public static final  char          PREFIX_DELIMITER       = ':';
-	public static final  String        PREFIX_DELIMTER_STRING = String.valueOf(PREFIX_DELIMITER);
+	private static final String NAMESPACE_PREFIX_BASE  = "ns";
+	public static final  char   PREFIX_DELIMITER       = ':';
+	public static final  String PREFIX_DELIMTER_STRING = String.valueOf(PREFIX_DELIMITER);
 
 	public static String createPrefixedURI(final String fullURI, final Map<String, String> uriPrefixedURIMap,
-			final Map<String, String> tempNamespacePrefixes, final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database,
+			final Map<String, String> tempNamespacePrefixes, final Map<String, String> inMemoryNamespacePrefixes,
+			final Tuple<Atomic.Long, DB> prefixCounterTuple, final GraphDatabaseService database,
 			final TransactionHandler tx)
 			throws DMPGraphException {
 
@@ -58,7 +59,8 @@ public class NamespaceUtils {
 
 			if (!uriPrefixedURIMap.containsKey(fullURI)) {
 
-				final String prefixedURI = determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+				final String prefixedURI = determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, prefixCounterTuple,
+						database, tx);
 
 				uriPrefixedURIMap.put(fullURI, prefixedURI);
 			}
@@ -66,7 +68,7 @@ public class NamespaceUtils {
 			return uriPrefixedURIMap.get(fullURI);
 		} else {
 
-			return determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+			return determinePrefixedURI(fullURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, prefixCounterTuple, database, tx);
 		}
 	}
 
@@ -95,7 +97,8 @@ public class NamespaceUtils {
 	}
 
 	public static String getPrefix(final String namespace, final Map<String, String> tempNamespacesPrefixesMap,
-			final Map<String, String> inMemoryNamespacesPrefixesMap, final GraphDatabaseService database, final TransactionHandler tx)
+			final Map<String, String> inMemoryNamespacesPrefixesMap, final Tuple<Atomic.Long, DB> prefixCounterTuple,
+			final GraphDatabaseService database, final TransactionHandler tx)
 			throws DMPGraphException {
 
 		if (namespace == null || namespace.trim().isEmpty()) {
@@ -132,7 +135,8 @@ public class NamespaceUtils {
 				return prefix;
 			}
 
-			final String prefix = NAMESPACE_PREFIX_BASE + counter.incrementAndGet();
+			final long currentPrefixCount = getNewPrefixCount(prefixCounterTuple);
+			final String prefix = NAMESPACE_PREFIX_BASE + currentPrefixCount;
 
 			if (tempNamespacesPrefixesMap != null) {
 
@@ -195,14 +199,16 @@ public class NamespaceUtils {
 	}
 
 	public static String determinePrefixedURI(final String fullURI, final Map<String, String> tempNamespacePrefixes,
-			final Map<String, String> inMemoryNamespacePrefixes, final GraphDatabaseService database, final TransactionHandler tx)
+			final Map<String, String> inMemoryNamespacePrefixes, final Tuple<Atomic.Long, DB> prefixCounterTuple, final GraphDatabaseService database,
+			final TransactionHandler tx)
 			throws DMPGraphException {
 
 		final Tuple<String, String> uriParts = URI.determineParts(fullURI);
 		final String namespaceURI = uriParts.v1();
 		final String localName = uriParts.v2();
 
-		final String prefix = NamespaceUtils.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+		final String prefix = NamespaceUtils
+				.getPrefix(namespaceURI, tempNamespacePrefixes, inMemoryNamespacePrefixes, prefixCounterTuple, database, tx);
 
 		return prefix + NamespaceUtils.PREFIX_DELIMITER + localName;
 	}
@@ -223,5 +229,17 @@ public class NamespaceUtils {
 		final String namespace = getNamespace(prefix, database, tx);
 
 		return namespace + localName;
+	}
+
+	private static long getNewPrefixCount(final Tuple<Atomic.Long, DB> prefixCounterTuple) {
+
+		final Atomic.Long prefixCounter = prefixCounterTuple.v1();
+		final DB prefixCounterDB = prefixCounterTuple.v2();
+
+		final long prefixCount = prefixCounter.getAndIncrement();
+
+		prefixCounterDB.commit();
+
+		return prefixCount;
 	}
 }

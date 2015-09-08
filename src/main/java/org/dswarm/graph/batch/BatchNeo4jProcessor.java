@@ -26,8 +26,6 @@ import java.util.Set;
 
 import com.carrotsearch.hppc.LongLongOpenHashMap;
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import org.mapdb.DB;

@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDF;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

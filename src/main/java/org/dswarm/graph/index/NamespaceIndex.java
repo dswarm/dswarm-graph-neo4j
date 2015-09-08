@@ -16,10 +16,12 @@
  */
 package org.dswarm.graph.index;
 
+import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.RDFS;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -32,6 +34,7 @@ import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.model.GraphStatics;
 import org.dswarm.graph.tx.TransactionHandler;
+import org.dswarm.graph.utils.GraphDatabaseUtils;
 import org.dswarm.graph.utils.NamespaceUtils;
 
 /**
@@ -48,6 +51,9 @@ public class NamespaceIndex {
 	// for caching over the whole process
 	private final Map<String, String> inMemoryNamespacePrefixes;
 	private final DB                  inMemoryNamespacePrefixesDB;
+
+	private final Tuple<Atomic.Long, DB> prefixCounterTuple;
+	private final DB                     prefixCounterDB;
 
 	private final Map<String, String> uriPrefixedURIMap;
 	private final Map<String, String> prefixedURIURIMap;
@@ -72,6 +78,13 @@ public class NamespaceIndex {
 				GraphIndexStatics.IN_MEMORY_NAMESPACE_PREFIXES_INDEX_NAME);
 		inMemoryNamespacePrefixes = mapDBTuple4.v1();
 		inMemoryNamespacePrefixesDB = mapDBTuple4.v2();
+
+		final String storeDir = GraphDatabaseUtils.determineMapDBIndexStoreDir(database);
+
+		prefixCounterTuple = MapDBUtils
+				.createOrGetPersistentLongIndexGlobalTransactional(storeDir + File.separator + GraphIndexStatics.PREFIX_COUNTER_INDEX_NAME,
+						GraphIndexStatics.PREFIX_COUNTER_INDEX_NAME);
+		prefixCounterDB = prefixCounterTuple.v2();
 	}
 
 	public void resetTXNamespaces() throws DMPGraphException {
@@ -90,7 +103,8 @@ public class NamespaceIndex {
 
 	public String createPrefixedURI(final String fullURI) throws DMPGraphException {
 
-		return NamespaceUtils.createPrefixedURI(fullURI, uriPrefixedURIMap, tempNamespacePrefixes, inMemoryNamespacePrefixes, database, tx);
+		return NamespaceUtils
+				.createPrefixedURI(fullURI, uriPrefixedURIMap, tempNamespacePrefixes, inMemoryNamespacePrefixes, prefixCounterTuple, database, tx);
 	}
 
 	public String createFullURI(final String prefixedURI) throws DMPGraphException {
@@ -166,6 +180,7 @@ public class NamespaceIndex {
 
 		closeMapDBIndex(tempNamespacePrefixesDB);
 		closeMapDBIndex(inMemoryNamespacePrefixesDB);
+		closeMapDBIndex(prefixCounterDB);
 	}
 
 	private void closeMapDBIndex(final DB mapDBIndex) {

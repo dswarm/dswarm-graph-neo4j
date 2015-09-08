@@ -19,7 +19,7 @@ package org.dswarm.graph.rdf.parse;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.parse.Handler;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * @author tgaengler

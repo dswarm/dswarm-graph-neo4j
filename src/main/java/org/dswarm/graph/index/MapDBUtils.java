@@ -19,7 +19,9 @@ package org.dswarm.graph.index;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -62,16 +64,28 @@ public final class MapDBUtils {
 		return Tuple.tuple(createStringStringTreeMap(db, indexName), db);
 	}
 
-	public static Map<String, String> createStringStringTreeMap(final DB db, final String indexFileName) {
+	public static Tuple<Atomic.Long, DB> createOrGetPersistentLongIndexGlobalTransactional(final String indexFileName, final String indexName) {
 
-		return db.createTreeMap(indexFileName)
+		final DB db = createGlobalTransactionalPermanentMapDB(indexFileName);
+
+		return Tuple.tuple(createLongIndex(db, indexName), db);
+	}
+
+	public static Map<String, String> createStringStringTreeMap(final DB db, final String indexName) {
+
+		return db.createTreeMap(indexName)
 				.keySerializer(BTreeKeySerializer.STRING)
 				.valueSerializer(Serializer.STRING).makeOrGet();
 	}
 
-	public static Set<Long> createTreeSet(final DB db, final String indexFileName) {
+	public static Atomic.Long createLongIndex(final DB db, final String indexName) {
 
-		return db.createTreeSet(indexFileName).makeOrGet();
+		return db.getAtomicLong(indexName);
+	}
+
+	public static Set<Long> createTreeSet(final DB db, final String indexName) {
+
+		return db.createTreeSet(indexName).makeOrGet();
 	}
 
 	public static DB createNonTransactionalInMemoryMapDB() {

@@ -21,8 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.common.base.Optional;
-import com.hp.hpl.jena.vocabulary.RDF;
-import org.neo4j.graphdb.Direction;
+import org.apache.jena.vocabulary.RDF;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -40,7 +39,6 @@ import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.GraphIndexStatics;
 import org.dswarm.graph.GraphProcessingStatics;
 import org.dswarm.graph.NodeType;
-import org.dswarm.graph.delta.util.GraphDBPrintUtil;
 import org.dswarm.graph.hash.HashUtils;
 import org.dswarm.graph.index.NamespaceIndex;
 import org.dswarm.graph.json.LiteralNode;

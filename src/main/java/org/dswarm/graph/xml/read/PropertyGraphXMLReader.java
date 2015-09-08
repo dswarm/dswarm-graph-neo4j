@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterators;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDF;
 import org.codehaus.stax2.XMLOutputFactory2;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;

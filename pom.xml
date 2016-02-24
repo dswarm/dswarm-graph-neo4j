@@ -32,14 +32,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
-		<maven-assembly-plugin.version>2.5.3</maven-assembly-plugin.version>
+		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
-		<maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
-		<maven-release-plugin.version>2.5.1</maven-release-plugin.version>
-		<maven-version-plugin.version>2.1</maven-version-plugin.version>
+		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-version-plugin.version>2.2</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
 		<jena.version>3.0.1</jena.version>
 		<!-- jersey 1.19 on is java 8 compatible -->
@@ -58,7 +58,7 @@
 	</properties>
 
 	<prerequisites>
-		<maven>2.2.1</maven>
+		<maven>3.0.0</maven>
 	</prerequisites>
 
 	<build>

@@ -27,7 +27,7 @@
 
 	<properties>
 		<neo4j.version>2.2.2</neo4j.version>
-		<google.guava.version>18.0</google.guava.version>
+		<google.guava.version>19.0</google.guava.version>
 		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
@@ -41,7 +41,7 @@
 		<maven-release-plugin.version>2.5.1</maven-release-plugin.version>
 		<maven-version-plugin.version>2.1</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>3.0.0</jena.version>
+		<jena.version>3.0.1</jena.version>
 		<!-- jersey 1.19 on is java 8 compatible -->
 		<jersey.version>1.18.1</jersey.version>
 		<junit.version>4.12</junit.version>
@@ -51,10 +51,10 @@
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
-		<aalto-xml.version>0.9.11</aalto-xml.version>
+		<aalto-xml.version>1.0.0</aalto-xml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
 		<mapdb.version>1.0.8</mapdb.version>
-		<rxjava.version>1.0.14</rxjava.version>
+		<rxjava.version>1.1.1</rxjava.version>
 	</properties>
 
 	<prerequisites>
@@ -153,7 +153,7 @@
 					<properties>
 						<owner>SLUB Dresden &amp; Avantgarde Labs GmbH</owner>
 						<project.name>d:swarm graph extension</project.name>
-						<project.inceptionYear>2013 &ndash; 2015</project.inceptionYear>
+						<project.inceptionYear>2013 &ndash; 2016</project.inceptionYear>
 						<email>&lt;code@dswarm.org&gt;</email>
 					</properties>
 					<useDefaultExcludes>true</useDefaultExcludes>

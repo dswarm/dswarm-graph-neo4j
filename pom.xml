@@ -26,7 +26,7 @@
 	<version>1.2</version>
 
 	<properties>
-		<neo4j.version>2.2.2</neo4j.version>
+		<neo4j.version>2.3.2</neo4j.version>
 		<google.guava.version>19.0</google.guava.version>
 		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,9 +41,8 @@
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<maven-version-plugin.version>2.2</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
-		<jena.version>3.0.1</jena.version>
-		<!-- jersey 1.19 on is java 8 compatible -->
-		<jersey.version>1.18.1</jersey.version>
+		<jena.version>3.0.0</jena.version>
+		<jersey.version>1.19</jersey.version>
 		<junit.version>4.12</junit.version>
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.3-SNAPSHOT</dswarm.graph.model.version>
@@ -103,12 +102,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=5
-						-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4
-						-XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode
-						-XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10
-						-XX:CMSFullGCsBeforeCompaction=1 -XX:+CMSClassUnloadingEnabled
-						-XX:-OmitStackTraceInFastThrow -XX:hashCode=5
+					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=1 -XX:NewSize=4g -XX:MaxNewSize=4G
+						-XX:+UseG1GC -XX:-OmitStackTraceInFastThrow -XX:hashCode=5
 					</argLine>
 				</configuration>
 				<executions>
@@ -266,8 +261,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
-			<artifactId>apache-jena-libs</artifactId>
-			<type>pom</type>
+			<artifactId>jena-core</artifactId>
 			<version>${jena.version}</version>
 			<exclusions>
 				<exclusion>
@@ -280,8 +274,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version> </dependency> -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+			<version>${jena.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-json</artifactId>
@@ -296,6 +303,13 @@
 			<groupId>org.dswarm</groupId>
 			<artifactId>common</artifactId>
 			<version>${dswarm.commons.version}</version>
+			<exclusions>
+				<!-- since we rely on jena 3.0.0 here -->
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -338,12 +352,12 @@
 		</dependency>
 		<dependency>
 			<groupId>de.knutwalker</groupId>
-			<artifactId>ntparser_2.10</artifactId>
+			<artifactId>ntparser_2.11</artifactId>
 			<version>${ntparser.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.knutwalker</groupId>
-			<artifactId>ntparser-model_2.10</artifactId>
+			<artifactId>ntparser-model_2.11</artifactId>
 			<version>${ntparser.version}</version>
 		</dependency>
 		<dependency>

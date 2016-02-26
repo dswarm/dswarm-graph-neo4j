@@ -23,7 +23,7 @@
 
 	<groupId>org.dswarm</groupId>
 	<artifactId>graph</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 
 	<properties>
 		<neo4j.version>2.3.2</neo4j.version>

@@ -40,8 +40,8 @@ import org.dswarm.graph.index.MapDBUtils;
 public final class GraphDatabaseUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GraphDatabaseUtils.class);
-	private static final String CONFIGURATION = "Configuration";
-	private static final String STORE_DIR     = "store_dir";
+	private static final String KERNEL = "Kernel";
+	private static final String STORE_DIR     = "StoreDirectory";
 
 	public static String determineMapDBIndexStoreDir(final GraphDatabaseService database) {
 
@@ -104,6 +104,8 @@ public final class GraphDatabaseUtils {
 
 			// fallback default
 			storeDir = System.getProperty("user.dir") + "/target";
+
+			LOG.debug("utilise fallback default for mapdb index store dir");
 		}
 
 		LOG.debug("mapdb index store dir '{}'", storeDir);
@@ -113,7 +115,7 @@ public final class GraphDatabaseUtils {
 
 	public static String getGraphDatabaseStoreDir(final GraphDatabaseService graphDbService) {
 
-		final ObjectName objectName = JmxUtils.getObjectName(graphDbService, CONFIGURATION);
+		final ObjectName objectName = JmxUtils.getObjectName(graphDbService, KERNEL);
 		return JmxUtils.getAttribute(objectName, STORE_DIR);
 	}
 }

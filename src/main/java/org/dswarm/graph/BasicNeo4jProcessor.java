@@ -700,7 +700,13 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		if (mapDBIndex != null && !mapDBIndex.isClosed()) {
 
-			mapDBIndex.close();
+			try {
+
+				mapDBIndex.close();
+			} catch (final RuntimeException e) {
+
+				LOG.error("could not close mapdb index properly.", e);
+			}
 		}
 	}
 }

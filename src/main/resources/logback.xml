@@ -12,17 +12,6 @@
 	<logger name="org.neo4j.kernel.info.DiagnosticsManager" level="info">
 	</logger>
 
-	<conversionRule conversionWord="module"
-		converterClass="org.neo4j.kernel.logging.ModuleConverter" />
-
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<filter class="org.neo4j.kernel.logging.ConsoleLoggingFilter" />
-		<encoder>
-			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSSZ,UTC} %-5level [%module]
-				%message%n</pattern>
-		</encoder>
-	</appender>
-
 	<appender name="FAT" class="ch.qos.logback.core.FileAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>TRACE</level>
@@ -118,10 +107,6 @@
 		<appender-ref ref="FAW" />
 		<appender-ref ref="FAE" />
 		<appender-ref ref="FAF" />
-	</logger>
-
-	<logger name="org.neo4j">
-		<appender-ref ref="CONSOLE" />
 	</logger>
 
 	<root level="DEBUG">

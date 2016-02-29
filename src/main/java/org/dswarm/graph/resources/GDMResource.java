@@ -16,11 +16,7 @@
  */
 package org.dswarm.graph.resources;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1065,8 +1061,7 @@ public class GDMResource extends GraphResource {
 			throws DMPGraphException {
 
 		// TODO: find proper graph database settings to hold everything in-memory only
-		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(impermanentGraphDatabaseDir)
-				.setConfig(GraphDatabaseSettings.cache_type, "strong").newGraphDatabase();
+		final GraphDatabaseService impermanentDB = impermanentGraphDatabaseFactory.newImpermanentDatabaseBuilder(new File(impermanentGraphDatabaseDir)).newGraphDatabase();
 
 		SchemaIndexUtils.createSchemaIndices(impermanentDB, impermanentGraphDatabaseDir);
 

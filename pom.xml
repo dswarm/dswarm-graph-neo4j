@@ -23,27 +23,26 @@
 
 	<groupId>org.dswarm</groupId>
 	<artifactId>graph</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 
 	<properties>
-		<neo4j.version>2.2.2</neo4j.version>
-		<google.guava.version>18.0</google.guava.version>
+		<neo4j.version>2.3.2</neo4j.version>
+		<google.guava.version>19.0</google.guava.version>
 		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
-		<maven-assembly-plugin.version>2.5.3</maven-assembly-plugin.version>
+		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
-		<maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
-		<maven-release-plugin.version>2.5.1</maven-release-plugin.version>
-		<maven-version-plugin.version>2.1</maven-version-plugin.version>
+		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-version-plugin.version>2.2</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
 		<jena.version>3.0.0</jena.version>
-		<!-- jersey 1.19 on is java 8 compatible -->
-		<jersey.version>1.18.1</jersey.version>
+		<jersey.version>1.19</jersey.version>
 		<junit.version>4.12</junit.version>
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.3-SNAPSHOT</dswarm.graph.model.version>
@@ -51,14 +50,14 @@
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
-		<aalto-xml.version>0.9.11</aalto-xml.version>
+		<aalto-xml.version>1.0.0</aalto-xml.version>
 		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
 		<mapdb.version>1.0.8</mapdb.version>
-		<rxjava.version>1.0.14</rxjava.version>
+		<rxjava.version>1.1.1</rxjava.version>
 	</properties>
 
 	<prerequisites>
-		<maven>2.2.1</maven>
+		<maven>3.0.0</maven>
 	</prerequisites>
 
 	<build>
@@ -103,12 +102,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=5
-						-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelCMSThreads=4
-						-XX:+CMSParallelRemarkEnabled -XX:+CMSIncrementalMode
-						-XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10
-						-XX:CMSFullGCsBeforeCompaction=1 -XX:+CMSClassUnloadingEnabled
-						-XX:-OmitStackTraceInFastThrow -XX:hashCode=5
+					<argLine>-server -d64 -Xms1G -Xmx8G -XX:NewRatio=1 -XX:NewSize=4g -XX:MaxNewSize=4G
+						-XX:+UseG1GC -XX:-OmitStackTraceInFastThrow -XX:hashCode=5
 					</argLine>
 				</configuration>
 				<executions>
@@ -153,7 +148,7 @@
 					<properties>
 						<owner>SLUB Dresden &amp; Avantgarde Labs GmbH</owner>
 						<project.name>d:swarm graph extension</project.name>
-						<project.inceptionYear>2013 &ndash; 2015</project.inceptionYear>
+						<project.inceptionYear>2013 &ndash; 2016</project.inceptionYear>
 						<email>&lt;code@dswarm.org&gt;</email>
 					</properties>
 					<useDefaultExcludes>true</useDefaultExcludes>
@@ -266,8 +261,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
-			<artifactId>apache-jena-libs</artifactId>
-			<type>pom</type>
+			<artifactId>jena-core</artifactId>
 			<version>${jena.version}</version>
 			<exclusions>
 				<exclusion>
@@ -280,8 +274,29 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version> </dependency> -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+			<version>${jena.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-core</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-databind</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.dswarm</groupId>
 			<artifactId>graph-json</artifactId>
@@ -296,6 +311,17 @@
 			<groupId>org.dswarm</groupId>
 			<artifactId>common</artifactId>
 			<version>${dswarm.commons.version}</version>
+			<exclusions>
+				<!-- since we rely on jena 3.0.0 here -->
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -338,13 +364,25 @@
 		</dependency>
 		<dependency>
 			<groupId>de.knutwalker</groupId>
-			<artifactId>ntparser_2.10</artifactId>
+			<artifactId>ntparser_2.11</artifactId>
 			<version>${ntparser.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>de.knutwalker</groupId>
-			<artifactId>ntparser-model_2.10</artifactId>
+			<artifactId>ntparser-model_2.11</artifactId>
 			<version>${ntparser.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.github.emboss</groupId>

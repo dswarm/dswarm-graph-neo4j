@@ -51,7 +51,7 @@
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
 		<aalto-xml.version>1.0.0</aalto-xml.version>
-		<xmlunit.version>2.0.0-SNAPSHOT</xmlunit.version>
+		<xmlunit.version>2.0.0</xmlunit.version>
 		<mapdb.version>1.0.8</mapdb.version>
 		<rxjava.version>1.1.1</rxjava.version>
 	</properties>

@@ -32,7 +32,7 @@ public interface GDMParser {
 	 */
 	void setGDMHandler(GDMHandler handler);
 
-	Observable<Void> parse() throws DMPGraphException;
+	Observable<Boolean> parse() throws DMPGraphException;
 
 	long parsedResources();
 }

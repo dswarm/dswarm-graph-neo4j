@@ -52,7 +52,7 @@ public class GDMModelParser implements GDMParser {
 	}
 
 	@Override
-	public Observable<Void> parse() throws DMPGraphException {
+	public Observable<Boolean> parse() throws DMPGraphException {
 
 		parsedResources = 0;
 
@@ -63,48 +63,45 @@ public class GDMModelParser implements GDMParser {
 			return Observable.empty();
 		}
 
-		return model.map(new Func1<Resource, Void>() {
+		return model.map(resource -> {
 
-			@Override public Void call(final Resource resource) {
+			final Set<Statement> statements = resource.getStatements();
 
-				final Set<Statement> statements = resource.getStatements();
+			if (statements == null || statements.isEmpty()) {
 
-				if (statements == null || statements.isEmpty()) {
+				LOG.debug("there are no statements for resource '{}' in the GDM model", resource.getUri());
 
-					LOG.debug("there are no statements for resource '{}' in the GDM model", resource.getUri());
-
-					return null;
-				}
-
-				AtomicLong counter = new AtomicLong(0);
-
-				try {
-
-					final String prefixedResourceUri = gdmHandler.getHandler().getProcessor().createPrefixedURI(resource.getUri());
-					final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional.<String>absent());
-
-					gdmHandler.getHandler().setResourceUri(prefixedResourceUri);
-					gdmHandler.getHandler().setResourceHash(resourceHash);
-					gdmHandler.getHandler().resetResourceIndexCounter();
-
-					for (final Statement statement : statements) {
-
-						final long i = counter.incrementAndGet();
-
-						// note: just increasing the counter probably won't work at an update ;)
-
-						gdmHandler.handleStatement(statement, resourceHash, i);
-
-					}
-				} catch (final DMPGraphException e) {
-
-					throw new RuntimeException(e);
-				}
-
-				parsedResources++;
-
-				return null;
+				return Boolean.FALSE;
 			}
+
+			AtomicLong counter = new AtomicLong(0);
+
+			try {
+
+				final String prefixedResourceUri = gdmHandler.getHandler().getProcessor().createPrefixedURI(resource.getUri());
+				final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional.<String>absent());
+
+				gdmHandler.getHandler().setResourceUri(prefixedResourceUri);
+				gdmHandler.getHandler().setResourceHash(resourceHash);
+				gdmHandler.getHandler().resetResourceIndexCounter();
+
+				for (final Statement statement : statements) {
+
+					final long i = counter.incrementAndGet();
+
+					// note: just increasing the counter probably won't work at an update ;)
+
+					gdmHandler.handleStatement(statement, resourceHash, i);
+
+				}
+			} catch (final DMPGraphException e) {
+
+				throw new RuntimeException(e);
+			}
+
+			parsedResources++;
+
+			return Boolean.TRUE;
 		});
 	}
 

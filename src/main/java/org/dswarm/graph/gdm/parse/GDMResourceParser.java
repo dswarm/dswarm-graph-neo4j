@@ -49,7 +49,7 @@ public class GDMResourceParser implements GDMParser {
 	}
 
 	@Override
-	public Observable<Void> parse() throws DMPGraphException {
+	public Observable<Boolean> parse() throws DMPGraphException {
 
 		parsedResources = 0;
 

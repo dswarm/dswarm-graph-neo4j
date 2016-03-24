@@ -214,7 +214,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 				boolean isType = false;
 
 				// add Label to subject node, if object is a type entry
-				if (optionalPredicateURI.get().equals(RDF.type.getURI())) {
+				if (optionalPrefixedObjectURI.isPresent() && optionalPredicateURI.get().equals(RDF.type.getURI())) {
 
 					processor.addLabel(subjectNode, optionalPrefixedObjectURI.get());
 

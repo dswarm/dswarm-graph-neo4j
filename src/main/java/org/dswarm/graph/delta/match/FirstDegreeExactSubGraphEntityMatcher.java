@@ -19,31 +19,30 @@ package org.dswarm.graph.delta.match;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.GraphProcessingStatics;
-import org.dswarm.graph.delta.DeltaStatics;
-import org.dswarm.graph.delta.match.mark.SubGraphEntityMarker;
-import org.dswarm.graph.delta.match.model.SubGraphEntity;
-import org.dswarm.graph.delta.util.GraphDBUtil;
-
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.DeltaStatics;
+import org.dswarm.graph.delta.match.mark.SubGraphEntityMarker;
+import org.dswarm.graph.delta.match.model.SubGraphEntity;
+import org.dswarm.graph.delta.util.GraphDBUtil;
+
 /**
  * @author tgaengler
  */
 public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntity> {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(FirstDegreeExactSubGraphEntityMatcher.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FirstDegreeExactSubGraphEntityMatcher.class);
 
 	public FirstDegreeExactSubGraphEntityMatcher(final Optional<? extends Collection<SubGraphEntity>> existingSubGraphEntitiesArg,
-			final Optional<? extends Collection<SubGraphEntity>> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
+	                                             final Optional<? extends Collection<SubGraphEntity>> newSubGraphEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	                                             final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws DMPGraphException {
 
 		super(existingSubGraphEntitiesArg, newSubGraphEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg,
 				prefixedNewResourceURIArg, new SubGraphEntityMarker());
@@ -61,7 +60,7 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 
 		final Map<String, SubGraphEntity> hashedSubGraphEntities = new HashMap<>();
 
-		for(final SubGraphEntity subGraphEntity : subGraphEntities) {
+		for (final SubGraphEntity subGraphEntity : subGraphEntities) {
 
 			final int keyHash = subGraphEntity.getCSEntity().getKey().hashCode();
 			final long csEntityOrderHash = Long.valueOf(subGraphEntity.getCSEntity().getEntityOrder()).hashCode();
@@ -71,11 +70,11 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 			final Map<Long, Long> nodeHashes = new HashMap<>();
 			final Integer deepestLeafHierarchyLevel = calculateEntityLeafHashes(graphDB, subGraphEntity.getNodeId(), nodeHashes);
 
-			if(deepestLeafHierarchyLevel != null && deepestLeafHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
+			if (deepestLeafHierarchyLevel != null && deepestLeafHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
 
 				int currentHierarchyLevel = deepestLeafHierarchyLevel - 1;
 
-				while(currentHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
+				while (currentHierarchyLevel > subGraphEntity.getHierarchyLevel()) {
 
 					calculateEntityHierarchyLevelNodesHashes(graphDB, subGraphEntity.getNodeId(), nodeHashes, currentHierarchyLevel);
 
@@ -90,12 +89,12 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 			long hash = keyHash;
 			hash = 31 * hash + predicateHash;
 
-			if(subGraphHash != null) {
+			if (subGraphHash != null) {
 
 				hash = 31 * hash + subGraphHash;
 			}
 			hash = 31 * hash + csEntityOrderHash;
-			hash = 31 * hash +  Long.valueOf(subGraphEntity.getOrder()).hashCode();
+			hash = 31 * hash + Long.valueOf(subGraphEntity.getOrder()).hashCode();
 
 			hashedSubGraphEntities.put(Long.valueOf(hash).toString(), subGraphEntity);
 		}
@@ -124,11 +123,11 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 	}
 
 	private void calculateEntityHierarchyLevelNodesHashes(final GraphDatabaseService graphDB, final long entityNodeId,
-			final Map<Long, Long> nodeHashes, final int hierarchyLevel) throws DMPGraphException {
+	                                                      final Map<Long, Long> nodeHashes, final int hierarchyLevel) throws DMPGraphException {
 
 		final Collection<String> entityHierarchyLevelNodeIds = getEntityHierarchyLevelNodes(graphDB, entityNodeId, hierarchyLevel);
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			for (final String entityHierarchyLevelNodeId : entityHierarchyLevelNodeIds) {
 
@@ -152,7 +151,7 @@ public class FirstDegreeExactSubGraphEntityMatcher extends Matcher<SubGraphEntit
 		final Collection<String> entityLeafNodeIds = GraphDBUtil.getEntityLeafs(graphDB, entityNodeId);
 		Integer deepestHierarchyLevel = null;
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			for (final String entityLeafNodeId : entityLeafNodeIds) {
 

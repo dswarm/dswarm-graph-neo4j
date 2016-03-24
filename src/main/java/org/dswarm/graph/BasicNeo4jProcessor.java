@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import com.carrotsearch.hppc.LongLongMap;
 import com.carrotsearch.hppc.LongLongOpenHashMap;
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
@@ -177,7 +177,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		if (!optionalFullURI.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return Optional.of(createPrefixedURI(optionalFullURI.get()));
@@ -277,7 +277,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		if (!optionalResourceNodeType.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
@@ -307,14 +307,14 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 			// literal node - should never be the case
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		// resource must be a blank node
 
 		final Node node = bnodes.get(optionalResourceId.get());
 
-		return Optional.fromNullable(node);
+		return Optional.ofNullable(node);
 	}
 
 	public Optional<Long> determineResourceHash(final Node subjectNode, final Optional<NodeType> optionalSubjectNodeType,
@@ -356,7 +356,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 			// shouldn't never be the case
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return finalOptionalResourceHash;
@@ -456,8 +456,8 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 	public long generateStatementHash(final Node subjectNode, final String predicateName, final Node objectNode, final NodeType subjectNodeType,
 			final NodeType objectNodeType) throws DMPGraphException {
 
-		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
-		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = Optional.ofNullable(subjectNodeType);
+		final Optional<NodeType> optionalObjectNodeType = Optional.ofNullable(objectNodeType);
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNode, optionalSubjectNodeType);
 		final Optional<String> optionalObjectIdentifier = getIdentifier(objectNode, optionalObjectNodeType);
 
@@ -505,7 +505,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		if (!optionalNodeType.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final String identifier;
@@ -545,7 +545,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 				break;
 		}
 
-		return Optional.fromNullable(identifier);
+		return Optional.ofNullable(identifier);
 	}
 
 	public abstract void addObjectToResourceWDataModelIndex(final Node node, final String URI, final Optional<String> optionalDataModelURI);
@@ -578,7 +578,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 
 		if (statementUUIDs == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final IndexHits<Relationship> hits = statementUUIDs.get(GraphStatics.UUID, uuid);
@@ -597,7 +597,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 			hits.close();
 		}
 
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	public void addNodeToResourcesIndex(final String value, final Node node) {
@@ -627,7 +627,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 			return Optional.of(tempIndex.get(key));
 		}
 
-		final Optional<Node> optionalNode = Optional.fromNullable(database.findNode(nodeLabel, nodeProperty, key));
+		final Optional<Node> optionalNode = Optional.ofNullable(database.findNode(nodeLabel, nodeProperty, key));
 
 		if (optionalNode.isPresent()) {
 
@@ -645,7 +645,7 @@ public abstract class BasicNeo4jProcessor implements TransactionalNeo4jProcessor
 			return Optional.of(tempIndex.get(key));
 		}
 
-		final Optional<Node> optionalNode = Optional.fromNullable(database.findNode(nodeLabel, nodeProperty, key));
+		final Optional<Node> optionalNode = Optional.ofNullable(database.findNode(nodeLabel, nodeProperty, key));
 
 		if (optionalNode.isPresent()) {
 

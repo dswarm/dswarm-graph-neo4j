@@ -20,16 +20,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
 import org.dswarm.graph.delta.match.model.ModificationEntity;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
 
 public abstract class ModificationMatcher<ENTITY extends ModificationEntity> extends Matcher<ENTITY> implements ModificationResultSet<ENTITY> {
 
@@ -38,9 +38,9 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	private Map<ENTITY, ENTITY> modifications;
 
 	public ModificationMatcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg,
-			final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg,
-			final Marker<ENTITY> markerArg) throws DMPGraphException {
+	                           final Optional<? extends Collection<ENTITY>> newEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	                           final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg,
+	                           final Marker<ENTITY> markerArg) throws DMPGraphException {
 
 		super(existingEntitiesArg, newEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg, prefixedNewResourceURIArg, markerArg);
 	}
@@ -56,12 +56,12 @@ public abstract class ModificationMatcher<ENTITY extends ModificationEntity> ext
 	@Override
 	public Map<ENTITY, ENTITY> getModifications() {
 
-		if(!matchesCalculated) {
+		if (!matchesCalculated) {
 
 			modifications = new HashMap<>();
 			matches = new HashSet<>();
 
-			if(existingEntities.isPresent() && newEntities.isPresent()) {
+			if (existingEntities.isPresent() && newEntities.isPresent()) {
 
 				for (final Map.Entry<String, ENTITY> existingEntityEntry : existingEntities.get().entrySet()) {
 

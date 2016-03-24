@@ -17,8 +17,8 @@
 package org.dswarm.graph.gdm.parse;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -45,10 +45,10 @@ import org.dswarm.graph.parse.TransactionalNeo4jHandler;
  */
 public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
-	private static final Logger				LOG						= LoggerFactory.getLogger(GDMNeo4jHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GDMNeo4jHandler.class);
 
-	protected final BaseNeo4jHandler		handler;
-	protected final GDMNeo4jProcessor		processor;
+	protected final BaseNeo4jHandler handler;
+	protected final GDMNeo4jProcessor processor;
 
 	protected final PropertyGraphGDMReaderHelper propertyGraphGDMReaderHelper;
 
@@ -66,7 +66,8 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		return handler;
 	}
 
-	@Override public GraphDatabaseService getDatabase() {
+	@Override
+	public GraphDatabaseService getDatabase() {
 
 		return ((TransactionalNeo4jHandler) handler).getDatabase();
 	}
@@ -83,14 +84,14 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 
 		final org.dswarm.graph.json.Predicate predicate = st.getPredicate();
 		final String predicateName = predicate.getUri();
-		sb.setOptionalPredicateURI(Optional.fromNullable(predicateName));
+		sb.setOptionalPredicateURI(Optional.ofNullable(predicateName));
 
 		final org.dswarm.graph.json.Node object = st.getObject();
 		final Optional<NodeType> optionalObjectNodeType = NodeTypeUtils.getNodeType(Optional.of(object));
 		sb.setOptionalObjectNodeType(optionalObjectNodeType);
 		processor.determineNode(object, sb, false);
 
-		final Optional<String> optionalStatementUUID = Optional.fromNullable(st.getUUID());
+		final Optional<String> optionalStatementUUID = Optional.ofNullable(st.getUUID());
 		sb.setOptionalStatementUUID(optionalStatementUUID);
 
 		sb.setOptionalResourceHash(Optional.of(resourceHash));
@@ -104,23 +105,28 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 		handler.handleStatement(statement);
 	}
 
-	@Override public long getCountedStatements() {
+	@Override
+	public long getCountedStatements() {
 		return handler.getCountedStatements();
 	}
 
-	@Override public int getRelationshipsAdded() {
+	@Override
+	public int getRelationshipsAdded() {
 		return handler.getRelationshipsAdded();
 	}
 
-	@Override public int getNodesAdded() {
+	@Override
+	public int getNodesAdded() {
 		return handler.getNodesAdded();
 	}
 
-	@Override public int getCountedLiterals() {
+	@Override
+	public int getCountedLiterals() {
 		return handler.getCountedLiterals();
 	}
 
-	@Override public NamespaceIndex getNamespaceIndex() {
+	@Override
+	public NamespaceIndex getNamespaceIndex() {
 
 		return processor.getProcessor().getNamespaceIndex();
 	}
@@ -144,7 +150,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			final Optional<Relationship> optionalRel = ((TransactionalNeo4jProcessor) handler.getProcessor()).getRelationshipFromStatementIndex(
 					stmtUUID);
 
-			if(!optionalRel.isPresent()) {
+			if (!optionalRel.isPresent()) {
 
 				GDMNeo4jHandler.LOG.error("couldn't find statement with the uuid '{}' in the database", stmtUUID);
 			}
@@ -167,7 +173,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			// index
 			// be update with the new stmt (?)
 			final long hash = processor.generateStatementHash(subject, predicate, object, stmt.getSubject().getType(), stmt.getObject().getType());
-			final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.fromNullable(stmt.getSubject()));
+			final Optional<NodeType> optionalSubjectNodeType = NodeTypeUtils.getNodeType(Optional.ofNullable(stmt.getSubject()));
 			final Optional<Long> optionalSubjectHash;
 
 			if (stmt.getSubject().getType().equals(org.dswarm.graph.json.NodeType.Resource)) {
@@ -176,12 +182,12 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 				final String subjectURI = processor.getProcessor().createPrefixedURI(subjectNode.getUri());
 				final String dataModelURI = processor.getProcessor().createPrefixedURI(subjectNode.getDataModel());
 
-				final long resourceUriDataModelUriHash = processor.getProcessor().generateResourceHash(subjectURI, Optional.fromNullable(dataModelURI));
+				final long resourceUriDataModelUriHash = processor.getProcessor().generateResourceHash(subjectURI, Optional.ofNullable(dataModelURI));
 
 				optionalSubjectHash = Optional.of(resourceUriDataModelUriHash);
 			} else {
 
-				optionalSubjectHash = Optional.absent();
+				optionalSubjectHash = Optional.empty();
 			}
 
 			final Optional<Long> optionalResourceHash = processor.determineResourceHash(stmt.getSubject(), resourceHash);
@@ -190,7 +196,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			qualifiedAttributes.put(GraphStatics.ORDER_PROPERTY, order);
 			final Optional<Map<String, Object>> optionalQualifiedAttributes = Optional.of(qualifiedAttributes);
 
-			handler.addRelationship(subject, predicate, object, optionalSubjectNodeType, optionalSubjectHash, Optional.<String> absent(),
+			handler.addRelationship(subject, predicate, object, optionalSubjectNodeType, optionalSubjectHash, Optional.empty(),
 					optionalResourceHash, optionalQualifiedAttributes, hash);
 		} catch (final DMPGraphException e) {
 
@@ -251,7 +257,7 @@ public abstract class GDMNeo4jHandler implements GDMHandler, GDMUpdateHandler {
 			optionalNodeId = Optional.of("" + gdmNode.getId());
 		} else {
 
-			optionalNodeId = Optional.absent();
+			optionalNodeId = Optional.empty();
 		}
 
 		handler.addBNode(optionalNodeId, optionalNodeType, node);

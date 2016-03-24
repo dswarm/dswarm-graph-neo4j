@@ -17,8 +17,7 @@
 package org.dswarm.graph.model;
 
 import java.util.Map;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import org.dswarm.graph.NodeType;
 
@@ -27,26 +26,26 @@ import org.dswarm.graph.NodeType;
  */
 public final class Statement {
 
-	private final Optional<NodeType>			optionalSubjectNodeType;
-	private final Optional<String>				optionalSubjectURI;
-	private final Optional<String>				optionalSubjectId;
-	private final Optional<String>				optionalSubjectDataModelURI;
-	private final Optional<String>				optionalPredicateURI;
-	private final Optional<NodeType>			optionalObjectNodeType;
-	private final Optional<String>				optionalObjectURI;
-	private final Optional<String>				optionalObjectValue;
-	private final Optional<String>				optionalObjectId;
-	private final Optional<String>				optionalObjectDataModelURI;
-	private final Optional<String>				optionalStatementUUID;
-	private final Optional<Long>              optionalResourceHash;
+	private final Optional<NodeType> optionalSubjectNodeType;
+	private final Optional<String> optionalSubjectURI;
+	private final Optional<String> optionalSubjectId;
+	private final Optional<String> optionalSubjectDataModelURI;
+	private final Optional<String> optionalPredicateURI;
+	private final Optional<NodeType> optionalObjectNodeType;
+	private final Optional<String> optionalObjectURI;
+	private final Optional<String> optionalObjectValue;
+	private final Optional<String> optionalObjectId;
+	private final Optional<String> optionalObjectDataModelURI;
+	private final Optional<String> optionalStatementUUID;
+	private final Optional<Long> optionalResourceHash;
 	private final Optional<Map<String, Object>> optionalQualifiedAttributes;
 
 	public Statement(final Optional<NodeType> optionalSubjectNodeType, final Optional<String> optionalSubjectURI,
-			final Optional<String> optionalSubjectId, final Optional<String> optionalSubjectDataModelURI,
-			final Optional<String> optionalPredicateURI, final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalObjectURI,
-			final Optional<String> optionalObjectValue, final Optional<String> optionalObjectId, final Optional<String> optionalObjectDataModelURI,
-			final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceHash,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes) {
+	                 final Optional<String> optionalSubjectId, final Optional<String> optionalSubjectDataModelURI,
+	                 final Optional<String> optionalPredicateURI, final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalObjectURI,
+	                 final Optional<String> optionalObjectValue, final Optional<String> optionalObjectId, final Optional<String> optionalObjectDataModelURI,
+	                 final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceHash,
+	                 final Optional<Map<String, Object>> optionalQualifiedAttributes) {
 
 		this.optionalSubjectNodeType = optionalSubjectNodeType;
 		this.optionalSubjectURI = optionalSubjectURI;

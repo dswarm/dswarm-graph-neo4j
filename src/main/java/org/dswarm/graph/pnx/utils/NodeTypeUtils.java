@@ -16,14 +16,14 @@
  */
 package org.dswarm.graph.pnx.utils;
 
-import org.dswarm.graph.NodeType;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import de.knutwalker.ntparser.model.BNode;
 import de.knutwalker.ntparser.model.Literal;
 import de.knutwalker.ntparser.model.Node;
 import de.knutwalker.ntparser.model.Resource;
+
+import org.dswarm.graph.NodeType;
 
 /**
  * @author tgaengler
@@ -32,14 +32,14 @@ public final class NodeTypeUtils {
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode) {
 
-		return NodeTypeUtils.getNodeType(optionalNode, Optional.<Boolean> absent());
+		return NodeTypeUtils.getNodeType(optionalNode, Optional.empty());
 	}
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode, final Optional<Boolean> optionalIsType) {
 
 		if (!optionalNode.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final NodeType nodeType;
@@ -83,6 +83,6 @@ public final class NodeTypeUtils {
 			nodeType = null;
 		}
 
-		return Optional.fromNullable(nodeType);
+		return Optional.ofNullable(nodeType);
 	}
 }

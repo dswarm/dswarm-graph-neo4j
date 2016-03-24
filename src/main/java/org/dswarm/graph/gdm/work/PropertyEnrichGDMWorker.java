@@ -16,7 +16,8 @@
  */
 package org.dswarm.graph.gdm.work;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.Direction;
@@ -49,18 +50,18 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PropertyEnrichGDMWorker.class);
 
-	private final HierarchyLevelNodeHandler         nodeHandler;
-	private final NodeHandler                       startNodeHandler;
+	private final HierarchyLevelNodeHandler nodeHandler;
+	private final NodeHandler startNodeHandler;
 	private final HierarchyLevelRelationshipHandler relationshipHandler;
 
 	private final String prefixedResourceUri;
-	private final long   resourceHash;
+	private final long resourceHash;
 
 	private final GraphDatabaseService database;
-	private final NamespaceIndex       namespaceIndex;
+	private final NamespaceIndex namespaceIndex;
 
 	private final RelationshipType prefixedRDFType;
-	private final Label            prefixedRDFSClass;
+	private final Label prefixedRDFSClass;
 
 	public PropertyEnrichGDMWorker(final String prefixedResourceUriArg, final long resourceHashArg, final GraphDatabaseService databaseArg, final
 	NamespaceIndex namespaceIndexArg) throws DMPGraphException {
@@ -214,7 +215,7 @@ public class PropertyEnrichGDMWorker implements GDMWorker {
 
 			final Node typeNode = database.findNode(GraphProcessingStatics.RESOURCE_TYPE_LABEL, GraphStatics.URI_PROPERTY, typeLabel);
 
-			if(typeNode != null) {
+			if (typeNode != null) {
 
 				return typeNode;
 			}

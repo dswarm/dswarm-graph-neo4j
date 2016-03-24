@@ -16,10 +16,10 @@
  */
 package org.dswarm.graph.gdm.utils;
 
+import java.util.Optional;
+
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.json.Node;
-
-import com.google.common.base.Optional;
 
 /**
  * @author tgaengler
@@ -28,14 +28,14 @@ public final class NodeTypeUtils {
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode) {
 
-		return getNodeType(optionalNode, Optional.<Boolean>absent());
+		return getNodeType(optionalNode, Optional.empty());
 	}
 
 	public static Optional<NodeType> getNodeType(final Optional<Node> optionalNode, final Optional<Boolean> optionalIsType) {
 
 		if (!optionalNode.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return getNodeTypeByGDMNodeType(Optional.of(optionalNode.get().getType()), optionalIsType);
@@ -43,14 +43,14 @@ public final class NodeTypeUtils {
 
 	public static Optional<NodeType> getNodeTypeByGDMNodeType(final Optional<org.dswarm.graph.json.NodeType> optionalNodeType) {
 
-		return getNodeTypeByGDMNodeType(optionalNodeType, Optional.<Boolean>absent());
+		return getNodeTypeByGDMNodeType(optionalNodeType, Optional.empty());
 	}
 
 	public static Optional<NodeType> getNodeTypeByGDMNodeType(final Optional<org.dswarm.graph.json.NodeType> optionalNodeType, final Optional<Boolean> optionalIsType) {
 
-		if(!optionalNodeType.isPresent()) {
+		if (!optionalNodeType.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final NodeType nodeType;
@@ -64,9 +64,9 @@ public final class NodeTypeUtils {
 				break;
 			case Resource:
 
-				if(optionalIsType.isPresent()) {
+				if (optionalIsType.isPresent()) {
 
-					if(Boolean.FALSE.equals(optionalIsType.get())) {
+					if (Boolean.FALSE.equals(optionalIsType.get())) {
 
 						nodeType = NodeType.Resource;
 					} else {
@@ -81,9 +81,9 @@ public final class NodeTypeUtils {
 				break;
 			case BNode:
 
-				if(optionalIsType.isPresent()) {
+				if (optionalIsType.isPresent()) {
 
-					if(Boolean.FALSE.equals(optionalIsType.get())) {
+					if (Boolean.FALSE.equals(optionalIsType.get())) {
 
 						nodeType = NodeType.BNode;
 					} else {
@@ -101,6 +101,6 @@ public final class NodeTypeUtils {
 				nodeType = null;
 		}
 
-		return Optional.fromNullable(nodeType);
+		return Optional.ofNullable(nodeType);
 	}
 }

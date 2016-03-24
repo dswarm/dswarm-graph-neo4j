@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
 import com.carrotsearch.hppc.LongLongOpenHashMap;
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
-import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import org.mapdb.DB;
 import org.neo4j.graphdb.DynamicLabel;
@@ -59,11 +59,11 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 	protected int addedLabels = 0;
 
-	protected final BatchInserter      inserter;
-	private         BatchInserterIndex resources;
-	private         BatchInserterIndex resourcesWDataModel;
-	private         BatchInserterIndex resourceTypes;
-	private         BatchInserterIndex statementUUIDs;
+	protected final BatchInserter inserter;
+	private BatchInserterIndex resources;
+	private BatchInserterIndex resourcesWDataModel;
+	private BatchInserterIndex resourceTypes;
+	private BatchInserterIndex statementUUIDs;
 
 	private BatchInserterIndexProvider resourcesProvider;
 	private BatchInserterIndexProvider resourcesWDataModelProvider;
@@ -80,11 +80,11 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 	protected final ObjectLongOpenHashMap<String> bnodes;
 	// private BatchInserterIndex statementHashes;
-	private         Set<Long>                     statementHashes;
-	private         DB                            statementHashesDB;
+	private Set<Long> statementHashes;
+	private DB statementHashesDB;
 
 	protected final Set<Long> tempStatementHashes;
-	protected final DB        tempStatementHashesDB;
+	protected final DB tempStatementHashesDB;
 	//protected final LongLongOpenHashMap tempStatementHashes;
 
 	protected final LongLongOpenHashMap nodeResourceMap;
@@ -138,7 +138,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	private void copyNFlushNClearIndex(final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex neo4jIndex,
-			final String indexProperty, final String indexName) {
+	                                   final String indexProperty, final String indexName) {
 
 		BatchNeo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
 
@@ -186,7 +186,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	private void copyNFlushNClearLongIndex(final Set<Long> tempIndex, final DB inMemoryDB, final Set<Long> persistentIndex, final String indexName,
-			final DB persistentDB) {
+	                                       final DB persistentDB) {
 
 		BatchNeo4jProcessor.LOG.debug("start pumping '{}' index of size '{}'", indexName, tempIndex.size());
 
@@ -345,7 +345,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 		if (key == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		if (bnodes.containsKey(key)) {
@@ -353,7 +353,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 			return Optional.of(bnodes.lget());
 		}
 
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	public void addToResourceTypesIndex(final String key, final long nodeId) {
@@ -418,11 +418,11 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	public Optional<Long> determineNode(final Optional<NodeType> optionalResourceNodeType, final Optional<String> optionalResourceId,
-			final Optional<String> optionalResourceURI, final Optional<String> optionalDataModelURI) {
+	                                    final Optional<String> optionalResourceURI, final Optional<String> optionalDataModelURI) {
 
 		if (!optionalResourceNodeType.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		if (NodeType.Resource == optionalResourceNodeType.get() || NodeType.TypeResource == optionalResourceNodeType.get()) {
@@ -452,7 +452,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 			// literal node - should never be the case
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		// resource must be a blank node
@@ -461,7 +461,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	public Optional<Long> determineResourceHash(final long subjectNodeId, final Optional<NodeType> optionalSubjectNodeType,
-			final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
+	                                            final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash;
 
@@ -482,7 +482,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	public Optional<Long> determineResourceHash(final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash,
-			final Optional<Long> optionalResourceHash) {
+	                                            final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash;
 
@@ -497,7 +497,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 			// shouldn't never be the case
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return finalOptionalResourceHash;
@@ -552,10 +552,10 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	public long generateStatementHash(final long subjectNodeId, final String predicateName, final long objectNodeId, final NodeType subjectNodeType,
-			final NodeType objectNodeType) throws DMPGraphException {
+	                                  final NodeType objectNodeType) throws DMPGraphException {
 
-		final Optional<NodeType> optionalSubjectNodeType = Optional.fromNullable(subjectNodeType);
-		final Optional<NodeType> optionalObjectNodeType = Optional.fromNullable(objectNodeType);
+		final Optional<NodeType> optionalSubjectNodeType = Optional.ofNullable(subjectNodeType);
+		final Optional<NodeType> optionalObjectNodeType = Optional.ofNullable(objectNodeType);
 		final Optional<String> optionalSubjectIdentifier = getIdentifier(subjectNodeId, optionalSubjectNodeType);
 		final Optional<String> optionalObjectIdentifier = getIdentifier(objectNodeId, optionalObjectNodeType);
 
@@ -576,8 +576,8 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	public long generateStatementHash(final String predicateName, final Optional<NodeType> optionalSubjectNodeType,
-			final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalSubjectIdentifier,
-			final Optional<String> optionalObjectIdentifier) throws DMPGraphException {
+	                                  final Optional<NodeType> optionalObjectNodeType, final Optional<String> optionalSubjectIdentifier,
+	                                  final Optional<String> optionalObjectIdentifier) throws DMPGraphException {
 
 		if (!optionalSubjectNodeType.isPresent() || !optionalObjectNodeType.isPresent() || !optionalSubjectIdentifier.isPresent()
 				|| !optionalObjectIdentifier.isPresent()) {
@@ -601,7 +601,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 		if (!optionalNodeType.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final String identifier;
@@ -641,7 +641,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 				break;
 		}
 
-		return Optional.fromNullable(identifier);
+		return Optional.ofNullable(identifier);
 	}
 
 	public abstract void addObjectToResourceWDataModelIndex(final long nodeId, final String URI, final Optional<String> optionalDataModelURI);
@@ -649,11 +649,12 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	public abstract void handleObjectDataModel(final Map<String, Object> objectNodeProperties, final Optional<String> optionalDataModelURI);
 
 	public abstract void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, String URI,
-			final Optional<String> optionalDataModelURI);
+	                                            final Optional<String> optionalDataModelURI);
 
 	public abstract Optional<Long> getResourceNodeHits(final String resourceURI);
 
-	@Override public String createPrefixedURI(String fullURI) throws DMPGraphException {
+	@Override
+	public String createPrefixedURI(String fullURI) throws DMPGraphException {
 
 		// TODO:
 
@@ -666,7 +667,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	protected abstract String putSaltToStatementHash(final String hash);
 
 	protected Tuple<BatchInserterIndex, BatchInserterIndexProvider> getOrCreateIndex(final String name, final String property,
-			final boolean nodeIndex, final int cachSize) {
+	                                                                                 final boolean nodeIndex, final int cachSize) {
 
 		final BatchInserterIndexProvider indexProvider = new LuceneBatchInserterIndexProvider(inserter);
 		final BatchInserterIndex index;
@@ -725,11 +726,11 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 	}
 
 	private Optional<Long> getIdFromIndex(final String key, final ObjectLongOpenHashMap<String> tempIndex, final BatchInserterIndex index,
-			final String indexProperty) {
+	                                      final String indexProperty) {
 
 		if (key == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		if (tempIndex.containsKey(key)) {
@@ -739,7 +740,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 		if (index == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final IndexHits<Long> hits = index.get(indexProperty, key);
@@ -750,7 +751,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 
 			hits.close();
 
-			final Optional<Long> optionalHit = Optional.fromNullable(hit);
+			final Optional<Long> optionalHit = Optional.ofNullable(hit);
 
 			if (optionalHit.isPresent()) {
 
@@ -766,7 +767,7 @@ public abstract class BatchNeo4jProcessor implements Neo4jProcessor {
 			hits.close();
 		}
 
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	private static boolean checkLongIndex(final long key, final Set<Long> index) {

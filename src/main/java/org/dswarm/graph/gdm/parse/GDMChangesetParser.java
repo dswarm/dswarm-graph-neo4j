@@ -19,9 +19,9 @@ package org.dswarm.graph.gdm.parse;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -48,14 +48,14 @@ public class GDMChangesetParser implements GDMUpdateParser {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GDMChangesetParser.class);
 
-	private       GDMUpdateHandler     gdmHandler;
-	private final Changeset            changeset;
-	private final long                 existingResourceHash;
+	private GDMUpdateHandler gdmHandler;
+	private final Changeset changeset;
+	private final long existingResourceHash;
 	private final GraphDatabaseService existingResourceDB;
 	private final GraphDatabaseService newResourceDB;
 
 	public GDMChangesetParser(final Changeset changesetArg, final long existingResourceHashArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg) {
+	                          final GraphDatabaseService newResourceDBArg) {
 
 		changeset = changesetArg;
 		existingResourceHash = existingResourceHashArg;
@@ -187,10 +187,10 @@ public class GDMChangesetParser implements GDMUpdateParser {
 							if (subject.getDataModel() != null) {
 
 								optionalDataModelURI = Optional
-										.fromNullable(gdmHandler.getHandler().getProcessor().createPrefixedURI(subject.getDataModel()));
+										.ofNullable(gdmHandler.getHandler().getProcessor().createPrefixedURI(subject.getDataModel()));
 							} else {
 
-								optionalDataModelURI = Optional.absent();
+								optionalDataModelURI = Optional.empty();
 							}
 
 							final long subjectHash = gdmHandler.getHandler().getProcessor()
@@ -389,7 +389,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 	}
 
 	private boolean checkStmt(final Relationship rel, final DeltaState deltaState, final Set<Long> alreadyAddedStatementUUIDs,
-			final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedStatementUUIDs) {
+	                          final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedStatementUUIDs) {
 
 		if (rel == null) {
 
@@ -432,7 +432,7 @@ public class GDMChangesetParser implements GDMUpdateParser {
 	}
 
 	private Relationship getNewRel(final Iterator<Relationship> newRelationshipsIter, final Set<Long> alreadyAddedStatementUUIDs,
-			final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedNewStatementUUIDs) {
+	                               final Set<Long> alreadyDeletedStatementUUIDs, final Set<Long> alreadyModifiedNewStatementUUIDs) {
 
 		final Relationship newRelationship = increaseRelationship(newRelationshipsIter);
 		final DeltaState deltaState = getDeltaState(newRelationship);

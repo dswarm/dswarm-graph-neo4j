@@ -26,11 +26,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.group.Group;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -46,8 +46,6 @@ import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.BranchOrderingPolicies;
-import org.neo4j.graphdb.traversal.Evaluation;
-import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -122,7 +120,7 @@ public final class GraphDBUtil {
 
 			// object resources don't need a type label
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		throw new DMPGraphException(String.format("couldn't determine type label for node %s", GraphDBPrintUtil.printNode(node)));
@@ -232,20 +230,16 @@ public final class GraphDBUtil {
 		// TODO: maybe replace with gethEntityPaths(GraphdataBaseService, Node)
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
 				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
-				.evaluator(new Evaluator() {
+				.evaluator(path -> {
 
-					@Override
-					public Evaluation evaluate(final Path path) {
+					final boolean hasLeafLabel = path.endNode() != null &&
+							path.endNode().hasLabel(org.dswarm.graph.GraphProcessingStatics.LEAF_LABEL);
 
-						final boolean hasLeafLabel = path.endNode() != null &&
-								path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
+					if (hasLeafLabel) {
 
-						if (hasLeafLabel) {
-
-							return Evaluation.INCLUDE_AND_CONTINUE;
-						}
-						return Evaluation.EXCLUDE_AND_CONTINUE;
+						return org.neo4j.graphdb.traversal.Evaluation.INCLUDE_AND_CONTINUE;
 					}
+					return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
 				}).traverse(resourceNode);
 
 		return paths;
@@ -260,7 +254,7 @@ public final class GraphDBUtil {
 	 * @return
 	 */
 	public static Iterable<Path> getResourcePaths(final GraphDatabaseService graphDB, final String prefixedResourceURI,
-			final String prefixedDataModelURI) {
+	                                              final String prefixedDataModelURI) {
 
 		final Node resourceNode = getResourceNode(graphDB, prefixedResourceURI, prefixedDataModelURI);
 
@@ -279,22 +273,18 @@ public final class GraphDBUtil {
 		// TODO: maybe replace with gethEntityPaths(GraphdataBaseService, Node)
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
 				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
-				.evaluator(new Evaluator() {
+				.evaluator(path -> {
 
-					@Override
-					public Evaluation evaluate(final Path path) {
+					final boolean reachedEndOfResourcePath =
+							path.length() >= 1 && (path.endNode().hasProperty(org.dswarm.graph.model.GraphStatics.URI_PROPERTY) || path.endNode()
+									.hasProperty(org.dswarm.graph.model.GraphStatics.VALUE_PROPERTY));
 
-						final boolean reachedEndOfResourcePath =
-								path.length() >= 1 && (path.endNode().hasProperty(GraphStatics.URI_PROPERTY) || path.endNode()
-										.hasProperty(GraphStatics.VALUE_PROPERTY));
+					if (reachedEndOfResourcePath) {
 
-						if (reachedEndOfResourcePath) {
-
-							return Evaluation.INCLUDE_AND_CONTINUE;
-						}
-
-						return Evaluation.EXCLUDE_AND_CONTINUE;
+						return org.neo4j.graphdb.traversal.Evaluation.INCLUDE_AND_CONTINUE;
 					}
+
+					return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
 				}).traverse(resourceNode);
 
 		return paths;
@@ -422,20 +412,16 @@ public final class GraphDBUtil {
 	private static Iterable<Path> getEntityPaths(final GraphDatabaseService graphDB, final Node entityNode) {
 
 		return graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST)
-				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
+				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(path -> {
 
-					@Override
-					public Evaluation evaluate(final Path path) {
+					final boolean hasLeafLabel = path.endNode().hasLabel(org.dswarm.graph.GraphProcessingStatics.LEAF_LABEL);
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
+					if (hasLeafLabel) {
 
-						if (hasLeafLabel) {
-
-							return Evaluation.INCLUDE_AND_PRUNE;
-						}
-
-						return Evaluation.EXCLUDE_AND_CONTINUE;
+						return org.neo4j.graphdb.traversal.Evaluation.INCLUDE_AND_PRUNE;
 					}
+
+					return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
 				}).traverse(entityNode);
 	}
 
@@ -452,20 +438,16 @@ public final class GraphDBUtil {
 		final Node entityNode = graphDB.getNodeById(entityId);
 
 		return graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST)
-				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(new Evaluator() {
+				.expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build()).evaluator(path -> {
 
-					@Override
-					public Evaluation evaluate(final Path path) {
+					final boolean hasLeafLabel = path.endNode().hasLabel(org.dswarm.graph.GraphProcessingStatics.LEAF_LABEL);
 
-						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
+					if (hasLeafLabel && path.endNode().getId() == leafNodeId) {
 
-						if (hasLeafLabel && path.endNode().getId() == leafNodeId) {
-
-							return Evaluation.INCLUDE_AND_PRUNE;
-						}
-
-						return Evaluation.EXCLUDE_AND_CONTINUE;
+						return org.neo4j.graphdb.traversal.Evaluation.INCLUDE_AND_PRUNE;
 					}
+
+					return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
 				}).traverse(entityNode);
 	}
 
@@ -686,7 +668,7 @@ public final class GraphDBUtil {
 	 * @param nodeId
 	 */
 	public static void determineNonMatchedSubGraphPathEndNodes(final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final Set<Long> pathEndNodeIds, final long nodeId) throws DMPGraphException {
+	                                                           final Set<Long> pathEndNodeIds, final long nodeId) throws DMPGraphException {
 
 		if (deltaState == DeltaState.ADDITION || deltaState == DeltaState.DELETION) {
 
@@ -703,7 +685,7 @@ public final class GraphDBUtil {
 	}
 
 	public static Collection<CSEntity> getCSEntities(final GraphDatabaseService graphDB, final String prefixedResourceURI,
-			final AttributePath commonPrefixedAttributePath, final ContentSchema prefixedContentSchema)
+	                                                 final AttributePath commonPrefixedAttributePath, final ContentSchema prefixedContentSchema)
 			throws DMPGraphException {
 
 		final Map<Long, CSEntity> csEntities = new LinkedHashMap<>();
@@ -771,7 +753,7 @@ public final class GraphDBUtil {
 
 		if (!subGraphEntities.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final Set<SubGraphLeafEntity> subGraphLeafEntities = new HashSet<>();
@@ -812,48 +794,44 @@ public final class GraphDBUtil {
 
 		final Iterable<Path> paths = graphDB.traversalDescription().uniqueness(Uniqueness.RELATIONSHIP_GLOBAL)
 				.order(BranchOrderingPolicies.POSTORDER_BREADTH_FIRST).expand(PathExpanderBuilder.allTypes(Direction.OUTGOING).build())
-				.evaluator(new Evaluator() {
+				.evaluator(path -> {
 
-					@Override
-					public Evaluation evaluate(final Path path) {
+					// if (entityNodeHierarchyLevel > (int) path.endNode().getProperty("__HIERARCHY_LEVEL__")) {
+					//
+					// return Evaluation.EXCLUDE_AND_PRUNE;
+					// }
 
-						// if (entityNodeHierarchyLevel > (int) path.endNode().getProperty("__HIERARCHY_LEVEL__")) {
-						//
-						// return Evaluation.EXCLUDE_AND_PRUNE;
-						// }
+					if (path.lastRelationship() == null && path.endNode().hasLabel(org.dswarm.graph.GraphProcessingStatics.LEAF_LABEL)) {
 
-						if (path.lastRelationship() == null && path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL)) {
-
-							return Evaluation.EXCLUDE_AND_PRUNE;
-						}
-
-						if (path.lastRelationship() == null) {
-
-							return Evaluation.EXCLUDE_AND_CONTINUE;
-						}
-
-						if (path.lastRelationship().hasProperty(DeltaStatics.MATCHED_PROPERTY)) {
-
-							// include only non-matched relationships (paths)
-							return Evaluation.EXCLUDE_AND_PRUNE;
-						}
-
-						final boolean hasLeafLabel = path.endNode().hasLabel(GraphProcessingStatics.LEAF_LABEL);
-
-						if (hasLeafLabel) {
-
-							return Evaluation.INCLUDE_AND_PRUNE;
-						}
-
-						return Evaluation.EXCLUDE_AND_CONTINUE;
+						return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_PRUNE;
 					}
+
+					if (path.lastRelationship() == null) {
+
+						return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
+					}
+
+					if (path.lastRelationship().hasProperty(org.dswarm.graph.delta.DeltaStatics.MATCHED_PROPERTY)) {
+
+						// include only non-matched relationships (paths)
+						return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_PRUNE;
+					}
+
+					final boolean hasLeafLabel = path.endNode().hasLabel(org.dswarm.graph.GraphProcessingStatics.LEAF_LABEL);
+
+					if (hasLeafLabel) {
+
+						return org.neo4j.graphdb.traversal.Evaluation.INCLUDE_AND_PRUNE;
+					}
+
+					return org.neo4j.graphdb.traversal.Evaluation.EXCLUDE_AND_CONTINUE;
 				}).traverse(entityNode);
 
 		return paths;
 	}
 
 	public static Collection<SubGraphEntity> determineNonMatchedCSEntitySubGraphs(final Collection<CSEntity> csEntities,
-			final GraphDatabaseService graphDB)
+	                                                                              final GraphDatabaseService graphDB)
 			throws DMPGraphException {
 
 		final Set<SubGraphEntity> subgraphEntities = new HashSet<>();
@@ -952,7 +930,7 @@ public final class GraphDBUtil {
 	}
 
 	public static String determineRecordIdentifier(final GraphDatabaseService graphDB, final AttributePath prefixedRecordIdentifierAP,
-			final String prefixedRecordURI)
+	                                               final String prefixedRecordURI)
 			throws DMPGraphException {
 
 		final String query = buildGetRecordIdentifierQuery(prefixedRecordIdentifierAP, prefixedRecordURI);
@@ -961,15 +939,15 @@ public final class GraphDBUtil {
 	}
 
 	public static String determineRecordUri(final String recordId, final AttributePath prefixedRecordIdentifierAP, final String prefixedDataModelUri,
-			final GraphDatabaseService graphDB) throws DMPGraphException {
+	                                        final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final String query = buildGetRecordUriQuery(recordId, prefixedRecordIdentifierAP, prefixedDataModelUri);
 		return executeQueryWithSingleResult(query, "record_uri", graphDB);
 	}
 
 	public static Collection<String> determineRecordUris(final String searchValue, final AttributePath prefixedKeyAttributePath,
-			final String prefixedDataModelUri,
-			final GraphDatabaseService graphDB) throws DMPGraphException {
+	                                                     final String prefixedDataModelUri,
+	                                                     final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final String query = buildGetRecordUrisQuery(searchValue, prefixedKeyAttributePath, prefixedDataModelUri);
 
@@ -1088,7 +1066,7 @@ public final class GraphDBUtil {
 	}
 
 	private static void determineKeyEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
-			final ContentSchema prefixedContentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
+	                                         final ContentSchema prefixedContentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
 		for (final AttributePath keyAttributePath : prefixedContentSchema.getKeyAttributePaths()) {
 
@@ -1120,7 +1098,7 @@ public final class GraphDBUtil {
 	}
 
 	private static void determineValueEntities(final GraphDatabaseService graphDB, final AttributePath commonAttributePath,
-			final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
+	                                           final ContentSchema contentSchema, final Map<Long, CSEntity> csEntities, final Node... csEntityNodesArray) {
 
 		final AttributePath valueAttributePath = contentSchema.getValueAttributePath();
 
@@ -1153,7 +1131,7 @@ public final class GraphDBUtil {
 	}
 
 	private static Optional<LinkedList<Attribute>> determineRelativeAttributePath(final AttributePath attributePath,
-			final AttributePath commonAttributePath) {
+	                                                                              final AttributePath commonAttributePath) {
 
 		final Iterator<Attribute> apIter = attributePath.getAttributes().iterator();
 		final Iterator<Attribute> commonAPIter = commonAttributePath.getAttributes().iterator();
@@ -1176,7 +1154,7 @@ public final class GraphDBUtil {
 
 		if (!apIter.hasNext()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final LinkedList<Attribute> relativeAttributePath = new LinkedList<>();
@@ -1286,7 +1264,7 @@ public final class GraphDBUtil {
 	}
 
 	private static String buildGetRecordUrisQuery(final String searchValue, final AttributePath prefixedKeyAttributePath,
-			final String prefixedDataModelUri)
+	                                              final String prefixedDataModelUri)
 			throws DMPGraphException {
 
 		final StringBuilder sb = new StringBuilder();
@@ -1397,7 +1375,7 @@ public final class GraphDBUtil {
 	}
 
 	public static Collection<String> executeQueryWithMultipleResults(final String query, final String resultVariableName,
-			final GraphDatabaseService graphDB) throws DMPGraphException {
+	                                                                 final GraphDatabaseService graphDB) throws DMPGraphException {
 
 		final Set<String> resultSet = new HashSet<>();
 
@@ -1440,7 +1418,7 @@ public final class GraphDBUtil {
 	}
 
 	private static Map<String, String> executeQueryWithMultipleResultsWithValues(final String query, final String resultVariableName,
-			final String uriVariableName, final String valueVariableName, final GraphDatabaseService graphDB)
+	                                                                             final String uriVariableName, final String valueVariableName, final GraphDatabaseService graphDB)
 			throws DMPGraphException {
 
 		final Map<String, String> resultSet = new HashMap<>();
@@ -1505,7 +1483,7 @@ public final class GraphDBUtil {
 	 * @return
 	 */
 	public static Relationship executeQueryWithSingleRelationshipResult(final String query, final String resultVariableName,
-			final GraphDatabaseService graphDB) {
+	                                                                    final GraphDatabaseService graphDB) {
 
 		final Result result = graphDB.execute(query);
 

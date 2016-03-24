@@ -17,8 +17,8 @@
 package org.dswarm.graph.utils;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -161,7 +161,7 @@ public class NamespaceUtils {
 	public static Optional<Node> getPrefix(final String namespace, final GraphDatabaseService database) {
 
 		return Optional
-				.fromNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
+				.ofNullable(database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphStatics.URI_PROPERTY, namespace));
 	}
 
 	public static String getNamespace(final String prefix, final GraphDatabaseService database, final TransactionHandler tx)
@@ -176,7 +176,7 @@ public class NamespaceUtils {
 
 			tx.ensureRunningTx();
 
-			final Optional<Node> optionalNode = Optional.fromNullable(
+			final Optional<Node> optionalNode = Optional.ofNullable(
 					database.findNode(GraphProcessingStatics.PREFIX_LABEL, GraphProcessingStatics.PREFIX_PROPERTY, prefix));
 
 			if (!optionalNode.isPresent()) {

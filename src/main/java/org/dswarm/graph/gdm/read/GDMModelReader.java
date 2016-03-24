@@ -17,8 +17,7 @@
 package org.dswarm.graph.gdm.read;
 
 import java.io.OutputStream;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.stream.ModelBuilder;

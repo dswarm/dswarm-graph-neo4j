@@ -16,11 +16,11 @@
  */
 package org.dswarm.graph;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.index.NamespaceIndex;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 
-import org.dswarm.graph.index.NamespaceIndex;
+import java.util.Optional;
 
 /**
  * @author tgaengler

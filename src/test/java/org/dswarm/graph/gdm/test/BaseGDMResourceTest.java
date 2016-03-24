@@ -20,13 +20,13 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
@@ -95,7 +95,7 @@ public abstract class BaseGDMResourceTest extends BasicResourceTest {
 	}
 
 	protected void readGDMFromDB(final String recordClassURI, final String dataModelURI, final int numberOfStatements,
-			final Optional<Integer> optionalAtMost) throws IOException {
+	                             final Optional<Integer> optionalAtMost) throws IOException {
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

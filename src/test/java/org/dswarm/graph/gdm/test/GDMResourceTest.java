@@ -20,36 +20,27 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
-import org.dswarm.common.DMPStatics;
-import org.dswarm.graph.json.Resource;
-import org.dswarm.graph.json.stream.ModelParser;
-import org.dswarm.graph.json.util.Util;
-import org.dswarm.graph.test.BasicResourceTest;
-import org.dswarm.graph.test.Neo4jDBWrapper;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteSource;
+import com.google.common.io.Resources;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
-import com.google.common.io.Resources;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
-import rx.Observable;
-import rx.functions.Func1;
+import org.dswarm.graph.json.util.Util;
+import org.dswarm.graph.test.Neo4jDBWrapper;
 
 /**
  * @author tgaengler
@@ -153,7 +144,7 @@ public abstract class GDMResourceTest extends BaseGDMResourceTest {
 		final String recordClassURI = "http://www.openarchives.org/OAI/2.0/recordType";
 		final int numberOfStatements = 2601;
 
-		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.empty());
 
 		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
@@ -170,7 +161,7 @@ public abstract class GDMResourceTest extends BaseGDMResourceTest {
 		final String recordClassURI = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType";
 		final int numberOfStatements = 191;
 
-		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.empty());
 
 		LOG.debug("finished read test for GDM resource at {} DB", dbType);
 	}
@@ -192,7 +183,7 @@ public abstract class GDMResourceTest extends BaseGDMResourceTest {
 		final String recordClassURI = "http://data.slub-dresden.de/resources/1/schema#RecordType";
 		final int numberOfStatements = 113;
 
-		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.empty());
 
 		LOG.debug("finished read test 2 for GDM resource at {} DB", dbType);
 	}

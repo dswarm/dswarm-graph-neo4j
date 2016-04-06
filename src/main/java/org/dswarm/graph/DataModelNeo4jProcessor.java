@@ -17,8 +17,8 @@
 package org.dswarm.graph;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,7 +42,7 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 	private final String prefixedDataModelURI;
 
 	public DataModelNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex,
-			final String prefixedDataModelURIArg) throws DMPGraphException {
+	                               final String prefixedDataModelURIArg) throws DMPGraphException {
 
 		super(database, txArg, namespaceIndex);
 
@@ -89,7 +89,8 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 		return getNodeFromResourcesWDataModelIndex(resourceUriDataModelUriHash);
 	}
 
-	@Override public long generateResourceHash(final String prefixedResourceURI, final Optional<String> optionalPrefixedDataModelURI) {
+	@Override
+	public long generateResourceHash(final String prefixedResourceURI, final Optional<String> optionalPrefixedDataModelURI) {
 
 		final String finalPrefixedDataModelURI = getPrefixedDataModelURI(optionalPrefixedDataModelURI);
 
@@ -98,14 +99,15 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 		return HashUtils.generateHash(hashString);
 	}
 
-	@Override protected String putSaltToStatementHash(final String hash) {
+	@Override
+	protected String putSaltToStatementHash(final String hash) {
 
 		return hash + " " + this.prefixedDataModelURI;
 	}
 
 	@Override
 	public Relationship prepareRelationship(final Node subjectNode, final String predicateURI, final Node objectNode, final long statementUUID,
-			final Optional<Map<String, Object>> qualifiedAttributes, final Optional<Long> optionalIndex, final VersionHandler versionHandler) {
+	                                        final Optional<Map<String, Object>> qualifiedAttributes, final Optional<Long> optionalIndex, final VersionHandler versionHandler) {
 
 		final Relationship rel = super.prepareRelationship(subjectNode, predicateURI, objectNode, statementUUID, qualifiedAttributes, optionalIndex, versionHandler);
 
@@ -119,7 +121,7 @@ public class DataModelNeo4jProcessor extends BasicNeo4jProcessor {
 
 	private String getPrefixedDataModelURI(final Optional<String> optionalPrefixedDataModelURI) {
 
-		if(optionalPrefixedDataModelURI.isPresent()) {
+		if (optionalPrefixedDataModelURI.isPresent()) {
 
 			return optionalPrefixedDataModelURI.get();
 		}

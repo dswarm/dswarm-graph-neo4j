@@ -16,14 +16,15 @@
  */
 package org.dswarm.graph.versioning;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.GraphStatics;
 
@@ -56,7 +57,8 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 		return latestVersion;
 	}
 
-	@Override public Range getRange() {
+	@Override
+	public Range getRange() {
 
 		return range;
 	}
@@ -65,7 +67,7 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 
 		final int currentLatestVersion = retrieveLatestVersion();
 
-		if(enableVersioning) {
+		if (enableVersioning) {
 
 			latestVersion = currentLatestVersion + 1;
 		} else {
@@ -91,7 +93,7 @@ public abstract class Neo4jVersionHandler implements VersionHandler {
 			final long resourceUriDataModelUriHash = processor
 					.generateResourceHash(dataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI));
 
-			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.<String>absent(),
+			Optional<Node> optionalDataModelNode = processor.determineNode(Optional.of(NodeType.Resource), Optional.empty(),
 					optionalDataModelURI, Optional.of(VersioningStatics.VERSIONING_DATA_MODEL_URI), Optional.of(resourceUriDataModelUriHash));
 
 			if (optionalDataModelNode.isPresent()) {

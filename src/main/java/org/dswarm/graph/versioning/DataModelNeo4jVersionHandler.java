@@ -16,22 +16,22 @@
  */
 package org.dswarm.graph.versioning;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.DataModelNeo4jProcessor;
-import org.dswarm.graph.BasicNeo4jProcessor;
+import java.util.Optional;
 
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.DataModelNeo4jProcessor;
 
 /**
  * @author tgaengler
  */
 public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(DataModelNeo4jVersionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DataModelNeo4jVersionHandler.class);
 
 	public DataModelNeo4jVersionHandler(final BasicNeo4jProcessor processorArg, final boolean enableVersioning) throws DMPGraphException {
 
@@ -68,7 +68,7 @@ public class DataModelNeo4jVersionHandler extends Neo4jVersionHandler {
 			finalDataModelURI = ((DataModelNeo4jProcessor) processor).getPrefixedDataModelURI();
 		}
 
-		super.setLatestVersion(Optional.fromNullable(finalDataModelURI));
+		super.setLatestVersion(Optional.ofNullable(finalDataModelURI));
 	}
 
 	@Override

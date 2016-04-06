@@ -16,9 +16,8 @@
  */
 package org.dswarm.graph;
 
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ import org.dswarm.graph.tx.TransactionHandler;
  */
 public class SimpleNeo4jProcessor extends BasicNeo4jProcessor {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleNeo4jProcessor.class);
 
 	public SimpleNeo4jProcessor(final GraphDatabaseService database, final TransactionHandler txArg, final NamespaceIndex namespaceIndex) throws DMPGraphException {
 
@@ -79,14 +78,16 @@ public class SimpleNeo4jProcessor extends BasicNeo4jProcessor {
 		return getNodeFromResourcesIndex(resourceURI);
 	}
 
-	@Override public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
+	@Override
+	public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
 
 		final String hashString = resourceURI;
 
 		return HashUtils.generateHash(hashString);
 	}
 
-	@Override protected String putSaltToStatementHash(final String hash) {
+	@Override
+	protected String putSaltToStatementHash(final String hash) {
 
 		return hash;
 	}

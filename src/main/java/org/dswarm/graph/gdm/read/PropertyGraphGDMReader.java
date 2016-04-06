@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.google.common.base.Optional;
 import org.apache.jena.vocabulary.RDF;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -54,15 +54,15 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMReader.class);
 
-	protected final NodeHandler         nodeHandler;
-	protected final NodeHandler         startNodeHandler;
+	protected final NodeHandler nodeHandler;
+	protected final NodeHandler startNodeHandler;
 	protected final RelationshipHandler relationshipHandler;
 
-	protected final String  prefixedDataModelUri;
-	protected       Integer version;
+	protected final String prefixedDataModelUri;
+	protected Integer version;
 
 	protected final GraphDatabaseService database;
-	protected final NamespaceIndex       namespaceIndex;
+	protected final NamespaceIndex namespaceIndex;
 
 	protected Resource currentResource;
 	protected final Map<Long, List<Statement>> currentResourceStatements = new TreeMap<>();
@@ -72,14 +72,14 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 	protected final String type;
 
 	private final Set<Long> processedNodes = new HashSet<>();
-	private final Predicate rdfType        = new Predicate(RDF.type.getURI());
+	private final Predicate rdfType = new Predicate(RDF.type.getURI());
 
 	public PropertyGraphGDMReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
-			final GraphDatabaseService databaseArg,
-			final
-			TransactionHandler txArg,
-			final NamespaceIndex namespaceIndexArg,
-			final String typeArg) throws DMPGraphException {
+	                              final GraphDatabaseService databaseArg,
+	                              final
+	                              TransactionHandler txArg,
+	                              final NamespaceIndex namespaceIndexArg,
+	                              final String typeArg) throws DMPGraphException {
 
 		prefixedDataModelUri = prefixedDataModelUriArg;
 		database = databaseArg;
@@ -322,7 +322,7 @@ public abstract class PropertyGraphGDMReader implements GDMReader {
 
 		if (!optionalTypeLabel.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 		final String typeLabel = optionalTypeLabel.get();
 		final String fullTypeURI = namespaceIndex.createFullURI(typeLabel);

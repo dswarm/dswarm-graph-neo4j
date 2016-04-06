@@ -16,7 +16,8 @@
  */
 package org.dswarm.graph.gdm.read;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
@@ -37,8 +38,8 @@ public class PropertyGraphGDMResourceByURIReader extends PropertyGraphGDMResourc
 	private final String prefixedRecordUri;
 
 	public PropertyGraphGDMResourceByURIReader(final String prefixedRecordUriArg, final String prefixedDataModelUri,
-			final Optional<Integer> optionalVersionArg,
-			final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex)
+	                                           final Optional<Integer> optionalVersionArg,
+	                                           final GraphDatabaseService database, final TransactionHandler tx, final NamespaceIndex namespaceIndex)
 			throws DMPGraphException {
 
 		super(prefixedDataModelUri, optionalVersionArg, database, tx, namespaceIndex, TYPE);

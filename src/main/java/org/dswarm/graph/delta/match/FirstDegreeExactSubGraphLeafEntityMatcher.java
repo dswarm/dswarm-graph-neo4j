@@ -20,11 +20,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
-import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
-import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -33,18 +30,21 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.delta.match.mark.SubGraphLeafEntityMarker;
+import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
+import org.dswarm.graph.delta.util.GraphDBUtil;
 
 /**
  * @author tgaengler
  */
 public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphLeafEntity> {
 
-	private static final Logger	LOG	= LoggerFactory.getLogger(FirstDegreeExactSubGraphLeafEntityMatcher.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FirstDegreeExactSubGraphLeafEntityMatcher.class);
 
 	public FirstDegreeExactSubGraphLeafEntityMatcher(final Optional<? extends Collection<SubGraphLeafEntity>> existingSubGraphLeafEntitiesArg,
-			final Optional<? extends Collection<SubGraphLeafEntity>> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg)
+	                                                 final Optional<? extends Collection<SubGraphLeafEntity>> newSubGraphLeafEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	                                                 final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg)
 			throws DMPGraphException {
 
 		super(existingSubGraphLeafEntitiesArg, newSubGraphLeafEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg,
@@ -62,7 +62,7 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 
 		final Map<String, SubGraphLeafEntity> hashedSubGraphLeafEntities = new HashMap<>();
 
-		for(final SubGraphLeafEntity subGraphLeafEntity : subGraphLeafEntities) {
+		for (final SubGraphLeafEntity subGraphLeafEntity : subGraphLeafEntities) {
 
 			final int keyHash = subGraphLeafEntity.getSubGraphEntity().getCSEntity().getKey().hashCode();
 			final long csEntityOrderHash = Long.valueOf(subGraphLeafEntity.getSubGraphEntity().getCSEntity().getEntityOrder()).hashCode();
@@ -75,13 +75,13 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 			long hash = keyHash;
 			hash = 31 * hash + predicateHash;
 
-			if(subGraphLeafPathHash != null) {
+			if (subGraphLeafPathHash != null) {
 
 				hash = 31 * hash + subGraphLeafPathHash;
 			}
 
 			hash = 31 * hash + csEntityOrderHash;
-			hash = 31 * hash +  Long.valueOf(subGraphLeafEntity.getSubGraphEntity().getOrder()).hashCode();
+			hash = 31 * hash + Long.valueOf(subGraphLeafEntity.getSubGraphEntity().getOrder()).hashCode();
 
 			hashedSubGraphLeafEntities.put(Long.valueOf(hash).toString(), subGraphLeafEntity);
 		}
@@ -92,7 +92,7 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 	private Long calculateSubGraphLeafPathHash(final Long leafNodeId, final Long entityNodeId, final GraphDatabaseService graphDB)
 			throws DMPGraphException {
 
-		try(final Transaction tx = graphDB.beginTx()) {
+		try (final Transaction tx = graphDB.beginTx()) {
 
 			final Iterable<Path> entityPaths = GraphDBUtil.getEntityPaths(graphDB, entityNodeId, leafNodeId);
 			if (entityPaths == null || !entityPaths.iterator().hasNext()) {
@@ -136,7 +136,7 @@ public class FirstDegreeExactSubGraphLeafEntityMatcher extends Matcher<SubGraphL
 			final String message = "couldn't calculate sub graph leaf path hashes";
 
 			FirstDegreeExactSubGraphLeafEntityMatcher.LOG.error(message, e);
-			
+
 			throw new DMPGraphException(message);
 		}
 	}

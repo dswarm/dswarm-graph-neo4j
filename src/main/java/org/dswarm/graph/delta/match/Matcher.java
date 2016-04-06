@@ -21,16 +21,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.base.Optional;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.DeltaState;
 import org.dswarm.graph.delta.match.mark.Marker;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
@@ -55,8 +55,8 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 	protected final Marker<ENTITY> marker;
 
 	public Matcher(final Optional<? extends Collection<ENTITY>> existingEntitiesArg, final Optional<? extends Collection<ENTITY>> newEntitiesArg,
-			final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg,
-			final String prefixedNewResourceURIArg, final Marker<ENTITY> markerArg) throws DMPGraphException {
+	               final GraphDatabaseService existingResourceDBArg, final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg,
+	               final String prefixedNewResourceURIArg, final Marker<ENTITY> markerArg) throws DMPGraphException {
 
 		existingResourceDB = existingResourceDBArg;
 		newResourceDB = newResourceDBArg;
@@ -68,18 +68,18 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 		if (existingEntitiesArg.isPresent()) {
 
-			existingEntities = Optional.fromNullable(generateHashes(existingEntitiesArg.get(), existingResourceDB));
+			existingEntities = Optional.ofNullable(generateHashes(existingEntitiesArg.get(), existingResourceDB));
 		} else {
 
-			existingEntities = Optional.absent();
+			existingEntities = Optional.empty();
 		}
 
 		if (newEntitiesArg.isPresent()) {
 
-			newEntities = Optional.fromNullable(generateHashes(newEntitiesArg.get(), newResourceDB));
+			newEntities = Optional.ofNullable(generateHashes(newEntitiesArg.get(), newResourceDB));
 		} else {
 
-			newEntities = Optional.absent();
+			newEntities = Optional.empty();
 		}
 	}
 
@@ -107,7 +107,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 		calculateMatches();
 
-		return Optional.fromNullable(matches);
+		return Optional.ofNullable(matches);
 	}
 
 	protected Optional<Map<String, ENTITY>> getExistingEntities() {
@@ -122,36 +122,36 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 	protected Optional<? extends Collection<ENTITY>> getMatches(final Optional<Map<String, ENTITY>> entityMap) {
 
-		if(matches == null || matches.isEmpty()) {
+		if (matches == null || matches.isEmpty()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
-		if(!entityMap.isPresent()) {
+		if (!entityMap.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final List<ENTITY> entities = new ArrayList<>();
 
-		for(final String match : matches) {
+		for (final String match : matches) {
 
-			if(entityMap.get().containsKey(match)) {
+			if (entityMap.get().containsKey(match)) {
 
 				entities.add(entityMap.get().get(match));
 			}
 		}
 
-		return Optional.fromNullable(entities);
+		return Optional.ofNullable(entities);
 	}
 
 	protected void calculateMatches() {
 
-		if(!matchesCalculated) {
+		if (!matchesCalculated) {
 
 			matches = new HashSet<>();
 
-			if(existingEntities.isPresent() && newEntities.isPresent()) {
+			if (existingEntities.isPresent() && newEntities.isPresent()) {
 
 				for (final String hash : existingEntities.get().keySet()) {
 
@@ -162,7 +162,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 				}
 			}
 
-			Matcher.LOG.debug("'{}' matches",  matches.size());
+			Matcher.LOG.debug("'{}' matches", matches.size());
 
 			matchesCalculated = true;
 		}
@@ -170,26 +170,26 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 
 	protected Optional<? extends Collection<ENTITY>> getNonMatches(final Optional<Map<String, ENTITY>> entityMap) {
 
-		if(matches == null || matches.isEmpty()) {
+		if (matches == null || matches.isEmpty()) {
 
-			if(!entityMap.isPresent()) {
+			if (!entityMap.isPresent()) {
 
-				return Optional.absent();
+				return Optional.empty();
 			}
 
 			return Optional.of(entityMap.get().values());
 		}
 
-		if(!entityMap.isPresent()) {
+		if (!entityMap.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final List<ENTITY> valueEntities = new ArrayList<>();
 
-		for(final Map.Entry<String, ENTITY> entityEntry : entityMap.get().entrySet()) {
+		for (final Map.Entry<String, ENTITY> entityEntry : entityMap.get().entrySet()) {
 
-			if(!matches.contains(entityEntry.getKey())) {
+			if (!matches.contains(entityEntry.getKey())) {
 
 				valueEntities.add(entityEntry.getValue());
 			}
@@ -210,7 +210,7 @@ public abstract class Matcher<ENTITY> implements MatchResultSet<ENTITY> {
 	}
 
 	protected void markPaths(final Optional<? extends Collection<ENTITY>> entities, final DeltaState deltaState, final GraphDatabaseService graphDB,
-			final String prefixedResourceURI) throws DMPGraphException {
+	                         final String prefixedResourceURI) throws DMPGraphException {
 
 		if (entities.isPresent()) {
 

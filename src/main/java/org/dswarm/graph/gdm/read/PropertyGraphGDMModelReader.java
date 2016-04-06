@@ -20,9 +20,9 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterators;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -49,16 +49,16 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 	private static final String TYPE = "GDM model";
 
-	private final String            recordClassUri;
-	private       Optional<Integer> optionalAtMost;
+	private final String recordClassUri;
+	private Optional<Integer> optionalAtMost;
 
-	private long size          = 0;
+	private long size = 0;
 	private long readResources = 0;
 
 	private ModelBuilder modelBuilder;
 
 	public PropertyGraphGDMModelReader(final String recordClassUriArg, final String dataModelUriArg, final Optional<Integer> optionalVersionArg,
-			final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg)
+	                                   final Optional<Integer> optionalAtMostArg, final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg)
 			throws DMPGraphException {
 
 		super(dataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, TYPE);
@@ -96,7 +96,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
-				return Optional.absent();
+				return Optional.empty();
 			}
 
 			if (!recordNodesIter.hasNext()) {
@@ -109,7 +109,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 								recordClassLabel, prefixedDataModelUri, version,
 								type);
 
-				return Optional.absent();
+				return Optional.empty();
 			}
 
 			modelBuilder = new ModelBuilder(outputStream);
@@ -146,7 +146,7 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 
 					final Set<Statement> statements = new LinkedHashSet<>();
 
-					for(List<Statement> statementList : currentResourceStatements.values()) {
+					for (List<Statement> statementList : currentResourceStatements.values()) {
 
 						statements.addAll(statementList);
 					}
@@ -190,7 +190,8 @@ public class PropertyGraphGDMModelReader extends PropertyGraphGDMReader implemen
 		return Optional.of(modelBuilder);
 	}
 
-	@Override public long readResources() {
+	@Override
+	public long readResources() {
 
 		return readResources;
 	}

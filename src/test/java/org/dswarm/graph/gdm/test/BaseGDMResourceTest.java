@@ -20,14 +20,13 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.ClientResponse;
@@ -37,10 +36,8 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
-import rx.functions.Func1;
 
 import org.dswarm.common.DMPStatics;
-import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
 import org.dswarm.graph.test.BasicResourceTest;
@@ -98,7 +95,7 @@ public abstract class BaseGDMResourceTest extends BasicResourceTest {
 	}
 
 	protected void readGDMFromDB(final String recordClassURI, final String dataModelURI, final int numberOfStatements,
-			final Optional<Integer> optionalAtMost) throws IOException {
+	                             final Optional<Integer> optionalAtMost) throws IOException {
 
 		final ObjectMapper objectMapper = Util.getJSONObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -125,14 +122,11 @@ public abstract class BaseGDMResourceTest extends BasicResourceTest {
 		final ModelParser modelParser = new ModelParser(bis);
 		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+		final Observable<Void> parseObservable = modelParser.parse().map(resource1 -> {
 
-			@Override public Void call(final Resource resource) {
+			model.addResource(resource1);
 
-				model.addResource(resource);
-
-				return null;
-			}
+			return null;
 		});
 
 		parseObservable.toBlocking().lastOrDefault(null);

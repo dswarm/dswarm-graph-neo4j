@@ -16,10 +16,11 @@
  */
 package org.dswarm.graph.rdf.utils;
 
-import org.dswarm.graph.NodeType;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import org.apache.jena.rdf.model.RDFNode;
+
+import org.dswarm.graph.NodeType;
 
 /**
  * @author tgaengler
@@ -28,14 +29,14 @@ public final class NodeTypeUtils {
 
 	public static Optional<NodeType> getNodeType(final Optional<RDFNode> optionalNode) {
 
-		return getNodeType(optionalNode, Optional.<Boolean>absent());
+		return getNodeType(optionalNode, Optional.empty());
 	}
 
 	public static Optional<NodeType> getNodeType(final Optional<RDFNode> optionalNode, final Optional<Boolean> optionalIsType) {
 
 		if(!optionalNode.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final NodeType nodeType;
@@ -79,6 +80,6 @@ public final class NodeTypeUtils {
 			nodeType = null;
 		}
 
-		return Optional.fromNullable(nodeType);
+		return Optional.ofNullable(nodeType);
 	}
 }

@@ -17,8 +17,8 @@
 package org.dswarm.graph.batch;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DataModelNeo4jProcessor extends BatchNeo4jProcessor {
 
 	@Override
 	public void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, final String URI,
-			final Optional<String> optionalDataModelURI) {
+	                                   final Optional<String> optionalDataModelURI) {
 
 		if (!optionalDataModelURI.isPresent()) {
 
@@ -91,7 +91,8 @@ public class DataModelNeo4jProcessor extends BatchNeo4jProcessor {
 		return getNodeIdFromResourcesWDataModelIndex(resourceURI + dataModelURI);
 	}
 
-	@Override public long generateResourceHash(final String resourceURI, final Optional<String> optionalDataModelURI) {
+	@Override
+	public long generateResourceHash(final String resourceURI, final Optional<String> optionalDataModelURI) {
 
 		final String finalDataModelURI = getDataModelURI(optionalDataModelURI);
 
@@ -100,7 +101,8 @@ public class DataModelNeo4jProcessor extends BatchNeo4jProcessor {
 		return HashUtils.generateHash(hashString);
 	}
 
-	@Override protected String putSaltToStatementHash(final String hash) {
+	@Override
+	protected String putSaltToStatementHash(final String hash) {
 
 		return hash + " " + this.dataModelURI;
 	}
@@ -117,7 +119,7 @@ public class DataModelNeo4jProcessor extends BatchNeo4jProcessor {
 
 	private String getDataModelURI(final Optional<String> optionalDataModelURI) {
 
-		if(optionalDataModelURI.isPresent()) {
+		if (optionalDataModelURI.isPresent()) {
 
 			return optionalDataModelURI.get();
 		}

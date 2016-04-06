@@ -20,26 +20,26 @@ import java.util.Map;
 
 import org.dswarm.graph.NodeType;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * @author tgaengler
  */
 public final class StatementBuilder {
 
-	private Optional<NodeType>            optionalSubjectNodeType     = Optional.absent();
-	private Optional<String>              optionalSubjectURI          = Optional.absent();
-	private Optional<String>              optionalSubjectId           = Optional.absent();
-	private Optional<String>              optionalSubjectDataModelURI = Optional.absent();
-	private Optional<String>              optionalPredicateURI        = Optional.absent();
-	private Optional<NodeType>            optionalObjectNodeType      = Optional.absent();
-	private Optional<String>              optionalObjectURI           = Optional.absent();
-	private Optional<String>              optionalObjectValue         = Optional.absent();
-	private Optional<String>              optionalObjectId            = Optional.absent();
-	private Optional<String>              optionalObjectDataModelURI  = Optional.absent();
-	private Optional<String>              optionalStatementUUID       = Optional.absent();
-	private Optional<Long>                optionalResourceHash        = Optional.absent();
-	private Optional<Map<String, Object>> optionalQualifiedAttributes = Optional.absent();
+	private Optional<NodeType>            optionalSubjectNodeType     = Optional.empty();
+	private Optional<String>              optionalSubjectURI          = Optional.empty();
+	private Optional<String>              optionalSubjectId           = Optional.empty();
+	private Optional<String>              optionalSubjectDataModelURI = Optional.empty();
+	private Optional<String>              optionalPredicateURI        = Optional.empty();
+	private Optional<NodeType>            optionalObjectNodeType      = Optional.empty();
+	private Optional<String>              optionalObjectURI           = Optional.empty();
+	private Optional<String>              optionalObjectValue         = Optional.empty();
+	private Optional<String>              optionalObjectId            = Optional.empty();
+	private Optional<String>              optionalObjectDataModelURI  = Optional.empty();
+	private Optional<String>              optionalStatementUUID       = Optional.empty();
+	private Optional<Long>                optionalResourceHash        = Optional.empty();
+	private Optional<Map<String, Object>> optionalQualifiedAttributes = Optional.empty();
 
 	public StatementBuilder() {
 	}
@@ -139,7 +139,7 @@ public final class StatementBuilder {
 
 		if (optionalSubjectNodeType == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalSubjectNodeType;
@@ -149,7 +149,7 @@ public final class StatementBuilder {
 
 		if (optionalSubjectURI == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalSubjectURI;
@@ -159,7 +159,7 @@ public final class StatementBuilder {
 
 		if (optionalSubjectId == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalSubjectId;
@@ -169,7 +169,7 @@ public final class StatementBuilder {
 
 		if (optionalSubjectDataModelURI == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalSubjectDataModelURI;
@@ -179,7 +179,7 @@ public final class StatementBuilder {
 
 		if (optionalPredicateURI == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalPredicateURI;
@@ -189,7 +189,7 @@ public final class StatementBuilder {
 
 		if (optionalObjectNodeType == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalObjectNodeType;
@@ -199,7 +199,7 @@ public final class StatementBuilder {
 
 		if (optionalObjectURI == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalObjectURI;
@@ -209,7 +209,7 @@ public final class StatementBuilder {
 
 		if (optionalObjectValue == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalObjectValue;
@@ -219,7 +219,7 @@ public final class StatementBuilder {
 
 		if (optionalObjectId == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalObjectId;
@@ -229,7 +229,7 @@ public final class StatementBuilder {
 
 		if (optionalObjectDataModelURI == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalObjectDataModelURI;
@@ -239,7 +239,7 @@ public final class StatementBuilder {
 
 		if (optionalStatementUUID == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalStatementUUID;
@@ -249,7 +249,7 @@ public final class StatementBuilder {
 
 		if (optionalResourceHash == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalResourceHash;
@@ -259,7 +259,7 @@ public final class StatementBuilder {
 
 		if (optionalQualifiedAttributes == null) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		return optionalQualifiedAttributes;

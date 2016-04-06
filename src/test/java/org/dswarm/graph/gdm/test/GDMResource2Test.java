@@ -24,14 +24,12 @@ import java.net.URL;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.io.ByteSource;
+import com.google.common.io.Resources;
+import com.sun.jersey.api.client.ClientResponse;
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Resources;
-import com.sun.jersey.api.client.ClientResponse;
 
 import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;

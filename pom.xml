@@ -46,7 +46,7 @@
 		<junit.version>4.12</junit.version>
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.3-SNAPSHOT</dswarm.graph.model.version>
-		<dswarm.commons.version>0.0.3-SNAPSHOT</dswarm.commons.version>
+		<dswarm.commons.version>0.0.3.2-SNAPSHOT</dswarm.commons.version>
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>

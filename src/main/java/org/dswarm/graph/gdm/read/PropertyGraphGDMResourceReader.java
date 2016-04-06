@@ -18,9 +18,9 @@ package org.dswarm.graph.gdm.read;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 	private static final Logger LOG = LoggerFactory.getLogger(PropertyGraphGDMResourceReader.class);
 
 	public PropertyGraphGDMResourceReader(final String prefixedDataModelUriArg, final Optional<Integer> optionalVersionArg,
-			final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg, final String type)
+	                                      final GraphDatabaseService databaseArg, final TransactionHandler tx, final NamespaceIndex namespaceIndexArg, final String type)
 			throws DMPGraphException {
 
 		super(prefixedDataModelUriArg, optionalVersionArg, databaseArg, tx, namespaceIndexArg, type);
@@ -92,7 +92,7 @@ public abstract class PropertyGraphGDMResourceReader extends PropertyGraphGDMRea
 
 				final Set<Statement> statements = new LinkedHashSet<>();
 
-				for(List<Statement> statementList : currentResourceStatements.values()) {
+				for (List<Statement> statementList : currentResourceStatements.values()) {
 
 					statements.addAll(statementList);
 				}

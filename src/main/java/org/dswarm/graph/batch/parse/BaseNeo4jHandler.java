@@ -18,16 +18,11 @@ package org.dswarm.graph.batch.parse;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.dswarm.graph.DMPGraphException;
-import org.dswarm.graph.Neo4jProcessor;
-import org.dswarm.graph.NodeType;
-import org.dswarm.graph.batch.BatchNeo4jProcessor;
-import org.dswarm.graph.model.GraphStatics;
-import org.dswarm.graph.model.Statement;
-import org.dswarm.graph.parse.Neo4jHandler;
-
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
@@ -36,9 +31,13 @@ import org.neo4j.helpers.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
+import org.dswarm.graph.DMPGraphException;
+import org.dswarm.graph.Neo4jProcessor;
+import org.dswarm.graph.NodeType;
+import org.dswarm.graph.batch.BatchNeo4jProcessor;
+import org.dswarm.graph.model.GraphStatics;
+import org.dswarm.graph.model.Statement;
+import org.dswarm.graph.parse.Neo4jHandler;
 
 /**
  * @author tgaengler
@@ -50,17 +49,17 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	private static final int TX_CHUNK_SIZE = 200000;
 	private static final int TX_TIME_DELTA = 30;
 
-	protected int totalTriples       = 0;
-	protected int addedNodes         = 0;
+	protected int totalTriples = 0;
+	protected int addedNodes = 0;
 	protected int addedRelationships = 0;
-	protected int sinceLastCommit    = 0;
-	protected int i                  = 0;
-	protected int literals           = 0;
+	protected int sinceLastCommit = 0;
+	protected int i = 0;
+	protected int literals = 0;
 
 	protected long tick = System.currentTimeMillis();
 
 	protected String resourceUri;
-	protected long   resourceHash;
+	protected long resourceHash;
 
 	protected final BatchNeo4jProcessor processor;
 
@@ -82,12 +81,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 		resourceUri = resourceUriArg;
 	}
 
-	@Override public void setResourceHash(final long resourceHashArg) {
+	@Override
+	public void setResourceHash(final long resourceHashArg) {
 
 		resourceHash = resourceHashArg;
 	}
 
-	@Override public void resetResourceIndexCounter() {
+	@Override
+	public void resetResourceIndexCounter() {
 
 		// TODO
 	}
@@ -120,7 +121,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 						.of(processor.generateResourceHash(optionalSubjectURI.get(), statement.getOptionalSubjectDataModelURI()));
 			} else {
 
-				optionalSubjectUriDataModelUriHash = Optional.absent();
+				optionalSubjectUriDataModelUriHash = Optional.empty();
 			}
 
 			// Check index for subject
@@ -218,7 +219,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 				if (optionalObjectNodeId.isPresent()) {
 
 					objectNodeId = optionalObjectNodeId.get();
-					optionalResourceHash = Optional.absent();
+					optionalResourceHash = Optional.empty();
 				} else {
 
 					final Map<String, Object> objectNodeProperties = new HashMap<>();
@@ -258,7 +259,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 
 						processor.addToResourcesIndex(objectURI, objectNodeId);
 						processor.addObjectToResourceWDataModelIndex(objectNodeId, objectURI, statement.getOptionalObjectDataModelURI());
-						optionalResourceHash = Optional.absent();
+						optionalResourceHash = Optional.empty();
 					} else {
 
 						final Pair<Long, Optional<Long>> result = handleBNode(subjectNodeId, statement, objectNodeProperties,
@@ -351,7 +352,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	}
 
 	public Pair<Long, Optional<Long>> handleBNode(final long subjectNodeId, final Statement statement,
-			final Map<String, Object> objectNodeProperties, final Optional<NodeType> optionalObjectNodeType, final Optional<Long> optionalSubjectHash)
+	                                              final Map<String, Object> objectNodeProperties, final Optional<NodeType> optionalObjectNodeType, final Optional<Long> optionalSubjectHash)
 			throws DMPGraphException {
 
 		if (!optionalObjectNodeType.isPresent()) {
@@ -372,11 +373,11 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 			optionalResourceHash = addResourceProperty(subjectNodeId, objectNodeProperties, statement.getOptionalSubjectNodeType(),
 					optionalSubjectHash, statement.getOptionalResourceHash());
 
-			optionalLabel = Optional.absent();
+			optionalLabel = Optional.empty();
 		} else {
 
 			optionalLabel = Optional.of(rdfsClassLabel);
-			optionalResourceHash = Optional.absent();
+			optionalResourceHash = Optional.empty();
 		}
 
 		final long objectNodeId;
@@ -440,9 +441,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	 * @throws org.dswarm.graph.DMPGraphException
 	 */
 	public long addRelationship(final long subjectNodeId, final String predicateURI, final long objectNodeId,
-			final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectURI,
-			final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceUri,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
+	                            final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectURI,
+	                            final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceUri,
+	                            final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
@@ -472,14 +473,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	}
 
 	protected Optional<Long> addResourceProperty(final long subjectNodeId, final Map<String, Object> objectProperties,
-			final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
+	                                             final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash = processor.determineResourceHash(subjectNodeId, optionalSubjectNodeType, optionalSubjectHash,
 				optionalResourceHash);
 
 		if (!finalOptionalResourceHash.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		objectProperties.put(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceHash.get());
@@ -488,7 +489,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler {
 	}
 
 	protected Optional<Long> addResourcePropertyToRelationship(final long subjectNodeId, final Map<String, Object> relProperties,
-			final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
+	                                                           final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash;
 

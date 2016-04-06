@@ -16,7 +16,7 @@
  */
 package org.dswarm.graph;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * @author tgaengler

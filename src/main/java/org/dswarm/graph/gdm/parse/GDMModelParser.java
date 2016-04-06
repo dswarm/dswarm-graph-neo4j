@@ -16,14 +16,13 @@
  */
 package org.dswarm.graph.gdm.parse;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
-import rx.functions.Func1;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.json.Resource;
@@ -36,7 +35,7 @@ public class GDMModelParser implements GDMParser {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GDMModelParser.class);
 
-	private       GDMHandler           gdmHandler;
+	private GDMHandler gdmHandler;
 	private final Observable<Resource> model;
 	private long parsedResources = 0;
 
@@ -79,7 +78,7 @@ public class GDMModelParser implements GDMParser {
 			try {
 
 				final String prefixedResourceUri = gdmHandler.getHandler().getProcessor().createPrefixedURI(resource.getUri());
-				final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional.<String>absent());
+				final long resourceHash = gdmHandler.getHandler().getProcessor().generateResourceHash(prefixedResourceUri, Optional.empty());
 
 				gdmHandler.getHandler().setResourceUri(prefixedResourceUri);
 				gdmHandler.getHandler().setResourceHash(resourceHash);
@@ -105,7 +104,8 @@ public class GDMModelParser implements GDMParser {
 		});
 	}
 
-	@Override public long parsedResources() {
+	@Override
+	public long parsedResources() {
 
 		return parsedResources;
 	}

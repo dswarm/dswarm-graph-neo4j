@@ -39,33 +39,26 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
-import rx.functions.Func1;
 
 import org.dswarm.common.DMPStatics;
 import org.dswarm.graph.json.Model;
 import org.dswarm.graph.json.Resource;
 import org.dswarm.graph.json.stream.ModelParser;
 import org.dswarm.graph.json.util.Util;
-import org.dswarm.graph.test.BasicResourceTest;
 import org.dswarm.graph.test.Neo4jDBWrapper;
 
 /**
  * @author tgaengler
  */
-public abstract class GDMResource4Test extends BasicResourceTest {
+public abstract class GDMResource4Test extends BaseGDMResourceTest {
 
 	private static final Logger LOG                  = LoggerFactory.getLogger(GDMResource4Test.class);
 	private static final String DATA_MODEL_URI       = "http://data.slub-dresden.de/resources/1";
 	private static final String MABXML_RESOURCE_GSON = "test-mabxml_w_data_model_resource.gson";
 
-	private final ObjectMapper objectMapper;
-
 	public GDMResource4Test(final Neo4jDBWrapper neo4jDBWrapper, final String dbTypeArg) {
 
-		super(neo4jDBWrapper, "/gdm", dbTypeArg);
-
-		objectMapper = Util.getJSONObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		super(neo4jDBWrapper, dbTypeArg);
 	}
 
 	@Test
@@ -95,14 +88,11 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final ModelParser modelParser = new ModelParser(bis);
 		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+		final Observable<Void> parseObservable = modelParser.parse().map(resource1 -> {
 
-			@Override public Void call(final Resource resource) {
+			model.addResource(resource1);
 
-				model.addResource(resource);
-
-				return null;
-			}
+			return null;
 		});
 
 		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();
@@ -393,37 +383,6 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		LOG.debug("finished search GDM records test 4 for GDM resource at {} DB", dbType);
 	}
 
-	private void writeGDMToDBInternal(final String dataModelURI, final String sourceFileName) throws IOException {
-
-		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
-
-		final URL fileURL = Resources.getResource(sourceFileName);
-		final ByteSource byteSource = Resources.asByteSource(fileURL);
-		final InputStream is = byteSource.openStream();
-		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
-
-		final ObjectNode metadata = objectMapper.createObjectNode();
-		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
-
-		final String requestJsonString = objectMapper.writeValueAsString(metadata);
-
-		// Construct a MultiPart with two body parts
-		final MultiPart multiPart = new MultiPart();
-		multiPart.bodyPart(new BodyPart(requestJsonString, MediaType.APPLICATION_JSON_TYPE)).bodyPart(
-				new BodyPart(bis, MediaType.APPLICATION_OCTET_STREAM_TYPE));
-
-		// POST the request
-		final ClientResponse response = target().path("/put").type("multipart/mixed").post(ClientResponse.class, multiPart);
-
-		Assert.assertEquals("expected 200", 200, response.getStatus());
-
-		multiPart.close();
-		bis.close();
-		is.close();
-
-		LOG.debug("finished writing GDM statements for GDM resource at {} DB", dbType);
-	}
-
 	private void writeGDMToDBInternalWDeprecation(final String dataModelURI, final String sourceFileName, final String recordClassURI)
 			throws IOException {
 
@@ -494,14 +453,11 @@ public abstract class GDMResource4Test extends BasicResourceTest {
 		final ModelParser modelParser = new ModelParser(bis);
 		final org.dswarm.graph.json.Model model = new org.dswarm.graph.json.Model();
 
-		final Observable<Void> parseObservable = modelParser.parse().map(new Func1<Resource, Void>() {
+		final Observable<Void> parseObservable = modelParser.parse().map(resource1 -> {
 
-			@Override public Void call(final Resource resource) {
+			model.addResource(resource1);
 
-				model.addResource(resource);
-
-				return null;
-			}
+			return null;
 		});
 
 		final Iterator<Void> iterator = parseObservable.toBlocking().getIterator();

@@ -16,6 +16,14 @@
  */
 package org.dswarm.graph.rdf.parse;
 
+import java.util.Optional;
+
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.model.StatementBuilder;
@@ -23,23 +31,16 @@ import org.dswarm.graph.parse.BaseNeo4jHandler;
 import org.dswarm.graph.parse.Neo4jHandler;
 import org.dswarm.graph.rdf.RDFNeo4jProcessor;
 import org.dswarm.graph.rdf.utils.NodeTypeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
 
 /**
  * @author tgaengler
  */
 public abstract class RDFNeo4jHandler implements RDFHandler {
 
-	private static final Logger			LOG	= LoggerFactory.getLogger(RDFNeo4jHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RDFNeo4jHandler.class);
 
-	protected final BaseNeo4jHandler	handler;
-	protected final RDFNeo4jProcessor	processor;
+	protected final BaseNeo4jHandler handler;
+	protected final RDFNeo4jProcessor processor;
 
 	public RDFNeo4jHandler(final BaseNeo4jHandler handlerArg, final RDFNeo4jProcessor processorArg) throws DMPGraphException {
 
@@ -65,7 +66,7 @@ public abstract class RDFNeo4jHandler implements RDFHandler {
 
 		final Property predicate = st.getPredicate();
 		final String predicateName = predicate.getURI();
-		sb.setOptionalPredicateURI(Optional.fromNullable(predicateName));
+		sb.setOptionalPredicateURI(Optional.ofNullable(predicateName));
 
 		final RDFNode object = st.getObject();
 		final Optional<NodeType> optionalObjectNodeType = NodeTypeUtils.getNodeType(Optional.of(object));

@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with d:swarm graph extension.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * This file is part of d:swarm graph extension. d:swarm graph extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version. d:swarm graph extension is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details. You should have received a copy of the GNU General Public License along with d:swarm
- * graph extension. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.dswarm.graph.parse;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.common.base.Optional;
 import org.apache.jena.vocabulary.RDF;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -36,8 +28,8 @@ import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.BasicNeo4jProcessor;
+import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.Neo4jProcessor;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.hash.HashUtils;
@@ -56,12 +48,12 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	private static final int TX_CHUNK_SIZE = 50000;
 	private static final int TX_TIME_DELTA = 30;
 
-	protected int totalTriples       = 0;
-	protected int addedNodes         = 0;
+	protected int totalTriples = 0;
+	protected int addedNodes = 0;
 	protected int addedRelationships = 0;
-	protected int sinceLastCommit    = 0;
-	protected int i                  = 0;
-	protected int literals           = 0;
+	protected int sinceLastCommit = 0;
+	protected int i = 0;
+	protected int literals = 0;
 
 	protected long tick = System.currentTimeMillis();
 
@@ -102,7 +94,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 		resourceHash = resourceHashArg;
 	}
 
-	@Override public void resetResourceIndexCounter() {
+	@Override
+	public void resetResourceIndexCounter() {
 
 		resourceIndexCounter = new AtomicLong(0);
 	}
@@ -149,7 +142,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 						.of(processor.generateResourceHash(optionalPrefixedSubjectURI.get(), optionalPrefixedSubjectDataModelURI));
 			} else {
 
-				optionalSubjectUriDataModelUriHash = Optional.absent();
+				optionalSubjectUriDataModelUriHash = Optional.empty();
 			}
 
 			final Optional<Node> optionalSubjectNode = processor.determineNode(statement.getOptionalSubjectNodeType(),
@@ -200,10 +193,10 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			final Optional<Long> optionalStatementResourceHash;
 
-			if(!statement.getOptionalResourceHash().isPresent()) {
+			if (!statement.getOptionalResourceHash().isPresent()) {
 
 				optionalStatementResourceHash = Optional.of(resourceHash);
-			} else  {
+			} else {
 
 				optionalStatementResourceHash = statement.getOptionalResourceHash();
 			}
@@ -267,7 +260,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 					optionalObjectResourceUriDataModelUriHash = Optional.of(HashUtils.generateHash(optionalPrefixedObjectURI.get()));
 				} else {
 
-					optionalObjectResourceUriDataModelUriHash = Optional.absent();
+					optionalObjectResourceUriDataModelUriHash = Optional.empty();
 				}
 
 				// Check index for object
@@ -279,7 +272,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 				if (optionalObjectNode.isPresent()) {
 
 					objectNode = optionalObjectNode.get();
-					optionalResourceHash = Optional.absent();
+					optionalResourceHash = Optional.empty();
 				} else {
 
 					final Label objectLabel = processor.getLabel(finalObjectNodeType.toString());
@@ -313,7 +306,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 						}
 
 						processor.addObjectToResourceWDataModelIndex(objectNode, objectURI, optionalPrefixedObjectDataModelURI);
-						optionalResourceHash = Optional.absent();
+						optionalResourceHash = Optional.empty();
 					} else {
 
 						optionalResourceHash = handleBNode(subjectNode, statement, objectNode, finalOptionalObjectNodeType,
@@ -458,8 +451,8 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	protected abstract void init() throws DMPGraphException;
 
 	public Optional<Long> handleBNode(final Node subjectNode, final Statement statement, final Node objectNode,
-			final Optional<NodeType> optionalObjectNodeType, final Optional<Long> optionalSubjectHash,
-			final Optional<Long> optionalResourceHash) throws DMPGraphException {
+	                                  final Optional<NodeType> optionalObjectNodeType, final Optional<Long> optionalSubjectHash,
+	                                  final Optional<Long> optionalResourceHash) throws DMPGraphException {
 
 		if (!optionalObjectNodeType.isPresent()) {
 
@@ -481,14 +474,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 
 			processor.addLabel(objectNode, processor.getNamespaceIndex().getRDFCLASSPrefixedURI());
 			processor.addLabel(objectNode, NodeType.BNode.toString());
-			finalOptionalResourceHash = Optional.absent();
+			finalOptionalResourceHash = Optional.empty();
 		}
 
 		return finalOptionalResourceHash;
 	}
 
 	public void handleLiteral(final Node subjectNode, final Statement statement, final Optional<Long> optionalSubjectHash,
-			final Optional<Long> optionalResourceHash, final Optional<String> optionalPrefixedPredicateURI) throws DMPGraphException {
+	                          final Optional<Long> optionalResourceHash, final Optional<String> optionalPrefixedPredicateURI) throws DMPGraphException {
 
 		final long hash = processor.generateStatementHash(subjectNode, statement, optionalPrefixedPredicateURI);
 
@@ -532,9 +525,9 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	 * @throws DMPGraphException
 	 */
 	public Relationship addRelationship(final Node subjectNode, final String predicateURI, final Node objectNode,
-			final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash,
-			final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceHash,
-			final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
+	                                    final Optional<NodeType> optionalSubjectNodeType, final Optional<Long> optionalSubjectHash,
+	                                    final Optional<String> optionalStatementUUID, final Optional<Long> optionalResourceHash,
+	                                    final Optional<Map<String, Object>> optionalQualifiedAttributes, final long hash) throws DMPGraphException {
 
 		final String finalStatementUUID;
 
@@ -562,14 +555,14 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	}
 
 	protected Optional<Long> addResourceProperty(final Node subjectNode, final Node objectNode, final Optional<NodeType> optionalSubjectNodeType,
-			final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
+	                                             final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash = processor.determineResourceHash(subjectNode, optionalSubjectNodeType, optionalSubjectHash,
 				optionalResourceHash);
 
 		if (!finalOptionalResourceHash.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		objectNode.setProperty(GraphStatics.RESOURCE_PROPERTY, finalOptionalResourceHash.get());
@@ -578,7 +571,7 @@ public abstract class BaseNeo4jHandler implements Neo4jHandler, Neo4jUpdateHandl
 	}
 
 	protected Optional<Long> addResourceProperty(final Node subjectNode, final Relationship rel, final Optional<NodeType> optionalSubjectNodeType,
-			final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
+	                                             final Optional<Long> optionalSubjectHash, final Optional<Long> optionalResourceHash) {
 
 		final Optional<Long> finalOptionalResourceHash;
 

@@ -17,8 +17,7 @@
 package org.dswarm.graph.delta.match;
 
 import java.util.Collection;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import org.dswarm.graph.DMPGraphException;
 

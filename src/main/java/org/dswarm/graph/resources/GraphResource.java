@@ -19,6 +19,7 @@ package org.dswarm.graph.resources;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -27,7 +28,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public abstract class GraphResource {
 
 		if (node != null) {
 
-			optionalValue = Optional.fromNullable(node.asText());
+			optionalValue = Optional.ofNullable(node.asText());
 		} else {
 
-			optionalValue = Optional.absent();
+			optionalValue = Optional.empty();
 		}
 
 		return optionalValue;
@@ -65,10 +65,10 @@ public abstract class GraphResource {
 
 		if (node != null) {
 
-			optionalValue = Optional.fromNullable(node.asInt());
+			optionalValue = Optional.ofNullable(node.asInt());
 		} else {
 
-			optionalValue = Optional.absent();
+			optionalValue = Optional.empty();
 		}
 
 		return optionalValue;

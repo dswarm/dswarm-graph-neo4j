@@ -17,10 +17,8 @@
 package org.dswarm.graph.batch;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.github.emboss.siphash.SipHash;
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +59,7 @@ public class SimpleNeo4jProcessor extends BatchNeo4jProcessor {
 
 	@Override
 	public void handleSubjectDataModel(final Map<String, Object> subjectNodeProperties, final String URI,
-			final Optional<String> optionalDataModelURI) {
+	                                   final Optional<String> optionalDataModelURI) {
 
 		if (optionalDataModelURI.isPresent()) {
 
@@ -75,14 +73,16 @@ public class SimpleNeo4jProcessor extends BatchNeo4jProcessor {
 		return getNodeIdFromResourcesIndex(resourceURI);
 	}
 
-	@Override public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
+	@Override
+	public long generateResourceHash(final String resourceURI, final Optional<String> dataModelURI) {
 
 		final String hashString = resourceURI;
 
 		return HashUtils.generateHash(hashString);
 	}
 
-	@Override protected String putSaltToStatementHash(final String hash) {
+	@Override
+	protected String putSaltToStatementHash(final String hash) {
 
 		return hash;
 	}

@@ -16,25 +16,26 @@
  */
 package org.dswarm.graph.batch.rdf;
 
+import java.util.Optional;
+
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.NodeType;
 import org.dswarm.graph.batch.BatchNeo4jProcessor;
 import org.dswarm.graph.model.StatementBuilder;
 import org.dswarm.graph.rdf.utils.NodeTypeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 
 /**
  * @author tgaengler
  */
 public abstract class RDFNeo4jProcessor {
 
-	private static final Logger		LOG	= LoggerFactory.getLogger(RDFNeo4jProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RDFNeo4jProcessor.class);
 
 	protected final BatchNeo4jProcessor processor;
 
@@ -50,7 +51,7 @@ public abstract class RDFNeo4jProcessor {
 
 	public StatementBuilder determineNode(final RDFNode resource, final StatementBuilder statementBuilder, final boolean forSubject) {
 
-		final Optional<RDFNode> optionalResource = Optional.fromNullable(resource);
+		final Optional<RDFNode> optionalResource = Optional.ofNullable(resource);
 		final Optional<NodeType> optionalResourceNodeType = NodeTypeUtils.getNodeType(optionalResource);
 
 		final Optional<String> optionalResourceId;
@@ -66,43 +67,43 @@ public abstract class RDFNeo4jProcessor {
 
 					// only bnodes have ids in Jena
 
-					optionalResourceId = Optional.fromNullable(((Resource) resource).getId().toString());
+					optionalResourceId = Optional.ofNullable(((Resource) resource).getId().toString());
 				} else {
 
-					optionalResourceId = Optional.absent();
+					optionalResourceId = Optional.empty();
 				}
 
 				if (NodeType.Resource.equals(optionalResourceNodeType.get()) || NodeType.TypeResource.equals(optionalResourceNodeType.get())) {
 
 					final Resource resourceResourceNode = (Resource) resource;
 
-					optionalResourceUri = Optional.fromNullable(resourceResourceNode.getURI());
-					optionalDataModelUri = Optional.absent();
-					optionalResourceValue = Optional.absent();
+					optionalResourceUri = Optional.ofNullable(resourceResourceNode.getURI());
+					optionalDataModelUri = Optional.empty();
+					optionalResourceValue = Optional.empty();
 				} else if (NodeType.Literal.equals(optionalResourceNodeType.get())) {
 
-					optionalResourceValue = Optional.fromNullable(((Literal) resource).getValue().toString());
-					optionalResourceUri = Optional.absent();
-					optionalDataModelUri = Optional.absent();
+					optionalResourceValue = Optional.ofNullable(((Literal) resource).getValue().toString());
+					optionalResourceUri = Optional.empty();
+					optionalDataModelUri = Optional.empty();
 				} else {
 
-					optionalResourceUri = Optional.absent();
-					optionalDataModelUri = Optional.absent();
-					optionalResourceValue = Optional.absent();
+					optionalResourceUri = Optional.empty();
+					optionalDataModelUri = Optional.empty();
+					optionalResourceValue = Optional.empty();
 				}
 			} else {
 
-				optionalResourceUri = Optional.absent();
-				optionalDataModelUri = Optional.absent();
-				optionalResourceValue = Optional.absent();
-				optionalResourceId = Optional.absent();
+				optionalResourceUri = Optional.empty();
+				optionalDataModelUri = Optional.empty();
+				optionalResourceValue = Optional.empty();
+				optionalResourceId = Optional.empty();
 			}
 		} else {
 
-			optionalResourceId = Optional.absent();
-			optionalResourceUri = Optional.absent();
-			optionalDataModelUri = Optional.absent();
-			optionalResourceValue = Optional.absent();
+			optionalResourceId = Optional.empty();
+			optionalResourceUri = Optional.empty();
+			optionalDataModelUri = Optional.empty();
+			optionalResourceValue = Optional.empty();
 		}
 
 		if (forSubject) {

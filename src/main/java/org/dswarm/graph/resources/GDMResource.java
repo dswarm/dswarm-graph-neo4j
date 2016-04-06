@@ -16,15 +16,58 @@
  */
 package org.dswarm.graph.resources;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.test.TestGraphDatabaseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.observables.BlockingObservable;
+import rx.observables.ConnectableObservable;
+
 import org.dswarm.common.DMPStatics;
 import org.dswarm.common.model.Attribute;
 import org.dswarm.common.model.AttributePath;
@@ -34,7 +77,15 @@ import org.dswarm.common.types.Tuple;
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.Changeset;
 import org.dswarm.graph.delta.DeltaState;
-import org.dswarm.graph.delta.match.*;
+import org.dswarm.graph.delta.match.FirstDegreeExactCSEntityMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactCSValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactGDMValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphEntityMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeExactSubGraphLeafEntityMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeModificationCSValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeModificationGDMValueMatcher;
+import org.dswarm.graph.delta.match.FirstDegreeModificationSubGraphLeafEntityMatcher;
+import org.dswarm.graph.delta.match.ModificationMatcher;
 import org.dswarm.graph.delta.match.model.CSEntity;
 import org.dswarm.graph.delta.match.model.SubGraphEntity;
 import org.dswarm.graph.delta.match.model.SubGraphLeafEntity;
@@ -45,8 +96,22 @@ import org.dswarm.graph.delta.util.GraphDBUtil;
 import org.dswarm.graph.gdm.DataModelGDMNeo4jProcessor;
 import org.dswarm.graph.gdm.GDMNeo4jProcessor;
 import org.dswarm.graph.gdm.SimpleGDMNeo4jProcessor;
-import org.dswarm.graph.gdm.parse.*;
-import org.dswarm.graph.gdm.read.*;
+import org.dswarm.graph.gdm.parse.DataModelGDMNeo4jHandler;
+import org.dswarm.graph.gdm.parse.GDMChangesetParser;
+import org.dswarm.graph.gdm.parse.GDMHandler;
+import org.dswarm.graph.gdm.parse.GDMModelParser;
+import org.dswarm.graph.gdm.parse.GDMNeo4jHandler;
+import org.dswarm.graph.gdm.parse.GDMParser;
+import org.dswarm.graph.gdm.parse.GDMResourceParser;
+import org.dswarm.graph.gdm.parse.GDMUpdateHandler;
+import org.dswarm.graph.gdm.parse.GDMUpdateParser;
+import org.dswarm.graph.gdm.parse.Neo4jDeltaGDMHandler;
+import org.dswarm.graph.gdm.parse.SimpleGDMNeo4jHandler;
+import org.dswarm.graph.gdm.read.GDMModelReader;
+import org.dswarm.graph.gdm.read.GDMResourceReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMModelReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByIDReader;
+import org.dswarm.graph.gdm.read.PropertyGraphGDMResourceByURIReader;
 import org.dswarm.graph.gdm.work.GDMWorker;
 import org.dswarm.graph.gdm.work.PropertyEnrichGDMWorker;
 import org.dswarm.graph.gdm.work.PropertyGraphDeltaGDMSubGraphWorker;
@@ -63,22 +128,6 @@ import org.dswarm.graph.parse.Neo4jUpdateHandler;
 import org.dswarm.graph.tx.Neo4jTransactionHandler;
 import org.dswarm.graph.tx.TransactionHandler;
 import org.dswarm.graph.versioning.VersioningStatics;
-import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.observables.BlockingObservable;
-import rx.observables.ConnectableObservable;
-
-import javax.ws.rs.*;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.*;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author tgaengler
@@ -121,10 +170,10 @@ public class GDMResource extends GraphResource {
 	 * multipart/mixed payload contains two body parts:<br/>
 	 * - first body part is the metadata (i.e. a JSON object with mandatory and obligatory properties for processing the
 	 * content):<br/>
-	 *     - "data_model_URI" (mandatory)<br/>
-	 *     - "content_schema" (obligatory)<br/>
-	 *     - "deprecate_missing_records" (obligatory)<br/>
-	 *     - "record_class_uri" (mandatory for "deprecate_missing_records")<br/>
+	 * - "data_model_URI" (mandatory)<br/>
+	 * - "content_schema" (obligatory)<br/>
+	 * - "deprecate_missing_records" (obligatory)<br/>
+	 * - "record_class_uri" (mandatory for "deprecate_missing_records")<br/>
 	 * - second body part is the content (i.e. the real data)
 	 *
 	 * @param multiPart
@@ -704,12 +753,12 @@ public class GDMResource extends GraphResource {
 					// note: version is absent -> should make use of latest version
 					gdmReader = new PropertyGraphGDMResourceByIDReader(recordIdentifier,
 							optionalPrefixedContentSchema.get().getRecordIdentifierAttributePath(),
-							prefixedDataModelURI, Optional.<Integer>absent(), permanentDatabase, tx, namespaceIndex);
+							prefixedDataModelURI, Optional.empty(), permanentDatabase, tx, namespaceIndex);
 				} else {
 
 					// try to retrieve existing model via resource uri
 					// note: version is absent -> should make use of latest version
-					gdmReader = new PropertyGraphGDMResourceByURIReader(prefixedResourceURI, prefixedDataModelURI, Optional.<Integer>absent(),
+					gdmReader = new PropertyGraphGDMResourceByURIReader(prefixedResourceURI, prefixedDataModelURI, Optional.empty(),
 							permanentDatabase, tx, namespaceIndex);
 				}
 
@@ -728,7 +777,7 @@ public class GDMResource extends GraphResource {
 				final String existingResourceURI = existingResource.getUri();
 				final String prefixedExistingResourceURI = handler.getHandler().getProcessor().createPrefixedURI(existingResourceURI);
 				final long existingResourceHash = handler.getHandler().getProcessor().generateResourceHash(prefixedExistingResourceURI,
-						Optional.<String>absent());
+						Optional.empty());
 				processedResources.add(existingResourceHash);
 
 				// final Model newResourceModel = new Model();
@@ -838,7 +887,7 @@ public class GDMResource extends GraphResource {
 			optionalPrefixedCommonAttributePath = AttributePathUtil.determineCommonAttributePath(optionalPrefixedContentSchema.get());
 		} else {
 
-			optionalPrefixedCommonAttributePath = Optional.absent();
+			optionalPrefixedCommonAttributePath = Optional.empty();
 		}
 
 		if (optionalPrefixedCommonAttributePath.isPresent()) {
@@ -862,8 +911,8 @@ public class GDMResource extends GraphResource {
 			// keep attention to sub entities of CS entities -> note: this needs to be done as part of the the exact cs entity =>
 			// see step 7
 			// matching as well, i.e., we need to be able to calc a hash from sub entities of the cs entities
-			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(Optional.fromNullable(existingCSEntities),
-					Optional.fromNullable(newCSEntities), existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
+			final FirstDegreeExactCSEntityMatcher exactCSMatcher = new FirstDegreeExactCSEntityMatcher(Optional.ofNullable(existingCSEntities),
+					Optional.ofNullable(newCSEntities), existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 			exactCSMatcher.match();
 
 			final Optional<? extends Collection<CSEntity>> newExactCSNonMatches = exactCSMatcher.getNewEntitiesNonMatches();
@@ -903,7 +952,7 @@ public class GDMResource extends GraphResource {
 			// 7.1 identify exact matches of (non-hierarchical) CS entity sub graphs
 			// 7.1.1 key + predicate + sub graph hash + order
 			final FirstDegreeExactSubGraphEntityMatcher firstDegreeExactSubGraphEntityMatcher = new FirstDegreeExactSubGraphEntityMatcher(
-					Optional.fromNullable(existingSubGraphEntities), Optional.fromNullable(newSubGraphEntities), existingResourceDB, newResourceDB,
+					Optional.ofNullable(existingSubGraphEntities), Optional.ofNullable(newSubGraphEntities), existingResourceDB, newResourceDB,
 					prefixedExistingResourceURI, prefixedNewResourceURI);
 			firstDegreeExactSubGraphEntityMatcher.match();
 
@@ -953,7 +1002,7 @@ public class GDMResource extends GraphResource {
 				existingResourceDB);
 		// 3.1 with key (predicate), value + value order => matches value entities
 		final FirstDegreeExactGDMValueMatcher firstDegreeExactGDMValueMatcher = new FirstDegreeExactGDMValueMatcher(
-				Optional.fromNullable(existingFlatResourceNodeValueEntities), Optional.fromNullable(newFlatResourceNodeValueEntities),
+				Optional.ofNullable(existingFlatResourceNodeValueEntities), Optional.ofNullable(newFlatResourceNodeValueEntities),
 				existingResourceDB, newResourceDB, prefixedExistingResourceURI, prefixedNewResourceURI);
 		firstDegreeExactGDMValueMatcher.match();
 
@@ -1330,7 +1379,7 @@ public class GDMResource extends GraphResource {
 
 				GDMResource.LOG.debug(message);
 
-				return Optional.absent();
+				return Optional.empty();
 			}
 		}
 
@@ -1343,7 +1392,7 @@ public class GDMResource extends GraphResource {
 
 		if (!optionalMetadataPartNode.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		final JsonNode metadataPartNode = optionalMetadataPartNode.get();
@@ -1366,7 +1415,7 @@ public class GDMResource extends GraphResource {
 
 				GDMResource.LOG.debug(message);
 
-				return Optional.absent();
+				return Optional.empty();
 			}
 		}
 
@@ -1380,7 +1429,7 @@ public class GDMResource extends GraphResource {
 
 		if (!optionalContentSchemaJSON.isPresent()) {
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 
 		try {
@@ -1399,7 +1448,7 @@ public class GDMResource extends GraphResource {
 				LOG.debug("try to prefix URIs of content schema '{}'", objectMapper.writeValueAsString(contentSchema));
 			}
 
-			final Optional<ContentSchema> contentSchemaOptional = Optional.fromNullable(contentSchema);
+			final Optional<ContentSchema> contentSchemaOptional = Optional.ofNullable(contentSchema);
 
 			if (contentSchemaOptional.isPresent()) {
 
@@ -1413,7 +1462,7 @@ public class GDMResource extends GraphResource {
 
 			GDMResource.LOG.error(message);
 
-			return Optional.absent();
+			return Optional.empty();
 		}
 	}
 
@@ -1532,7 +1581,7 @@ public class GDMResource extends GraphResource {
 
 		if (optionalDeprecateMissingRecords.isPresent()) {
 
-			result = Optional.fromNullable(Boolean.valueOf(optionalDeprecateMissingRecords.get()));
+			result = Optional.ofNullable(Boolean.valueOf(optionalDeprecateMissingRecords.get()));
 		} else {
 
 			result = Optional.of(Boolean.FALSE);
@@ -1556,7 +1605,7 @@ public class GDMResource extends GraphResource {
 
 		if (optionalEnableVersioning.isPresent()) {
 
-			result = Optional.fromNullable(Boolean.valueOf(optionalEnableVersioning.get()));
+			result = Optional.ofNullable(Boolean.valueOf(optionalEnableVersioning.get()));
 		} else {
 
 			result = Optional.of(Boolean.TRUE);

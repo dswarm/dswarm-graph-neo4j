@@ -19,15 +19,15 @@ package org.dswarm.graph.delta.match;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dswarm.graph.DMPGraphException;
 import org.dswarm.graph.delta.match.mark.ValueEntityMarker;
 import org.dswarm.graph.delta.match.model.ValueEntity;
-
-import com.google.common.base.Optional;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author tgaengler
@@ -37,8 +37,8 @@ public class FirstDegreeModificationCSValueMatcher extends ModificationMatcher<V
 	private static final Logger LOG = LoggerFactory.getLogger(FirstDegreeModificationCSValueMatcher.class);
 
 	public FirstDegreeModificationCSValueMatcher(final Optional<? extends Collection<ValueEntity>> existingValueEntitiesArg,
-			final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
-			final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws
+	                                             final Optional<? extends Collection<ValueEntity>> newValueEntitiesArg, final GraphDatabaseService existingResourceDBArg,
+	                                             final GraphDatabaseService newResourceDBArg, final String prefixedExistingResourceURIArg, final String prefixedNewResourceURIArg) throws
 			DMPGraphException {
 
 		super(existingValueEntitiesArg, newValueEntitiesArg, existingResourceDBArg, newResourceDBArg, prefixedExistingResourceURIArg, prefixedNewResourceURIArg,
@@ -59,13 +59,13 @@ public class FirstDegreeModificationCSValueMatcher extends ModificationMatcher<V
 
 		final Map<String, ValueEntity> hashedValueEntities = new HashMap<>();
 
-		for(final ValueEntity valueEntity : valueEntities) {
+		for (final ValueEntity valueEntity : valueEntities) {
 
 			final int keyHash = valueEntity.getCSEntity().getKey().hashCode();
 			final int entityOrderHash = Long.valueOf(valueEntity.getCSEntity().getEntityOrder()).hashCode();
 
 			long valueHash = keyHash;
-			valueHash = 31 * valueHash +  Long.valueOf(valueEntity.getOrder()).hashCode();
+			valueHash = 31 * valueHash + Long.valueOf(valueEntity.getOrder()).hashCode();
 			valueHash = 31 * valueHash + entityOrderHash;
 
 			hashedValueEntities.put(Long.valueOf(valueHash).toString(), valueEntity);

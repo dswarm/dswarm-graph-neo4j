@@ -19,13 +19,13 @@ package org.dswarm.graph.maintain.test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Optional;
 import com.sun.jersey.api.client.ClientResponse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,13 +60,13 @@ public abstract class MaintainResourceDeprecateTest extends BaseGDMResourceTest 
 		final String recordClassURI = "http://www.ddb.de/professionell/mabxml/mabxml-1.xsd#datensatzType";
 		final int numberOfStatements = 191;
 
-		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.empty());
 
 		final String body = deprecateDataModel(dataModelURI);
 
 		Assert.assertEquals("{\"deprecated\":152}", body);
 
-		readGDMFromDB(recordClassURI, dataModelURI, 0, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, 0, Optional.empty());
 
 		// try to deprecate data model again
 		final String body2 = deprecateDataModel(dataModelURI);
@@ -77,7 +77,7 @@ public abstract class MaintainResourceDeprecateTest extends BaseGDMResourceTest 
 		//		// write same data again to data model
 		//		writeGDMToDBInternal(dataModelURI, BaseGDMResourceTest.DEFAULT_GDM_FILE_NAME);
 		//
-		//		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		//		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>empty());
 
 		MaintainResourceDeprecateTest.LOG.debug("finished deprecate data model test for maintain resource at {} DB", dbType);
 	}
@@ -97,13 +97,13 @@ public abstract class MaintainResourceDeprecateTest extends BaseGDMResourceTest 
 		final List<String> recordURIs = new ArrayList<>();
 		recordURIs.add(recordURI);
 
-		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.empty());
 
 		final String body = deprecateRecords(dataModelURI, recordURIs);
 
 		Assert.assertEquals("{\"deprecated\":152}", body);
 
-		readGDMFromDB(recordClassURI, dataModelURI, 0, Optional.<Integer>absent());
+		readGDMFromDB(recordClassURI, dataModelURI, 0, Optional.empty());
 
 		// try to deprecate data model again
 		final String body2 = deprecateRecords(dataModelURI, recordURIs);
@@ -114,7 +114,7 @@ public abstract class MaintainResourceDeprecateTest extends BaseGDMResourceTest 
 		//		// write same data again to data model
 		//		writeGDMToDBInternal(dataModelURI, BaseGDMResourceTest.DEFAULT_GDM_FILE_NAME);
 		//
-		//		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>absent());
+		//		readGDMFromDB(recordClassURI, dataModelURI, numberOfStatements, Optional.<Integer>empty());
 
 		MaintainResourceDeprecateTest.LOG.debug("finished deprecate some records in data model test for maintain resource at {} DB", dbType);
 	}

@@ -81,6 +81,17 @@ public abstract class GDMResourceTest extends BaseGDMResourceTest {
 		writeGDMToDBInternal("http://data.slub-dresden.de/datamodel/2/data", "versioning/dd-854/example_2.task.result.json");
 	}
 
+	/**
+	 * data was derived from XML that contains rdf:type elements
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void writeGDMToDB5() throws IOException {
+
+		writeGDMToDBInternalWOVersioning("http://data.slub-dresden.de/datamodel/6/data", "uvapub_formatted_3_records.xml.gdm.json");
+	}
+
 	@Test
 	public void testResourceTypeNodeUniqueness() throws IOException {
 

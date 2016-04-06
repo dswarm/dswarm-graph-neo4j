@@ -64,15 +64,29 @@ public abstract class BaseGDMResourceTest extends BasicResourceTest {
 
 	protected void writeGDMToDBInternal(final String dataModelURI, final String fileName) throws IOException {
 
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+
+		writeGDMToDBInternal(metadata, fileName);
+	}
+
+	protected void writeGDMToDBInternalWOVersioning(final String dataModelURI, final String fileName) throws IOException {
+
+		final ObjectNode metadata = objectMapper.createObjectNode();
+		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
+		metadata.put(DMPStatics.ENABLE_VERSIONING_IDENTIFIER, Boolean.FALSE.toString());
+
+		writeGDMToDBInternal(metadata, fileName);
+	}
+
+	protected void writeGDMToDBInternal(final ObjectNode metadata, final String fileName) throws java.io.IOException {
+
 		LOG.debug("start writing GDM statements for GDM resource at {} DB", dbType);
 
 		final URL fileURL = Resources.getResource(fileName);
 		final ByteSource byteSource = Resources.asByteSource(fileURL);
 		final InputStream is = byteSource.openStream();
 		final BufferedInputStream bis = new BufferedInputStream(is, 1024);
-
-		final ObjectNode metadata = objectMapper.createObjectNode();
-		metadata.put(DMPStatics.DATA_MODEL_URI_IDENTIFIER, dataModelURI);
 
 		final String requestJsonString = objectMapper.writeValueAsString(metadata);
 

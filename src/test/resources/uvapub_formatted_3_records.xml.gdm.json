@@ -1,0 +1,9124 @@
+[
+  {
+    "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/42fbabce-2cda-43ac-88b1-7313440b4674": [
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/42fbabce-2cda-43ac-88b1-7313440b4674"
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/recordType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/42fbabce-2cda-43ac-88b1-7313440b4674"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/header",
+        "o": {
+          "id": 1
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 1
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/headerType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 1
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/identifier",
+        "o": {
+          "id": 2
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 2
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 2
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "oai:uva.nl:100084"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 1
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/datestamp",
+        "o": {
+          "id": 3
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 3
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/datestampType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 3
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1950-01-01"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 1
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/setSpec",
+        "o": {
+          "id": 4
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 4
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/setSpecType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 4
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "fulltext"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/42fbabce-2cda-43ac-88b1-7313440b4674"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/metadata",
+        "o": {
+          "id": 5
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 5
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/metadataType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 5
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDL",
+        "o": {
+          "id": 6
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 6
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDLType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 6
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#schemaLocation",
+        "o": {
+          "v": "urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd                                                   urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd                                                  urn:mpeg:mpeg21:2005:01-DIP-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dip/dip.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 6
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 7
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 7
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 8
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 8
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 8
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 9
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 9
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 9
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 9
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 10
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 10
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 10
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1247"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 11
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 11
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 11
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 12
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 12
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 12
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 12
+        },
+        "p": "http://purl.org/dc/terms/modified",
+        "o": {
+          "id": 13
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 13
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/modifiedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 13
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1950-01-01"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 14
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 14
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 14
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 15
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 15
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 15
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 15
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100084"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 16
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 16
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 16
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 17
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 17
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 17
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 18
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 18
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 18
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 18
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 19
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 19
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 19
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/descriptiveMetadata"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 16
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 20
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 20
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 20
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 21
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 21
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 21
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 21
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 22
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 22
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 22
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1247/mods"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 16
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 23
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 23
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 23
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 24
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 24
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 24
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 24
+        },
+        "p": "http://www.loc.gov/mods/v3#mods",
+        "o": {
+          "id": 25
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#modsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#version",
+        "o": {
+          "v": "3.2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#schemaLocation",
+        "o": {
+          "v": "http://www.loc.gov/mods/v3    http://www.loc.gov/standards/mods/v3/mods-3-2.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 26
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 26
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 26
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 27
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 27
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 27
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Coping: Persoonsgebonden of situatiebepaald?"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 28
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100084_1"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 29
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 29
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 29
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 29
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Baaren, van"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 30
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 30
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 30
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 30
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "N.K."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 31
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 31
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 31
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "N.K. van Baaren"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 28
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 32
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 32
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 32
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 33
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 33
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 33
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 33
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 33
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 34
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100084_2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 35
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 35
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 35
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 35
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Schie, van"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 36
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 36
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 36
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 36
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "E.C.M."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 37
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 37
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 37
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "E.C.M. van Schie"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 34
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 38
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 38
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 38
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 39
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 39
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 39
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 39
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 39
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 40
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100084_3"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 41
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 41
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 41
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 41
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Jakobs"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 42
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 42
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 42
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 42
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "E.B."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 43
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 43
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 43
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "E.B. Jakobs"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 40
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 44
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 44
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 44
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 45
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 45
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 45
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 45
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 45
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 4,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 46
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100084_4"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 47
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 47
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 47
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 47
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Pligt, van der"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 48
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 48
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 48
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 48
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 49
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 49
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 49
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J. van der Pligt"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#affiliation",
+        "o": {
+          "id": 50
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 50
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#affiliationType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 50
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 46
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 51
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 51
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 51
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 52
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 52
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 52
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 52
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 52
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#extension",
+        "o": {
+          "id": 53
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 53
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extensionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 53
+        },
+        "p": "info:eu-repo/dai#daiList",
+        "o": {
+          "id": 54
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 54
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#daiListType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 54
+        },
+        "p": "info:eu-repo/dai#schemaLocation",
+        "o": {
+          "v": "info:eu-repo/dai    http://purl.org/REP/standards/dai-extension.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 54
+        },
+        "p": "info:eu-repo/dai#identifier",
+        "o": {
+          "id": 55
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 55
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 55
+        },
+        "p": "info:eu-repo/dai#IDref",
+        "o": {
+          "v": "authors100084_4"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 55
+        },
+        "p": "info:eu-repo/dai#authority",
+        "o": {
+          "v": "info:eu-repo/dai/nl"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 55
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " 074131591"
+        }
+      },
+      {
+        "order": 5,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 56
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 56
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 56
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "corporate"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 56
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 57
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 57
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 57
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 56
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 58
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 58
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 58
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 59
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 59
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 59
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 59
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 59
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "dgg"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#typeOfResource",
+        "o": {
+          "id": 60
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 60
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#typeOfResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 60
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "text"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#genre",
+        "o": {
+          "id": 61
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 61
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#genreType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 61
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "info:eu-repo/semantics/article"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#originInfo",
+        "o": {
+          "id": 62
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 62
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#originInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 62
+        },
+        "p": "http://www.loc.gov/mods/v3#dateIssued",
+        "o": {
+          "id": 63
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 63
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#dateIssuedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 63
+        },
+        "p": "http://www.loc.gov/mods/v3#encoding",
+        "o": {
+          "v": "iso8601"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 63
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1994"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#physicalDescription",
+        "o": {
+          "id": 64
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 64
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#physicalDescriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 64
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 65
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 65
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 65
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "10"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 25
+        },
+        "p": "http://www.loc.gov/mods/v3#relatedItem",
+        "o": {
+          "id": 66
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 66
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#relatedItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 66
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "host"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 66
+        },
+        "p": "http://www.loc.gov/mods/v3#identifier",
+        "o": {
+          "id": 67
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 67
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 67
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "uri"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 67
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "URN:ISSN:09215360"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 66
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 68
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 68
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 68
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 69
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 69
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 69
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Gedrag &amp; Gezondheid"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 66
+        },
+        "p": "http://www.loc.gov/mods/v3#part",
+        "o": {
+          "id": 70
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 70
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#partType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 70
+        },
+        "p": "http://www.loc.gov/mods/v3#detail",
+        "o": {
+          "id": 71
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 71
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#detailType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 71
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "volume"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 71
+        },
+        "p": "http://www.loc.gov/mods/v3#number",
+        "o": {
+          "id": 72
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 72
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#numberType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 72
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "22"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 70
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 73
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 73
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 73
+        },
+        "p": "http://www.loc.gov/mods/v3#unit",
+        "o": {
+          "v": "page"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 73
+        },
+        "p": "http://www.loc.gov/mods/v3#start",
+        "o": {
+          "id": 74
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 74
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#startType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 74
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "126"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 73
+        },
+        "p": "http://www.loc.gov/mods/v3#end",
+        "o": {
+          "id": 75
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 75
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#endType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 75
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "137"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 76
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 76
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 76
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 77
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 77
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 77
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 78
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 78
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 78
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 78
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 79
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 79
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 79
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/objectFile"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 76
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 80
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 80
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 80
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 81
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 81
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 81
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 81
+        },
+        "p": "http://purl.org/dc/elements/1.1/description",
+        "o": {
+          "id": 82
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 82
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/elements/1.1/descriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 82
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "pligt_1994_coping.pdf"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 76
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 83
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 83
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 83
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 84
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 84
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 84
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 84
+        },
+        "p": "http://purl.org/dc/terms/accessRights",
+        "o": {
+          "id": 85
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 85
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/accessRightsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 85
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " http://purl.org/eprint/accessRights/OpenAccess"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 76
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 86
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 86
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 86
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 87
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 87
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 87
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/pdf"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 87
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/2.141"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 88
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 88
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 88
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 89
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 89
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 89
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 90
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 90
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 90
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 90
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 91
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 91
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 91
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/objectFile"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 88
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 92
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 92
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 92
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 93
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 93
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 93
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 93
+        },
+        "p": "http://purl.org/dc/elements/1.1/description",
+        "o": {
+          "id": 94
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 94
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/elements/1.1/descriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 94
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "HS150805"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 88
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 95
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 95
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 95
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 96
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 96
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 96
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 96
+        },
+        "p": "http://purl.org/dc/terms/accessRights",
+        "o": {
+          "id": 97
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 97
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/accessRightsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 97
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " http://purl.org/eprint/accessRights/OpenAccess"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 88
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 98
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 98
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 98
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 99
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 99
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 99
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/pdf"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 99
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/2.142"
+        }
+      },
+      {
+        "order": 4,
+        "s": {
+          "id": 7
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 100
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 100
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 100
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 101
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 101
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 101
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 102
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 102
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 102
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 102
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 103
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 103
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 103
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/humanStartPage"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 100
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 104
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 104
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 104
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 105
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 105
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 105
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 105
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100084"
+        }
+      }
+    ]
+  },
+  {
+    "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/cf04dec7-d051-4181-a15f-ab7b03962023": [
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/cf04dec7-d051-4181-a15f-ab7b03962023"
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/recordType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/cf04dec7-d051-4181-a15f-ab7b03962023"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/header",
+        "o": {
+          "id": 106
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 106
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/headerType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 106
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/identifier",
+        "o": {
+          "id": 107
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 107
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 107
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "oai:uva.nl:100086"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 106
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/datestamp",
+        "o": {
+          "id": 108
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 108
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/datestampType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 108
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "2011-09-23"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 106
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/setSpec",
+        "o": {
+          "id": 109
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 109
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/setSpecType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 109
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "fulltext"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/cf04dec7-d051-4181-a15f-ab7b03962023"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/metadata",
+        "o": {
+          "id": 110
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 110
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/metadataType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 110
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDL",
+        "o": {
+          "id": 111
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 111
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDLType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 111
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#schemaLocation",
+        "o": {
+          "v": "urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd                                                   urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd                                                  urn:mpeg:mpeg21:2005:01-DIP-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dip/dip.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 111
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 112
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 112
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 113
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 113
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 113
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 114
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 114
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 114
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 114
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 115
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 115
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 115
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1249"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 116
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 116
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 116
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 117
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 117
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 117
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 117
+        },
+        "p": "http://purl.org/dc/terms/modified",
+        "o": {
+          "id": 118
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 118
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/modifiedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 118
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "2011-09-23"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 119
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 119
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 119
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 120
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 120
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 120
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 120
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100086"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 121
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 121
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 121
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 122
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 122
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 122
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 123
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 123
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 123
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 123
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 124
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 124
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 124
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/descriptiveMetadata"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 121
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 125
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 125
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 125
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 126
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 126
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 126
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 126
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 127
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 127
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 127
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1249/mods"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 121
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 128
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 128
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 128
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 129
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 129
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 129
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 129
+        },
+        "p": "http://www.loc.gov/mods/v3#mods",
+        "o": {
+          "id": 130
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#modsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#version",
+        "o": {
+          "v": "3.2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#schemaLocation",
+        "o": {
+          "v": "http://www.loc.gov/mods/v3    http://www.loc.gov/standards/mods/v3/mods-3-2.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 131
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 131
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 131
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 132
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 132
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 132
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " Selective exposure and the false consensus effect: The availability of similar and dissimilar others"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 133
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100086_1"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 134
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 134
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 134
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 134
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Bosveld"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 135
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 135
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 135
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 135
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "W."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 136
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 136
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 136
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "W. Bosveld"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 133
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 137
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 137
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 137
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 138
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 138
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 138
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 138
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 138
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 139
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100086_2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 140
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 140
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 140
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 140
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Koomen"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 141
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 141
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 141
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 141
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "W."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 142
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 142
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 142
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "W. Koomen"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#affiliation",
+        "o": {
+          "id": 143
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 143
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#affiliationType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 143
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 139
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 144
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 144
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 144
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 145
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 145
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 145
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 145
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 145
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 146
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100086_3"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 147
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 147
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 147
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 147
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Pligt, van der"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 148
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 148
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 148
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 148
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 149
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 149
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 149
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J. van der Pligt"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#affiliation",
+        "o": {
+          "id": 150
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 150
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#affiliationType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 150
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 146
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 151
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 151
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 151
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 152
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 152
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 152
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 152
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 152
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#extension",
+        "o": {
+          "id": 153
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 153
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extensionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 153
+        },
+        "p": "info:eu-repo/dai#daiList",
+        "o": {
+          "id": 154
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 154
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#daiListType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 154
+        },
+        "p": "info:eu-repo/dai#schemaLocation",
+        "o": {
+          "v": "info:eu-repo/dai    http://purl.org/REP/standards/dai-extension.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 154
+        },
+        "p": "info:eu-repo/dai#identifier",
+        "o": {
+          "id": 155
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 155
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 155
+        },
+        "p": "info:eu-repo/dai#IDref",
+        "o": {
+          "v": "authors100086_2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 155
+        },
+        "p": "info:eu-repo/dai#authority",
+        "o": {
+          "v": "info:eu-repo/dai/nl"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 155
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " 140901701"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 154
+        },
+        "p": "info:eu-repo/dai#identifier",
+        "o": {
+          "id": 156
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 156
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 156
+        },
+        "p": "info:eu-repo/dai#IDref",
+        "o": {
+          "v": "authors100086_3"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 156
+        },
+        "p": "info:eu-repo/dai#authority",
+        "o": {
+          "v": "info:eu-repo/dai/nl"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 156
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " 074131591"
+        }
+      },
+      {
+        "order": 4,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 157
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 157
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 157
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "corporate"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 157
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 158
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 158
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 158
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 157
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 159
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 159
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 159
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 160
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 160
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 160
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 160
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 160
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "dgg"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#typeOfResource",
+        "o": {
+          "id": 161
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 161
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#typeOfResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 161
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "text"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#genre",
+        "o": {
+          "id": 162
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 162
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#genreType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 162
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "info:eu-repo/semantics/article"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#originInfo",
+        "o": {
+          "id": 163
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 163
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#originInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 163
+        },
+        "p": "http://www.loc.gov/mods/v3#dateIssued",
+        "o": {
+          "id": 164
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 164
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#dateIssuedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 164
+        },
+        "p": "http://www.loc.gov/mods/v3#encoding",
+        "o": {
+          "v": "iso8601"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 164
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1994"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#physicalDescription",
+        "o": {
+          "id": 165
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 165
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#physicalDescriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 165
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 166
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 166
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 166
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "10"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 130
+        },
+        "p": "http://www.loc.gov/mods/v3#relatedItem",
+        "o": {
+          "id": 167
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 167
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#relatedItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 167
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "host"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 167
+        },
+        "p": "http://www.loc.gov/mods/v3#identifier",
+        "o": {
+          "id": 168
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 168
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 168
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "uri"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 168
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "URN:ISSN:01446665"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 167
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 169
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 169
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 169
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 170
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 170
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 170
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "British Journal of Social Psychology"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 167
+        },
+        "p": "http://www.loc.gov/mods/v3#part",
+        "o": {
+          "id": 171
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 171
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#partType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 171
+        },
+        "p": "http://www.loc.gov/mods/v3#detail",
+        "o": {
+          "id": 172
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 172
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#detailType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 172
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "volume"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 172
+        },
+        "p": "http://www.loc.gov/mods/v3#number",
+        "o": {
+          "id": 173
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 173
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#numberType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 173
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "33"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 171
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 174
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 174
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 174
+        },
+        "p": "http://www.loc.gov/mods/v3#unit",
+        "o": {
+          "v": "page"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 174
+        },
+        "p": "http://www.loc.gov/mods/v3#start",
+        "o": {
+          "id": 175
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 175
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#startType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 175
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "457"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 174
+        },
+        "p": "http://www.loc.gov/mods/v3#end",
+        "o": {
+          "id": 176
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 176
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#endType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 176
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "466"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 177
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 177
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 177
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 178
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 178
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 178
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 179
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 179
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 179
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 179
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 180
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 180
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 180
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/objectFile"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 177
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 181
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 181
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 181
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 182
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 182
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 182
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 182
+        },
+        "p": "http://purl.org/dc/elements/1.1/description",
+        "o": {
+          "id": 183
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 183
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/elements/1.1/descriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 183
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "pligt_1994_selectiveexposure.pdf"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 177
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 184
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 184
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 184
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 185
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 185
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 185
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 185
+        },
+        "p": "http://purl.org/dc/terms/accessRights",
+        "o": {
+          "id": 186
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 186
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/accessRightsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 186
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " http://purl.org/eprint/accessRights/OpenAccess"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 177
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 187
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 187
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 187
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 188
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 188
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 188
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/pdf"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 188
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/2.143"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 112
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 189
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 189
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 189
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 190
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 190
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 190
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 191
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 191
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 191
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 191
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 192
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 192
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 192
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/humanStartPage"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 189
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 193
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 193
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 193
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 194
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 194
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 194
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 194
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100086"
+        }
+      }
+    ]
+  },
+  {
+    "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/eb084a17-a5ec-4716-a54a-1425fd7c3386": [
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/eb084a17-a5ec-4716-a54a-1425fd7c3386"
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/recordType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/eb084a17-a5ec-4716-a54a-1425fd7c3386"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/header",
+        "o": {
+          "id": 195
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 195
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/headerType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 195
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/identifier",
+        "o": {
+          "id": 196
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 196
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 196
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "oai:uva.nl:100088"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 195
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/datestamp",
+        "o": {
+          "id": 197
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 197
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/datestampType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 197
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1950-01-01"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 195
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/setSpec",
+        "o": {
+          "id": 198
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 198
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/setSpecType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 198
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "fulltext"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "uri": "http://data.slub-dresden.de/datamodels/DataModel-50419da2-19c0-4992-bdf3-ce57ccbefc43/records/eb084a17-a5ec-4716-a54a-1425fd7c3386"
+        },
+        "p": "http://www.openarchives.org/OAI/2.0/metadata",
+        "o": {
+          "id": 199
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 199
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.openarchives.org/OAI/2.0/metadataType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 199
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDL",
+        "o": {
+          "id": 200
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 200
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DIDLType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 200
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#schemaLocation",
+        "o": {
+          "v": "urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd                                                   urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd                                                  urn:mpeg:mpeg21:2005:01-DIP-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dip/dip.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 200
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 201
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 201
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 202
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 202
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 202
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 203
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 203
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 203
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 203
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 204
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 204
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 204
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1251"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 205
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 205
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 205
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 206
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 206
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 206
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 206
+        },
+        "p": "http://purl.org/dc/terms/modified",
+        "o": {
+          "id": 207
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 207
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/modifiedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 207
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1950-01-01"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 208
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 208
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 208
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 209
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 209
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 209
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 209
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100088"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 210
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 210
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 210
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 211
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 211
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 211
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 212
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 212
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 212
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 212
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 213
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 213
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 213
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/descriptiveMetadata"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 210
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 214
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 214
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 214
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 215
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 215
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 215
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 215
+        },
+        "p": "urn:mpeg:mpeg21:2002:01-DII-NS#Identifier",
+        "o": {
+          "id": 216
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 216
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:01-DII-NS#IdentifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 216
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "urn:nbn:nl:ui:29-1251/mods"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 210
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 217
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 217
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 217
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 218
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 218
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 218
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 218
+        },
+        "p": "http://www.loc.gov/mods/v3#mods",
+        "o": {
+          "id": 219
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#modsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#version",
+        "o": {
+          "v": "3.2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#schemaLocation",
+        "o": {
+          "v": "http://www.loc.gov/mods/v3    http://www.loc.gov/standards/mods/v3/mods-3-2.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 220
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 220
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 220
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 221
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 221
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 221
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " Risk communication in the Netherlands: The Monitored Introduction of the EC 'Post Seveso' Directive"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 222
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_1"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 223
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 223
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 223
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 223
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Eijndhoven, van"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 224
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 224
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 224
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 224
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J.C.M."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 225
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 225
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 225
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J.C.M. van Eijndhoven"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 222
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 226
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 226
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 226
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 227
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 227
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 227
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 227
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 227
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 228
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_2"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 229
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 229
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 229
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 229
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Weterings"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 230
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 230
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 230
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 230
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "R.A.P.M."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 231
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 231
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 231
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "R.A.P.M. Weterings"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 228
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 232
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 232
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 232
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 233
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 233
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 233
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 233
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 233
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 234
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_3"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 235
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 235
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 235
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 235
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Worrell"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 236
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 236
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 236
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 236
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "C.W."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 237
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 237
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 237
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "C.W. Worrell"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 234
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 238
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 238
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 238
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 239
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 239
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 239
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 239
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 239
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 4,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 240
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_4"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 241
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 241
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 241
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 241
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Boerd, de"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 242
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 242
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 242
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 242
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 243
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 243
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 243
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J. de Boerd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 240
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 244
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 244
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 244
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 245
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 245
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 245
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 245
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 245
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 5,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 246
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_5"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 247
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 247
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 247
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 247
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Pligt, van der"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 248
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 248
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 248
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 248
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 249
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 249
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 249
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "J. van der Pligt"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#affiliation",
+        "o": {
+          "id": 250
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 250
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#affiliationType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 250
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 246
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 251
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 251
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 251
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 252
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 252
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 252
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 252
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 252
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 6,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 253
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#ID",
+        "o": {
+          "v": "authors100088_6"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "personal"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 254
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 254
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 254
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "family"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 254
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Stallen"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 255
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 255
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 255
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "given"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 255
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "P.J.M."
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#displayForm",
+        "o": {
+          "id": 256
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 256
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#displayFormType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 256
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "P.J.M. Stallen"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 253
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 257
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 257
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 257
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 258
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 258
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 258
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 258
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 258
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "aut"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#extension",
+        "o": {
+          "id": 259
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 259
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extensionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 259
+        },
+        "p": "info:eu-repo/dai#daiList",
+        "o": {
+          "id": 260
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 260
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#daiListType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 260
+        },
+        "p": "info:eu-repo/dai#schemaLocation",
+        "o": {
+          "v": "info:eu-repo/dai    http://purl.org/REP/standards/dai-extension.xsd"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 260
+        },
+        "p": "info:eu-repo/dai#identifier",
+        "o": {
+          "id": 261
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 261
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "info:eu-repo/dai#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 261
+        },
+        "p": "info:eu-repo/dai#IDref",
+        "o": {
+          "v": "authors100088_5"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 261
+        },
+        "p": "info:eu-repo/dai#authority",
+        "o": {
+          "v": "info:eu-repo/dai/nl"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 261
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " 074131591"
+        }
+      },
+      {
+        "order": 7,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#name",
+        "o": {
+          "id": 262
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 262
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#nameType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 262
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "corporate"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 262
+        },
+        "p": "http://www.loc.gov/mods/v3#namePart",
+        "o": {
+          "id": 263
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 263
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#namePartType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 263
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Universiteit van Amsterdam"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 262
+        },
+        "p": "http://www.loc.gov/mods/v3#role",
+        "o": {
+          "id": 264
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 264
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 264
+        },
+        "p": "http://www.loc.gov/mods/v3#roleTerm",
+        "o": {
+          "id": 265
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 265
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#roleTermType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 265
+        },
+        "p": "http://www.loc.gov/mods/v3#authority",
+        "o": {
+          "v": "marcrelator"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 265
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "code"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 265
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "dgg"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#typeOfResource",
+        "o": {
+          "id": 266
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 266
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#typeOfResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 266
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "text"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#genre",
+        "o": {
+          "id": 267
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 267
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#genreType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 267
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "info:eu-repo/semantics/article"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#originInfo",
+        "o": {
+          "id": 268
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 268
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#originInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 268
+        },
+        "p": "http://www.loc.gov/mods/v3#dateIssued",
+        "o": {
+          "id": 269
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 269
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#dateIssuedType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 269
+        },
+        "p": "http://www.loc.gov/mods/v3#encoding",
+        "o": {
+          "v": "iso8601"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 269
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1994"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#physicalDescription",
+        "o": {
+          "id": 270
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 270
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#physicalDescriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 270
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 271
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 271
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 271
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "10"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 219
+        },
+        "p": "http://www.loc.gov/mods/v3#relatedItem",
+        "o": {
+          "id": 272
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 272
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#relatedItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 272
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "host"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 272
+        },
+        "p": "http://www.loc.gov/mods/v3#identifier",
+        "o": {
+          "id": 273
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 273
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#identifierType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 273
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "uri"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 273
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "URN:ISSN:02724332"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 272
+        },
+        "p": "http://www.loc.gov/mods/v3#titleInfo",
+        "o": {
+          "id": 274
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 274
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleInfoType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 274
+        },
+        "p": "http://www.loc.gov/mods/v3#title",
+        "o": {
+          "id": 275
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 275
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#titleType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 275
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "Risk Analysis"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 272
+        },
+        "p": "http://www.loc.gov/mods/v3#part",
+        "o": {
+          "id": 276
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 276
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#partType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 276
+        },
+        "p": "http://www.loc.gov/mods/v3#detail",
+        "o": {
+          "id": 277
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 277
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#detailType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 277
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "volume"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 277
+        },
+        "p": "http://www.loc.gov/mods/v3#number",
+        "o": {
+          "id": 278
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 278
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#numberType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 278
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "14"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 276
+        },
+        "p": "http://www.loc.gov/mods/v3#detail",
+        "o": {
+          "id": 279
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 279
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#detailType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 279
+        },
+        "p": "http://www.loc.gov/mods/v3#type",
+        "o": {
+          "v": "issue"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 279
+        },
+        "p": "http://www.loc.gov/mods/v3#number",
+        "o": {
+          "id": 280
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 280
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#numberType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 280
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "1"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 276
+        },
+        "p": "http://www.loc.gov/mods/v3#extent",
+        "o": {
+          "id": 281
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 281
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#extentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 281
+        },
+        "p": "http://www.loc.gov/mods/v3#unit",
+        "o": {
+          "v": "page"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 281
+        },
+        "p": "http://www.loc.gov/mods/v3#start",
+        "o": {
+          "id": 282
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 282
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#startType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 282
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "87"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 281
+        },
+        "p": "http://www.loc.gov/mods/v3#end",
+        "o": {
+          "id": 283
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 283
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.loc.gov/mods/v3#endType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 283
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "96"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 284
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 284
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 284
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 285
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 285
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 285
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 286
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 286
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 286
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 286
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 287
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 287
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 287
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/objectFile"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 284
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 288
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 288
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 288
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 289
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 289
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 289
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 289
+        },
+        "p": "http://purl.org/dc/elements/1.1/description",
+        "o": {
+          "id": 290
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 290
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/elements/1.1/descriptionType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 290
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": "pligt_1994_risk_communication.pdf"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 284
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 291
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 291
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 291
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 292
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 292
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 292
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 292
+        },
+        "p": "http://purl.org/dc/terms/accessRights",
+        "o": {
+          "id": 293
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 293
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://purl.org/dc/terms/accessRightsType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 293
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#value",
+        "o": {
+          "v": " http://purl.org/eprint/accessRights/OpenAccess"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 284
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 294
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 294
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 294
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 295
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 295
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 295
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/pdf"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 295
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/2.144"
+        }
+      },
+      {
+        "order": 3,
+        "s": {
+          "id": 201
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Item",
+        "o": {
+          "id": 296
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 296
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ItemType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 296
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Descriptor",
+        "o": {
+          "id": 297
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 297
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#DescriptorType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 297
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Statement",
+        "o": {
+          "id": 298
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 298
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#StatementType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 298
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "application/xml"
+        }
+      },
+      {
+        "order": 2,
+        "s": {
+          "id": 298
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "id": 299
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 299
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#typeType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 299
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource",
+        "o": {
+          "v": "info:eu-repo/semantics/humanStartPage"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 296
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Component",
+        "o": {
+          "id": 300
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 300
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ComponentType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 300
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#Resource",
+        "o": {
+          "id": 301
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 301
+        },
+        "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "o": {
+          "uri": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ResourceType"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 301
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#mimeType",
+        "o": {
+          "v": "text/html"
+        }
+      },
+      {
+        "order": 1,
+        "s": {
+          "id": 301
+        },
+        "p": "urn:mpeg:mpeg21:2002:02-DIDL-NS#ref",
+        "o": {
+          "v": "http://hdl.handle.net/11245/1.100088"
+        }
+      }
+    ]
+  }
+]

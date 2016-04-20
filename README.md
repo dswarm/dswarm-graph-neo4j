@@ -29,9 +29,18 @@ This is an unmanaged extension for [Neo4j](http://www.neo4j.org/) for processing
 
    You can POST to this service a ````multipart/mixed```` object with the bytes of the GDM and the second part should be a data model URI (as string), e.g.,
    
-        curl -H "Content-Type:multipart/mixed" -F "content=@test-gdm.json; type=application/octet-stream" -F "content=http://data.example.com/resources/1" -X POST http://localhost:7474/graph/gdm/put -i -v
+        curl -H "Content-Type:multipart/mixed" -F "content=@request.json; type=application/json" -F "content=@test-gdm.json; type=application/octet-stream" -X POST http://localhost:7474/graph/gdm/put -i -v
         
-   (````test-gdm.json```` is the file name (relative path) of the GDM JSON and ````http://data.example.com/resources/1```` is the data model URI)
+   (````test-gdm.json```` is the file name (relative path) of the GDM JSON and ````request.json```` is the metadata (in JSON) for the request)
+   
+   An example of for the metadata of the write request is the following JSON
+   
+        {
+            "data_model_uri": "http://data.slub-dresden.de/datamodel/DataModel-cf998267-392a-4d87-a33a-88dd1bffb016/data",
+            "deprecate_missing_records": "false",
+            "record_class_uri": "http://purl.org/ontology/bibo/Document",
+            "enable_versioning": "false"
+        }
 
 7. You can retrieve GDM from the database via
 

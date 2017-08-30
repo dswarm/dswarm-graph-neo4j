@@ -27,33 +27,33 @@
 
 	<properties>
 		<neo4j.version>2.3.2</neo4j.version>
-		<google.guava.version>19.0</google.guava.version>
+		<google.guava.version>23.0</google.guava.version>
 		<google.lambdaj.version>2.4</google.lambdaj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
-		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
-		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-compiler-plugin.version>3.6.2</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+		<maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-version-plugin.version>2.2</maven-version-plugin.version>
+		<maven-version-plugin.version>2.4</maven-version-plugin.version>
 		<jackson.version>1.9.7</jackson.version>
 		<jena.version>3.0.0</jena.version>
 		<jersey.version>1.19</jersey.version>
 		<junit.version>4.12</junit.version>
 		<dswarm.graph.json.version>0.0.4-SNAPSHOT</dswarm.graph.json.version>
 		<dswarm.graph.model.version>0.0.3-SNAPSHOT</dswarm.graph.model.version>
-		<dswarm.commons.version>0.0.3.2-SNAPSHOT</dswarm.commons.version>
+		<dswarm.commons.version>0.0.3.4-SNAPSHOT</dswarm.commons.version>
 		<hppc.version>0.6.1</hppc.version>
 		<ntparser.version>0.3.0</ntparser.version>
 		<siphash.version>1.0.0-SNAPSHOT</siphash.version>
 		<aalto-xml.version>1.0.0</aalto-xml.version>
-		<xmlunit.version>2.2.1</xmlunit.version>
+		<xmlunit.version>2.4.0</xmlunit.version>
 		<mapdb.version>1.0.8</mapdb.version>
-		<rxjava.version>1.1.9</rxjava.version>
+		<rxjava.version>1.3.0</rxjava.version>
 	</properties>
 
 	<prerequisites>
@@ -148,7 +148,7 @@
 					<properties>
 						<owner>SLUB Dresden &amp; Avantgarde Labs GmbH</owner>
 						<project.name>d:swarm graph extension</project.name>
-						<project.inceptionYear>2013 &ndash; 2016</project.inceptionYear>
+						<project.inceptionYear>2013 &ndash; 2017</project.inceptionYear>
 						<email>&lt;code@dswarm.org&gt;</email>
 					</properties>
 					<useDefaultExcludes>true</useDefaultExcludes>
